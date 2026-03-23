@@ -162,19 +162,19 @@ const CHURCH: string[] = [
 ];
 
 const TAVERN: string[] = [
-  "            ___/\\___            ",
-  "           /:::::::::\\           ",
-  "          /:::::::::::\\          ",
-  "         /:::::::::::::\\         ",
-  "        /::::::::::::::\\        ",
-  "       /::::::::::::::::\\       ",
+  "             ___/\\___             ",
+  "           /::::::::::\\           ",
+  "          /::::::::::::\\          ",
+  "         /::::::::::::::\\         ",
+  "        /::::::::::::::::\\        ",
+  "       /::::::::::::::::::\\       ",
   "      /____________________\\      ",
   "      |                    |      ",
-  "      |  []      |     []  |      ",
+  "      |  []      |    []   |      ",
   "      |          |         |      ",
-  "      |  []      |     []  |      ",
+  "      |  []      |    []   |      ",
   "      |          |         |      ",
-  "      |  []      |     []  |      ",
+  "      |  []      |    []   |      ",
   "      |          |         |      ",
   "      |     [        ]     |      ",
   "      |     |        |     |      ",
@@ -183,18 +183,18 @@ const TAVERN: string[] = [
 ];
 
 const TOWN_HALL: string[] = [
-  "   _|_|_|_|_|_|_|_|_|_|_|_|_   ",
-  "  |                           |  ",
-  "  |                           |  ",
-  "  |  []      [####]      []  |  ",
-  "  |                           |  ",
-  "  |  []                  []  |  ",
-  "  |                           |  ",
-  "  |  []                  []  |  ",
-  "  |                           |  ",
-  "  |  []      [####]      []  |  ",
-  "  |                           |  ",
-  "  |        /========\\        |  ",
+  "   _|_|_|_|_|_|_|_|_|_|_|_|_|_|   ",
+  "  |                            |  ",
+  "  |                            |  ",
+  "  |  []       [####]       []  |  ",
+  "  |                            |  ",
+  "  |  []                    []  |  ",
+  "  |                            |  ",
+  "  |  []                    []  |  ",
+  "  |                            |  ",
+  "  |  []       [####]       []  |  ",
+  "  |                            |  ",
+  "  |         /========\\         |  ",
   "  |       ||  ||  ||  ||       |  ",
   "  |       ||  ||  ||  ||       |  ",
   "  |       ||  ||  ||  ||       |  ",
@@ -203,34 +203,34 @@ const TOWN_HALL: string[] = [
 ];
 
 const TOWER: string[] = [
-  "       _       ",
-  "      |>|      ",
-  "      /  \\     ",
-  "     /    \\    ",
-  "    /      \\   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    | []   |   ",
-  "    |      |   ",
-  "    |  /\\  |   ",
-  "    |__|__|    ",
+  "        _       ",
+  "       |>|      ",
+  "      /  \\      ",
+  "     /    \\     ",
+  "    /      \\    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    | []   |    ",
+  "    |      |    ",
+  "    |  /\\  |    ",
+  "    |_|  |_|    ",
 ];
 
 // Template width lookup (source of truth for building widths)
@@ -672,9 +672,11 @@ export function AsciiVillage() {
       S.windTarget = 0.5;
       S.windChangeTimer = 5000;
 
-      // Stars — more, spread across upper 60% of sky
+      // Stars — scale with screen size, spread across upper 60% of sky
       S.stars = [];
-      for (let i = 0; i < 60; i++) {
+      const skyArea = S.cols * Math.floor(S.rows * 0.6);
+      const starCount = Math.max(80, Math.floor(skyArea / 30));
+      for (let i = 0; i < starCount; i++) {
         S.stars.push({
           col: Math.floor(Math.random() * S.cols),
           row: Math.floor(Math.random() * (S.rows * 0.6)),
@@ -881,12 +883,12 @@ export function AsciiVillage() {
         const moonColor = themeColors.windowLit;
         drawChar(".", cx, cy - 3, moonColor, 0.5);
         drawChar("-", cx + 1, cy - 3, moonColor, 0.6);
-        drawChar(")", cx + 1, cy - 2, moonColor, 0.8);
+        drawChar(")", cx + 2, cy - 2, moonColor, 0.8);
         drawChar(")", cx + 2, cy - 1, moonColor, 0.9);
         drawChar(")", cx + 2, cy, moonColor, 0.9);
-        drawChar(")", cx + 1, cy + 1, moonColor, 0.8);
-        drawChar("-", cx, cy + 2, moonColor, 0.6);
-        drawChar("'", cx + 1, cy + 2, moonColor, 0.5);
+        drawChar(")", cx + 2, cy + 1, moonColor, 0.8);
+        drawChar("'", cx, cy + 2, moonColor, 0.5);
+        drawChar("-", cx + 1, cy + 2, moonColor, 0.6);
       }
     }
 

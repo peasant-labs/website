@@ -13,6 +13,7 @@
 
 /* ── Dark Mode (default): "The Night Watch" ── */
 :root {
+  scroll-behavior: smooth;
   color-scheme: dark;
 
   --bg-deep: #0c0c0e;
