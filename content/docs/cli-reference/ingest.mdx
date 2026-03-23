@@ -1,0 +1,101 @@
+---
+title: "peasant ingest"
+description: "Run the data ingestion pipeline to process AI coding assistant sessions."
+---
+
+## NAME
+
+`peasant ingest` — Run the data ingestion pipeline
+
+## SYNOPSIS
+
+```bash
+peasant ingest [flags]
+peasant ingest verify
+```
+
+## DESCRIPTION
+
+Discovers AI coding assistant session files on your filesystem, processes them through the nine-stage ingestion pipeline, and stores the results in the local SQLite database.
+
+By default, `peasant ingest` performs incremental ingestion — only new or modified sessions since the last run are processed. Sessions that are currently active are excluded unless `--include-active` is specified.
+
+The `verify` subcommand checks the database schema integrity without running the full pipeline.
+
+## FLAGS
+
+| Flag | Type | Description |
+|---|---|---|
+| `--dry-run` | bool | Run the pipeline without writing to the database. Shows what would be ingested. |
+| `--force` | bool | Skip the diff stage and re-ingest all discovered sessions. |
+| `--include-active` | bool | Include sessions that are currently active (excluded by default). |
+| `--session <ids>` | string | Comma-separated list of session IDs to ingest. All others are skipped. |
+| `--since <duration>` | string | Only ingest sessions newer than this duration (e.g., `24h`, `7d`). |
+| `--source-provider <p>` | string | Only ingest from a specific provider (`claude-code`, `opencode`). |
+| `--source-path <path>` | string | Override the configured source path for discovery. |
+| `--output <path>` | string | Write output to an alternative path. |
+| `--json` | bool | Output the final report as structured JSON. |
+| `--verbose` | bool | Print detailed stage-by-stage progress. |
+| `--reindex` | bool | Rebuild all indexes without re-ingesting session data. |
+| `--detect-commits` | bool | Detect and associate git commits with sessions during extraction. |
+| `--config <path>` | string | Path to an alternative configuration file. |
+
+## EXAMPLES
+
+Run a standard incremental ingest:
+
+```bash
+peasant ingest
+```
+
+Preview what would be ingested without writing anything:
+
+```bash
+peasant ingest --dry-run
+```
+
+Force a full re-ingest of all sessions:
+
+```bash
+peasant ingest --force
+```
+
+Ingest only sessions from the last 48 hours:
+
+```bash
+peasant ingest --since 48h
+```
+
+Ingest only Claude Code sessions:
+
+```bash
+peasant ingest --source-provider claude-code
+```
+
+Ingest specific sessions by ID:
+
+```bash
+peasant ingest --session abc123,def456
+```
+
+Rebuild indexes without re-ingesting:
+
+```bash
+peasant ingest --reindex
+```
+
+Get JSON output for scripting:
+
+```bash
+peasant ingest --json
+```
+
+Verify the database schema:
+
+```bash
+peasant ingest verify
+```
+
+<Callout type="info">
+See [The Nine Gates](/docs/core-concepts/ingest-pipeline) for a detailed explanation of each pipeline stage and how these flags affect them.
+</Callout>

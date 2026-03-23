@@ -1,0 +1,51 @@
+---
+title: "Raising the Banner"
+description: "How to install Peasant on your machine using Go or Nix."
+---
+
+Peasant can be installed through two methods: a direct Go install, or a Nix-based development environment. Choose whichever fits your workflow.
+
+## Method 1: Go Install
+
+If you have Go 1.22 or later installed, you can install Peasant directly:
+
+```bash
+go install github.com/anthropics/peasant/cmd/peasant@latest
+```
+
+This fetches the source, compiles it, and places the `peasant` binary in your `$GOPATH/bin` directory. Make sure that directory is on your `$PATH`.
+
+## Method 2: Nix + Make
+
+If you use Nix, you can enter the development environment and build from source:
+
+```bash
+nix develop
+make build
+```
+
+This gives you a reproducible build environment with all dependencies pinned.
+
+## Verify the Installation
+
+Regardless of which method you used, confirm that Peasant is installed and accessible:
+
+```bash
+peasant version
+```
+
+You should see the current version string printed to stdout.
+
+<Callout type="warn">
+If the command is not found, verify that the binary location is on your `$PATH`. For Go installs, this is typically `$GOPATH/bin` or `$HOME/go/bin`.
+</Callout>
+
+## Next Step: First-Time Setup
+
+Once installed, run the setup wizard to create your configuration file and initialize the database:
+
+```bash
+peasant kickstart
+```
+
+See [Your Apprenticeship](/docs/getting-started) for the full first-run walkthrough.

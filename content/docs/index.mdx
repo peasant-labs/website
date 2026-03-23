@@ -1,0 +1,46 @@
+---
+title: "Welcome to the Village"
+description: "Peasant is an open-source CLI tool that turns AI coding assistant sessions into actionable analytics."
+---
+
+# Peasant
+
+Tend your harvests. Share your yields.
+
+Peasant is the open-source CLI for AI coding transcript analytics. Ingest sessions from Claude Code, OpenCode, and more. Analyze metrics locally via a web dashboard or terminal UI. Share transcripts with the Village when you choose.
+
+## What Is Peasant?
+
+Every conversation you have with an AI coding assistant generates raw session logs. These logs contain a wealth of information — token usage, tool calls, model selections, conversation flow — but in their raw form they are opaque and scattered across your filesystem. Peasant discovers those files, runs them through a nine-stage ingestion pipeline, stores the results in a local SQLite database, and serves them back to you in a form that is actually useful.
+
+Peasant is open-source, runs entirely on your machine, and sends nothing to external services unless you explicitly push transcripts to a Peasant village.
+
+## Quick Start
+
+```bash
+$ peasant kickstart
+$ peasant ingest
+$ peasant tui
+```
+
+<Callout type="tip">
+Peasant runs entirely on your machine. No data leaves your system unless you explicitly push to the Village.
+</Callout>
+
+## Features
+
+- **Multi-provider ingestion** — Supports Claude Code (JSONL) and OpenCode (JSON) session formats, with schema reservations for Codex and Gemini.
+- **Nine-stage pipeline** — A deterministic ingestion pipeline that discovers, diffs, filters, extracts, indexes, and computes metrics from your session data.
+- **Web dashboard** — A local Next.js-powered dashboard served on port 8690 for visual exploration of sessions and metrics.
+- **Terminal UI** — A TUI for navigating sessions and analytics without leaving the terminal.
+- **Session tagging and metrics** — Tag sessions for organization and compute derived metrics across your usage history.
+- **Village sync** — Push ingested transcripts to a Peasant village for sharing or backup, with visibility controls.
+
+## Next Steps
+
+- **[Getting Started](/docs/getting-started)** — Install Peasant, run your first ingest, and view results.
+- **[Installation Guide](/docs/guides/installation)** — Detailed installation methods and verification.
+- **[Configuration](/docs/guides/configuration)** — Set up your config file and provider paths.
+- **[Ingest Pipeline](/docs/core-concepts/ingest-pipeline)** — Understand the nine stages that process your session data.
+- **[Architecture](/docs/core-concepts/architecture)** — How Peasant is built and where it stores data.
+- **[CLI Reference](/docs/cli-reference/ingest)** — Complete flag and command documentation.

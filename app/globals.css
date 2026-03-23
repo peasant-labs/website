@@ -1,26 +1,193 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ============================================
+   PEASANT DESIGN SYSTEM
+   "The terminal is the medium. The manor is the message."
+   ============================================ */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-background: var(--bg-deep);
+  --color-foreground: var(--text-primary);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Dark Mode (default): "The Night Watch" ── */
+:root {
+  color-scheme: dark;
+
+  --bg-deep: #0c0c0e;
+  --bg-surface: #141416;
+  --bg-elevated: #1c1c1f;
+
+  --grid-line: rgba(255, 255, 255, 0.04);
+  --grid-major: rgba(255, 255, 255, 0.08);
+
+  --text-primary: #e8e5e0;
+  --text-secondary: #9b9689;
+  --text-tertiary: #5c5850;
+
+  --border-default: #2a2a2e;
+  --border-strong: #3e3e42;
+
+  --accent: #d4a843;
+  --accent-muted: #2e2518;
+
+  --green: #4ade80;
+  --green-muted: #0f2918;
+
+  --red: #f87171;
+  --red-muted: #2e1515;
+
+  --amber: #fbbf24;
+  --amber-muted: #2e2510;
+}
+
+/* ── Light Mode: "The Parchment" ── */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-deep: #f0ece4;
+  --bg-surface: #f7f4ee;
+  --bg-elevated: #ffffff;
+
+  --grid-line: rgba(0, 0, 0, 0.08);
+  --grid-major: rgba(0, 0, 0, 0.14);
+
+  --text-primary: #141210;
+  --text-secondary: #4a4540;
+  --text-tertiary: #7a756d;
+
+  --border-default: #c8c2b8;
+  --border-strong: #a8a298;
+
+  --accent: #8a6820;
+  --accent-muted: #e8dfc8;
+
+  --green: #16a34a;
+  --green-muted: #dcfce7;
+
+  --red: #dc2626;
+  --red-muted: #fee2e2;
+
+  --amber: #d97706;
+  --amber-muted: #fef3c7;
+}
+
+/* ── Base ── */
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-geist-mono), "JetBrains Mono", "IBM Plex Mono",
+    "Fira Code", "Menlo", monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01", "ss02", "cv01";
+}
+
+/* ── Grid Background ── */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── Selection ── */
+::selection {
+  background: var(--accent);
+  color: var(--bg-deep);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* ── Cursor Blink ── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.cursor-blink {
+  animation: blink 1.06s step-end infinite;
+}
+
+/* ── Wheat Sway ── */
+@keyframes sway {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+.wheat-sway {
+  animation: sway 8s ease-in-out infinite;
+}
+
+/* ── Grid Breath ── */
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.grid-breathe {
+  animation: breathe 20s ease-in-out infinite;
+}
+
+/* ── Smoke Rise ── */
+@keyframes rise {
+  0% { transform: translateY(0); opacity: 0.6; }
+  100% { transform: translateY(-20px); opacity: 0; }
+}
+.smoke-particle {
+  animation: rise 3s ease-out infinite;
+}
+
+/* ── Scroll Progress Bar ── */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--accent);
+  z-index: 100;
+  transition: width 50ms linear;
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Paused (via pause button) ── */
+[data-paused="true"] *, [data-paused="true"] *::before, [data-paused="true"] *::after {
+  animation-play-state: paused !important;
+  transition-duration: 0ms !important;
 }
+[data-paused="true"] .cursor-blink {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+/* ── Typography Scale (Minor Third 1.2) ── */
+.text-display { font-size: 40px; line-height: 1.2; }
+.text-hero { font-size: 33px; line-height: 1.2; }
+.text-title { font-size: 28px; line-height: 1.3; }
+.text-heading { font-size: 23px; line-height: 1.3; }
+.text-subheading { font-size: 19px; line-height: 1.4; }
+.text-body { font-size: 16px; line-height: 1.6; }
+.text-small { font-size: 13px; line-height: 1.5; }
+.text-caption { font-size: 11px; line-height: 1.5; }

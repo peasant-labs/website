@@ -1,0 +1,96 @@
+---
+title: "Your Apprenticeship"
+description: "Go from zero to your first session analytics in under five minutes."
+---
+
+This guide walks you through installing Peasant, running the setup wizard, ingesting your first batch of AI coding sessions, and viewing the results. By the end, you will have a working analytics pipeline on your machine.
+
+## Prerequisites
+
+You need one of the following:
+
+- **Go 1.22+** — If you prefer a direct install via `go install`.
+- **Nix** — If you prefer a reproducible development environment.
+
+You also need at least one supported AI coding assistant with existing session data on your machine:
+
+- **Claude Code** — Stores sessions as JSONL files.
+- **OpenCode** — Stores sessions as JSON files.
+
+## Step 1: Install Peasant
+
+Choose your preferred method.
+
+**Option A: Go install**
+
+```bash
+go install github.com/anthropics/peasant/cmd/peasant@latest
+```
+
+**Option B: Nix + Make**
+
+```bash
+nix develop
+make build
+```
+
+Verify the installation:
+
+```bash
+peasant version
+```
+
+<Callout type="info">
+See the full [Installation Guide](/docs/guides/installation) for troubleshooting and additional methods.
+</Callout>
+
+## Step 2: Run the Setup Wizard
+
+The kickstart command walks you through first-time configuration — it creates your config file, detects providers on your system, and sets up the database.
+
+```bash
+peasant kickstart
+```
+
+This creates your configuration at `~/.config/peasant/config.yaml` and initializes the SQLite database at `~/.local/share/peasant/peasant.db`.
+
+## Step 3: Ingest Your Sessions
+
+Run the ingestion pipeline to discover and process your AI coding session data:
+
+```bash
+peasant ingest
+```
+
+The pipeline runs through nine stages — from discovering session files on disk to computing metrics — and reports what it found.
+
+<Callout type="tip">
+Want to see what would happen without writing anything? Use `--dry-run`:
+```bash
+peasant ingest --dry-run
+```
+</Callout>
+
+## Step 4: View Your Results
+
+You have two ways to explore your ingested data.
+
+**Terminal UI:**
+
+```bash
+peasant tui
+```
+
+**Web Dashboard:**
+
+```bash
+peasant web start
+```
+
+The web dashboard launches on [http://localhost:8690](http://localhost:8690) and opens your browser automatically.
+
+## What's Next
+
+- Learn about the [ingest pipeline stages](/docs/core-concepts/ingest-pipeline) to understand what happens to your data.
+- Explore [configuration options](/docs/guides/configuration) to customize provider paths and behavior.
+- Read the [CLI reference](/docs/cli-reference/ingest) for the full set of flags and commands.
