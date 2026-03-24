@@ -6,15 +6,15 @@ import { useInView } from "@/lib/use-in-view";
 const BATTLEMENT =
   "|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|_|^|";
 
-const LINE1 = ["Every AI coding session generates a transcript."];
+const LINE1 = ["every ai coding session generates a transcript."];
 const LINE2 = [
-  "Companies keep them. Use them to retrain their",
-  "models. You never see them again.",
+  "companies keep them. use them to retrain their",
+  "models. you never see them again.",
 ];
-const LINE3 = ["What if you could take them back?"];
+const LINE3 = ["what if you could take them back?"];
 const LINE4 = [
-  "Redact the sensitive parts. Keep the insights.",
-  "Share with researchers, the open-source community,",
+  "redact the sensitive parts. keep the insights.",
+  "share with researchers, the open-source community,",
   "and your own team — on your terms.",
 ];
 

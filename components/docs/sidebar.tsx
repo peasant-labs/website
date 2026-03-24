@@ -43,7 +43,7 @@ export function Sidebar() {
           open={section.hasActive || undefined}
           className={`${sIdx === 0 ? "" : "mt-4"} group`}
         >
-          <summary className="cursor-pointer select-none list-none text-[var(--text-secondary)] uppercase tracking-widest text-caption mb-2 hover:text-[var(--text-primary)] transition-colors [&::-webkit-details-marker]:hidden">
+          <summary className="cursor-pointer select-none list-none text-[var(--text-secondary)] tracking-widest text-caption mb-2 hover:text-[var(--text-primary)] transition-colors [&::-webkit-details-marker]:hidden">
             <span className="text-[var(--text-tertiary)] mr-1 inline-block transition-transform group-open:rotate-90">
               &gt;
             </span>

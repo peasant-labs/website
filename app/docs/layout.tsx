@@ -6,11 +6,11 @@ import { DocsSearch } from "@/components/docs/search";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Peasant Docs",
-    default: "Peasant Docs",
+    template: "%s | peasant docs",
+    default: "peasant docs",
   },
   description:
-    "Documentation for Peasant — the open-source CLI for AI coding transcript analytics.",
+    "documentation for peasant — the open-source cli for ai coding transcript analytics.",
 };
 
 export default function DocsLayout({
@@ -51,8 +51,8 @@ export default function DocsLayout({
 
         {/* Right rail */}
         <aside className="hidden lg:block w-[200px] shrink-0 border-l border-[var(--border-default)] sticky top-12 h-[calc(100vh-48px)] overflow-y-auto px-5 pt-5 pb-6">
-          <span className="text-caption text-[var(--text-tertiary)] uppercase tracking-widest">
-            On this page
+          <span className="text-caption text-[var(--text-tertiary)] tracking-widest">
+            on this page
           </span>
         </aside>
       </div>

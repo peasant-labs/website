@@ -6,16 +6,16 @@ import { useAsciiMorph } from "@/lib/use-ascii-morph";
 import { useMemo } from "react";
 
 const COMMANDS = [
-  "# Install peasant",
+  "# install peasant",
   "$ go install github.com/org/peasant@latest",
   "",
-  "# Run the setup wizard",
+  "# run the setup wizard",
   "$ peasant kickstart",
   "",
-  "# Ingest your first sessions",
+  "# ingest your first sessions",
   "$ peasant ingest",
   "",
-  "# Launch the TUI",
+  "# launch the tui",
   "$ peasant tui",
 ];
 
@@ -114,7 +114,7 @@ export function Quickstart() {
               href="/docs/getting-started"
               className="text-body text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
             >
-              Read the full guide →
+              read the full guide →
             </a>
           </div>
         </div>

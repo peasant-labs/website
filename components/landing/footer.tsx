@@ -15,7 +15,7 @@ export function Footer() {
         {/* Three-column nav */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12 text-small">
           <div>
-            <p className="text-[var(--text-primary)] mb-2">Docs</p>
+            <p className="text-[var(--text-primary)] mb-2">docs</p>
             <div className="space-y-1 text-[var(--text-secondary)]">
               <p>
                 <span className="text-[var(--text-tertiary)]">├─ </span>
@@ -23,7 +23,7 @@ export function Footer() {
                   href="/docs/getting-started"
                   className="hover:text-[var(--accent)] transition-colors"
                 >
-                  Getting Started
+                  getting started
                 </a>
               </p>
               <p>
@@ -32,7 +32,7 @@ export function Footer() {
                   href="/docs/guides"
                   className="hover:text-[var(--accent)] transition-colors"
                 >
-                  Guides
+                  guides
                 </a>
               </p>
               <p>
@@ -41,14 +41,14 @@ export function Footer() {
                   href="/docs/cli-reference"
                   className="hover:text-[var(--accent)] transition-colors"
                 >
-                  CLI Ref
+                  cli ref
                 </a>
               </p>
             </div>
           </div>
 
           <div>
-            <p className="text-[var(--text-primary)] mb-2">Community</p>
+            <p className="text-[var(--text-primary)] mb-2">community</p>
             <div className="space-y-1 text-[var(--text-secondary)]">
               <p>
                 <span className="text-[var(--text-tertiary)]">├─ </span>
@@ -58,7 +58,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-[var(--accent)] transition-colors"
                 >
-                  GitHub
+                  github
                 </a>
               </p>
               <p>
@@ -69,7 +69,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-[var(--accent)] transition-colors"
                 >
-                  Village
+                  village
                 </a>
               </p>
               <p>
@@ -80,14 +80,14 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-[var(--accent)] transition-colors"
                 >
-                  Discord
+                  discord
                 </a>
               </p>
             </div>
           </div>
 
           <div>
-            <p className="text-[var(--text-primary)] mb-2">Project</p>
+            <p className="text-[var(--text-primary)] mb-2">project</p>
             <div className="space-y-1 text-[var(--text-secondary)]">
               <p>
                 <span className="text-[var(--text-tertiary)]">├─ </span>
@@ -97,7 +97,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-[var(--accent)] transition-colors"
                 >
-                  License (MIT)
+                  license (mit)
                 </a>
               </p>
               <p>
@@ -108,7 +108,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-[var(--accent)] transition-colors"
                 >
-                  Contributing
+                  contributing
                 </a>
               </p>
             </div>
@@ -117,7 +117,7 @@ export function Footer() {
 
         {/* Bottom line */}
         <p className="text-caption text-[var(--text-tertiary)]">
-          Built by peasants, for peasants. MIT License.
+          built by peasants, for peasants. mit license.
         </p>
       </div>
     </footer>

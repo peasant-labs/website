@@ -5,17 +5,18 @@ import { useAsciiMorph } from "@/lib/use-ascii-morph";
 import { useTypewriter } from "@/lib/use-typewriter";
 import { AsciiVillage } from "@/components/landing/ascii-village";
 
-const FIGLET = ` ____  _____    _    ____    _    _   _ _____
-|  _ \\| ____|  / \\  / ___|  / \\  | \\ | |_   _|
-| |_) |  _|   / _ \\ \\___ \\ / _ \\ |  \\| | | |
-|  __/| |___ / ___ \\ ___) / ___ \\| |\\  | | |
-|_|   |_____/_/   \\_\\____/_/   \\_\\_| \\_| |_|  `;
+const FIGLET = `                              _
+ _ __   ___  __ _ ___  __ _ _ __ | |_
+| '_ \\ / _ \\/ _\` / __|/ _\` | '_ \\| __|
+| |_) |  __/ (_| \\__ \\ (_| | | | | |_
+| .__/ \\___|\\__,_|___/\\__,_|_| |_|\\__|
+|_|                                     `;
 
 const INSTALL_CMD = "go install github.com/org/peasant@latest";
 
 const DESC_LINES = [
-  "Open-source CLI for AI coding transcripts.",
-  "Take back your sessions from Claude Code, Codex & more.",
+  "open-source cli for ai coding transcripts.",
+  "take back your sessions from claude code, codex & more.",
 ];
 
 export function Hero() {
@@ -59,7 +60,7 @@ export function Hero() {
   );
 
   return (
-    <section className="relative min-h-[95vh] flex items-start justify-center pt-[20vh] grid-bg overflow-hidden">
+    <section className="relative min-h-[95vh] flex items-start justify-center pt-[20vh] overflow-hidden">
       {/* Animated ASCII village — full background */}
       <AsciiVillage />
 
@@ -70,15 +71,15 @@ export function Hero() {
           <pre
             ref={morphRef as React.RefObject<HTMLPreElement>}
             className="hidden md:block text-[var(--accent)] text-[11px] sm:text-[13px] lg:text-[15px] leading-tight select-none whitespace-pre font-mono"
-            aria-label="PEASANT"
+            aria-label="peasant"
           >
             {morphedText}
           </pre>
           <h1
             className="md:hidden text-display text-[var(--accent)] font-bold tracking-tight select-none"
-            aria-label="PEASANT"
+            aria-label="peasant"
           >
-            PEASANT
+            peasant
           </h1>
         </div>
 
@@ -131,7 +132,7 @@ export function Hero() {
                 opacity: installComplete ? 1 : 0,
                 transition: "opacity 300ms cubic-bezier(0.16, 1, 0.3, 1)",
               }}
-              aria-label="Copy install command"
+              aria-label="copy install command"
               tabIndex={installComplete ? 0 : -1}
             >
               {copied ? "copied!" : "copy"}

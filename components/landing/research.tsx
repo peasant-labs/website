@@ -6,42 +6,42 @@ import { useAsciiMorph } from "@/lib/use-ascii-morph";
 // Placeholder contributors — replace with real data
 const INDIVIDUALS = [
   {
-    name: "Your Name",
-    company: "Company",
+    name: "your name",
+    company: "company",
     image: "/demos/avatar-placeholder.svg",
   },
   {
-    name: "Your Name",
-    company: "Company",
+    name: "your name",
+    company: "company",
     image: "/demos/avatar-placeholder.svg",
   },
   {
-    name: "Your Name",
-    company: "Company",
+    name: "your name",
+    company: "company",
     image: "/demos/avatar-placeholder.svg",
   },
   {
-    name: "Your Name",
-    company: "Company",
+    name: "your name",
+    company: "company",
     image: "/demos/avatar-placeholder.svg",
   },
   {
-    name: "Your Name",
-    company: "Company",
+    name: "your name",
+    company: "company",
     image: "/demos/avatar-placeholder.svg",
   },
   {
-    name: "Your Name",
-    company: "Company",
+    name: "your name",
+    company: "company",
     image: "/demos/avatar-placeholder.svg",
   },
 ];
 
 const COMPANIES = [
-  { name: "Company", logo: "/demos/logo-placeholder.svg" },
-  { name: "Company", logo: "/demos/logo-placeholder.svg" },
-  { name: "Company", logo: "/demos/logo-placeholder.svg" },
-  { name: "Company", logo: "/demos/logo-placeholder.svg" },
+  { name: "company", logo: "/demos/logo-placeholder.svg" },
+  { name: "company", logo: "/demos/logo-placeholder.svg" },
+  { name: "company", logo: "/demos/logo-placeholder.svg" },
+  { name: "company", logo: "/demos/logo-placeholder.svg" },
 ];
 
 export function Research() {
@@ -52,7 +52,7 @@ export function Research() {
   return (
     <section
       ref={ref as React.RefObject<HTMLElement>}
-      className="bg-[var(--bg-surface)] py-24 px-4"
+      className="bg-[var(--bg-elevated)] py-24 px-4"
     >
       <div className="max-w-6xl mx-auto flex flex-col gap-16">
         {/* Section title */}
@@ -61,7 +61,7 @@ export function Research() {
             // <span ref={titleRef as React.RefObject<HTMLSpanElement>}>{titleText}</span>
           </h2>
           <p className="text-small text-[var(--text-tertiary)] mt-1">
-            Peasants who tend the commons
+            peasants who tend the commons
           </p>
         </div>
 
@@ -113,8 +113,8 @@ export function Research() {
             transition: "all 500ms ease-out 400ms",
           }}
         >
-          <p className="text-caption text-[var(--text-tertiary)] tracking-widest uppercase mb-6">
-            Supported by
+          <p className="text-caption text-[var(--text-tertiary)] tracking-widest mb-6">
+            supported by
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             {COMPANIES.map((company, i) => (

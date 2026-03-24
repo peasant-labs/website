@@ -6,23 +6,23 @@ import { useInView } from "@/lib/use-in-view";
 import { TerminalWindow } from "@/components/ui/terminal-window";
 
 const STAGES = [
-  { name: "DISCOVER", desc: "find sessions" },
-  { name: "DIFF", desc: "compare mod times" },
-  { name: "FILTER", desc: "skip unchanged" },
-  { name: "EXTRACT", desc: "parse & write" },
-  { name: "DB INSERT", desc: "upsert to SQLite" },
-  { name: "INDEX", desc: "build entries" },
-  { name: "COMPUTE", desc: "run 16 metrics" },
-  { name: "CLEANUP", desc: "remove orphans" },
-  { name: "REPORT", desc: "summary counts" },
+  { name: "discover", desc: "find sessions" },
+  { name: "diff", desc: "compare mod times" },
+  { name: "filter", desc: "skip unchanged" },
+  { name: "extract", desc: "parse & write" },
+  { name: "db insert", desc: "upsert to sqlite" },
+  { name: "index", desc: "build entries" },
+  { name: "compute", desc: "run 16 metrics" },
+  { name: "cleanup", desc: "remove orphans" },
+  { name: "report", desc: "summary counts" },
 ] as const;
 
 const TERMINAL_LINES = [
   "$ peasant ingest --since 2w",
-  "  DISCOVER → DIFF → FILTER → EXTRACT → DB INSERT → INDEX → COMPUTE → CLEANUP → REPORT",
+  "  discover → diff → filter → extract → db insert → index → compute → cleanup → report",
   "  ████████████████████████████████████████ 100%",
   "",
-  "  New: 35  Updated: 12  Unchanged: 12  Active: 0  Errors: 0",
+  "  new: 35  updated: 12  unchanged: 12  active: 0  errors: 0",
 ];
 
 const STAGE_DELAY_MS = 150;
@@ -271,13 +271,13 @@ function colorizeStats(line: string): React.ReactNode {
     if (match) {
       const [, label, value] = match;
       let valueColor = "var(--text-primary)";
-      if (label === "New") valueColor = "var(--green)";
-      else if (label === "Updated") valueColor = "var(--accent)";
-      else if (label === "Errors")
+      if (label === "new") valueColor = "var(--green)";
+      else if (label === "updated") valueColor = "var(--accent)";
+      else if (label === "errors")
         valueColor =
           Number(value) > 0 ? "var(--red)" : "var(--text-tertiary)";
-      else if (label === "Active") valueColor = "var(--text-tertiary)";
-      else if (label === "Unchanged") valueColor = "var(--text-tertiary)";
+      else if (label === "active") valueColor = "var(--text-tertiary)";
+      else if (label === "unchanged") valueColor = "var(--text-tertiary)";
 
       return (
         <span key={i}>

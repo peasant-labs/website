@@ -8,14 +8,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Peasant — Tend your harvests. Share your yields.",
+  title: "peasant — tend your harvests. share your yields.",
   description:
-    "The open-source CLI for AI coding transcript analytics. Ingest sessions from Claude Code, OpenCode, and more. Analyze metrics locally. Share anonymized transcripts with the Village.",
+    "the open-source cli for ai coding transcript analytics. ingest sessions from claude code, opencode, and more. analyze metrics locally. share anonymized transcripts with the village.",
   keywords: [
-    "AI coding",
+    "ai coding",
     "transcript analytics",
-    "Claude Code",
-    "TUI",
+    "claude code",
+    "tui",
     "developer tools",
     "open source",
   ],

@@ -89,6 +89,9 @@ interface BuildingDef {
   hasFlag?: boolean;
 }
 
+// ─── Building Scale ──────────────────────────────────────────────────
+const BUILDING_SCALE = 1.25;
+
 // ─── Building ASCII Art Templates ────────────────────────────────────
 
 const COTTAGE_1: string[] = [
@@ -333,6 +336,7 @@ export function AsciiVillage() {
       windDirection: 0.5,
       windTarget: 0.5,
       windChangeTimer: 0,
+      cloudTime: 0, // accumulated cloud drift time (clamped, won't jump on refocus)
 
       trailParticles: [] as TrailParticle[],
       smokeClouds: [] as SmokeCloud[],
@@ -460,15 +464,15 @@ export function AsciiVillage() {
           { w: 11, h: 7, type: "house3", layer: 1, chimneyPos: 4, windowRows: 3, windowsPerRow: 2 },
           { w: 8, h: 5, type: "tower", layer: 1, chimneyPos: 3, windowRows: 3, windowsPerRow: 1, hasFlag: true },
         ],
-        // Layer 2 (foreground): template-based buildings
+        // Layer 2 (foreground): template-based buildings (scaled)
         [
-          { w: TEMPLATE_WIDTH.house, h: COTTAGE_1.length, type: "house", layer: 2, chimneyPos: CHIMNEY_OFFSET.house, windowRows: 0, windowsPerRow: 0 },
-          { w: TEMPLATE_WIDTH.guildhall, h: TOWN_HALL.length, type: "guildhall", layer: 2, chimneyPos: CHIMNEY_OFFSET.guildhall, windowRows: 0, windowsPerRow: 0, hasFlag: true },
-          { w: TEMPLATE_WIDTH.church, h: CHURCH.length, type: "church", layer: 2, chimneyPos: CHIMNEY_OFFSET.church, windowRows: 0, windowsPerRow: 0, hasCross: true },
-          { w: TEMPLATE_WIDTH.tower, h: TOWER.length, type: "tower", layer: 2, chimneyPos: CHIMNEY_OFFSET.tower, windowRows: 0, windowsPerRow: 0, hasFlag: true },
-          { w: TEMPLATE_WIDTH.tavern, h: TAVERN.length, type: "tavern", layer: 2, chimneyPos: CHIMNEY_OFFSET.tavern, windowRows: 0, windowsPerRow: 0 },
-          { w: TEMPLATE_WIDTH.house2, h: COTTAGE_2.length, type: "house2", layer: 2, chimneyPos: CHIMNEY_OFFSET.house2, windowRows: 0, windowsPerRow: 0 },
-          { w: TEMPLATE_WIDTH.house3, h: COTTAGE_1.length, type: "house3", layer: 2, chimneyPos: CHIMNEY_OFFSET.house3, windowRows: 0, windowsPerRow: 0 },
+          { w: Math.ceil(TEMPLATE_WIDTH.house * BUILDING_SCALE), h: Math.ceil(COTTAGE_1.length * BUILDING_SCALE), type: "house", layer: 2, chimneyPos: CHIMNEY_OFFSET.house, windowRows: 0, windowsPerRow: 0 },
+          { w: Math.ceil(TEMPLATE_WIDTH.guildhall * BUILDING_SCALE), h: Math.ceil(TOWN_HALL.length * BUILDING_SCALE), type: "guildhall", layer: 2, chimneyPos: CHIMNEY_OFFSET.guildhall, windowRows: 0, windowsPerRow: 0, hasFlag: true },
+          { w: Math.ceil(TEMPLATE_WIDTH.church * BUILDING_SCALE), h: Math.ceil(CHURCH.length * BUILDING_SCALE), type: "church", layer: 2, chimneyPos: CHIMNEY_OFFSET.church, windowRows: 0, windowsPerRow: 0, hasCross: true },
+          { w: Math.ceil(TEMPLATE_WIDTH.tower * BUILDING_SCALE), h: Math.ceil(TOWER.length * BUILDING_SCALE), type: "tower", layer: 2, chimneyPos: CHIMNEY_OFFSET.tower, windowRows: 0, windowsPerRow: 0, hasFlag: true },
+          { w: Math.ceil(TEMPLATE_WIDTH.tavern * BUILDING_SCALE), h: Math.ceil(TAVERN.length * BUILDING_SCALE), type: "tavern", layer: 2, chimneyPos: CHIMNEY_OFFSET.tavern, windowRows: 0, windowsPerRow: 0 },
+          { w: Math.ceil(TEMPLATE_WIDTH.house2 * BUILDING_SCALE), h: Math.ceil(COTTAGE_2.length * BUILDING_SCALE), type: "house2", layer: 2, chimneyPos: CHIMNEY_OFFSET.house2, windowRows: 0, windowsPerRow: 0 },
+          { w: Math.ceil(TEMPLATE_WIDTH.house3 * BUILDING_SCALE), h: Math.ceil(COTTAGE_1.length * BUILDING_SCALE), type: "house3", layer: 2, chimneyPos: CHIMNEY_OFFSET.house3, windowRows: 0, windowsPerRow: 0 },
         ],
       ];
 
@@ -517,10 +521,11 @@ export function AsciiVillage() {
             default: template = COTTAGE_1; break;
           }
 
-          const totalH = template.length;
+          const totalH = def.layer === 2 ? Math.ceil(template.length * BUILDING_SCALE) : template.length;
           const topRow = baseRow - totalH + 1;
 
-          const chimneyCol = curX + (CHIMNEY_OFFSET[def.type] ?? def.chimneyPos);
+          const rawChimneyOff = CHIMNEY_OFFSET[def.type] ?? def.chimneyPos;
+          const chimneyCol = curX + (def.layer === 2 ? Math.round(rawChimneyOff * BUILDING_SCALE) : rawChimneyOff);
           const chimneyRow = topRow - 1;
 
           // Generate window states by counting [] pairs in the template
@@ -715,6 +720,17 @@ export function AsciiVillage() {
         initSimulation();
       } else {
         computeBuildingLayout();
+        // Regenerate stars to fill new screen dimensions
+        S.stars = [];
+        const skyArea = S.cols * Math.floor(S.rows * 0.6);
+        const starCount = Math.max(80, Math.floor(skyArea / 30));
+        for (let i = 0; i < starCount; i++) {
+          S.stars.push({
+            col: Math.floor(Math.random() * S.cols),
+            row: Math.floor(Math.random() * (S.rows * 0.6)),
+            twinkleOffset: Math.random() * 1000,
+          });
+        }
       }
     }
 
@@ -775,20 +791,25 @@ export function AsciiVillage() {
         default: template = COTTAGE_1; break;
       }
 
-      // Draw template bottom-aligned to baseRow
-      const startRow = baseRow - template.length + 1;
-      for (let r = 0; r < template.length; r++) {
-        const row = template[r];
-        for (let c = 0; c < row.length; c++) {
-          const ch = row[c];
+      // Draw template bottom-aligned to baseRow, scaled by BUILDING_SCALE
+      const bs = def.layer === 2 ? BUILDING_SCALE : 1;
+      const scaledH = Math.ceil(template.length * bs);
+      const startRow = baseRow - scaledH + 1;
+
+      for (let sr = 0; sr < scaledH; sr++) {
+        const srcR = Math.min(Math.floor(sr / bs), template.length - 1);
+        const row = template[srcR];
+        const scaledW = Math.ceil(row.length * bs);
+        for (let sc = 0; sc < scaledW; sc++) {
+          const srcC = Math.min(Math.floor(sc / bs), row.length - 1);
+          const ch = row[srcC];
           if (ch !== " ") {
-            drawAndRegister(ch, bx + c, startRow + r, themeColors.buildingWall, layerOpacity);
+            drawAndRegister(ch, bx + sc, startRow + sr, themeColors.buildingWall, layerOpacity);
           }
         }
       }
 
-      // Draw windows with lit/dark state (override [] positions with coloring)
-      // Flatten window states from bl.windows (which is WindowState[][])
+      // Draw windows with lit/dark state at scaled positions
       const flatWindows: WindowState[] = [];
       for (const wRow of bl.windows) {
         for (const ws of wRow) {
@@ -809,8 +830,10 @@ export function AsciiVillage() {
                 ws.nextToggle = 3000 + Math.random() * 12000;
               }
               const wColor = (ws.on && def.layer === 2) ? themeColors.windowLit : themeColors.windowDark;
-              drawAndRegister("[", bx + c, startRow + r, wColor, layerOpacity);
-              drawAndRegister("]", bx + c + 1, startRow + r, wColor, layerOpacity);
+              const sc = Math.round(c * bs);
+              const sr = Math.round(r * bs);
+              drawAndRegister("[", bx + sc, startRow + sr, wColor, layerOpacity);
+              drawAndRegister("]", bx + sc + 1, startRow + sr, wColor, layerOpacity);
             }
             wIdx++;
           }
@@ -873,22 +896,26 @@ export function AsciiVillage() {
         drawChar("\\", cx + 2, cy + 1, sunColor, 0.5);
         drawChar("\\", cx + 3, cy + 1, sunColor, 0.5);
       } else {
-        // Flipped crescent — opens to the right
-        //     .-
-        //      )
-        //       )
-        //       )
-        //      )
-        //     -'
+        // Rounded crescent — semicircle opening right
+        //    .--
+        //   /
+        //  (
+        //  (
+        //  (
+        //   \
+        //    '--
         const moonColor = themeColors.windowLit;
         drawChar(".", cx, cy - 3, moonColor, 0.5);
         drawChar("-", cx + 1, cy - 3, moonColor, 0.6);
-        drawChar(")", cx + 2, cy - 2, moonColor, 0.8);
-        drawChar(")", cx + 2, cy - 1, moonColor, 0.9);
-        drawChar(")", cx + 2, cy, moonColor, 0.9);
-        drawChar(")", cx + 2, cy + 1, moonColor, 0.8);
-        drawChar("'", cx, cy + 2, moonColor, 0.5);
-        drawChar("-", cx + 1, cy + 2, moonColor, 0.6);
+        drawChar("-", cx + 2, cy - 3, moonColor, 0.6);
+        drawChar("/", cx - 1, cy - 2, moonColor, 0.7);
+        drawChar("(", cx - 2, cy - 1, moonColor, 0.9);
+        drawChar("(", cx - 2, cy, moonColor, 0.9);
+        drawChar("(", cx - 2, cy + 1, moonColor, 0.9);
+        drawChar("\\", cx - 1, cy + 2, moonColor, 0.7);
+        drawChar("'", cx, cy + 3, moonColor, 0.5);
+        drawChar("-", cx + 1, cy + 3, moonColor, 0.6);
+        drawChar("-", cx + 2, cy + 3, moonColor, 0.6);
       }
     }
 
@@ -1063,10 +1090,10 @@ export function AsciiVillage() {
       { xFrac: 0.75, row: 8, driftOffset: 300, template: 1 },
     ];
 
-    function drawClouds(now: number) {
+    function drawClouds() {
       const cloudOpacity = 0.25;
       for (const dc of decorativeClouds) {
-        const drift = Math.floor((now * 0.001 + dc.driftOffset) * S.windDirection * 0.5) % S.cols;
+        const drift = Math.floor((S.cloudTime * 0.001 + dc.driftOffset) * S.windDirection * 0.5) % S.cols;
         const baseCol = Math.floor(dc.xFrac * S.cols) + drift;
         const r = dc.row;
         const tmpl = CLOUD_TEMPLATES[dc.template];
@@ -1099,127 +1126,159 @@ export function AsciiVillage() {
       const isMoving = Math.abs(frame) > 0.01 && step !== 0;
 
       if (isChild) {
-        // Child: 5 wide, 5 rows tall — harmonious proportions
+        // Child: 5 wide, 6 rows tall
         //  ___
-        // (o o)
-        // (_u_)
-        // |###|
+        // {^_^}
+        //  |#|
+        //  |_|
         //  | |
-        // _/ \_
-        const headRow = row - 4;
+        //  O O
+        const headRow = row - 5;
 
-        // Row 0: head top
+        // Row 0: hat
         drawAndRegister("_", col + 1, headRow, color);
         drawAndRegister("_", col + 2, headRow, color);
         drawAndRegister("_", col + 3, headRow, color);
 
-        // Row 1: face with eyes
-        drawAndRegister("(", col, headRow + 1, color);
-        drawAndRegister("o", col + 1, headRow + 1, color);
-        drawAndRegister(" ", col + 2, headRow + 1, color);
-        drawAndRegister("o", col + 3, headRow + 1, color);
-        drawAndRegister(")", col + 4, headRow + 1, color);
+        // Row 1: face {^_^} or {^o^} when speaking
+        drawAndRegister("{", col, headRow + 1, color);
+        drawAndRegister("^", col + 1, headRow + 1, color);
+        drawAndRegister(speaking ? "o" : "_", col + 2, headRow + 1, color);
+        drawAndRegister("^", col + 3, headRow + 1, color);
+        drawAndRegister("}", col + 4, headRow + 1, color);
 
-        // Row 2: mouth
-        drawAndRegister("(", col, headRow + 2, color);
-        drawAndRegister("_", col + 1, headRow + 2, color);
-        drawAndRegister(speaking ? "o" : "u", col + 2, headRow + 2, color);
-        drawAndRegister("_", col + 3, headRow + 2, color);
-        drawAndRegister(")", col + 4, headRow + 2, color);
+        // Row 2: tunic |#|
+        drawAndRegister("|", col + 1, headRow + 2, color);
+        const cb = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
+        drawAndRegister(cb, col + 2, headRow + 2, color);
+        drawAndRegister("|", col + 3, headRow + 2, color);
 
-        // Row 3: tunic body
-        drawAndRegister("|", col, headRow + 3, color);
-        const bodyChar1 = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
-        const bodyChar2 = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
-        const bodyChar3 = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
-        drawAndRegister(bodyChar1, col + 1, headRow + 3, color);
-        drawAndRegister(bodyChar2, col + 2, headRow + 3, color);
-        drawAndRegister(bodyChar3, col + 3, headRow + 3, color);
-        drawAndRegister("|", col + 4, headRow + 3, color);
+        // Row 3: belt |_|
+        drawAndRegister("|", col + 1, headRow + 3, color);
+        drawAndRegister("_", col + 2, headRow + 3, color);
+        drawAndRegister("|", col + 3, headRow + 3, color);
 
-        // Row 4: legs + feet — animated
-        if (step === 0 || step === 2) {
-          drawAndRegister("_", col, headRow + 4, color);
-          drawAndRegister("/", col + 1, headRow + 4, color);
-          drawAndRegister(" ", col + 2, headRow + 4, color);
-          drawAndRegister("\\", col + 3, headRow + 4, color);
-          drawAndRegister("_", col + 4, headRow + 4, color);
-        } else if (step === 1) {
+        // Rows 4-5: legs + feet (animated)
+        if (step === 1 && isMoving) {
           drawAndRegister("/", col, headRow + 4, color);
-          drawAndRegister(" ", col + 1, headRow + 4, color);
-          drawAndRegister(" ", col + 2, headRow + 4, color);
-          drawAndRegister("\\", col + 3, headRow + 4, color);
-          drawAndRegister("_", col + 4, headRow + 4, color);
-        } else {
-          drawAndRegister("_", col, headRow + 4, color);
-          drawAndRegister("/", col + 1, headRow + 4, color);
-          drawAndRegister(" ", col + 2, headRow + 4, color);
-          drawAndRegister(" ", col + 3, headRow + 4, color);
           drawAndRegister("\\", col + 4, headRow + 4, color);
+          drawAndRegister("o", col, headRow + 5, color);
+          drawAndRegister("o", col + 4, headRow + 5, color);
+        } else if (step === 3 && isMoving) {
+          drawAndRegister("\\", col + 1, headRow + 4, color);
+          drawAndRegister("/", col + 3, headRow + 4, color);
+          drawAndRegister("o", col + 1, headRow + 5, color);
+          drawAndRegister("o", col + 3, headRow + 5, color);
+        } else {
+          drawAndRegister("|", col + 1, headRow + 4, color);
+          drawAndRegister("|", col + 3, headRow + 4, color);
+          drawAndRegister("o", col + 1, headRow + 5, color);
+          drawAndRegister("o", col + 3, headRow + 5, color);
         }
         return;
       }
 
-      // Full-size peasant: 8 wide, 8 rows tall — symmetric medieval with hat/cap
-      //     __
-      //    /  \        ← hat/cap
-      //   | oo |       ← face with eyes
-      //   | -- |       ← mouth (-- when closed, <> when speaking)
-      //    \__/        ← chin
-      //   /|##|\       ← tunic with arms
-      //   ||##||       ← body
-      //   _|  |_       ← legs/feet
-      const headRow = row - 7;
+      // Full-size peasant: 10 wide, 9 rows tall (all even-width, center col+3.5)
+      //      ____
+      //     {^__^}
+      //      -\/-
+      //   ---|##|---
+      //      |__|
+      //      /  \
+      //      |  |
+      //      |  |
+      //      o  o
+      const headRow = row - 8;
 
-      // Row 0: hat top — centered at col+3, col+4
+      // Row 0: hat ____
+      drawAndRegister("_", col + 2, headRow, color);
       drawAndRegister("_", col + 3, headRow, color);
       drawAndRegister("_", col + 4, headRow, color);
+      drawAndRegister("_", col + 5, headRow, color);
 
-      // Row 1: hat brim — /  \  at col+2, col+5
-      drawAndRegister("/", col + 2, headRow + 1, color);
-      drawAndRegister("\\", col + 5, headRow + 1, color);
+      // Row 1: face {^__^} or {^_o^} when speaking
+      drawAndRegister("{", col + 1, headRow + 1, color);
+      drawAndRegister("^", col + 2, headRow + 1, color);
+      drawAndRegister("_", col + 3, headRow + 1, color);
+      drawAndRegister(speaking ? "o" : "_", col + 4, headRow + 1, color);
+      drawAndRegister("^", col + 5, headRow + 1, color);
+      drawAndRegister("}", col + 6, headRow + 1, color);
 
-      // Row 2: face with eyes — | at col+1 and col+6, eyes at col+3 and col+4
-      drawAndRegister("|", col + 1, headRow + 2, color);
-      drawAndRegister("o", col + 3, headRow + 2, color);
-      drawAndRegister("o", col + 4, headRow + 2, color);
-      drawAndRegister("|", col + 6, headRow + 2, color);
+      // Row 2: collar -\/-
+      drawAndRegister("-", col + 2, headRow + 2, color);
+      drawAndRegister("\\", col + 3, headRow + 2, color);
+      drawAndRegister("/", col + 4, headRow + 2, color);
+      drawAndRegister("-", col + 5, headRow + 2, color);
 
-      // Row 3: mouth — | at col+1 and col+6, mouth at col+3 and col+4
-      drawAndRegister("|", col + 1, headRow + 3, color);
-      const mouthChar = speaking ? "<" : "-";
-      const mouthChar2 = speaking ? ">" : "-";
-      drawAndRegister(mouthChar, col + 3, headRow + 3, color);
-      drawAndRegister(mouthChar2, col + 4, headRow + 3, color);
-      drawAndRegister("|", col + 6, headRow + 3, color);
+      // Row 3: tunic with arms ---|##|--- (animated arms, 3 chars each side)
+      const bc1 = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
+      const bc2 = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
+      drawAndRegister("|", col + 2, headRow + 3, color);
+      drawAndRegister(bc1, col + 3, headRow + 3, color);
+      drawAndRegister(bc2, col + 4, headRow + 3, color);
+      drawAndRegister("|", col + 5, headRow + 3, color);
+      if (step === 1 && isMoving) {
+        // Arms swing: --/ on left, \-- on right
+        drawAndRegister("-", col - 1, headRow + 3, color);
+        drawAndRegister("-", col, headRow + 3, color);
+        drawAndRegister("/", col + 1, headRow + 3, color);
+        drawAndRegister("\\", col + 6, headRow + 3, color);
+        drawAndRegister("-", col + 7, headRow + 3, color);
+        drawAndRegister("-", col + 8, headRow + 3, color);
+      } else if (step === 3 && isMoving) {
+        // Arms swing opposite: --\ on left, /-- on right
+        drawAndRegister("-", col - 1, headRow + 3, color);
+        drawAndRegister("-", col, headRow + 3, color);
+        drawAndRegister("\\", col + 1, headRow + 3, color);
+        drawAndRegister("/", col + 6, headRow + 3, color);
+        drawAndRegister("-", col + 7, headRow + 3, color);
+        drawAndRegister("-", col + 8, headRow + 3, color);
+      } else {
+        // Arms at rest: --- on each side
+        drawAndRegister("-", col - 1, headRow + 3, color);
+        drawAndRegister("-", col, headRow + 3, color);
+        drawAndRegister("-", col + 1, headRow + 3, color);
+        drawAndRegister("-", col + 6, headRow + 3, color);
+        drawAndRegister("-", col + 7, headRow + 3, color);
+        drawAndRegister("-", col + 8, headRow + 3, color);
+      }
 
-      // Row 4: chin — \__/ at col+2..col+5
-      drawAndRegister("\\", col + 2, headRow + 4, color);
+      // Row 4: belt |__|
+      drawAndRegister("|", col + 2, headRow + 4, color);
       drawAndRegister("_", col + 3, headRow + 4, color);
       drawAndRegister("_", col + 4, headRow + 4, color);
-      drawAndRegister("/", col + 5, headRow + 4, color);
+      drawAndRegister("|", col + 5, headRow + 4, color);
 
-      // Row 5: tunic upper — /|##|\ at col+1..col+6
-      drawAndRegister("/", col + 1, headRow + 5, color);
-      drawAndRegister("|", col + 2, headRow + 5, color);
-      drawAndRegister("#", col + 3, headRow + 5, color);
-      drawAndRegister("#", col + 4, headRow + 5, color);
-      drawAndRegister("|", col + 5, headRow + 5, color);
-      drawAndRegister("\\", col + 6, headRow + 5, color);
+      // Row 5: hip /  \
+      drawAndRegister("/", col + 2, headRow + 5, color);
+      drawAndRegister("\\", col + 5, headRow + 5, color);
 
-      // Row 6: tunic lower — ||##|| at col+1..col+6
-      drawAndRegister("|", col + 1, headRow + 6, color);
-      drawAndRegister("|", col + 2, headRow + 6, color);
-      drawAndRegister("#", col + 3, headRow + 6, color);
-      drawAndRegister("#", col + 4, headRow + 6, color);
-      drawAndRegister("|", col + 5, headRow + 6, color);
-      drawAndRegister("|", col + 6, headRow + 6, color);
-
-      // Row 7: feet — _|  |_ at col+1..col+6 (animated)
-      drawAndRegister("_", col + 1, headRow + 7, color);
-      drawAndRegister("|", col + 2, headRow + 7, color);
-      drawAndRegister("|", col + 5, headRow + 7, color);
-      drawAndRegister("_", col + 6, headRow + 7, color);
+      // Rows 6-8: legs + feet (animated)
+      if (step === 1 && isMoving) {
+        // Wide stride
+        drawAndRegister("/", col + 1, headRow + 6, color);
+        drawAndRegister("\\", col + 6, headRow + 6, color);
+        drawAndRegister("|", col + 1, headRow + 7, color);
+        drawAndRegister("|", col + 6, headRow + 7, color);
+        drawAndRegister("o", col + 1, headRow + 8, color);
+        drawAndRegister("o", col + 6, headRow + 8, color);
+      } else if (step === 3 && isMoving) {
+        // Narrow passing stride
+        drawAndRegister("\\", col + 3, headRow + 6, color);
+        drawAndRegister("/", col + 4, headRow + 6, color);
+        drawAndRegister("|", col + 3, headRow + 7, color);
+        drawAndRegister("|", col + 4, headRow + 7, color);
+        drawAndRegister("o", col + 3, headRow + 8, color);
+        drawAndRegister("o", col + 4, headRow + 8, color);
+      } else {
+        // Standing
+        drawAndRegister("|", col + 2, headRow + 6, color);
+        drawAndRegister("|", col + 5, headRow + 6, color);
+        drawAndRegister("|", col + 2, headRow + 7, color);
+        drawAndRegister("|", col + 5, headRow + 7, color);
+        drawAndRegister("o", col + 2, headRow + 8, color);
+        drawAndRegister("o", col + 5, headRow + 8, color);
+      }
     }
 
     // ── Dog: small blocky shape following walker ──
@@ -1343,6 +1402,19 @@ export function AsciiVillage() {
     function updatePeasants(dt: number, now: number) {
       const groundRow = S.rows - 1;
 
+      // Track occupied column ranges for speech bubbles to prevent overlap
+      const speechOccupied: { start: number; end: number }[] = [];
+      function canPlaceSpeech(col: number, len: number): boolean {
+        const start = col;
+        const end = col + len;
+        const buffer = 4; // min 4-char gap between speech bubbles
+        for (const r of speechOccupied) {
+          if (start < r.end + buffer && end > r.start - buffer) return false;
+        }
+        speechOccupied.push({ start, end });
+        return true;
+      }
+
       for (let pi = 0; pi < S.peasants.length; pi++) {
         const p = S.peasants[pi];
         p.frame += dt * 0.003;
@@ -1373,8 +1445,8 @@ export function AsciiVillage() {
 
         // Grabbed
         if (p.grabbed) {
-          p.x = S.mouseX / S.charW - 3;  // center horizontally (half of 8-wide peasant)
-          p.y = S.mouseY / S.charH + 4;  // offset down so cursor grabs head (head is ~4 rows above feet for 8-tall peasant)
+          p.x = S.mouseX / S.charW - 4;  // center horizontally (half of 8-wide peasant)
+          p.y = S.mouseY / S.charH + 5;  // offset down so cursor grabs head (head is ~5 rows above center for 9-tall peasant)
           // Add wobble based on frame count
           const wobble = Math.sin(S.frame * 0.15) * 0.5;
           const col = Math.floor(p.x + wobble);
@@ -1387,11 +1459,11 @@ export function AsciiVillage() {
 
         const col = Math.floor(p.x);
 
-        // Speech bubble
+        // Speech bubble (skip if overlapping another)
         if (p.speechTimer > 0) {
           p.speechTimer -= dt;
-          if (p.speechBubble) {
-            const bubbleRow = p.type === "child" ? groundRow - 6 : groundRow - 9;
+          if (p.speechBubble && canPlaceSpeech(col, p.speechBubble.length)) {
+            const bubbleRow = p.type === "child" ? groundRow - 8 : groundRow - 12;
             drawStr(p.speechBubble, col, bubbleRow, themeColors.speechBubble, 0.8);
           }
         }
@@ -1422,8 +1494,8 @@ export function AsciiVillage() {
                 p.stopTimer = 1500 + Math.random() * 3000;
                 p.stateTimer = 5000 + Math.random() * 8000;
                 if (Math.random() > 0.5) {
-                  p.speechBubble = "?";
-                  p.speechTimer = 1000;
+                  p.speechBubble = "!";
+                  p.speechTimer = 1800;
                 }
               } else if (p.stateTimer <= 0) {
                 p.stateTimer = 3000 + Math.random() * 5000;
@@ -1444,8 +1516,8 @@ export function AsciiVillage() {
               p.state = (p.state + 1) % 6;
               p.stateTimer = 800 + Math.random() * 1500;
               if (p.state === 1 || p.state === 3 || p.state === 5) {
-                p.speechBubble = ["...", "!", "?", "!!", "~", ">>", "***"][Math.floor(Math.random() * 7)];
-                p.speechTimer = 1200;
+                p.speechBubble = ["!!", "@#", "$%", "**", "#!", "!@", "%*"][Math.floor(Math.random() * 7)];
+                p.speechTimer = 2000;
               }
             }
 
@@ -1459,30 +1531,36 @@ export function AsciiVillage() {
 
             const speaker = speakerIsFirst ? col : px;
 
-            // Draw speech bubble text above speaker when speechTimer active
-            if (p.speechTimer > 0) {
-              drawStr(p.speechBubble, speaker + 1, groundRow - 9, themeColors.speechBubble, 0.9);
+            // Draw speech bubble text above speaker when speechTimer active (skip if overlapping)
+            if (p.speechTimer > 0 && canPlaceSpeech(speaker + 1, p.speechBubble.length)) {
+              drawStr(p.speechBubble, speaker + 1, groundRow - 12, themeColors.speechBubble, 0.9);
             }
 
-            // Spawn speech particles from MOUTH — max 20, one every 300ms
-            // Mouth is at (groundRow - 4), side depends on facing direction
-            if (isSpeaking && S.talkParticles.length < 20) {
-              const spawnInterval = Math.floor(300 / 16);
+            // Spawn speech particles from MOUTH — max 35, one every 250ms
+            // Mouth is at (groundRow - 7), side depends on facing direction
+            if (isSpeaking && S.talkParticles.length < 35) {
+              const spawnInterval = Math.floor(250 / 16);
               if (S.frame % spawnInterval === 0) {
-                const talkChars = ["~", "\u00B7", "\u00B0", "*", "+"];
-                const mouthRow = groundRow - 4;
+                const talkChars = ["!", "@", "#", "$", "%", "*"];
+                const mouthRow = groundRow - 7;
                 // Spawn from the side of the mouth facing the listener
-                const mouthCol = speakerIsFirst ? speaker + 5 : speaker + 2;
+                const mouthCol = speakerIsFirst ? speaker + 6 : speaker + 1;
                 const spawnX = mouthCol * S.charW + (Math.random() - 0.5) * S.charW;
                 const spawnY = mouthRow * S.charH;
+                // Skip if too close to an existing particle
+                const minDist = S.charW * 1.5;
+                const tooClose = S.talkParticles.some(
+                  (tp) => Math.abs(tp.x - spawnX) < minDist && Math.abs(tp.y - spawnY) < minDist
+                );
+                if (tooClose) break;
                 S.talkParticles.push({
                   x: spawnX,
                   y: spawnY,
                   char: talkChars[Math.floor(Math.random() * talkChars.length)],
                   opacity: 0.8,
-                  life: 6000,
-                  vy: -0.3 * S.charH, // very slow rise, survives much longer
-                  vx: (Math.random() - 0.5) * 0.2, // tiny random drift
+                  life: 10000,
+                  vy: -0.5 * S.charH, // faster rise, travels further up
+                  vx: (Math.random() - 0.5) * 0.3, // slightly more drift
                   shuffleTimer: 200,
                 });
               }
@@ -1513,7 +1591,7 @@ export function AsciiVillage() {
             const noteChars = ["\u266A", "\u266B", "\u266A", " "];
             const noteChar = noteChars[p.state];
             if (noteChar !== " ") {
-              const noteY = groundRow - 7 - (p.state % 3);
+              const noteY = groundRow - 9 - (p.state % 3);
               const noteX = col + 6 + (p.state % 2);
               drawAndRegister(noteChar, noteX, noteY, themeColors.peasant, 0.5);
             }
@@ -1857,7 +1935,7 @@ export function AsciiVillage() {
       drawStars();
       drawCelestialBody();
       drawMountains();
-      drawClouds(0);
+      drawClouds();
       drawAllBuildings(0);
       drawTrees();
 
@@ -1914,8 +1992,9 @@ export function AsciiVillage() {
       // Draw mountains behind everything
       drawMountains();
 
-      // Decorative clouds in the sky
-      drawClouds(timestamp);
+      // Decorative clouds in the sky (use accumulated time to avoid jumps on refocus)
+      if (!paused) S.cloudTime += dt;
+      drawClouds();
 
       // Draw all buildings (3 layers, packed tightly)
       drawAllBuildings(timestamp);
@@ -1938,7 +2017,7 @@ export function AsciiVillage() {
         // Shuffle character every 250ms through speech chars
         tp.shuffleTimer -= dt;
         if (tp.shuffleTimer <= 0) {
-          const shuffleSet = ["~", "\u00B7", "\u00B0", "*", "+", "#", "@"];
+          const shuffleSet = ["!", "@", "#", "$", "%", "*"];
           tp.char = shuffleSet[Math.floor(Math.random() * shuffleSet.length)];
           tp.shuffleTimer = 250;
         }
@@ -1946,7 +2025,11 @@ export function AsciiVillage() {
           S.talkParticles.splice(i, 1);
           continue;
         }
-        drawCharPx(tp.char, tp.x, tp.y, themeColors.speechBubble, 0.8);
+        const tpScale = 1.4;
+        ctx!.font = `${Math.round(fontSize * tpScale)}px "Geist Mono", "JetBrains Mono", "Courier New", monospace`;
+        const fadeRatio = Math.min(tp.life / 2000, 1); // fade out over last 2s
+        drawCharPx(tp.char, tp.x, tp.y, themeColors.speechBubble, 0.8 * fadeRatio);
+        ctx!.font = `${fontSize}px "Geist Mono", "JetBrains Mono", "Courier New", monospace`;
       }
 
       // Birds and paragliders
