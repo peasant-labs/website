@@ -90,7 +90,7 @@ interface BuildingDef {
 }
 
 // ─── Building Scale ──────────────────────────────────────────────────
-const BUILDING_SCALE = 1.25;
+const BUILDING_SCALE = 1;
 
 // ─── Building ASCII Art Templates ────────────────────────────────────
 
@@ -447,12 +447,11 @@ export function AsciiVillage() {
     // Returns array of BuildingDef that tile across the full width with NO gaps
     function generateBuildingStrip(layer: 0 | 1 | 2): BuildingDef[] {
       const templates: BuildingDef[][] = [
-        // Layer 0 (far): small buildings
+        // Layer 0 (far): small buildings (no church/guildhall)
         [
           { w: 8, h: 5, type: "house", layer: 0, chimneyPos: 2, windowRows: 2, windowsPerRow: 1 },
           { w: 10, h: 6, type: "house2", layer: 0, chimneyPos: 3, windowRows: 2, windowsPerRow: 2 },
           { w: 7, h: 4, type: "house3", layer: 0, chimneyPos: 2, windowRows: 1, windowsPerRow: 1 },
-          { w: 12, h: 7, type: "church", layer: 0, chimneyPos: 5, windowRows: 3, windowsPerRow: 2, hasCross: true },
           { w: 9, h: 5, type: "house", layer: 0, chimneyPos: 3, windowRows: 2, windowsPerRow: 1 },
         ],
         // Layer 1 (mid): medium buildings
@@ -460,16 +459,11 @@ export function AsciiVillage() {
           { w: 12, h: 7, type: "house", layer: 1, chimneyPos: 3, windowRows: 3, windowsPerRow: 2 },
           { w: 15, h: 8, type: "tavern", layer: 1, chimneyPos: 4, windowRows: 3, windowsPerRow: 3 },
           { w: 10, h: 6, type: "house2", layer: 1, chimneyPos: 3, windowRows: 2, windowsPerRow: 2 },
-          { w: 14, h: 9, type: "church", layer: 1, chimneyPos: 5, windowRows: 4, windowsPerRow: 2, hasCross: true },
           { w: 11, h: 7, type: "house3", layer: 1, chimneyPos: 4, windowRows: 3, windowsPerRow: 2 },
-          { w: 8, h: 5, type: "tower", layer: 1, chimneyPos: 3, windowRows: 3, windowsPerRow: 1, hasFlag: true },
         ],
-        // Layer 2 (foreground): template-based buildings (scaled)
+        // Layer 2 (foreground): template-based buildings
         [
           { w: Math.ceil(TEMPLATE_WIDTH.house * BUILDING_SCALE), h: Math.ceil(COTTAGE_1.length * BUILDING_SCALE), type: "house", layer: 2, chimneyPos: CHIMNEY_OFFSET.house, windowRows: 0, windowsPerRow: 0 },
-          { w: Math.ceil(TEMPLATE_WIDTH.guildhall * BUILDING_SCALE), h: Math.ceil(TOWN_HALL.length * BUILDING_SCALE), type: "guildhall", layer: 2, chimneyPos: CHIMNEY_OFFSET.guildhall, windowRows: 0, windowsPerRow: 0, hasFlag: true },
-          { w: Math.ceil(TEMPLATE_WIDTH.church * BUILDING_SCALE), h: Math.ceil(CHURCH.length * BUILDING_SCALE), type: "church", layer: 2, chimneyPos: CHIMNEY_OFFSET.church, windowRows: 0, windowsPerRow: 0, hasCross: true },
-          { w: Math.ceil(TEMPLATE_WIDTH.tower * BUILDING_SCALE), h: Math.ceil(TOWER.length * BUILDING_SCALE), type: "tower", layer: 2, chimneyPos: CHIMNEY_OFFSET.tower, windowRows: 0, windowsPerRow: 0, hasFlag: true },
           { w: Math.ceil(TEMPLATE_WIDTH.tavern * BUILDING_SCALE), h: Math.ceil(TAVERN.length * BUILDING_SCALE), type: "tavern", layer: 2, chimneyPos: CHIMNEY_OFFSET.tavern, windowRows: 0, windowsPerRow: 0 },
           { w: Math.ceil(TEMPLATE_WIDTH.house2 * BUILDING_SCALE), h: Math.ceil(COTTAGE_2.length * BUILDING_SCALE), type: "house2", layer: 2, chimneyPos: CHIMNEY_OFFSET.house2, windowRows: 0, windowsPerRow: 0 },
           { w: Math.ceil(TEMPLATE_WIDTH.house3 * BUILDING_SCALE), h: Math.ceil(COTTAGE_1.length * BUILDING_SCALE), type: "house3", layer: 2, chimneyPos: CHIMNEY_OFFSET.house3, windowRows: 0, windowsPerRow: 0 },
@@ -537,7 +531,7 @@ export function AsciiVillage() {
               if (line[c] === "[" && line[c + 1] === "]") {
                 rowWindows.push({
                   on: Math.random() > 0.3,
-                  nextToggle: 3000 + Math.random() * 12000,
+                  nextToggle: 300000 + Math.random() * 600000,
                   hasCat: Math.random() > 0.85,
                 });
               }
@@ -574,8 +568,7 @@ export function AsciiVillage() {
       S.peasants = [];
       const walkerConfigs = [
         { xFrac: 0.15, dir: 1, speed: 0.014 },
-        { xFrac: 0.52, dir: -1, speed: 0.016 },
-        { xFrac: 0.82, dir: 1, speed: 0.015 },
+        { xFrac: 0.72, dir: -1, speed: 0.016 },
       ];
       for (const wc of walkerConfigs) {
         S.peasants.push({
@@ -604,7 +597,7 @@ export function AsciiVillage() {
       }
 
       // ── Talking pairs (2 pairs)
-      const talkerPositions = [0.18, 0.70];
+      const talkerPositions = [0.40];
       for (const xf of talkerPositions) {
         const baseX = Math.floor(S.cols * xf);
         S.peasants.push({
@@ -637,26 +630,22 @@ export function AsciiVillage() {
 
       // ── Birds (4) — fewer, fly lower (below stars/clouds)
       S.birds = [];
-      for (let i = 0; i < 2; i++) {
-        S.birds.push({
-          x: Math.random() * S.cols * 0.4,
-          y: Math.floor(S.rows * 0.3) + Math.random() * Math.floor(S.rows * 0.15),
-          speed: 0.005,
-          frame: Math.random() * 4,
-          formation: true,
-          formationOffset: i * 3,
-        });
-      }
-      for (let i = 0; i < 2; i++) {
-        S.birds.push({
-          x: Math.random() * S.cols,
-          y: Math.floor(S.rows * 0.35) + Math.random() * Math.floor(S.rows * 0.2),
-          speed: 0.003 + Math.random() * 0.004,
-          frame: Math.random() * 4,
-          formation: false,
-          formationOffset: 0,
-        });
-      }
+      S.birds.push({
+        x: Math.random() * S.cols * 0.4,
+        y: Math.floor(S.rows * 0.5) + Math.random() * Math.floor(S.rows * 0.15),
+        speed: 0.005,
+        frame: Math.random() * 4,
+        formation: true,
+        formationOffset: 0,
+      });
+      S.birds.push({
+        x: Math.random() * S.cols,
+        y: Math.floor(S.rows * 0.55) + Math.random() * Math.floor(S.rows * 0.15),
+        speed: 0.003 + Math.random() * 0.004,
+        frame: Math.random() * 4,
+        formation: false,
+        formationOffset: 0,
+      });
 
       // ── Paraglider (1)
       S.paragliders = [
@@ -680,7 +669,7 @@ export function AsciiVillage() {
       // Stars — scale with screen size, spread across upper 60% of sky
       S.stars = [];
       const skyArea = S.cols * Math.floor(S.rows * 0.6);
-      const starCount = Math.max(80, Math.floor(skyArea / 30));
+      const starCount = Math.max(27, Math.floor(skyArea / 90));
       for (let i = 0; i < starCount; i++) {
         S.stars.push({
           col: Math.floor(Math.random() * S.cols),
@@ -723,7 +712,7 @@ export function AsciiVillage() {
         // Regenerate stars to fill new screen dimensions
         S.stars = [];
         const skyArea = S.cols * Math.floor(S.rows * 0.6);
-        const starCount = Math.max(80, Math.floor(skyArea / 30));
+        const starCount = Math.max(27, Math.floor(skyArea / 90));
         for (let i = 0; i < starCount; i++) {
           S.stars.push({
             col: Math.floor(Math.random() * S.cols),
@@ -827,7 +816,7 @@ export function AsciiVillage() {
               ws.nextToggle -= 16;
               if (ws.nextToggle <= 0) {
                 ws.on = !ws.on;
-                ws.nextToggle = 3000 + Math.random() * 12000;
+                ws.nextToggle = 300000 + Math.random() * 600000;
               }
               const wColor = (ws.on && def.layer === 2) ? themeColors.windowLit : themeColors.windowDark;
               const sc = Math.round(c * bs);
@@ -866,6 +855,52 @@ export function AsciiVillage() {
           const char = twinkle > 0.5 ? "*" : twinkle > 0 ? "+" : ".";
           const opacity = 0.3 + twinkle * 0.3;
           drawChar(char, star.col, star.row, themeColors.peasant, opacity);
+        }
+      }
+    }
+
+    // ── Shooting star ──
+    let shootingStar = { x: 0, y: 0, vx: 0, vy: 0, life: 0, cooldown: 3000 + Math.random() * 5000 };
+
+    function updateShootingStar(dt: number) {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      if (isLight) return;
+
+      if (shootingStar.life > 0) {
+        shootingStar.life -= dt;
+        shootingStar.x += shootingStar.vx * dt;
+        shootingStar.y += shootingStar.vy * dt;
+        const opacity = Math.min(shootingStar.life / 400, 1);
+        const hx = Math.floor(shootingStar.x);
+        const hy = Math.floor(shootingStar.y);
+        // Normalized trail direction (opposite of velocity)
+        const speed = Math.sqrt(shootingStar.vx * shootingStar.vx + shootingStar.vy * shootingStar.vy);
+        const tx = -shootingStar.vx / speed; // trail unit vector
+        const ty = -shootingStar.vy / speed;
+        // Bright head
+        drawChar("*", hx, hy, themeColors.windowLit, opacity);
+        // Trail — 6 steps back along trajectory
+        for (let i = 1; i <= 6; i++) {
+          const px = Math.floor(hx + tx * i);
+          const py = Math.floor(hy + ty * i);
+          const trailOpacity = opacity * (1 - i / 7);
+          const ch = i <= 2 ? "=" : i <= 4 ? "-" : ".";
+          const color = i <= 4 ? themeColors.windowLit : themeColors.peasant;
+          drawChar(ch, px, py, color, trailOpacity);
+        }
+      } else {
+        shootingStar.cooldown -= dt;
+        if (shootingStar.cooldown <= 0) {
+          // Random position across the upper sky
+          shootingStar.x = Math.random() * S.cols;
+          shootingStar.y = Math.random() * S.rows * 0.3 + 1;
+          // Random trajectory — pick a random angle biased downward
+          const angle = (Math.random() * 0.8 + 0.1) * Math.PI; // 18° to 144° (mostly horizontal, slight down)
+          const spd = 0.04 + Math.random() * 0.04; // variable speed
+          shootingStar.vx = Math.cos(angle) * spd * (Math.random() > 0.5 ? 1 : -1); // random left or right
+          shootingStar.vy = Math.abs(Math.sin(angle)) * spd * 0.4; // always drifts slightly down
+          shootingStar.life = 800 + Math.random() * 600;
+          shootingStar.cooldown = 6000 + Math.random() * 12000;
         }
       }
     }
@@ -968,6 +1003,65 @@ export function AsciiVillage() {
       ];
       for (const bx of bushPositions) {
         drawStr("(())", bx, backBaseRow, bushColor, 0.35);
+      }
+    }
+
+    // ── Firepit — small animated campfire on the ground ──
+    function drawFirepit() {
+      const groundRow = S.rows - 1;
+      const fx = Math.floor(S.cols * 0.88); // far right, away from buildings
+      const fireColor = themeColors.windowLit;
+      const stoneColor = themeColors.buildingWall;
+      const flickr = S.frame % 12;
+
+      // Logs:  /~~\
+      //       /~~~~\
+      drawChar("/", fx - 1, groundRow, stoneColor, 0.7);
+      drawChar("~", fx, groundRow, stoneColor, 0.6);
+      drawChar("~", fx + 1, groundRow, stoneColor, 0.6);
+      drawChar("~", fx + 2, groundRow, stoneColor, 0.6);
+      drawChar("~", fx + 3, groundRow, stoneColor, 0.6);
+      drawChar("\\", fx + 4, groundRow, stoneColor, 0.7);
+
+      // Flame — 3 animation frames
+      if (flickr < 4) {
+        //   ,
+        //  )*(
+        // (***) drawChar(",", fx + 2, groundRow - 3, fireColor, 0.5);
+        drawChar(")", fx, groundRow - 2, fireColor, 0.8);
+        drawChar("*", fx + 1, groundRow - 2, fireColor, 1);
+        drawChar("*", fx + 2, groundRow - 2, fireColor, 1);
+        drawChar("(", fx + 3, groundRow - 2, fireColor, 0.8);
+        drawChar("(", fx, groundRow - 1, fireColor, 0.9);
+        drawChar("*", fx + 1, groundRow - 1, fireColor, 1);
+        drawChar("*", fx + 2, groundRow - 1, fireColor, 1);
+        drawChar("*", fx + 3, groundRow - 1, fireColor, 1);
+        drawChar(")", fx + 4, groundRow - 1, fireColor, 0.9);
+      } else if (flickr < 8) {
+        //    '
+        //  (*) drawChar("'", fx + 1, groundRow - 3, fireColor, 0.5);
+        drawChar("(", fx, groundRow - 2, fireColor, 0.8);
+        drawChar("*", fx + 1, groundRow - 2, fireColor, 1);
+        drawChar("*", fx + 2, groundRow - 2, fireColor, 1);
+        drawChar("*", fx + 3, groundRow - 2, fireColor, 1);
+        drawChar(")", fx + 4, groundRow - 2, fireColor, 0.8);
+        drawChar(")", fx, groundRow - 1, fireColor, 0.9);
+        drawChar("*", fx + 1, groundRow - 1, fireColor, 1);
+        drawChar("*", fx + 2, groundRow - 1, fireColor, 1);
+        drawChar("*", fx + 3, groundRow - 1, fireColor, 1);
+        drawChar("(", fx + 4, groundRow - 1, fireColor, 0.9);
+      } else {
+        //  .
+        //  )**( drawChar(".", fx + 3, groundRow - 3, fireColor, 0.5);
+        drawChar(")", fx, groundRow - 2, fireColor, 0.8);
+        drawChar("*", fx + 1, groundRow - 2, fireColor, 1);
+        drawChar("*", fx + 2, groundRow - 2, fireColor, 1);
+        drawChar("*", fx + 3, groundRow - 2, fireColor, 1);
+        drawChar("(", fx + 4, groundRow - 2, fireColor, 0.8);
+        drawChar("(", fx, groundRow - 1, fireColor, 0.9);
+        drawChar("*", fx + 1, groundRow - 1, fireColor, 1);
+        drawChar("*", fx + 2, groundRow - 1, fireColor, 1);
+        drawChar("(", fx + 3, groundRow - 1, fireColor, 0.9);
       }
     }
 
@@ -1075,26 +1169,29 @@ export function AsciiVillage() {
 
     // Cloud templates — variable widths
     const CLOUD_TEMPLATES = [
-      // Small
-      ["  ___  ", " /   \\ ", "/     \\", "\\_____/"],
+      // Small (2x min width)
+      ["      _____________      ", "    _/             \\_    ", "   /                 \\   ", "   \\_________________ /  "],
       // Medium
-      ["    _______    ", "  _/       \\_  ", " /           \\ ", " \\___________/ "],
+      ["          ________________          ", "      ___/                \\___      ", "    /                          \\    ", "    \\____________________________ / "],
       // Large
-      ["      ___________      ", "   __/           \\__   ", "  /                 \\  ", "  \\_________________ / "],
+      ["              _____________________              ", "         ____/                     \\____         ", "       /                                 \\       ", "       \\___________________________________ /    "],
     ];
 
-    // 3 decorative clouds at fixed horizontal positions, drifting slowly
+    // 3 decorative clouds — each tracks its own smooth drift
     const decorativeClouds = [
-      { xFrac: 0.08, row: 6, driftOffset: 0, template: 0 },
-      { xFrac: 0.42, row: 3, driftOffset: 150, template: 2 },
-      { xFrac: 0.75, row: 8, driftOffset: 300, template: 1 },
+      { xFrac: 0.08, row: 6, drift: 0, template: 0 },
+      { xFrac: 0.42, row: 3, drift: 0, template: 2 },
+      { xFrac: 0.75, row: 8, drift: 0, template: 1 },
     ];
 
-    function drawClouds() {
+    function updateAndDrawClouds(dt: number, paused: boolean) {
       const cloudOpacity = 0.25;
+      const driftSpeed = 0.008; // chars per second
       for (const dc of decorativeClouds) {
-        const drift = Math.floor((S.cloudTime * 0.001 + dc.driftOffset) * S.windDirection * 0.5) % S.cols;
-        const baseCol = Math.floor(dc.xFrac * S.cols) + drift;
+        if (!paused) {
+          dc.drift += S.windDirection * driftSpeed * dt;
+        }
+        const baseCol = Math.floor(dc.xFrac * S.cols + dc.drift);
         const r = dc.row;
         const tmpl = CLOUD_TEMPLATES[dc.template];
 
@@ -1126,158 +1223,96 @@ export function AsciiVillage() {
       const isMoving = Math.abs(frame) > 0.01 && step !== 0;
 
       if (isChild) {
-        // Child: 5 wide, 6 rows tall
-        //  ___
-        // {^_^}
-        //  |#|
+        // Child: 4 wide, 4 rows tall (2/3 of previous)
+        //  __
+        // {^^}
         //  |_|
-        //  | |
-        //  O O
-        const headRow = row - 5;
+        //  o o
+        const headRow = row - 3;
 
-        // Row 0: hat
         drawAndRegister("_", col + 1, headRow, color);
         drawAndRegister("_", col + 2, headRow, color);
-        drawAndRegister("_", col + 3, headRow, color);
-
-        // Row 1: face {^_^} or {^o^} when speaking
         drawAndRegister("{", col, headRow + 1, color);
         drawAndRegister("^", col + 1, headRow + 1, color);
-        drawAndRegister(speaking ? "o" : "_", col + 2, headRow + 1, color);
-        drawAndRegister("^", col + 3, headRow + 1, color);
-        drawAndRegister("}", col + 4, headRow + 1, color);
-
-        // Row 2: tunic |#|
+        drawAndRegister("^", col + 2, headRow + 1, color);
+        drawAndRegister("}", col + 3, headRow + 1, color);
         drawAndRegister("|", col + 1, headRow + 2, color);
-        const cb = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
-        drawAndRegister(cb, col + 2, headRow + 2, color);
+        drawAndRegister("_", col + 2, headRow + 2, color);
         drawAndRegister("|", col + 3, headRow + 2, color);
-
-        // Row 3: belt |_|
-        drawAndRegister("|", col + 1, headRow + 3, color);
-        drawAndRegister("_", col + 2, headRow + 3, color);
-        drawAndRegister("|", col + 3, headRow + 3, color);
-
-        // Rows 4-5: legs + feet (animated)
         if (step === 1 && isMoving) {
-          drawAndRegister("/", col, headRow + 4, color);
-          drawAndRegister("\\", col + 4, headRow + 4, color);
-          drawAndRegister("o", col, headRow + 5, color);
-          drawAndRegister("o", col + 4, headRow + 5, color);
-        } else if (step === 3 && isMoving) {
-          drawAndRegister("\\", col + 1, headRow + 4, color);
-          drawAndRegister("/", col + 3, headRow + 4, color);
-          drawAndRegister("o", col + 1, headRow + 5, color);
-          drawAndRegister("o", col + 3, headRow + 5, color);
+          drawAndRegister("o", col, headRow + 3, color);
+          drawAndRegister("o", col + 3, headRow + 3, color);
         } else {
-          drawAndRegister("|", col + 1, headRow + 4, color);
-          drawAndRegister("|", col + 3, headRow + 4, color);
-          drawAndRegister("o", col + 1, headRow + 5, color);
-          drawAndRegister("o", col + 3, headRow + 5, color);
+          drawAndRegister("o", col + 1, headRow + 3, color);
+          drawAndRegister("o", col + 2, headRow + 3, color);
         }
         return;
       }
 
-      // Full-size peasant: 10 wide, 9 rows tall (all even-width, center col+3.5)
-      //      ____
-      //     {^__^}
-      //      -\/-
-      //   ---|##|---
-      //      |__|
-      //      /  \
-      //      |  |
-      //      |  |
-      //      o  o
-      const headRow = row - 8;
+      // Full-size peasant: 6 rows tall, ~5 wide (2/3 of previous 9-row)
+      //   ___
+      //  {^_^}
+      // --|#|--
+      //   |_|
+      //   | |
+      //   o o
+      const headRow = row - 5;
 
-      // Row 0: hat ____
+      // Row 0: hat
+      drawAndRegister("_", col + 1, headRow, color);
       drawAndRegister("_", col + 2, headRow, color);
       drawAndRegister("_", col + 3, headRow, color);
-      drawAndRegister("_", col + 4, headRow, color);
-      drawAndRegister("_", col + 5, headRow, color);
 
-      // Row 1: face {^__^} or {^_o^} when speaking
-      drawAndRegister("{", col + 1, headRow + 1, color);
-      drawAndRegister("^", col + 2, headRow + 1, color);
-      drawAndRegister("_", col + 3, headRow + 1, color);
-      drawAndRegister(speaking ? "o" : "_", col + 4, headRow + 1, color);
-      drawAndRegister("^", col + 5, headRow + 1, color);
-      drawAndRegister("}", col + 6, headRow + 1, color);
+      // Row 1: face {^_^} or {^o^} when speaking
+      drawAndRegister("{", col, headRow + 1, color);
+      drawAndRegister("^", col + 1, headRow + 1, color);
+      drawAndRegister(speaking ? "o" : "_", col + 2, headRow + 1, color);
+      drawAndRegister("^", col + 3, headRow + 1, color);
+      drawAndRegister("}", col + 4, headRow + 1, color);
 
-      // Row 2: collar -\/-
-      drawAndRegister("-", col + 2, headRow + 2, color);
-      drawAndRegister("\\", col + 3, headRow + 2, color);
-      drawAndRegister("/", col + 4, headRow + 2, color);
-      drawAndRegister("-", col + 5, headRow + 2, color);
-
-      // Row 3: tunic with arms ---|##|--- (animated arms, 3 chars each side)
-      const bc1 = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
-      const bc2 = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
-      drawAndRegister("|", col + 2, headRow + 3, color);
-      drawAndRegister(bc1, col + 3, headRow + 3, color);
-      drawAndRegister(bc2, col + 4, headRow + 3, color);
-      drawAndRegister("|", col + 5, headRow + 3, color);
+      // Row 2: body with animated arms --|#|--
+      const bc = (isMoving && Math.random() > 0.85) ? (Math.random() > 0.5 ? "\u2593" : "\u2592") : "#";
+      drawAndRegister("|", col + 1, headRow + 2, color);
+      drawAndRegister(bc, col + 2, headRow + 2, color);
+      drawAndRegister("|", col + 3, headRow + 2, color);
       if (step === 1 && isMoving) {
-        // Arms swing: --/ on left, \-- on right
-        drawAndRegister("-", col - 1, headRow + 3, color);
-        drawAndRegister("-", col, headRow + 3, color);
-        drawAndRegister("/", col + 1, headRow + 3, color);
-        drawAndRegister("\\", col + 6, headRow + 3, color);
-        drawAndRegister("-", col + 7, headRow + 3, color);
-        drawAndRegister("-", col + 8, headRow + 3, color);
+        drawAndRegister("/", col, headRow + 2, color);
+        drawAndRegister("-", col - 1, headRow + 1, color);
+        drawAndRegister("\\", col + 4, headRow + 2, color);
+        drawAndRegister("-", col + 5, headRow + 3, color);
       } else if (step === 3 && isMoving) {
-        // Arms swing opposite: --\ on left, /-- on right
+        drawAndRegister("\\", col, headRow + 2, color);
         drawAndRegister("-", col - 1, headRow + 3, color);
-        drawAndRegister("-", col, headRow + 3, color);
-        drawAndRegister("\\", col + 1, headRow + 3, color);
-        drawAndRegister("/", col + 6, headRow + 3, color);
-        drawAndRegister("-", col + 7, headRow + 3, color);
-        drawAndRegister("-", col + 8, headRow + 3, color);
+        drawAndRegister("/", col + 4, headRow + 2, color);
+        drawAndRegister("-", col + 5, headRow + 1, color);
       } else {
-        // Arms at rest: --- on each side
-        drawAndRegister("-", col - 1, headRow + 3, color);
-        drawAndRegister("-", col, headRow + 3, color);
-        drawAndRegister("-", col + 1, headRow + 3, color);
-        drawAndRegister("-", col + 6, headRow + 3, color);
-        drawAndRegister("-", col + 7, headRow + 3, color);
-        drawAndRegister("-", col + 8, headRow + 3, color);
+        drawAndRegister("\\", col, headRow + 2, color);
+        drawAndRegister("_", col - 1, headRow + 3, color);
+        drawAndRegister("/", col + 4, headRow + 2, color);
+        drawAndRegister("_", col + 5, headRow + 3, color);
       }
 
-      // Row 4: belt |__|
-      drawAndRegister("|", col + 2, headRow + 4, color);
-      drawAndRegister("_", col + 3, headRow + 4, color);
-      drawAndRegister("_", col + 4, headRow + 4, color);
-      drawAndRegister("|", col + 5, headRow + 4, color);
+      // Row 3: belt |_|
+      drawAndRegister("|", col + 1, headRow + 3, color);
+      drawAndRegister("_", col + 2, headRow + 3, color);
+      drawAndRegister("|", col + 3, headRow + 3, color);
 
-      // Row 5: hip /  \
-      drawAndRegister("/", col + 2, headRow + 5, color);
-      drawAndRegister("\\", col + 5, headRow + 5, color);
-
-      // Rows 6-8: legs + feet (animated)
+      // Rows 4-5: legs + feet (animated)
       if (step === 1 && isMoving) {
-        // Wide stride
-        drawAndRegister("/", col + 1, headRow + 6, color);
-        drawAndRegister("\\", col + 6, headRow + 6, color);
-        drawAndRegister("|", col + 1, headRow + 7, color);
-        drawAndRegister("|", col + 6, headRow + 7, color);
-        drawAndRegister("o", col + 1, headRow + 8, color);
-        drawAndRegister("o", col + 6, headRow + 8, color);
+        drawAndRegister("/", col, headRow + 4, color);
+        drawAndRegister("\\", col + 4, headRow + 4, color);
+        drawAndRegister("o", col, headRow + 5, color);
+        drawAndRegister("o", col + 4, headRow + 5, color);
       } else if (step === 3 && isMoving) {
-        // Narrow passing stride
-        drawAndRegister("\\", col + 3, headRow + 6, color);
-        drawAndRegister("/", col + 4, headRow + 6, color);
-        drawAndRegister("|", col + 3, headRow + 7, color);
-        drawAndRegister("|", col + 4, headRow + 7, color);
-        drawAndRegister("o", col + 3, headRow + 8, color);
-        drawAndRegister("o", col + 4, headRow + 8, color);
+        drawAndRegister("\\", col + 1, headRow + 4, color);
+        drawAndRegister("/", col + 3, headRow + 4, color);
+        drawAndRegister("o", col + 1, headRow + 5, color);
+        drawAndRegister("o", col + 3, headRow + 5, color);
       } else {
-        // Standing
-        drawAndRegister("|", col + 2, headRow + 6, color);
-        drawAndRegister("|", col + 5, headRow + 6, color);
-        drawAndRegister("|", col + 2, headRow + 7, color);
-        drawAndRegister("|", col + 5, headRow + 7, color);
-        drawAndRegister("o", col + 2, headRow + 8, color);
-        drawAndRegister("o", col + 5, headRow + 8, color);
+        drawAndRegister("|", col + 1, headRow + 4, color);
+        drawAndRegister("|", col + 3, headRow + 4, color);
+        drawAndRegister("o", col + 1, headRow + 5, color);
+        drawAndRegister("o", col + 3, headRow + 5, color);
       }
     }
 
@@ -1445,8 +1480,8 @@ export function AsciiVillage() {
 
         // Grabbed
         if (p.grabbed) {
-          p.x = S.mouseX / S.charW - 4;  // center horizontally (half of 8-wide peasant)
-          p.y = S.mouseY / S.charH + 5;  // offset down so cursor grabs head (head is ~5 rows above center for 9-tall peasant)
+          p.x = S.mouseX / S.charW - 2;  // center horizontally (half of 5-wide peasant)
+          p.y = S.mouseY / S.charH + 3;  // offset down so cursor grabs head (head is ~3 rows above center for 6-tall peasant)
           // Add wobble based on frame count
           const wobble = Math.sin(S.frame * 0.15) * 0.5;
           const col = Math.floor(p.x + wobble);
@@ -1463,7 +1498,7 @@ export function AsciiVillage() {
         if (p.speechTimer > 0) {
           p.speechTimer -= dt;
           if (p.speechBubble && canPlaceSpeech(col, p.speechBubble.length)) {
-            const bubbleRow = p.type === "child" ? groundRow - 8 : groundRow - 12;
+            const bubbleRow = p.type === "child" ? groundRow - 5 : groundRow - 8;
             drawStr(p.speechBubble, col, bubbleRow, themeColors.speechBubble, 0.8);
           }
         }
@@ -1533,7 +1568,7 @@ export function AsciiVillage() {
 
             // Draw speech bubble text above speaker when speechTimer active (skip if overlapping)
             if (p.speechTimer > 0 && canPlaceSpeech(speaker + 1, p.speechBubble.length)) {
-              drawStr(p.speechBubble, speaker + 1, groundRow - 12, themeColors.speechBubble, 0.9);
+              drawStr(p.speechBubble, speaker + 1, groundRow - 8, themeColors.speechBubble, 0.9);
             }
 
             // Spawn speech particles from MOUTH — max 35, one every 250ms
@@ -1542,9 +1577,9 @@ export function AsciiVillage() {
               const spawnInterval = Math.floor(250 / 16);
               if (S.frame % spawnInterval === 0) {
                 const talkChars = ["!", "@", "#", "$", "%", "*"];
-                const mouthRow = groundRow - 7;
+                const mouthRow = groundRow - 4;
                 // Spawn from the side of the mouth facing the listener
-                const mouthCol = speakerIsFirst ? speaker + 6 : speaker + 1;
+                const mouthCol = speakerIsFirst ? speaker + 4 : speaker;
                 const spawnX = mouthCol * S.charW + (Math.random() - 0.5) * S.charW;
                 const spawnY = mouthRow * S.charH;
                 // Skip if too close to an existing particle
@@ -1591,7 +1626,7 @@ export function AsciiVillage() {
             const noteChars = ["\u266A", "\u266B", "\u266A", " "];
             const noteChar = noteChars[p.state];
             if (noteChar !== " ") {
-              const noteY = groundRow - 9 - (p.state % 3);
+              const noteY = groundRow - 6 - (p.state % 3);
               const noteX = col + 6 + (p.state % 2);
               drawAndRegister(noteChar, noteX, noteY, themeColors.peasant, 0.5);
             }
@@ -1935,9 +1970,10 @@ export function AsciiVillage() {
       drawStars();
       drawCelestialBody();
       drawMountains();
-      drawClouds();
+      updateAndDrawClouds(0, true);
       drawAllBuildings(0);
       drawTrees();
+      drawFirepit();
 
       ctx.globalAlpha = 1;
 
@@ -1985,22 +2021,23 @@ export function AsciiVillage() {
 
       const simDt = simTick ? SIM_STEP : 0;
 
-      // Stars and celestial body behind everything
+      // Stars, shooting star, and celestial body behind everything
       drawStars();
+      if (!paused) updateShootingStar(dt);
       drawCelestialBody();
 
       // Draw mountains behind everything
       drawMountains();
 
-      // Decorative clouds in the sky (use accumulated time to avoid jumps on refocus)
-      if (!paused) S.cloudTime += dt;
-      drawClouds();
+      // Decorative clouds in the sky
+      updateAndDrawClouds(dt, paused);
 
       // Draw all buildings (3 layers, packed tightly)
       drawAllBuildings(timestamp);
 
-      // Draw trees at edges
+      // Draw trees at edges and firepit
       drawTrees();
+      drawFirepit();
 
       // Smoke — updates every frame (frozen when paused)
       updateSmoke(effectiveDt, timestamp);

@@ -5,7 +5,7 @@ import { useAsciiMorph } from "@/lib/use-ascii-morph";
 import { useTypewriter } from "@/lib/use-typewriter";
 import { AsciiVillage } from "@/components/landing/ascii-village";
 
-const FIGLET = `                              _
+const FIGLET = `                                  _
  _ __   ___  __ _ ___  __ _ _ __ | |_
 | '_ \\ / _ \\/ _\` / __|/ _\` | '_ \\| __|
 | |_) |  __/ (_| \\__ \\ (_| | | | | |_

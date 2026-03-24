@@ -78,9 +78,10 @@ export function Research() {
             {INDIVIDUALS.map((person, i) => (
               <div
                 key={i}
-                className="flex items-center gap-4 p-4 border border-[var(--border-default)] bg-[var(--bg-deep)] transition-all duration-500 ease-out hover:border-[var(--accent)] hover:-translate-y-[2px]"
+                className="flex items-center gap-4 p-4 border border-[var(--border-default)] bg-[var(--bg-deep)] transition-[border-color,transform,opacity] duration-200 ease-out hover:border-[var(--accent)] hover:-translate-y-[2px]"
                 style={{
                   transitionDelay: isInView ? `${i * 80}ms` : "0ms",
+                  transitionDuration: isInView ? undefined : "200ms",
                   opacity: isInView ? 1 : 0,
                 }}
               >
