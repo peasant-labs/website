@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -8,17 +8,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "peasant — tend your harvests. share your yields.",
+  title: "peasants deserve their share — dispatch 001",
   description:
-    "the open-source cli for ai coding transcript analytics. ingest sessions from claude code, opencode, and more. analyze metrics locally. share anonymized transcripts with the village.",
+    "an upcoming editorial on the quiet enclosure of the transcript commons, and why the harvest belongs to the hands that sowed it.",
+  applicationName: "peasant",
+  authors: [{ name: "peasant" }],
   keywords: [
-    "ai coding",
-    "transcript analytics",
-    "claude code",
-    "tui",
-    "developer tools",
-    "open source",
+    "agent transcripts",
+    "data sovereignty",
+    "coding agents",
+    "attribution",
+    "the commons",
   ],
+  openGraph: {
+    title: "peasants deserve their share",
+    description:
+      "forthcoming — on the quiet enclosure of the transcript commons.",
+    type: "article",
+  },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0c0c0e",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -28,7 +41,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={geistMono.variable} suppressHydrationWarning>
-      <body className="min-h-screen font-mono">{children}</body>
+      <body className="lowercase-all uniform min-h-screen font-mono antialiased">
+        <a
+          href="#content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border focus:border-[var(--accent)] focus:bg-[var(--bg-deep)] focus:px-4 focus:py-2 focus:text-[var(--accent)]"
+        >
+          skip to content
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

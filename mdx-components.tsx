@@ -1,6 +1,4 @@
 import type { MDXComponents } from "mdx/types";
-import { Callout } from "@/components/mdx/callout";
-import { Steps } from "@/components/mdx/steps";
 
 const components: MDXComponents = {
   h1: (props) => (
@@ -116,10 +114,6 @@ const components: MDXComponents = {
   hr: (props) => (
     <hr className="my-8 border-[var(--border-default)]" {...props} />
   ),
-
-  // Custom MDX components available in all docs
-  Callout,
-  Steps,
 };
 
 export function useMDXComponents(): MDXComponents {

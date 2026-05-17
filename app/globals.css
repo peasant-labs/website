@@ -192,3 +192,47 @@ body {
 .text-body { font-size: 16px; line-height: 1.6; }
 .text-small { font-size: 13px; line-height: 1.5; }
 .text-caption { font-size: 11px; line-height: 1.5; }
+
+@media (min-width: 768px) {
+  .text-display { font-size: 52px; }
+}
+
+/* never uppercase — the peasant does not capitalize for the manor */
+.lowercase-all,
+.lowercase-all * {
+  text-transform: lowercase !important;
+}
+
+/* visible focus for keyboard users (accessibility) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* honeypot — off-screen (not display:none, so bots still fill it) */
+.hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ============================================================
+   one size, everywhere. hierarchy comes only from
+   weight, color, and transparency — never from size.
+   ============================================================ */
+
+/* every text node renders at the body size */
+.uniform,
+.uniform * {
+  font-size: 1rem !important;
+}
+.uniform {
+  line-height: 1.6;
+}
+
+/* readable measure for long-form text */
+.measure {
+  max-width: 64ch;
+}
