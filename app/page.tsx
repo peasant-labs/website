@@ -2,6 +2,26 @@ import { Mark } from "@/components/mark";
 import { SubscribeForm } from "@/components/subscribe-form";
 import { Tldr } from "@/components/tldr";
 import Link from "next/link";
+import type { ReactNode } from "react";
+
+function ExternalLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-[var(--accent)] underline underline-offset-4 decoration-[var(--accent)]/40 transition-colors hover:decoration-[var(--accent)]"
+    >
+      {children}
+    </a>
+  );
+}
 
 export default function Home() {
   return (
@@ -50,8 +70,15 @@ export default function Home() {
           introduce …. one other human. Collaborating with others means
           reviewing your teammate’s code, or a random contributor’s pull request
           that modified 10K lines in the codebase. As stated by Simon Willison
-          (and one month earlier by Kailash Nadh), “Writing code is cheap now” ,
-          but there is still substantial effort when it comes to engineering
+          (and one month earlier by{" "}
+          <ExternalLink href="https://nadh.in/blog/code-is-cheap/">
+            Kailash Nadh
+          </ExternalLink>
+          ),{" "}
+          <ExternalLink href="https://simonwillison.net/guides/agentic-engineering-patterns/code-is-cheap/">
+            “Writing code is cheap now”
+          </ExternalLink>{" "}
+          , but there is still substantial effort when it comes to engineering
           good, verified, and maintainable solutions for multiple operating
           systems and form factors — and these engineering decisions would be
           sitting in the coding agent transcripts. When I’m handed a large slop
@@ -73,38 +100,57 @@ export default function Home() {
           Other AI Company you’re using: by agreeing to their terms of use and
           privacy policies, they have the power to plunder your trove of
           transcripts with impunity and use your efforts to grow their walled
-          gardens of data. They can also change the terms on you at any time, or
-          roll out changes that nullify your use case.
+          gardens of data. They can also{" "}
+          <ExternalLink href="https://techcrunch.com/2026/04/10/anthropic-temporarily-banned-openclaws-creator-from-accessing-claude/">
+            change the terms on you at any time
+          </ExternalLink>
+          , or roll out changes that nullify your use case.
         </p>
         <p>
           If you wanted to contribute your data back to an open data repository
-          (similar to DataClaw) or store transcripts internally for your own
-          team, most of the existing solutions don’t come with fine-grained
-          permissions settings (or they put these settings behind a paywall).
-          Sharing of these transcripts also requires understanding of the
-          privacy implications and some data governance expertise, and this can
-          get complicated very fast. Our solutions will provide advanced
-          permissions and access controls to the user, but also help balance the
-          cognitive load of governance by guiding the user with secure and sane
-          defaults, and allowing users to progressively opt-in to more
-          complexity if they want.
+          (similar to{" "}
+          <ExternalLink href="https://x.com/peterom/status/2026754938291056947">
+            DataClaw
+          </ExternalLink>
+          ) or store transcripts internally for your own team, most of the
+          existing solutions don’t come with fine-grained permissions settings
+          (or they put these settings behind a paywall). Sharing of these
+          transcripts also requires understanding of the privacy implications
+          and some data governance expertise, and this can get complicated very
+          fast. Our solutions will provide advanced permissions and access
+          controls to the user, but also help balance the cognitive load of
+          governance by guiding the user with secure and sane defaults, and
+          allowing users to progressively opt-in to more complexity if they
+          want.
         </p>
 
         {/* aside — further reading */}
         <aside className="border-l-2 border-[var(--border-strong)] pl-4 text-[var(--text-secondary)]">
-          <span className="mb-1.5 block font-bold">[ aside ]</span>
           <p>
             These topics have also been explored by Nicholas Vincent, in his
-            substack post “The Coding Agent Data Deal” which further explores
-            implications of the terms of use in popular coding agent tools, and
-            in his follow-up post “The Paradox of Reuse in 2026: A Case of
-            Quasi-Enclosure”, which contextualizes the relationship between AI
-            providers, knowledge workers, and AI users as a precarious
-            quasi-enclosure, in which the AI providers can decide the terms of
-            at any time. While beneficial for individual developers now, future
-            terms may be less so, and some popular open-source libraries are
-            already facing harm (closing their doors and limiting who can open
-            PRs as with tldraw, or cURL closing their bug bounty program).
+            substack post{" "}
+            <ExternalLink href="https://dataleverage.substack.com/p/the-coding-agent-data-deal">
+              “The Coding Agent Data Deal”
+            </ExternalLink>{" "}
+            which further explores implications of the terms of use in popular
+            coding agent tools, and in his follow-up post{" "}
+            <ExternalLink href="https://dataleverage.substack.com/p/the-paradox-of-reuse-in-2026-a-case">
+              “The Paradox of Reuse in 2026: A Case of Quasi-Enclosure”
+            </ExternalLink>
+            , which contextualizes the relationship between AI providers,
+            knowledge workers, and AI users as a precarious quasi-enclosure, in
+            which the AI providers can decide the terms of at any time. While
+            beneficial for individual developers now, future terms may be less
+            so, and some popular open-source libraries are already facing harm
+            (closing their doors and limiting who can open PRs as with{" "}
+            <ExternalLink href="https://github.com/tldraw/tldraw/issues/7695">
+              tldraw
+            </ExternalLink>
+            , or cURL{" "}
+            <ExternalLink href="https://daniel.haxx.se/blog/2026/01/26/the-end-of-the-curl-bug-bounty/">
+              closing their bug bounty program
+            </ExternalLink>
+            ).
           </p>
         </aside>
 
