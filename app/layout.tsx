@@ -8,7 +8,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "peasants deserve their share — dispatch 001",
+  title: "Reclaiming Data Autonomy as a Peasant",
   description:
     "an upcoming editorial on the quiet enclosure of the transcript commons, and why the harvest belongs to the hands that sowed it.",
   applicationName: "peasant",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "the commons",
   ],
   openGraph: {
-    title: "peasants deserve their share",
+    title: "Reclaiming Data Autonomy as a Peasant",
     description:
       "forthcoming — on the quiet enclosure of the transcript commons.",
     type: "article",
