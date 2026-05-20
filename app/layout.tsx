@@ -1,3 +1,4 @@
+import { site } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -8,11 +9,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Reclaiming Data Autonomy as a Peasant",
-  description:
-    "an upcoming editorial on the quiet enclosure of the transcript commons, and why the harvest belongs to the hands that sowed it.",
-  applicationName: "peasant",
-  authors: [{ name: "peasant" }],
+  // resolves the generated og / twitter images to absolute urls
+  metadataBase: new URL(site.url),
+  title: site.title,
+  description: site.description,
+  applicationName: site.name,
+  authors: [{ name: site.name }],
   keywords: [
     "agent transcripts",
     "data sovereignty",
@@ -20,12 +22,22 @@ export const metadata: Metadata = {
     "attribution",
     "the commons",
   ],
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Reclaiming Data Autonomy as a Peasant",
-    description:
-      "forthcoming — on the quiet enclosure of the transcript commons.",
+    title: site.title,
+    description: site.tagline,
     type: "article",
+    url: site.url,
+    siteName: site.name,
+    locale: "en_US",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: site.title,
+    description: site.tagline,
+  },
+  // og:image / twitter:image are wired automatically from
+  // app/opengraph-image.tsx and app/twitter-image.tsx
   robots: { index: true, follow: true },
 };
 

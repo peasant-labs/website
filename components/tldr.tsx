@@ -1,8 +1,8 @@
 /**
- * tldr — a collapsible summary. the `tldr;` row stays visible and
- * toggles the rest: the thesis, then the goals as a short numbered
- * list. built on native <details>, so it collapses without
- * javascript and stays a server component.
+ * tldr — a collapsible summary, open by default. the `tldr;` row
+ * stays visible and toggles the rest: the thesis, then the goals as a
+ * short numbered list. built on native <details>, so it collapses
+ * without javascript and stays a server component.
  *
  * presentational only — content is passed in.
  */
@@ -14,7 +14,10 @@ export function Tldr({
   goals: React.ReactNode[];
 }) {
   return (
-    <details className="group measure mt-10 border border-[var(--border-default)] bg-[var(--bg-surface)]">
+    <details
+      open
+      className="group measure mt-10 border border-[var(--border-default)] bg-[var(--bg-surface)]"
+    >
       <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-3 font-bold text-[var(--accent)] transition-colors hover:bg-[var(--bg-elevated)] [&::-webkit-details-marker]:hidden">
         tldr;
         <svg
