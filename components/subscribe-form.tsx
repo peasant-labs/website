@@ -4,23 +4,26 @@ import { useEffect, useRef, useState } from "react";
 
 type State = "idle" | "sending" | "done" | "error";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 export function SubscribeForm() {
   const mountedAt = useRef<number>(0);
   const [state, setState] = useState<State>("idle");
   const [msg, setMsg] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     mountedAt.current = Date.now();
   }, []);
+
+  const emailValid = EMAIL_RE.test(email.trim());
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (state === "sending" || state === "done") return;
 
     const form = e.currentTarget;
-    const email = (
-      form.elements.namedItem("email") as HTMLInputElement
-    ).value.trim();
+    const trimmedEmail = email.trim();
     const company = (
       form.elements.namedItem("company") as HTMLInputElement
     ).value;
@@ -28,7 +31,7 @@ export function SubscribeForm() {
       form.elements.namedItem("comment") as HTMLTextAreaElement
     ).value.trim();
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    if (!EMAIL_RE.test(trimmedEmail)) {
       setState("error");
       setMsg("that email doesn't look right.");
       return;
@@ -41,7 +44,7 @@ export function SubscribeForm() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          email,
+          email: trimmedEmail,
           comment,
           company,
           ts: mountedAt.current,
@@ -82,7 +85,7 @@ export function SubscribeForm() {
           htmlFor="email"
           className="mb-1 block font-bold text-[var(--text-secondary)]"
         >
-          email <span className="text-[var(--accent)]">*</span>
+          email <span className="text-[var(--accent)] glow">*</span>
         </label>
         <input
           id="email"
@@ -92,6 +95,8 @@ export function SubscribeForm() {
           autoComplete="email"
           required
           disabled={done}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           className="min-h-[44px] w-full border border-[var(--border-strong)] bg-transparent px-3 py-2.5 text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:border-[var(--accent)] focus:outline-none disabled:opacity-50"
         />
@@ -118,8 +123,9 @@ export function SubscribeForm() {
 
       <button
         type="submit"
-        disabled={state === "sending" || done}
-        className="min-h-[44px] w-full cursor-pointer border border-[var(--accent)] px-5 py-2.5 font-bold text-[var(--accent)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--bg-deep)] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        disabled={!emailValid || state === "sending" || done}
+        aria-disabled={!emailValid || state === "sending" || done}
+        className="min-h-[44px] w-full cursor-pointer border border-[var(--accent)] px-5 py-2.5 font-bold text-[var(--accent)] transition-all hover:bg-[var(--accent)] hover:text-[var(--bg-deep)] hover:shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_45%,transparent)] disabled:cursor-not-allowed disabled:border-[var(--border-strong)] disabled:bg-transparent disabled:text-[var(--text-tertiary)] disabled:shadow-none disabled:hover:bg-transparent disabled:hover:text-[var(--text-tertiary)] disabled:hover:shadow-none sm:w-auto"
       >
         {state === "sending" ? "sending..." : done ? "joined ✓" : "notify me"}
       </button>

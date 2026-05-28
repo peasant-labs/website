@@ -16,16 +16,16 @@
   scroll-behavior: smooth;
   color-scheme: dark;
 
-  --bg-deep: #0c0c0e;
-  --bg-surface: #141416;
-  --bg-elevated: #1c1c1f;
+  --bg-deep: #000000;
+  --bg-surface: #0a0a0c;
+  --bg-elevated: #131316;
 
   --grid-line: rgba(255, 255, 255, 0.04);
   --grid-major: rgba(255, 255, 255, 0.08);
 
-  --text-primary: #e8e5e0;
-  --text-secondary: #9b9689;
-  --text-tertiary: #5c5850;
+  --text-primary: #efece7;
+  --text-secondary: #c4bfb3;
+  --text-tertiary: #7a7669;
 
   --border-default: #2a2a2e;
   --border-strong: #3e3e42;
@@ -203,6 +203,37 @@ body {
   text-transform: lowercase !important;
 }
 
+/* crt-style glow — bold text and anything tagged .glow */
+.font-bold,
+strong,
+b,
+.glow {
+  text-shadow: 0 0 8px color-mix(in srgb, currentColor 25%, transparent);
+}
+
+/* svg variant — text-shadow does nothing on strokes */
+.glow-svg {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, currentColor 30%, transparent));
+}
+
+/* inline accent links — dim by default, glow on hover */
+.link-accent {
+  color: color-mix(in srgb, var(--accent) 70%, var(--text-secondary));
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  transition:
+    color 180ms ease,
+    text-decoration-color 180ms ease,
+    text-shadow 180ms ease;
+}
+.link-accent:hover,
+.link-accent:focus-visible {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+  text-shadow: 0 0 10px color-mix(in srgb, currentColor 45%, transparent);
+}
+
 /* visible focus for keyboard users (accessibility) */
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -226,13 +257,15 @@ body {
 /* every text node renders at the body size */
 .uniform,
 .uniform * {
-  font-size: 1rem !important;
+  font-size: 0.875rem !important;
 }
 .uniform {
-  line-height: 1.6;
+  line-height: 1.8;
+  letter-spacing: 0.005em;
 }
 
 /* readable measure for long-form text */
 .measure {
-  max-width: 64ch;
+  max-width: 84ch;
 }
+

@@ -1,8 +1,10 @@
 import { Mark } from "@/components/mark";
 import { SubscribeForm } from "@/components/subscribe-form";
 import { Tldr } from "@/components/tldr";
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import bannerImage from "@/public/banner.png";
 
 function ExternalLink({
   href,
@@ -16,7 +18,7 @@ function ExternalLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-[var(--accent)] underline underline-offset-4 decoration-[var(--accent)]/40 transition-colors hover:decoration-[var(--accent)]"
+      className="link-accent"
     >
       {children}
     </a>
@@ -25,18 +27,27 @@ function ExternalLink({
 
 export default function Home() {
   return (
-    <main id="content" className="mx-auto max-w-2xl px-6 py-16 sm:py-20">
+    <main id="content" className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
       {/* logo — the plant only */}
       <Link
         href="/"
         aria-label="peasant — home"
         className="-m-3 inline-flex cursor-pointer p-3 text-[var(--accent)] transition-opacity duration-200 hover:opacity-70"
       >
-        <Mark className="h-11 w-11" />
+        <Mark className="h-11 w-11 glow-svg" />
       </Link>
 
+      {/* banner */}
+      <Image
+        src={bannerImage}
+        alt="peasants tending and harvesting wheat under a starry sky, drawn in dashed amber lines"
+        priority
+        sizes="(min-width: 768px) 84ch, 100vw"
+        className="measure mt-1 h-auto w-full"
+      />
+
       {/* title — same size as the body, set apart by weight + color */}
-      <h1 className="mt-14 font-bold text-[var(--text-primary)]">
+      <h1 className="mt-1 font-bold text-[var(--text-primary)]">
         Reclaiming Data Autonomy as a Peasant
       </h1>
 
@@ -51,7 +62,7 @@ export default function Home() {
       />
 
       {/* essay */}
-      <article className="measure mt-10 space-y-5 text-[var(--text-secondary)]">
+      <article className="measure mt-4 space-y-7 text-[var(--text-secondary)]">
         <p>
           Using coding agents like Claude Code or OpenAI Codex leaves traces on
           your local machine in the form of transcripts, and these transcripts
@@ -165,30 +176,37 @@ export default function Home() {
           <li className="flex gap-3">
             <span
               aria-hidden="true"
-              className="shrink-0 select-none text-[var(--accent)]"
+              className="shrink-0 select-none text-[var(--accent)] glow"
             >
-              –
+              ●
             </span>
-            <span>
-              the public has no input, agency, autonomy over their data, or the
-              platforms that host it
-            </span>
+            <div>
+              the public has no
+              <ul className="mt-2.5 space-y-2.5">
+                {[
+                  "input, agency, autonomy over their data,",
+                  "or the platforms that host it",
+                  "no infrastructure for attribution, or attestation",
+                ].map((sub) => (
+                  <li key={sub} className="flex gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="shrink-0 select-none text-[var(--accent)] glow"
+                    >
+                      ○
+                    </span>
+                    <span>{sub}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </li>
           <li className="flex gap-3">
             <span
               aria-hidden="true"
-              className="shrink-0 select-none text-[var(--accent)]"
+              className="shrink-0 select-none text-[var(--accent)] glow"
             >
-              –
-            </span>
-            <span>no infrastructure for attribution, or attestation</span>
-          </li>
-          <li className="flex gap-3">
-            <span
-              aria-hidden="true"
-              className="shrink-0 select-none text-[var(--accent)]"
-            >
-              –
+              ●
             </span>
             <div>
               as peasants, we rely on the government to enact and enforce
@@ -199,16 +217,40 @@ export default function Home() {
                   "complex, maze-like, confusing",
                   "in some cases politically misaligned",
                   "very high-effort to engage with",
-                  "results in a collective action problem",
+                ].map((sub) => (
+                  <li key={sub} className="flex gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="shrink-0 select-none text-[var(--accent)] glow"
+                    >
+                      ○
+                    </span>
+                    <span>{sub}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+          <li className="flex gap-3">
+            <span
+              aria-hidden="true"
+              className="shrink-0 select-none text-[var(--accent)] glow"
+            >
+              ●
+            </span>
+            <div>
+              results in a collective action problem
+              <ul className="mt-2.5 space-y-2.5">
+                {[
                   "needs some amount of coordination and centralization",
                   "outreach and alliance-building",
                 ].map((sub) => (
                   <li key={sub} className="flex gap-3">
                     <span
                       aria-hidden="true"
-                      className="shrink-0 select-none text-[var(--accent)]"
+                      className="shrink-0 select-none text-[var(--accent)] glow"
                     >
-                      ·
+                      ○
                     </span>
                     <span>{sub}</span>
                   </li>

@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   applicationName: site.name,
   authors: [{ name: site.name }],
   keywords: [
+    "peasantlabs",
+    "peasant labs",
+    "peasant",
     "agent transcripts",
     "data sovereignty",
     "coding agents",
@@ -42,7 +45,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c0c0e",
+  themeColor: "#000000",
   colorScheme: "dark",
 };
 

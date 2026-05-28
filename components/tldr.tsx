@@ -16,7 +16,7 @@ export function Tldr({
   return (
     <details
       open
-      className="group measure mt-10 border border-[var(--border-default)] bg-[var(--bg-surface)]"
+      className="group measure mt-6 border border-[var(--border-default)] bg-[var(--bg-surface)]"
     >
       <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-3 font-bold text-[var(--accent)] transition-colors hover:bg-[var(--bg-elevated)] [&::-webkit-details-marker]:hidden">
         tldr;
