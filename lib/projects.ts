@@ -298,7 +298,7 @@ export const EVIDENCE = {
   },
   "fairtrade-0.0.9": {
     id: "fairtrade-0.0.9",
-    label: "Fairtrade 0.0.9 package",
+    label: "fairtrade 0.0.9 package",
     claim:
       "The published package provides the canonical tokens, base styles, component CSS, icons, and React UI exports used by these pages.",
     sourceScope: "public-release",

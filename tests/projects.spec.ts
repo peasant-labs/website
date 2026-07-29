@@ -1382,7 +1382,7 @@ test("skip navigation, route focus, theme persistence, and command copy work by 
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(firstCommand!.command);
 });
 
-test("Atkinson fonts and canonical Fairtrade component styles mount from real production resources", async ({ page }) => {
+test("Atkinson fonts and canonical fairtrade component styles mount from real production resources", async ({ page }) => {
   const fontResponses: string[] = [];
   page.on("response", (response) => {
     if (new URL(response.url()).hostname === "fonts.gstatic.com" && response.ok()) {
@@ -1412,7 +1412,7 @@ test("Atkinson fonts and canonical Fairtrade component styles mount from real pr
     const button = document.querySelector<HTMLElement>(".btn");
     const prose = document.querySelector<HTMLElement>("[data-reading-text]");
     if (!card || !breadcrumb || !button || !prose) {
-      throw new Error("Mounted Fairtrade style probe could not find card, breadcrumb, button, and prose targets.");
+      throw new Error("Mounted fairtrade style probe could not find card, breadcrumb, button, and prose targets.");
     }
     const root = getComputedStyle(document.documentElement);
     const cardStyle = getComputedStyle(card);
