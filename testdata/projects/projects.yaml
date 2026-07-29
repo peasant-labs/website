@@ -1,0 +1,588 @@
+version: 1
+copyPolicy:
+  preservedSentenceStarts:
+    - Peasant Labs
+    - Peasant
+    - Village
+    - Entire.io
+    - Entire
+    - GitHub
+    - Git
+    - Schema
+    - SQLite
+    - FTS5
+    - Docker
+    - OAuth
+    - Go
+    - Node
+    - TypeScript
+    - Zod
+    - OpenAPI
+    - Apache-2.0
+    - CC0-1.0
+    - CC-BY-4.0
+    - CC-BY-SA-4.0
+    - MIT
+site:
+  baseUrl: https://peasantlabs.org
+  routes:
+    - id: home
+      path: /
+      h1: Reclaiming Data Autonomy as a Peasant
+      metadata:
+        title: Reclaiming Data Autonomy as a Peasant
+        description: an upcoming editorial on the quiet enclosure of the transcript commons, and why the harvest belongs to the hands that sowed it.
+        canonical: https://peasantlabs.org
+        openGraph:
+          title: Reclaiming Data Autonomy as a Peasant
+          description: forthcoming — on the quiet enclosure of the transcript commons.
+          url: https://peasantlabs.org
+          type: article
+        twitter:
+          card: summary_large_image
+          title: Reclaiming Data Autonomy as a Peasant
+          description: forthcoming — on the quiet enclosure of the transcript commons.
+    - id: projects
+      path: /projects
+      h1: keep the work. share what matters.
+      metadata:
+        title: projects | Peasant Labs
+        description: Peasant keeps supported coding-agent session history local. Village publishes selected records to a governed commons.
+        canonical: https://peasantlabs.org/projects
+        openGraph:
+          title: projects | Peasant Labs
+          description: Peasant keeps supported coding-agent session history local. Village publishes selected records to a governed commons.
+          url: https://peasantlabs.org/projects
+          type: website
+        twitter:
+          card: summary_large_image
+          title: projects | Peasant Labs
+          description: Peasant keeps supported coding-agent session history local. Village publishes selected records to a governed commons.
+    - id: peasant
+      path: /projects/peasant
+      h1: one history across the supported tools you use
+      metadata:
+        title: "Peasant: local coding-agent project history"
+        description: Peasant normalizes supported coding-agent sessions into a local project history for analysis, review, redaction, and explicit sharing.
+        canonical: https://peasantlabs.org/projects/peasant
+        openGraph:
+          title: "Peasant: local coding-agent project history"
+          description: Peasant normalizes supported coding-agent sessions into a local project history for analysis, review, redaction, and explicit sharing.
+          url: https://peasantlabs.org/projects/peasant
+          type: website
+        twitter:
+          card: summary_large_image
+          title: "Peasant: local coding-agent project history"
+          description: Peasant normalizes supported coding-agent sessions into a local project history for analysis, review, redaction, and explicit sharing.
+    - id: village
+      path: /projects/village
+      h1: a commons for selected agent work
+      metadata:
+        title: "Village: a governed commons for agent sessions"
+        description: Village stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
+        canonical: https://peasantlabs.org/projects/village
+        openGraph:
+          title: "Village: a governed commons for agent sessions"
+          description: Village stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
+          url: https://peasantlabs.org/projects/village
+          type: website
+        twitter:
+          card: summary_large_image
+          title: "Village: a governed commons for agent sessions"
+          description: Village stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
+  sitemap:
+    - https://peasantlabs.org
+    - https://peasantlabs.org/projects
+    - https://peasantlabs.org/projects/peasant
+    - https://peasantlabs.org/projects/village
+catalog:
+  storyTitle: from local history to shared context
+  figure:
+    accessibleName: placeholder for the Peasant Labs suite workflow showing a selected local record, deliberate review, and its governed published copy
+    stateText: Peasant Labs suite workflow screenshot forthcoming
+    caption: the future image will show a selected local record in Peasant, its deliberate review boundary, and the governed copy explicitly published to Village.
+    aspectRatio: "16 / 9"
+  cards:
+    - id: peasant
+      label: Peasant
+      target: /projects/peasant
+      action: explore Peasant
+    - id: village
+      label: Village
+      target: /projects/village
+      action: explore Village
+products:
+  - id: peasant
+    route: /projects/peasant
+    advertisedState: private-preview
+    availabilityTitle: private preview
+    availabilityQualification: preview repository or release access is required before any install or run command can work.
+    evidenceSummary: open the full evidence ledger / 10 source records with scope, revision, and provenance
+    figure:
+      accessibleName: placeholder for the Peasant project timeline showing selected sessions and available Git associations
+      stateText: Peasant project timeline screenshot forthcoming
+      caption: the future image will show a local project history with session context and association limits visible.
+      aspectRatio: "16 / 9"
+    features:
+      - id: supported-harness-history
+        heading: one history across supported harnesses
+        evidence: [peasant-adapters, peasant-readme]
+      - id: project-context
+        heading: project context beyond the transcript
+        evidence: [peasant-readme, peasant-selection-redaction]
+      - id: local-analysis
+        heading: local analysis before publication
+        evidence: [peasant-readme, peasant-search]
+      - id: redaction-review
+        heading: review what leaves the machine
+        evidence: [peasant-selection-redaction, peasant-readme]
+      - id: schema-backed-sharing
+        heading: one typed record from local to shared
+        evidence: [schema-rc10, peasant-schema-pin, peasant-readme]
+    access:
+      - id: preview-access
+        body: use a private preview release or repository checkout supplied by a maintainer. there is no signed-out public artifact linked from this page.
+        command: null
+        action: null
+        qualification: the observed private baseline is v0.1.0-rc2 and its placeholder product license is not a public open-source grant.
+        evidence: [peasant-rc2-private-release, peasant-license]
+    run:
+      - id: configure
+        body: run the setup wizard after the preview binary is available on PATH.
+        command: peasant kickstart
+        action: null
+        qualification: post-access command for a private preview build.
+        evidence: [peasant-readme, peasant-selection-redaction]
+      - id: ingest
+        body: process discovered sessions that match the configured selection.
+        command: peasant ingest
+        action: null
+        qualification: results depend on retained source transcripts, supported formats, selection, and successful parsing.
+        evidence: [peasant-readme, peasant-selection-redaction]
+      - id: open-dashboard
+        body: start the dashboard backed by the local Peasant store.
+        command: peasant web start
+        action: null
+        qualification: post-access command; the documented default port is 8690.
+        evidence: [peasant-readme]
+    stories:
+      - id: multi-harness-developer
+        evidence: [peasant-adapters, peasant-selection-redaction]
+      - id: maintainer-context
+        evidence: [peasant-readme]
+      - id: review-before-share
+        evidence: [peasant-selection-redaction, peasant-readme]
+    outputs:
+      - id: kickstart-summary
+        evidence: [peasant-selection-redaction]
+        lines:
+          - "Redaction:    standard"
+          - "Selected:     12 session(s)"
+          - "New branches: Auto-ingest"
+    related:
+      - { id: all-projects, target: /projects }
+      - { id: village, target: /projects/village }
+      - { id: comparison, target: /projects#comparison }
+      - { id: schema, target: https://github.com/peasant-labs/schema/releases/tag/v0.1.0-rc10 }
+    requiredEvidence:
+      - peasant-rc2-private-release
+      - peasant-current-corpus-2026-07-28
+      - peasant-readme
+      - peasant-adapters
+      - peasant-selection-redaction
+      - peasant-search
+      - peasant-pull
+      - peasant-license
+      - peasant-schema-pin
+      - schema-rc10
+  - id: village
+    route: /projects/village
+    advertisedState: private-contributor-development
+    availabilityTitle: private contributor development
+    availabilityQualification: repository access, GitHub OAuth credentials, a GitHub token, Docker, Go, Node, and pnpm are prerequisites.
+    evidenceSummary: open the full evidence ledger / 7 source records with scope, revision, and provenance
+    figure:
+      accessibleName: placeholder for the Village collective view showing published session copies and governance state
+      stateText: Village collective view screenshot forthcoming
+      caption: the future image will show a published copy, its collective access, reuse license, and policy history.
+      aspectRatio: "16 / 9"
+    features:
+      - id: published-copy-boundary
+        heading: publish a copy, keep the local source
+        evidence: [village-readme, peasant-readme]
+      - id: collective-sharing
+        heading: share through collectives
+        evidence: [village-collectives]
+      - id: access-and-license
+        heading: choose access and reuse separately
+        evidence: [village-governance, schema-rc10]
+      - id: governance-history
+        heading: preserve a policy change history
+        evidence: [village-governance]
+      - id: one-way-pull
+        heading: pull context without republishing it
+        evidence: [peasant-pull, village-governance]
+    access:
+      - id: contributor-access
+        body: Peasant Labs is open-sourcing the governance and access-control layer for agentic coding data in the Village repository.
+        command: null
+        action:
+          label: open the Village repository
+          accessibleName: open the Village repository on GitHub; currently private
+          target: https://github.com/peasant-labs/village
+        qualification: the repository is private now, so signed-out visitors may receive a 404 until its visibility changes. this link is not a public download, self-host release, product license, or license grant.
+        evidence: [village-readme]
+      - id: configure-development
+        body: copy the environment template, then supply GitHub OAuth credentials, a GitHub token, and the other documented secrets.
+        command: cp .env.example .env
+        action: null
+        qualification: private contributor-development command; it is not a public install path.
+        evidence: [village-readme]
+    run:
+      - id: publish-from-peasant
+        body: after authentication and review, publishing is initiated by the Peasant CLI rather than an upload control in Village.
+        command: peasant village push
+        action: null
+        qualification: private current-source flow; publication remains an explicit user action.
+        evidence: [peasant-readme, village-readme]
+    stories:
+      - id: selected-publisher
+        evidence: [peasant-readme, village-readme, village-governance]
+      - id: collective-curator
+        evidence: [village-collectives]
+      - id: authorized-pull
+        evidence: [peasant-pull, village-governance]
+      - id: policy-steward
+        evidence: [village-governance]
+    outputs:
+      - id: governance-record
+        evidence: [village-governance, schema-rc10]
+        lines:
+          - "event: governance_changed"
+          - "visibility: shared"
+          - "license: CC-BY-4.0"
+    related:
+      - { id: all-projects, target: /projects }
+      - { id: peasant, target: /projects/peasant }
+      - { id: comparison, target: /projects#comparison }
+      - { id: schema, target: https://github.com/peasant-labs/schema/releases/tag/v0.1.0-rc10 }
+    requiredEvidence:
+      - village-readme
+      - village-collectives
+      - village-governance
+      - village-schema-pin
+      - peasant-readme
+      - peasant-pull
+      - schema-rc10
+evidence:
+  - id: peasant-rc2-private-release
+    sourceScope: private-preview
+    advertisedState: private-preview
+    revisionOrVersion: v0.1.0-rc2 at 917ea1a4a03b26dffe0bfd287fe53b6ed5f12427
+    sourceIds: []
+    verifiedOn: 2026-07-28
+    reverifyBy: 2026-08-27
+    publicHref: null
+    internalProvenance: Peasant private release tag and commit
+  - id: peasant-current-corpus-2026-07-28
+    sourceScope: current-source
+    advertisedState: current-source
+    revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec
+    sourceIds: []
+    verifiedOn: 2026-07-28
+    reverifyBy: 2026-08-27
+    publicHref: null
+    internalProvenance: Peasant current source reviewed at the pinned revision
+  - { id: peasant-readme, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: peasant/develop/README.md }
+  - { id: peasant-adapters, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: "peasant/develop/internal/ingest/adapter.go:50-63" }
+  - { id: peasant-selection-redaction, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: peasant/develop/docs/KICKSTART.md }
+  - { id: peasant-search, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: peasant/develop/internal/store/schema_v35.go and internal/api/provider.go }
+  - { id: peasant-pull, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: peasant/develop/docs/pull.md }
+  - { id: peasant-license, sourceScope: current-source, advertisedState: not-publicly-available, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: "peasant/develop/LICENSE:1-9" }
+  - { id: peasant-schema-pin, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: "Peasant ec322ef19d65d4a3a9085ad5601c765a4b9990ec, schema v0.1.0-rc9", sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: "peasant/develop/go.mod:15" }
+  - { id: village-readme, sourceScope: private-contributor-development, advertisedState: private-contributor-development, revisionOrVersion: 430ab072c59f42c8917994cc4f2ddf3f68cf2529, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: village/develop/README.md }
+  - { id: village-collectives, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: 430ab072c59f42c8917994cc4f2ddf3f68cf2529, sourceIds: [village-readme], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: village/develop/frontend/src/app/groups and collective settings routes }
+  - { id: village-governance, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: 430ab072c59f42c8917994cc4f2ddf3f68cf2529, sourceIds: [village-readme], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: village/develop/docs/database-invariants.md }
+  - { id: village-schema-pin, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: "Village 430ab072c59f42c8917994cc4f2ddf3f68cf2529, schema v0.1.0-rc9", sourceIds: [village-readme], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: "village/develop/backend/go.mod:16" }
+  - id: schema-rc10
+    sourceScope: public-release
+    advertisedState: public-release
+    revisionOrVersion: v0.1.0-rc10 at d80a744010cc4dfe0ba763a96b9073f340e75c32
+    sourceIds: []
+    verifiedOn: 2026-07-28
+    reverifyBy: 2026-08-27
+    publicHref: https://github.com/peasant-labs/schema/releases/tag/v0.1.0-rc10
+    internalProvenance: schema release and commit-pinned README
+  - { id: schema-current, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: 8870b78eba91bd28552872d2dda18797dc5afff0, sourceIds: [schema-rc10], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://github.com/peasant-labs/schema, internalProvenance: schema/develop source }
+  - id: fairtrade-0.0.9
+    sourceScope: public-release
+    advertisedState: public-release
+    revisionOrVersion: 0.0.9 at ba3ff1e1c1558e250c54c215589acba2dfdbad87
+    sourceIds: []
+    verifiedOn: 2026-07-28
+    reverifyBy: 2026-08-27
+    publicHref: https://registry.npmjs.org/@peasant-labs/fairtrade/-/fairtrade-0.0.9.tgz
+    internalProvenance: sha512-roEJAbbZyed5WlkxI/sAZGa+1Ve9NyVLZ6I9Df4xuVeAVUQgVyHIh1WxJcMKYejMbOwWM9jKo3LS3sW1EDpRUw==
+  - { id: bundle-definition, sourceScope: bundle-definition, advertisedState: null, revisionOrVersion: comparison scope verified 2026-07-28, sourceIds: [peasant-current-corpus-2026-07-28, village-readme, schema-rc10, entire-declared-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: balanced comparison bundle definition }
+  - { id: entire-home, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://entire.io/, internalProvenance: Official Entire homepage }
+  - { id: entire-projects, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://entire.io/projects, internalProvenance: Official Entire projects page }
+  - { id: entire-docs-index, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor docs index reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/llms.txt, internalProvenance: Official Entire docs index }
+  - { id: entire-cli-repo, sourceScope: public-release, advertisedState: public-release, revisionOrVersion: public repository reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://github.com/entireio/cli, internalProvenance: Official Entire CLI repository }
+  - { id: entire-cli-v0.9.0, sourceScope: public-release, advertisedState: public-release, revisionOrVersion: v0.9.0 at 8b77ad43132d18f7958825c9dcd26544ab8f5d92, sourceIds: [entire-cli-repo], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://github.com/entireio/cli/releases/tag/v0.9.0, internalProvenance: Official Entire CLI release }
+  - { id: entire-quickstart, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/quickstart, internalProvenance: Official Entire quickstart }
+  - { id: entire-agents, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/agents/overview, internalProvenance: Official Entire agents overview }
+  - { id: entire-security, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/security, internalProvenance: Official Entire security docs }
+  - { id: entire-checkpoint-storage, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/checkpoints/store-checkpoint-data, internalProvenance: Official Entire checkpoint storage guide }
+  - { id: entire-keep-local, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/checkpoints/keep-checkpoints-local, internalProvenance: Official Entire local checkpoint guide }
+  - { id: entire-separate-repo, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/checkpoints/store-checkpoints-in-another-repo, internalProvenance: Official Entire separate repository guide }
+  - { id: entire-import-history, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/sessions/import-past-agent-history, internalProvenance: Official Entire import guide }
+  - { id: entire-platform, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/platforms/entire-io, internalProvenance: Official Entire platform guide }
+  - { id: entire-search, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/search/semantic-search/overview, internalProvenance: Official Entire search guide }
+  - { id: entire-dispatches, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/dispatches/overview, internalProvenance: Official Entire dispatches guide }
+  - { id: entire-repositories, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/repositories/overview, internalProvenance: Official Entire repositories guide }
+  - { id: entire-repository-limitations, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/repositories/limitations, internalProvenance: Official Entire repository limitations }
+  - { id: entire-privacy, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://entire.io/privacy, internalProvenance: Official Entire privacy policy }
+  - { id: entire-terms, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://entire.io/terms, internalProvenance: Official Entire terms }
+  - id: entire-declared-corpus-2026-07-28
+    sourceScope: vendor-documented
+    advertisedState: null
+    revisionOrVersion: declared official corpus reviewed 2026-07-28
+    sourceIds:
+      - entire-home
+      - entire-projects
+      - entire-docs-index
+      - entire-cli-repo
+      - entire-cli-v0.9.0
+      - entire-quickstart
+      - entire-agents
+      - entire-security
+      - entire-checkpoint-storage
+      - entire-keep-local
+      - entire-separate-repo
+      - entire-import-history
+      - entire-platform
+      - entire-search
+      - entire-dispatches
+      - entire-repositories
+      - entire-repository-limitations
+      - entire-privacy
+      - entire-terms
+    verifiedOn: 2026-07-28
+    reverifyBy: 2026-08-27
+    publicHref: https://docs.entire.io/llms.txt
+    internalProvenance: Complete official Entire capability corpus
+comparison:
+  title: an independent comparison with Entire
+  scrollHelp: scroll horizontally to compare all columns.
+  caption: "independent comparison: Peasant plus Village plus Schema versus Entire CLI plus Entire.io and its documented repository service. verified 2026-07-28."
+  bundleDefinition: Peasant Labs means Peasant, Village, and the public Schema contract. Entire means Entire CLI, Entire.io, and its documented repository service.
+  verifiedOn: 2026-07-28
+  reverifyBy: 2026-08-27
+  reviewOwner: Peasant Labs website maintainers
+  meaningNote: not documented means no equivalent was found in the reviewed materials, not that one cannot exist.
+  groups:
+    - shared-baseline
+    - retrieval-and-continuation
+    - sharing-and-governance
+    - infrastructure-and-maturity
+  rows:
+    - id: existing-local-agent-history
+      group: shared-baseline
+      peasantLabs:
+        status: supported
+        sourceScope: current-source
+        qualification: four current-source adapters feed one canonical Peasant session-detail path.
+        sources: [peasant-adapters, peasant-readme, schema-rc10]
+      entire:
+        status: supported
+        sourceScope: vendor-documented
+        qualification: Entire documents historical import, eight named built-ins, and executable plugins.
+        sources: [entire-agents, entire-import-history]
+      takeaway: both import cross-agent history; Entire documents broader integration coverage.
+    - id: session-context-linked-to-git
+      group: shared-baseline
+      peasantLabs:
+        status: partial
+        sourceScope: current-source
+        qualification: Peasant stores durable associations only where commit detection observes them.
+        sources: [peasant-readme]
+      entire:
+        status: supported
+        sourceScope: vendor-documented
+        qualification: Entire documents automatic Git-linked checkpoints as a core workflow.
+        sources: [entire-quickstart, entire-agents]
+      takeaway: both connect context to Git; Entire's automatic checkpoint model is the clearer public promise.
+    - id: keep-captured-history-local
+      group: shared-baseline
+      peasantLabs:
+        status: supported
+        sourceScope: current-source
+        qualification: local SQLite is the base store; optional network actions are separate and explicit.
+        sources: [peasant-readme]
+      entire:
+        status: supported
+        sourceScope: vendor-documented
+        qualification: Entire documents local checkpoints with push disabled and multiple storage placements.
+        sources: [entire-checkpoint-storage, entire-keep-local]
+      takeaway: both offer local operation modes; neither gets an exclusivity claim.
+    - id: cross-product-language-contract
+      group: retrieval-and-continuation
+      peasantLabs:
+        status: supported
+        sourceScope: public-release
+        qualification: public Schema rc10 exposes Go, TypeScript, Zod, and OpenAPI contracts; both products were observed on rc9.
+        sources: [schema-rc10, peasant-schema-pin, village-schema-pin]
+      entire:
+        status: not-documented
+        sourceScope: vendor-documented
+        qualification: no equivalent affirmative cross-language transcript contract was found in the declared official corpus.
+        sources: [entire-declared-corpus-2026-07-28]
+      takeaway: Peasant Labs has a public source-backed contract; Entire's equivalent is not documented, not absent.
+    - id: analyze-session-and-project-behavior
+      group: retrieval-and-continuation
+      peasantLabs:
+        status: supported
+        sourceScope: current-source
+        qualification: Peasant documents local transcripts, metrics, trends, project views, changes, and search.
+        sources: [peasant-readme, peasant-search]
+      entire:
+        status: supported
+        sourceScope: vendor-documented
+        qualification: Entire documents sessions, checkpoints, diffs, activity, search, review, and summaries.
+        sources: [entire-platform, entire-search, entire-dispatches]
+      takeaway: Peasant emphasizes local analysis; Entire emphasizes Git checkpoint review and retrieval.
+    - id: search-past-intent
+      group: retrieval-and-continuation
+      peasantLabs:
+        status: partial
+        sourceScope: current-source
+        qualification: Peasant provides local FTS5 full-text search over recorded message entries, not semantic search.
+        sources: [peasant-search]
+      entire:
+        status: supported
+        sourceScope: vendor-documented
+        qualification: Entire documents hybrid semantic and keyword search across checkpoints, sessions, and commits.
+        sources: [entire-search]
+      takeaway: Entire documents semantic and cross-repository search; Peasant currently claims local full-text search only.
+    - id: continue-work-across-agents
+      group: retrieval-and-continuation
+      peasantLabs:
+        status: not-documented
+        sourceScope: current-source
+        qualification: no general cross-agent resume contract was verified in the declared Peasant current-source corpus.
+        sources: [peasant-current-corpus-2026-07-28]
+      entire:
+        status: partial
+        sourceScope: vendor-documented
+        qualification: Entire advertises resume across agents with explicit integration-specific limits.
+        sources: [entire-home, entire-agents]
+      takeaway: Entire has the documented advantage, with visible integration limits.
+    - id: publish-and-share-selected-context
+      group: sharing-and-governance
+      peasantLabs:
+        status: supported
+        sourceScope: current-source
+        qualification: private current source supports explicit Peasant publishing into Village visibility and collective controls.
+        sources: [peasant-readme, village-readme, village-collectives, village-governance]
+      entire:
+        status: supported
+        sourceScope: vendor-documented
+        qualification: Entire documents repository access, Entire.io sharing, checkpoints, and dispatches.
+        sources: [entire-platform, entire-checkpoint-storage, entire-dispatches]
+      takeaway: both share context through different access and storage models.
+    - id: per-transcript-reuse-license
+      group: sharing-and-governance
+      peasantLabs:
+        status: supported
+        sourceScope: current-source
+        qualification: private current source carries an optional CC selection through publish and pull; legal copy remains qualified.
+        sources: [village-governance, peasant-pull, schema-rc10]
+      entire:
+        status: not-documented
+        sourceScope: vendor-documented
+        qualification: no equivalent affirmative per-transcript reuse-license behavior was found in the declared official corpus.
+        sources: [entire-declared-corpus-2026-07-28]
+      takeaway: this is a source-backed Peasant Labs distinction; it does not establish that Entire lacks the capability.
+    - id: collective-contribution-governance
+      group: sharing-and-governance
+      peasantLabs:
+        status: supported
+        sourceScope: current-source
+        qualification: Village current source documents open contribution and owner-curated approval modes.
+        sources: [village-collectives]
+      entire:
+        status: not-documented
+        sourceScope: vendor-documented
+        qualification: no equivalent affirmative collective moderation model was found in the declared official corpus.
+        sources: [entire-declared-corpus-2026-07-28]
+      takeaway: Peasant Labs documents open and curated collectives; Entire's equivalent is not documented.
+    - id: visibility-license-change-history
+      group: sharing-and-governance
+      peasantLabs:
+        status: supported
+        sourceScope: current-source
+        qualification: Village current source documents trigger-written append-only governance events with policy snapshots.
+        sources: [village-governance]
+      entire:
+        status: not-documented
+        sourceScope: vendor-documented
+        qualification: no equivalent affirmative transcript policy-history behavior was found in the declared official corpus.
+        sources: [entire-declared-corpus-2026-07-28]
+      takeaway: this is a narrow policy-history distinction, not a certification or compliance claim.
+    - id: one-way-pull-with-foreign-ownership
+      group: sharing-and-governance
+      peasantLabs:
+        status: supported
+        sourceScope: current-source
+        qualification: pulled Village records land in a separate one-way namespace outside owned analytics and re-push candidates.
+        sources: [peasant-pull, village-governance]
+      entire:
+        status: not-documented
+        sourceScope: vendor-documented
+        qualification: this ownership and non-republication boundary was not found; Entire documents different resume and shared-history behavior.
+        sources: [entire-declared-corpus-2026-07-28, entire-agents, entire-platform]
+      takeaway: the products document different semantics, not a generic feature advantage.
+    - id: distributed-git-mirrors
+      group: infrastructure-and-maturity
+      peasantLabs:
+        status: not-in-current-scope
+        sourceScope: bundle-definition
+        qualification: distributed Git mirrors are outside the defined Peasant plus Village plus Schema bundle.
+        sources: [bundle-definition]
+      entire:
+        status: supported
+        sourceScope: vendor-documented
+        qualification: Entire documents regional EntireDB mirrors while GitHub remains the source repository.
+        sources: [entire-repositories]
+      takeaway: Entire has the documented advantage.
+    - id: public-cli-release-maturity
+      group: infrastructure-and-maturity
+      peasantLabs:
+        status: partial
+        sourceScope: private-preview
+        qualification: the observed Peasant release is private prerelease v0.1.0-rc2; signed-out public availability was not verified.
+        sources: [peasant-rc2-private-release, peasant-readme, peasant-license]
+      entire:
+        status: supported
+        sourceScope: public-release
+        qualification: Entire CLI v0.9.0 is a verified stable public release.
+        sources: [entire-cli-v0.9.0]
+      takeaway: Entire is further along in verified public CLI release maturity.
+viewports:
+  - { id: desktop-dark, width: 1280, height: 900, theme: dark, reflowEquivalent: null }
+  - { id: desktop-light, width: 1280, height: 900, theme: light, reflowEquivalent: null }
+  - id: phone-dark
+    width: 320
+    height: 900
+    theme: dark
+    reflowEquivalent: { sourceCssWidth: 1280, zoomPercent: 400, browserZoomEmulated: false }
+  - id: phone-light
+    width: 320
+    height: 900
+    theme: light
+    reflowEquivalent: { sourceCssWidth: 1280, zoomPercent: 400, browserZoomEmulated: false }
+invalidCase:
+  kind: expected-value-mismatch
+  route: /projects
+  selector: '[data-project-card]'
+  expectedFirstText: Deliberate mismatch sentinel
