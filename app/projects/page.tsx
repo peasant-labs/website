@@ -59,7 +59,7 @@ function ComparisonTable() {
         data-table-scroll
         data-contained-overflow
         role="region"
-        aria-label="Peasant Labs and Entire comparison"
+        aria-label="peasant labs and Entire comparison"
         aria-describedby="comparison-scroll-help"
         tabIndex={0}
       >
@@ -71,7 +71,7 @@ function ComparisonTable() {
                 capability
               </th>
               <th className="tbl-th" scope="col">
-                Peasant Labs
+                peasant labs
               </th>
               <th className="tbl-th" scope="col">
                 Entire
@@ -129,7 +129,7 @@ export default function ProjectsPage() {
     <main id="content" className="pj-main" tabIndex={-1}>
       <Breadcrumb
         label="project path"
-        items={[{ label: "Peasant Labs", href: "/" }, { label: "projects" }]}
+        items={[{ label: "peasant labs", href: "/" }, { label: "projects" }]}
       />
 
       <header className="pj-catalog-hero">

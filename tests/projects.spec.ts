@@ -607,8 +607,8 @@ function parseComparisonCell(value: unknown, location: string): ComparisonCellFi
   ) {
     fixtureError(
       location,
-      "not-documented lacks the declared Peasant current-source corpus",
-      "cite the dated Peasant corpus evidence ID",
+      "not-documented lacks the declared peasant current-source corpus",
+      "cite the dated peasant corpus evidence ID",
     );
   }
   if (status === "not-in-current-scope" && !sources.includes("bundle-definition")) {
@@ -708,7 +708,7 @@ function loadFixture(): ProjectFixture {
     };
   });
   if (cards.length !== 2 || cards.some((card, index) => card.id !== PROJECT_IDS[index])) {
-    fixtureError("catalog.cards", "cards must be exactly Peasant then Village", "restore the two-card order");
+    fixtureError("catalog.cards", "cards must be exactly peasant then village", "restore the two-card order");
   }
   uniqueBy(cards, (card) => card.id, "catalog.cards.id");
 
@@ -716,7 +716,7 @@ function loadFixture(): ProjectFixture {
     parseProduct(item, `products[${index}]`),
   );
   if (products.length !== 2 || products.some((product, index) => product.id !== PROJECT_IDS[index])) {
-    fixtureError("products", "products must be exactly Peasant then Village", "restore the two-product order");
+    fixtureError("products", "products must be exactly peasant then village", "restore the two-product order");
   }
   uniqueBy(products, (product) => product.id, "products.id");
   uniqueBy(products, (product) => product.route, "products.route");

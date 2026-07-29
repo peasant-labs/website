@@ -171,7 +171,7 @@ export function ProjectDetail({
       <Breadcrumb
         label="project path"
         items={[
-          { label: "Peasant Labs", href: "/" },
+          { label: "peasant labs", href: "/" },
           { label: "projects", href: "/projects" },
           { label: project.name },
         ]}
