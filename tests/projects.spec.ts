@@ -1778,6 +1778,34 @@ test("the install line sits above the explanation and is copyable", async ({ pag
   );
 });
 
+test("the advertised install command resolves to a readable script", async ({ request }) => {
+  /*
+   * The command is copy-pasteable from four places on this site, and the path in
+   * it and the route that serves it can drift apart with nothing to show for it
+   * — `curl -f` swallows a 404 and pipes nothing, so a broken installer looks
+   * exactly like a silent success.
+   */
+  const advertised = fixture.install.command.match(/https:\/\/\S+/);
+  expect(advertised, "the install command names no URL").not.toBeNull();
+  const response = await request.get(new URL(advertised![0]).pathname);
+  expect(response.status()).toBe(200);
+
+  // Readable in a browser, not an opaque download: it is about to run as root's
+  // equal on someone's machine, so it has to be inspectable first.
+  expect(response.headers()["content-type"]).toContain("text/plain");
+
+  const script = await response.text();
+  expect(script).toContain("peasant-labs/peasant");
+
+  /*
+   * And nothing executes until the last byte lands. A script piped into a shell
+   * runs whatever arrived, so the body is functions and the final line calls
+   * one: a dropped connection then defines some functions and does nothing,
+   * rather than half-installing.
+   */
+  expect(script.trimEnd().endsWith('main "$@"')).toBe(true);
+});
+
 test("the transcript viewer mounts the real component over demo data", async ({ page }) => {
   await page.goto("/projects");
   const viewer = page.locator("[data-viewer]");
