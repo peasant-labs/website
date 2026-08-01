@@ -1,0 +1,5 @@
+# Shell scripts must be LF whatever the checkout platform. scripts/install.sh is
+# served verbatim at /install and piped into bash: a single CR makes the first
+# line `set -euo pipefail\r`, which bash rejects, and the install dies before it
+# has printed anything.
+*.sh text eol=lf

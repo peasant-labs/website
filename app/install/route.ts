@@ -16,7 +16,17 @@ import { join } from "node:path";
  */
 export const dynamic = "force-static";
 
-const SCRIPT = readFileSync(join(process.cwd(), "scripts", "install.sh"), "utf8");
+/*
+ * Normalised to LF on the way out. The script is piped straight into bash, and a
+ * single CR turns the first directive into `set -euo pipefail\r`, which bash
+ * rejects — the install then dies before printing anything, on every machine.
+ * `.gitattributes` keeps the file itself LF; this makes a Windows editor that
+ * rewrites it between checkout and build unable to ship a broken installer.
+ */
+const SCRIPT = readFileSync(join(process.cwd(), "scripts", "install.sh"), "utf8").replace(
+  /\r\n/g,
+  "\n",
+);
 
 export function GET() {
   return new Response(SCRIPT, {

@@ -1798,6 +1798,14 @@ test("the advertised install command resolves to a readable script", async ({ re
   expect(script).toContain("peasant-labs/peasant");
 
   /*
+   * Not one carriage return. This is piped into bash, where a CRLF file makes
+   * the first directive `set -euo pipefail\r` — bash rejects it and the install
+   * dies before printing a thing. A Windows editor introduces this by saving the
+   * file, which is a long way from anywhere anyone would think to look.
+   */
+  expect(script).not.toContain("\r");
+
+  /*
    * And nothing executes until the last byte lands. A script piped into a shell
    * runs whatever arrived, so the body is functions and the final line calls
    * one: a dropped connection then defines some functions and does nothing,
