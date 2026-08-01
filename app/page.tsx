@@ -27,15 +27,23 @@ function ExternalLink({
 
 export default function Home() {
   return (
-    <main id="content" className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
-      {/* logo — the plant only */}
-      <Link
-        href="/"
-        aria-label="peasant — home"
-        className="-m-3 inline-flex cursor-pointer p-3 text-[var(--accent)] transition-opacity duration-200 hover:opacity-70"
-      >
-        <Mark className="h-11 w-11 glow-svg" />
-      </Link>
+    <main
+      id="content"
+      className="home-page mx-auto min-h-screen max-w-3xl px-6 py-16 sm:py-20"
+      tabIndex={-1}
+    >
+      <nav className="home-nav" aria-label="site">
+        <Link
+          href="/"
+          aria-label="peasant — home"
+          className="-m-3 inline-flex cursor-pointer p-3 text-[var(--accent)] transition-opacity duration-200 hover:opacity-70"
+        >
+          <Mark className="h-11 w-11 glow-svg" />
+        </Link>
+        <Link href="/projects" className="home-projects-link">
+          explore projects
+        </Link>
+      </nav>
 
       {/* banner */}
       <Image

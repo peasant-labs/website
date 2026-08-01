@@ -1,17 +1,28 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Package manager
+
+**This is a pnpm-only project.** `pnpm-lock.yaml` is the single committed lockfile, and `package.json` pins `packageManager` to an exact pnpm version.
+
+Do not use npm, yarn, or bun. `npm install` fails outright: `node_modules` is a pnpm symlink store, and npm's dependency resolver crashes while walking `node_modules/.pnpm`. Note that `npm run dev` appears to work only because it reuses whatever pnpm already installed.
+
+This is a convention, not a programmatic guard, so please follow it.
+
 ## Getting Started
 
-First, run the development server:
+Install dependencies, then run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
+```
+
+Other project scripts:
+
+```bash
+pnpm lint      # eslint
+pnpm build     # production build
+pnpm validate  # mounted production checks for the project pages
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

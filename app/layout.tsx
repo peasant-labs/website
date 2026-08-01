@@ -1,7 +1,13 @@
 import { site } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
+import "@peasant-labs/fairtrade/tokens.css";
+import "@peasant-labs/fairtrade/base.css";
+import "@peasant-labs/fairtrade/components.css";
 import "./globals.css";
+
+/* App Router mounts the canonical font stylesheet once from this root head. */
+/* eslint-disable @next/next/no-page-custom-font */
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -45,9 +51,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
-  colorScheme: "dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#070706" },
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
+  ],
+  colorScheme: "dark light",
 };
+
+const themeScript = `(function(){try{var theme=localStorage.getItem("peasant-labs-theme");if(theme==="dark"||theme==="light"){document.documentElement.dataset.theme=theme}}catch(_){}})();`;
 
 export default function RootLayout({
   children,
@@ -55,11 +66,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={geistMono.variable} suppressHydrationWarning>
-      <body className="lowercase-all uniform min-h-screen font-mono antialiased">
+    <html
+      lang="en"
+      data-theme="dark"
+      className={geistMono.variable}
+      suppressHydrationWarning
+    >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Atkinson+Hyperlegible+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+        />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="site-root">
         <a
           href="#content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border focus:border-[var(--accent)] focus:bg-[var(--bg-deep)] focus:px-4 focus:py-2 focus:text-[var(--accent)]"
+          className="site-skip-link"
         >
           skip to content
         </a>

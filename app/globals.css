@@ -1,271 +1,1755 @@
 @import "tailwindcss";
 
-/* ============================================
-   PEASANT DESIGN SYSTEM
-   "The terminal is the medium. The manor is the message."
-   ============================================ */
-
-@theme inline {
-  --color-background: var(--bg-deep);
-  --color-foreground: var(--text-primary);
-  --font-mono: var(--font-geist-mono);
+.site-root {
+  min-height: 100vh;
 }
 
-/* ── Dark Mode (default): "The Night Watch" ── */
-:root {
-  scroll-behavior: smooth;
-  color-scheme: dark;
+.site-skip-link {
+  position: fixed;
+  inset-block-start: var(--sp-4);
+  inset-inline-start: var(--sp-4);
+  z-index: var(--z-toast);
+  translate: 0 calc(-100% - var(--sp-6));
+  min-height: var(--control-h);
+  padding: var(--sp-2) var(--sp-4);
+  border: var(--bd-strong);
+  background: var(--canvas);
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  text-transform: lowercase;
+}
 
+.site-skip-link:focus {
+  translate: 0;
+}
+
+/* The existing editorial keeps its legacy treatment without leaking a token fork into project routes. */
+.site-root:has(.home-page) {
+  background: #000000;
+}
+
+.home-page {
   --bg-deep: #000000;
   --bg-surface: #0a0a0c;
   --bg-elevated: #131316;
-
-  --grid-line: rgba(255, 255, 255, 0.04);
-  --grid-major: rgba(255, 255, 255, 0.08);
-
   --text-primary: #efece7;
   --text-secondary: #c4bfb3;
-  --text-tertiary: #7a7669;
-
+  --text-tertiary: #817d70;
   --border-default: #2a2a2e;
   --border-strong: #3e3e42;
-
   --accent: #d4a843;
-  --accent-muted: #2e2518;
-
   --green: #4ade80;
-  --green-muted: #0f2918;
-
   --red: #f87171;
-  --red-muted: #2e1515;
-
-  --amber: #fbbf24;
-  --amber-muted: #2e2510;
-}
-
-/* ── Light Mode: "The Parchment" ── */
-[data-theme="light"] {
-  color-scheme: light;
-
-  --bg-deep: #f0ece4;
-  --bg-surface: #f7f4ee;
-  --bg-elevated: #ffffff;
-
-  --grid-line: rgba(0, 0, 0, 0.08);
-  --grid-major: rgba(0, 0, 0, 0.14);
-
-  --text-primary: #141210;
-  --text-secondary: #4a4540;
-  --text-tertiary: #7a756d;
-
-  --border-default: #c8c2b8;
-  --border-strong: #a8a298;
-
-  --accent: #8a6820;
-  --accent-muted: #e8dfc8;
-
-  --green: #16a34a;
-  --green-muted: #dcfce7;
-
-  --red: #dc2626;
-  --red-muted: #fee2e2;
-
-  --amber: #d97706;
-  --amber-muted: #fef3c7;
-}
-
-/* ── Base ── */
-body {
   background: var(--bg-deep);
   color: var(--text-primary);
-  font-family: var(--font-geist-mono), "JetBrains Mono", "IBM Plex Mono",
-    "Fira Code", "Menlo", monospace;
-  font-size: 16px;
-  line-height: 1.6;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  letter-spacing: 0.005em;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "ss01", "ss02", "cv01";
 }
 
-/* ── Grid Background ── */
-.grid-bg {
-  background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 24px 24px;
+.home-page,
+.home-page * {
+  font-size: 0.875rem;
 }
 
-/* ── Selection ── */
-::selection {
+.home-page h1,
+.home-page h2,
+.home-page h3 {
+  color: var(--text-primary);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  line-height: inherit;
+  text-transform: none;
+}
+
+.home-page p,
+.home-page .prose {
+  max-inline-size: none;
+  letter-spacing: inherit;
+  word-spacing: normal;
+}
+
+.home-page section {
+  max-width: 84ch;
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+.home-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.home-projects-link,
+.home-page .link-accent {
+  color: color-mix(in srgb, var(--accent) 70%, var(--text-secondary));
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  text-underline-offset: 0.25rem;
+  transition:
+    color 180ms ease,
+    text-decoration-color 180ms ease,
+    text-shadow 180ms ease;
+}
+
+.home-projects-link:hover,
+.home-projects-link:focus-visible,
+.home-page .link-accent:hover,
+.home-page .link-accent:focus-visible {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+  text-shadow: 0 0 0.625rem color-mix(in srgb, currentColor 45%, transparent);
+}
+
+.home-page ::selection {
   background: var(--accent);
   color: var(--bg-deep);
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-deep);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
+.home-page .measure {
+  max-width: 84ch;
 }
 
-/* ── Cursor Blink ── */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-.cursor-blink {
-  animation: blink 1.06s step-end infinite;
+.home-page .font-bold,
+.home-page strong,
+.home-page b,
+.home-page .glow {
+  text-shadow: 0 0 0.5rem color-mix(in srgb, currentColor 25%, transparent);
 }
 
-/* ── Wheat Sway ── */
-@keyframes sway {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-1px); }
-  75% { transform: translateX(1px); }
-}
-.wheat-sway {
-  animation: sway 8s ease-in-out infinite;
+.home-page .glow-svg {
+  filter: drop-shadow(0 0 0.3125rem color-mix(in srgb, currentColor 30%, transparent));
 }
 
-/* ── Grid Breath ── */
-@keyframes breathe {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-.grid-breathe {
-  animation: breathe 20s ease-in-out infinite;
+.home-page :focus-visible {
+  outline: 0.125rem solid var(--accent);
+  outline-offset: 0.1875rem;
 }
 
-/* ── Smoke Rise ── */
-@keyframes rise {
-  0% { transform: translateY(0); opacity: 0.6; }
-  100% { transform: translateY(-20px); opacity: 0; }
-}
-.smoke-particle {
-  animation: rise 3s ease-out infinite;
-}
-
-/* ── Scroll Progress Bar ── */
-.scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 2px;
-  background: var(--accent);
-  z-index: 100;
-  transition: width 50ms linear;
+.home-page .hp {
+  position: absolute;
+  inset-inline-start: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
-/* ── Reduced Motion ── */
+@layer components {
+  .project-shell {
+    min-height: 100vh;
+    overflow-x: clip;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+  }
+
+  .pj-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-nav);
+    border-bottom: var(--bd);
+    background: var(--nav-bg);
+  }
+
+  .pj-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    max-width: var(--maxw);
+    min-height: var(--nav-h);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .pj-brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target-comfortable);
+    color: var(--ink-strong);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    text-transform: lowercase;
+  }
+
+  /*
+   * The header destinations. The items keep fairtrade's `.iu-subnav-item`
+   * chrome untouched — this rule only lays them out inside the header bar,
+   * which already owns the sticky edge and border the standalone `.iu-subnav`
+   * would otherwise duplicate.
+   */
+  .pj-nav {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--sp-1);
+    min-width: 0;
+  }
+
+  .pj-nav .iu-subnav-item {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* contact is the last entry, and it sits at the far end of the bar. */
+  .pj-nav > :last-child {
+    margin-inline-start: auto;
+  }
+
+  .pj-main {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding: var(--sp-7) var(--gutter) var(--sp-8);
+    outline: none;
+  }
+
+  .pj-main > section {
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .pj-main .crumb {
+    margin-block-end: var(--sp-6);
+  }
+
+  /*
+   * The signup on /contact. fairtrade's fields carry their own label, border,
+   * and spacing, so the form only sets its own measure and the two accents the
+   * label text needs.
+   */
+  .pj-contact-form {
+    max-width: var(--measure-prose);
+  }
+
+  .pj-contact-form .pj-required {
+    color: var(--amber);
+  }
+
+  .pj-contact-form .pj-optional {
+    color: var(--ink-4);
+  }
+
+  .pj-contact-status {
+    margin-block-start: var(--sp-3);
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+  }
+
+  .pj-contact-status[data-contact-status="error"] {
+    color: var(--clay);
+  }
+
+  /* the honeypot: off-screen for everyone, reachable only by a bot reading the DOM. */
+  .pj-honeypot {
+    position: absolute;
+    inset-inline-start: -9999px;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+  }
+
+  .pj-catalog-hero,
+  .pj-detail-hero {
+    display: grid;
+    gap: var(--sp-6);
+    align-items: start;
+  }
+
+  .pj-hero-copy {
+    max-width: var(--measure-prose);
+  }
+
+  /*
+   * The catalog hero once reserved a second column for a figure it no longer renders, so the
+   * headline was wrapping at three fifths of the page for empty space. It gets the full
+   * measure now; the lede stays inside the prose measure fairtrade sets on every paragraph.
+   */
+  .pj-catalog-hero .pj-hero-copy {
+    max-width: none;
+  }
+
+  .pj-detail-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* village: join community beside an example collective card. */
+  .pj-village-join {
+    display: grid;
+    gap: var(--sp-6);
+    align-items: start;
+  }
+
+  .pj-village-join-copy {
+    display: grid;
+    gap: var(--sp-3);
+    max-width: var(--measure-prose);
+  }
+
+  .pj-village-join-copy > h2 {
+    margin: 0;
+  }
+
+  .pj-village-example {
+    display: grid;
+    gap: var(--sp-4);
+    justify-items: start;
+    min-width: 0;
+  }
+
+  .pj-village-collective-card {
+    inline-size: 100%;
+    max-inline-size: 28rem;
+  }
+
+  /*
+   * fairtrade's `.card-thumb` is a fixed 4/3 band, so the specimen has to fill it
+   * rather than set it — a next/image static import arrives carrying the intrinsic
+   * width and height of the source, which would otherwise decide the band's shape.
+   */
+  .pj-village-collective-thumb {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  /* the group glyph leads the collective's name on the same baseline. */
+  .pj-village-collective-head {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-width: 0;
+  }
+
+  .pj-village-join-action {
+    justify-self: start;
+  }
+
+  /*
+   * The join dialog's summary panel. `ConsentSummary` is the wrong shape here: it
+   * boxes each icon in a bordered chip and sets the key beside the value in a
+   * three-column grid, where this states a bare icon and key over the thing that
+   * becomes true. The panel borrows the component's surface and its muted key so
+   * it still reads as the same family.
+   */
+  .pj-village-join-axes {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: var(--sp-4);
+    border: var(--bd);
+    background: var(--surface-2);
+  }
+
+  .pj-village-join-axis {
+    display: grid;
+    gap: var(--sp-1);
+  }
+
+  .pj-village-join-axis-key {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0;
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    line-height: var(--lh-mono);
+    text-transform: lowercase;
+  }
+
+  .pj-village-join-axis-key .lucide {
+    inline-size: var(--ic-md);
+    block-size: var(--ic-md);
+    flex: none;
+  }
+
+  /* the value hangs under its key, clear of the icon that labels the row. */
+  .pj-village-join-axis-value {
+    margin: 0;
+    padding-inline-start: calc(var(--ic-md) + var(--sp-2));
+    color: var(--ink-strong);
+    font-family: var(--font-mono);
+    font-size: var(--fs-body);
+    line-height: var(--lh-mono);
+  }
+
+  /* governance: ConsentSummary card left, prose right. */
+  .pj-village-governance {
+    display: grid;
+    gap: var(--sp-6);
+    align-items: start;
+  }
+
+  /*
+   * ConsentSummary is built for a dialog of definite width, so it sizes itself with
+   * `width: max-content`. Dropped into a page grid that also sizes to content, the whole
+   * chain resolved to the max-content of the longest scope line: the summary grew past the
+   * card border and printed over the prose beside it. A definite column here, and a summary
+   * told to fill it, put the wrapping back under the card's control — `max-width: 100%`
+   * alone could not, because the parent it measured against had already grown.
+   */
+  .pj-village-governance-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-4);
+    min-width: 0;
+    padding: var(--sp-5);
+  }
+
+  .pj-village-governance-card .cns-summary {
+    inline-size: 100%;
+    min-width: 0;
+  }
+
+  /* the dialog's column gap is too generous at card width; the value column needs it more. */
+  .pj-village-governance-card :is(.cns-axes, .cns-axis) {
+    column-gap: var(--sp-4);
+  }
+
+  .pj-village-governance-card .cns-axis-value {
+    text-wrap: pretty;
+  }
+
+  .pj-village-governance-copy {
+    display: grid;
+    gap: var(--sp-3);
+    max-width: var(--measure-prose);
+  }
+
+  .pj-village-governance-copy > h2 {
+    margin: 0;
+  }
+
+  /*
+   * Narrow: the fixed chip and the `max-content` key column together take most of a
+   * phone-width card, ratcheting the value into a one-word column. Below the point where
+   * the section stops being two columns, the value drops to its own full-width row instead.
+   */
+  @media (max-width: 47.99rem) {
+    .pj-village-governance-card .cns-axes {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pj-village-governance-card .cns-axis {
+      grid-template-columns: var(--control-h-sm) minmax(0, 1fr);
+      align-items: center;
+    }
+
+    .pj-village-governance-card .cns-axis-val {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .pj-village-join {
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+    }
+
+    .pj-village-governance {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    }
+  }
+
+  .pj-main h1 {
+    max-width: var(--measure-read);
+    font-size: var(--fs-hero);
+    text-transform: none;
+  }
+
+  .pj-main h2 {
+    font-size: var(--fs-xl);
+    text-transform: none;
+  }
+
+  .pj-main h3 {
+    font-size: var(--fs-md);
+    text-transform: none;
+  }
+
+  .pj-lede {
+    margin-block-start: var(--sp-4);
+    color: var(--ink-2);
+    font-size: var(--fs-md);
+    line-height: var(--lh-body);
+  }
+
+  .pj-product-name,
+  .pj-user-content {
+    color: var(--ink-strong);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 700;
+    text-transform: none;
+  }
+
+  .pj-detail-hero > .pj-hero-copy > .pj-product-name {
+    margin-block-end: var(--sp-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+  }
+
+  .pj-section {
+    margin-block-start: var(--group-y);
+    padding-block-start: var(--sp-5);
+    border-block-start: var(--bd);
+  }
+
+  .pj-section-heading {
+    display: grid;
+    gap: var(--sp-4);
+    margin-block-end: var(--sp-6);
+  }
+
+  /*
+   * Where the content answers its heading directly — the two product cards, the
+   * getting-started steps, the answers under "questions" — the heading sits
+   * closer to it. The viewer and comparison headings carry several paragraphs of
+   * qualification before their content and keep the wider gap.
+   */
+  :is([data-what], [data-story], [data-faq], [data-start], [data-uses])
+    > .pj-section-heading {
+    margin-block-end: var(--sp-6);
+  }
+
+  /*
+   * The comparison heading is three stacked paragraphs deep — intro, bundle
+   * definition, and the barred meaning note — so the table needs more air under
+   * that stack than a one-paragraph heading does before the marks read as a
+   * separate thing rather than a fourth line of qualification.
+   */
+  [data-comparison] > .pj-section-heading {
+    margin-block-end: var(--sp-8);
+  }
+
+  .pj-section-heading > p,
+  .pj-proof > p {
+    color: var(--ink-2);
+  }
+
+  .pj-card-grid,
+  .pj-feature-grid,
+  .pj-benefit-grid,
+  .pj-story-grid,
+  .pj-instruction-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-4);
+  }
+
+  .pj-project-card {
+    min-width: 0;
+  }
+
+  .pj-project-card .card-body {
+    min-height: 100%;
+  }
+
+  .pj-project-card .card-head {
+    color: var(--ink-strong);
+  }
+
+  .pj-project-card h3 {
+    text-transform: none;
+  }
+
+  .pj-project-card .card-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+  }
+
+  .pj-card-action {
+    color: var(--amber);
+    font-weight: 700;
+  }
+
+  .pj-card-availability {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-1) var(--sp-2);
+    border: var(--bd);
+    background: var(--surface-2);
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    line-height: var(--lh-mono);
+  }
+
+  .pj-card-availability::before {
+    inline-size: var(--sp-2);
+    block-size: var(--sp-2);
+    flex: none;
+    border-radius: 50%;
+    background: var(--amber-dim);
+    content: "";
+  }
+
+  /* the word the card is filed under, set as chrome above the product's name. */
+  .pj-card-kind {
+    color: var(--amber);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+  }
+
+  /*
+   * The demonstration panels carry invented data, and a reader deserves to know
+   * that before they read a number off one. The note sits between the section
+   * prose and the panel it qualifies.
+   */
+  .pj-demo-note {
+    margin-block-end: var(--sp-4);
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+  }
+
+  /* The same note, under its panel rather than above it. */
+  .pj-demo-note-after {
+    margin-block-start: var(--sp-3);
+    margin-block-end: 0;
+  }
+
+  /*
+   * RedactionReview renders its own <section>, which picks up the base stylesheet's
+   * centred max-width and gutter padding. Inside a section that already owns both,
+   * that reads as an unexplained indent.
+   */
+  .pj-redaction-demo > .rdx {
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .pj-flow ol {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pj-flow li {
+    display: grid;
+    grid-template-columns: var(--control-h-sm) minmax(0, 1fr);
+    gap: var(--sp-3);
+    align-items: start;
+    padding-block: var(--sp-3);
+    border-bottom: var(--bd);
+  }
+
+  .pj-flow li > .tnum {
+    display: inline-grid;
+    place-items: center;
+    width: var(--control-h-sm);
+    height: var(--control-h-sm);
+    background: var(--amber-fill);
+    color: var(--amber-fill-ink);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 700;
+  }
+
+  /*
+   * get started: fairtrade's StepWizard carries the rail, the body panel, and the
+   * footer controls. The page only decides how wide it runs and where the
+   * copy-all control sits above it.
+   */
+  .pj-start-body {
+    max-width: var(--measure-code);
+    /* the measure is in ch, so it has to be read in the face the commands are set in. */
+    font-family: var(--font-mono);
+  }
+
+  /* right-aligned to the wizard, so it reads as the wizard's own control. */
+  .pj-start-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-block-end: var(--sp-4);
+  }
+
+  /* one step's prose sits above its command, both inside the wizard body. */
+  .pj-start-step {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .pj-start-step > p {
+    margin: 0;
+    max-width: var(--measure-prose);
+    color: var(--ink-2);
+    font-family: var(--font-body);
+  }
+
+  /*
+   * Five step names do not fit across a narrow rail; left visible they overlap
+   * into each other. Below the layout breakpoint the rail keeps its numbers and
+   * the names go visually hidden — still in each marker's accessible name, and
+   * the step in view is named in full by the body kicker underneath.
+   */
+  @media (max-width: 47.99rem) {
+    .pj-start-body .swz-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
+  .pj-terminal {
+    min-width: 0;
+    border: var(--bd-strong);
+    background: var(--surface-2);
+  }
+
+  /* the head carries the panel name on the left and "copy all" hard right. */
+  .pj-terminal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    min-height: var(--control-h-sm);
+    padding-inline-start: var(--sp-4);
+    border-block-end: var(--bd);
+    background: var(--surface);
+  }
+
+  .pj-terminal-name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0;
+    padding-block: var(--sp-2);
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    line-height: var(--lh-mono);
+  }
+
+  .pj-copy-all {
+    align-self: stretch;
+  }
+
+  .pj-terminal-dot {
+    inline-size: var(--sp-2);
+    block-size: var(--sp-2);
+    border-radius: 50%;
+    background: var(--amber-dim);
+  }
+
+  .pj-terminal-lines {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0;
+    padding: var(--sp-4);
+    list-style: none;
+  }
+
+  .pj-terminal-lines li {
+    display: grid;
+    gap: var(--sp-1);
+    min-width: 0;
+  }
+
+  .pj-terminal-note {
+    margin: 0;
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-mono);
+    overflow-wrap: anywhere;
+  }
+
+  .pj-terminal .pj-command-scroll {
+    margin-block-start: 0;
+  }
+
+  /*
+   * The install line is the first thing after the hero, so it gets the emphasis
+   * treatment: one full-width command, with nothing under it competing for the
+   * attention of a reader who has already decided.
+   */
+  .pj-install {
+    display: grid;
+    margin-block-start: var(--sp-6);
+    max-width: var(--measure-prose);
+  }
+
+  .pj-install .pj-command-scroll {
+    margin-block-start: 0;
+  }
+
+  /*
+   * This is the one thing on the page a decided reader is here to do, so it carries the
+   * amber accent the calls to action use elsewhere rather than reading quieter than the
+   * FAQ headers below it.
+   */
+  .pj-install .cli-cmd {
+    border: var(--bd-strong);
+    border-inline-start: var(--stroke-emphasis) solid var(--amber);
+    background: var(--surface-2);
+  }
+
+  /*
+   * The transcript browser is a three-column application surface. It gets the
+   * full page width and a floor below which it stops being legible; under that
+   * the wrapper scrolls rather than letting the columns collapse into noise.
+   */
+  .pj-transcript {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    border: var(--bd-strong);
+  }
+
+  .pj-transcript > * {
+    min-width: 60rem;
+  }
+
+  /*
+   * An application surface earns more room than the reading column. Past the
+   * point where the page stops growing, the viewer breaks out of `--maxw` and
+   * keeps widening with the window, centred on its own overhang. `.project-shell`
+   * clips horizontal overflow, so the bleed can never reach the page scrollbar.
+   *
+   * The ceiling is a modest step past `--maxw` (1040px) rather than the width of
+   * the window: enough for the three columns to breathe, not so much that the
+   * viewer reads as a different page from everything stacked above it.
+   */
+  @media (min-width: 64rem) {
+    .pj-viewer .pj-transcript {
+      --pj-viewer-w: min(80rem, calc(100vw - 2 * var(--gutter)));
+      inline-size: var(--pj-viewer-w);
+      max-width: none;
+      margin-inline: calc((100% - var(--pj-viewer-w)) / 2);
+    }
+  }
+
+  /*
+   * "our projects," and what that means are two authored lines rather than one
+   * sentence left to wrap wherever the column ends. Each line still wraps
+   * normally inside itself on a narrow screen.
+   */
+  [data-tools] > .pj-section-heading > h2 {
+    white-space: pre-line;
+  }
+
+  /*
+   * The heading is a direct child here rather than sitting in a `.pj-section-heading`
+   * wrapper, so the rule keeps `padding-block-start` alone: the section's own rule
+   * sets the distance from the rule above, and overriding it with the shorthand left
+   * this one title sitting closer to its bar than every other.
+   */
+  .pj-community {
+    display: grid;
+    gap: var(--sp-3);
+    padding-block-end: var(--sp-3);
+  }
+
+  .pj-community > p {
+    color: var(--ink-2);
+  }
+
+  /*
+   * fairtrade resets `list-style` away, so the old indent produced three unanchored lines
+   * with no marker. The points carry their own rule instead, matching the dash the product
+   * cards use for their proof bullets.
+   */
+  .pj-community ul {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    color: var(--ink-2);
+  }
+
+  .pj-community li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--sp-3);
+    align-items: baseline;
+  }
+
+  .pj-community li::before {
+    color: var(--amber);
+    font-family: var(--font-mono);
+    content: "–";
+  }
+
+  .pj-faq [data-faq-list] {
+    max-width: var(--measure-prose);
+  }
+
+  .pj-availability {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-5);
+    border: var(--bd-strong);
+    background: var(--surface);
+  }
+
+  /*
+   * Under-construction notice: spacing only. Visual language comes from
+   * fairtrade's DangerZone (.rr-danger) so the warning glyph + "warning" label
+   * match the rest of the system.
+   */
+  .pj-under-construction {
+    margin-block-end: var(--sp-6);
+  }
+
+  .pj-under-construction .rr-danger-body > p {
+    margin: 0;
+    max-width: var(--measure-prose);
+  }
+
+  .pj-proof {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-5);
+    border-inline-start: var(--stroke-emphasis) solid var(--rule-strong);
+    background: transparent;
+  }
+
+  .pj-proof ul {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding-inline-start: var(--sp-5);
+    color: var(--ink-2);
+  }
+
+  .pj-availability h2 {
+    font-size: var(--fs-lg);
+  }
+
+  .pj-figure {
+    display: grid;
+    gap: var(--sp-3);
+    margin: var(--group-y) 0 0;
+    padding: var(--sp-5);
+    border: var(--bd-strong);
+    background: var(--surface-2);
+  }
+
+  .pj-hero-figure {
+    grid-column: 1 / -1;
+    margin-block-start: 0;
+  }
+
+  .pj-figure-state {
+    display: grid;
+    place-items: center;
+    position: relative;
+    inline-size: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: var(--bd);
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    text-align: center;
+  }
+
+  .pj-figure-state::before,
+  .pj-figure-state::after {
+    position: absolute;
+    content: "";
+    pointer-events: none;
+  }
+
+  .pj-figure-state::before {
+    inset-block: var(--sp-5);
+    inset-inline-start: var(--sp-5);
+    inline-size: 50%;
+    border-block: var(--bd);
+    border-inline-start: var(--stroke-emphasis) solid var(--amber-dim);
+  }
+
+  .pj-figure-state::after {
+    inset-block-start: var(--sp-7);
+    inset-inline-end: var(--sp-6);
+    inline-size: 33%;
+    block-size: 40%;
+    border-block-start: var(--bd-strong);
+    border-inline-end: var(--bd-strong);
+  }
+
+  .pj-figure-label {
+    position: relative;
+    z-index: 1;
+    max-width: var(--measure-read);
+    padding: var(--sp-2) var(--sp-3);
+    border-block: var(--bd);
+    background: var(--surface-2);
+  }
+
+  .pj-figure figcaption {
+    max-width: var(--measure-prose);
+    color: var(--ink-3);
+    font-size: var(--fs-body);
+  }
+
+  .pj-feature,
+  .pj-benefit,
+  .pj-instruction,
+  .pj-story,
+  .pj-output {
+    display: grid;
+    gap: var(--sp-3);
+    min-width: 0;
+    padding: var(--sp-4);
+  }
+
+  .pj-benefit {
+    align-content: start;
+  }
+
+  .pj-story,
+  .pj-output {
+    padding-inline: 0;
+    border-block-start: var(--bd-strong);
+    background: transparent;
+  }
+
+  .pj-story dl {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  .pj-story dl > div {
+    display: grid;
+    gap: var(--sp-1);
+  }
+
+  .pj-story dt,
+  .pj-qualification {
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    line-height: var(--lh-mono);
+  }
+
+  .pj-story dd {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .pj-command-scroll,
+  .pj-output-scroll,
+  .pj-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .pj-command-scroll,
+  .pj-output-scroll {
+    margin-block-start: var(--sp-2);
+  }
+
+  .pj-command-scroll .cli-cmd {
+    min-width: max-content;
+  }
+
+  .pj-instruction-action {
+    justify-self: start;
+  }
+
+  .pj-output pre {
+    min-width: max-content;
+    margin: 0;
+    padding: var(--sp-4);
+    border: var(--bd);
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-mono);
+  }
+
+  .pj-citations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pj-citations li > a,
+  .pj-citations li > span {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1);
+    min-height: var(--target-min);
+    padding-block: var(--sp-1);
+    border-block-end: var(--bd);
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-mono);
+  }
+
+  .pj-citations li > a:hover,
+  .pj-citations li > a:focus-visible {
+    color: var(--ink-strong);
+    border-block-end-color: var(--rule-strong);
+  }
+
+  .pj-citation-label {
+    color: var(--ink-2);
+  }
+
+  .pj-citation-scope::before {
+    content: "[";
+  }
+
+  .pj-citation-scope::after {
+    content: "]";
+  }
+
+  .pj-evidence-disclosure {
+    border-block: var(--bd-strong);
+  }
+
+  .pj-evidence-disclosure summary {
+    min-height: var(--target-comfortable);
+    padding: var(--sp-4);
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    line-height: var(--lh-mono);
+    cursor: pointer;
+  }
+
+  .pj-evidence-disclosure summary:hover,
+  .pj-evidence-disclosure summary:focus-visible {
+    color: var(--ink-strong);
+  }
+
+  .pj-evidence-disclosure[open] summary {
+    border-block-end: var(--bd);
+  }
+
+  .pj-evidence-ledger {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    list-style: none;
+  }
+
+  .pj-evidence-ledger li,
+  .pj-evidence-ledger li > a {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-1);
+    min-width: 0;
+  }
+
+  .pj-evidence-ledger li {
+    padding: var(--sp-3);
+    border-block-end: var(--bd);
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-mono);
+    overflow-wrap: anywhere;
+  }
+
+  .pj-evidence-ledger strong {
+    color: var(--ink-strong);
+  }
+
+  .pj-evidence-ledger a {
+    color: inherit;
+  }
+
+  .pj-meaning-note {
+    padding-inline-start: var(--sp-3);
+    border-inline-start: var(--stroke-emphasis) solid var(--amber-dim);
+  }
+
+  .pj-table-wrap {
+    scroll-padding-inline: var(--sp-3);
+  }
+
+  /*
+   * Three columns fit a desktop page; the wrapper owns the scroll on phones.
+   * Fixed layout is what makes the column budget real — under auto layout the
+   * capability column stretches to absorb slack and outgrows the phone viewport.
+   * Widths therefore live on the header row and add up to 100%.
+   */
+  .pj-comparison-table {
+    min-width: 34rem;
+    table-layout: fixed;
+  }
+
+  .pj-comparison-table thead .tbl-th:first-child {
+    inline-size: 26%;
+  }
+
+  .pj-comparison-table thead .tbl-th:not(:first-child) {
+    inline-size: 37%;
+  }
+
+  .pj-comparison-table .pj-mark-cell {
+    vertical-align: middle;
+  }
+
+  .pj-comparison-table .pj-capability {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: calc(var(--z-sticky) - 1);
+    overflow-wrap: anywhere;
+    background: var(--canvas);
+    color: var(--ink-strong);
+    font-weight: 600;
+    text-align: start;
+  }
+
+  .pj-comparison-table thead .tbl-th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-sticky);
+    background: var(--surface-2);
+  }
+
+  .pj-comparison-table thead .tbl-th:first-child {
+    inset-inline-start: 0;
+    z-index: calc(var(--z-sticky) + 1);
+  }
+
+  .pj-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: var(--target-min);
+    padding: var(--sp-1) var(--sp-2);
+    border: var(--bd-strong);
+    color: var(--ink-strong);
+    background: var(--surface-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    line-height: var(--lh-mono);
+  }
+
+  .pj-status-glyph {
+    flex: none;
+  }
+
+  /*
+   * The argument of this table lives in the rows where the two columns disagree, and a
+   * dash used to be as solid a chip as a tick — so a reader had to read every row to find
+   * them. A capability is a filled mark and an absence is bare text, which makes the
+   * differing rows legible before any of the words are.
+   */
+  .pj-status[data-status="yes"] {
+    border-color: var(--olive);
+    background: color-mix(in srgb, var(--olive) 14%, var(--surface-2));
+  }
+
+  .pj-status[data-status="partial"] {
+    border-color: var(--amber-dim);
+    background: color-mix(in srgb, var(--amber-dim) 16%, var(--surface-2));
+  }
+
+  .pj-status[data-status="yes"] .pj-status-glyph {
+    color: var(--olive);
+  }
+
+  .pj-status[data-status="partial"] .pj-status-glyph {
+    color: var(--amber);
+  }
+
+  .pj-status[data-status="not-documented"] {
+    border-color: transparent;
+    background: transparent;
+    color: var(--ink-3);
+    font-weight: 400;
+  }
+
+  .pj-related {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin-block-start: var(--group-y);
+    padding-block-start: var(--sp-5);
+    border-top: var(--bd-strong);
+  }
+
+  [data-reading-text] {
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    text-transform: none;
+  }
+
+  @media (min-width: 48rem) {
+    .pj-detail-hero {
+      grid-template-columns: minmax(0, 3fr) minmax(16rem, 2fr);
+    }
+
+    .pj-card-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pj-section-heading {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      align-items: start;
+    }
+
+    .pj-section-heading > p {
+      max-width: var(--measure-prose);
+    }
+
+    /*
+     * The h2 takes its own row rather than spanning a fixed six. A span reserved
+     * rows the section did not have, and their row gaps came out as dead height
+     * under every heading that carries fewer than six paragraphs — which is all
+     * of them. Auto placement gives the grid exactly as many rows as it has
+     * content, and the paragraphs still flow down column 2 beside the heading.
+     */
+    .pj-section-heading > h2 {
+      grid-column: 1;
+    }
+
+    .pj-section-heading > :not(h2) {
+      grid-column: 2;
+    }
+
+    .pj-proof {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      column-gap: var(--sp-6);
+    }
+
+    .pj-proof > h2 {
+      grid-column: 1;
+      grid-row: 1 / span 4;
+    }
+
+    .pj-proof > :not(h2) {
+      grid-column: 2;
+    }
+
+    .pj-feature-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pj-feature:last-child {
+      grid-column: 1 / -1;
+    }
+
+    .pj-benefit-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .pj-community {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      column-gap: var(--sp-6);
+    }
+
+    .pj-community > h2 {
+      grid-column: 1;
+      grid-row: 1 / span 3;
+    }
+
+    .pj-community > :not(h2) {
+      grid-column: 2;
+    }
+
+    .pj-story-grid,
+    .pj-instruction-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* with only three columns there is room to let the capability read normally. */
+    .pj-comparison-table thead .tbl-th:first-child {
+      inline-size: 54%;
+    }
+
+    .pj-comparison-table thead .tbl-th:not(:first-child) {
+      inline-size: 23%;
+    }
+
+    .pj-comparison-table .pj-capability {
+      overflow-wrap: normal;
+    }
+
+    .pj-evidence-ledger {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--sp-5);
+    }
+  }
+
+  /*
+   * Narrow: the wordmark, four destinations, and the theme control cannot share
+   * one row without pushing the page into horizontal scroll. The nav takes a row
+   * of its own under them rather than being hidden — a link a reader cannot
+   * reach is worse than a taller header — and contact gives up its right edge
+   * along with the row it was anchored to.
+   */
+  @media (max-width: 47.99rem) {
+    .pj-header-inner {
+      flex-wrap: wrap;
+      row-gap: var(--sp-2);
+      padding-block: var(--sp-2);
+    }
+
+    .pj-nav {
+      order: 1;
+      flex-basis: 100%;
+      flex-wrap: wrap;
+    }
+
+    .pj-nav > :last-child {
+      margin-inline-start: 0;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .pj-header-inner,
+    .pj-main {
+      padding-inline: var(--sp-4);
+    }
+
+    .pj-main {
+      padding-block-start: var(--sp-6);
+    }
+
+    .pj-main h1 {
+      font-size: var(--fs-xl);
+    }
+
+    .pj-main h2 {
+      font-size: var(--fs-lg);
+    }
+
+    .pj-proof,
+    .pj-availability,
+    .pj-figure {
+      padding: var(--sp-4);
+    }
+
+    .pj-terminal-lines {
+      padding: var(--sp-3);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pj-project-card,
+    .pj-related .btn,
+    .pj-header .btn {
+      transition:
+        border-color var(--dur-1) var(--ease-standard),
+        background var(--dur-1) var(--ease-standard),
+        color var(--dur-1) var(--ease-standard);
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  .home-page *,
+  .home-page *::before,
+  .home-page *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-/* ── Paused (via pause button) ── */
-[data-paused="true"] *, [data-paused="true"] *::before, [data-paused="true"] *::after {
-  animation-play-state: paused !important;
-  transition-duration: 0ms !important;
-}
-[data-paused="true"] .cursor-blink {
-  animation: none !important;
-  opacity: 0 !important;
-}
-
-/* ── Typography Scale (Minor Third 1.2) ── */
-.text-display { font-size: 40px; line-height: 1.2; }
-.text-hero { font-size: 33px; line-height: 1.2; }
-.text-title { font-size: 28px; line-height: 1.3; }
-.text-heading { font-size: 23px; line-height: 1.3; }
-.text-subheading { font-size: 19px; line-height: 1.4; }
-.text-body { font-size: 16px; line-height: 1.6; }
-.text-small { font-size: 13px; line-height: 1.5; }
-.text-caption { font-size: 11px; line-height: 1.5; }
-
-@media (min-width: 768px) {
-  .text-display { font-size: 52px; }
+/*
+ * fairtrade's base sets `h1, h2, h3 { font-weight: 700 }`, but Tailwind's preflight ships
+ * `h1..h6 { font-weight: inherit }` — also unlayered, and later in the cascade — so every
+ * authored heading silently rendered at the body weight of 400. The largest type on the page
+ * was also its lightest, leaving hierarchy to size alone. Restoring the design system's
+ * intent needs the same unlayered origin to win.
+ *
+ * The transcript demo is an embedded application surface that styles its own headings; it is
+ * excluded so this page-level correction cannot reach inside it.
+ */
+.pj-main :is(h1, h2, h3):not(.pj-transcript *) {
+  font-weight: 700;
 }
 
-/* never uppercase — the peasant does not capitalize for the manor */
-.lowercase-all,
-.lowercase-all * {
-  text-transform: lowercase !important;
+/*
+ * fairtrade ships its component CSS unlayered, so an unlayered cascade origin is the only
+ * way these terminal-line overrides can win over the canonical `.cli-cmd` box treatment.
+ * Inside the terminal panel a command is a line, not its own bordered block.
+ */
+.pj-terminal .cli-cmd {
+  align-items: center;
+  border: 0;
+  background: transparent;
 }
 
-/* crt-style glow — bold text and anything tagged .glow */
-.font-bold,
-strong,
-b,
-.glow {
-  text-shadow: 0 0 8px color-mix(in srgb, currentColor 25%, transparent);
+.pj-terminal .cli-cmd-line {
+  padding: 0;
 }
 
-/* svg variant — text-shadow does nothing on strokes */
-.glow-svg {
-  filter: drop-shadow(0 0 5px color-mix(in srgb, currentColor 30%, transparent));
+/* Scoped to the lines: "copy all" sits in the head and keeps its divider. */
+.pj-terminal-lines .cli-copy {
+  border-left: 0;
 }
 
-/* inline accent links — dim by default, glow on hover */
-.link-accent {
-  color: color-mix(in srgb, var(--accent) 70%, var(--text-secondary));
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent);
-  transition:
-    color 180ms ease,
-    text-decoration-color 180ms ease,
-    text-shadow 180ms ease;
-}
-.link-accent:hover,
-.link-accent:focus-visible {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
-  text-shadow: 0 0 10px color-mix(in srgb, currentColor 45%, transparent);
+/* Outside a command block, "copy all" is its own control and needs its own box. */
+.pj-start-actions .cli-copy {
+  border: var(--bd);
+  background: var(--surface);
 }
 
-/* visible focus for keyboard users (accessibility) */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
+/*
+ * Same unlayered-origin reason again: the accordion trigger lowercases its label
+ * and sets the panel in the mono face. Question text is authored, and an answer
+ * is prose, so both need the body treatment.
+ */
+.pj-faq .acc-trigger {
+  text-transform: none;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
 }
 
-/* honeypot — off-screen (not display:none, so bots still fill it) */
-.hp {
+.pj-faq .acc-body {
+  font-family: var(--font-body);
+  max-width: var(--measure-prose);
+}
+
+/*
+ * `.txn-meta` turns into a horizontally scrolling chip strip under a narrow
+ * VIEWPORT media query. Inside the demo that rule misfires: the wrapper already
+ * guarantees the composite 60rem regardless of viewport, so the strip has room
+ * it does not know about and becomes a scroll region with nothing focusable in
+ * it — a serious axe failure at 320px. The wrapper owns the scrolling here.
+ */
+.pj-transcript .txn-meta {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
+
+/*
+ * Same unlayered-origin reason: `.tbl-th` and `.tbl-caption` lowercase their text, which would
+ * coerce the authored "Entire" into "entire". Casing on this page is authored, never CSS-applied.
+ */
+.pj-comparison-table thead .tbl-th,
+.pj-comparison-table .tbl-caption {
+  text-transform: none;
+}
+
+/* `.tbl-th` forbids wrapping, which a percentage-width header column cannot honour. */
+.pj-comparison-table thead .tbl-th {
+  white-space: normal;
+}
+
+/*
+ * Same unlayered-origin reason once more: `.cli-step-title` lowercases its text, and casing on this
+ * page is authored, never CSS-applied. The step titles are the component's own chrome rather than
+ * page headings, so they also keep the weight fairtrade gives them over the page's heading 700.
+ */
+.pj-story-steps .cli-step-title {
+  text-transform: none;
+  font-weight: 600;
+}
+
+/*
+ * `.cli-cmd-line` scrolls a long command horizontally. At 320px that leaves a scroll region with
+ * nothing focusable in it — a serious axe failure, and an overflow no wrapper owns. The page's own
+ * ProjectCommand solves this by wrapping CommandBlock in a focusable region, but CliSteps renders
+ * the block itself, so there is nowhere to put that wrapper. Letting the line wrap removes the
+ * scroll container altogether and keeps the whole command readable on a phone.
+ */
+.pj-story-steps .cli-cmd-line {
+  overflow-x: visible;
+}
+
+/* `.cli-cmd-line code` re-declares `white-space: pre`, so the code element needs telling too. */
+.pj-story-steps .cli-cmd-line,
+.pj-story-steps .cli-cmd-line code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * ─── the rail ───────────────────────────────────────────────────────────────
+ *
+ * The walkthrough and the viewer are one movement, not two sections that happen
+ * to sit together: the line threading the numbered steps carries on out of the
+ * last one, across the gap, and down into the transcript browser that shows what
+ * those four commands produced. It is the same gold as the markers it threads,
+ * so it reads as the sequence continuing rather than as a border.
+ *
+ * `--pj-rail-x` is the centre of a 24px step marker sitting at the left edge of
+ * its row, which is also the left edge of the section's content column, so one
+ * offset holds the whole run in line.
+ */
+.pj-main {
+  --pj-rail-x: 12px;
+  --pj-rail-w: 1px;
+  --pj-rail-ink: var(--amber-fill);
+  /* the air above and below the viewer heading, and the two rail runs that cross it. */
+  --pj-viewer-lead: var(--sp-8);
+  /* past the top of the spacing scale: the run out of the question is the longer
+   * of the two, so the panel arrives as a landing rather than as the next thing. */
+  --pj-viewer-tail: calc(var(--sp-8) * 2.2);
+  /* how far the question hangs left of the column it sits in. */
+  --pj-title-pull: var(--gutter);
+  /*
+   * How far each run stops short of the question, on both sides. It is taken off
+   * the title end of each run only — the other ends still meet the last step and
+   * the top of the panel exactly, so widening the clearance opens air around the
+   * words rather than pulling the line away from what it connects.
+   */
+  --pj-title-clear: var(--sp-5);
+}
+
+/*
+ * fairtrade stops its own rail at the second-to-last step (`:not(:last-child)`)
+ * and paints it in `--rule`. Both are replaced here: every step carries the
+ * line, and the last one runs it to the bottom of the section.
+ *
+ * Two classes on the list rather than one: fairtrade's `.cli-step:not(:last-child):before`
+ * is itself two classes deep, and a tie would leave this at the mercy of stylesheet order.
+ */
+.cli-steps.pj-story-steps .cli-step::before {
+  content: "";
   position: absolute;
-  left: -9999px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
+  /* just clear of a 24px marker, so the line reads as leaving the number rather
+   * than restarting below it — fairtrade's own --sp-7 left a 16px break. */
+  top: var(--sp-6);
+  bottom: 0;
+  left: var(--pj-rail-x);
+  width: var(--pj-rail-w);
+  background: var(--pj-rail-ink);
 }
 
-/* ============================================================
-   one size, everywhere. hierarchy comes only from
-   weight, color, and transparency — never from size.
-   ============================================================ */
-
-/* every text node renders at the body size */
-.uniform,
-.uniform * {
-  font-size: 0.875rem !important;
-}
-.uniform {
-  line-height: 1.8;
-  letter-spacing: 0.005em;
+/*
+ * The viewer picks the rail up where the steps put it down. Its own section rule
+ * is dropped: a horizontal divider drawn across a line meant to read as one
+ * continuous run would cut the run in two.
+ */
+.pj-viewer {
+  position: relative;
+  border-block-start: 0;
+  padding-block-start: var(--pj-viewer-lead);
 }
 
-/* readable measure for long-form text */
-.measure {
-  max-width: 84ch;
+/*
+ * From the last step down to the question. The negative offset is the gap
+ * between the two sections — `.pj-section` sets it as `margin-block-start` and
+ * carries no bottom margin, so `--group-y` above this section's own box is
+ * exactly where the steps ended. This depends on the viewer following the story
+ * directly; the section order is asserted in tests/projects.spec.ts.
+ */
+.pj-viewer::before {
+  content: "";
+  position: absolute;
+  left: var(--pj-rail-x);
+  top: calc(-1 * var(--group-y));
+  /* short of the question by the clearance; the start is untouched, so it still
+   * meets the last step's own run exactly. */
+  height: calc(var(--group-y) + var(--pj-viewer-lead) - var(--pj-title-clear));
+  width: var(--pj-rail-w);
+  background: var(--pj-rail-ink);
 }
 
+/*
+ * The question breaks the run — a line drawn through the words reads as a strike
+ * rather than a thread — and it picks up again underneath, landing on the top of
+ * the panel.
+ *
+ * The break is the whole heading block rather than the title alone: at this
+ * width the paragraph sits in a second column well clear of the line, but under
+ * 64rem it stacks beneath the title and lands directly on it.
+ */
+.pj-viewer > .pj-section-heading {
+  position: relative;
+  margin-block-end: var(--pj-viewer-tail);
+}
+
+.pj-viewer > .pj-section-heading::after {
+  content: "";
+  position: absolute;
+  left: var(--pj-rail-x);
+  /* pushed down by the clearance and shortened by the same, so the far end still
+   * lands on the top of the panel. */
+  top: calc(100% + var(--pj-title-clear));
+  height: calc(var(--pj-viewer-tail) - var(--pj-title-clear));
+  width: var(--pj-rail-w);
+  background: var(--pj-rail-ink);
+}
+
+/*
+ * The question hangs left of the column it sits in, out into the page gutter.
+ * Neither run follows it: the upper one is positioned against the section and
+ * the lower one against the heading, and this moves only the h2 inside them.
+ *
+ * The margins are paired so the box slides rather than widens — a lone negative
+ * start margin would give the title more room per line and rewrap it.
+ *
+ * Two columns only. Under 64rem the heading stacks, so the pull would indent the
+ * title away from the paragraph beneath it, and at 30rem the page's own inline
+ * padding drops to --sp-4 — less than a full gutter, so the title would hang
+ * past the viewport edge and open a horizontal scroll.
+ */
+@media (min-width: 64rem) {
+  .pj-viewer > .pj-section-heading > h2 {
+    margin-inline-start: calc(-1 * var(--pj-title-pull));
+    margin-inline-end: var(--pj-title-pull);
+  }
+}
+
+/*
+ * Same unlayered-origin reason: `.rdx-row-muted` dims a kept pair to 45% opacity, which drops its
+ * diff text to 2.86:1 in dark and 1.98:1 in light — well under AA. No opacity passes both themes
+ * without the dimming ceasing to read as dimming, and on a kept match the struck line is the one
+ * that actually gets sent, so it is the last text on the page that should be hard to read.
+ *
+ * The state is not lost with the dimming: the match keeps its "will be sent" badge, its
+ * strike-through, its revert control, and the "kept un-redacted" tally above the list. None of
+ * those are colour-only, so the pair still reads as the exception it is.
+ *
+ * The `.rdx-row` in the middle is load-bearing: fairtrade's own `.rdx-row-add.rdx-row-muted` is
+ * two classes, and a tie would leave this rule at the mercy of stylesheet order.
+ */
+.pj-redaction-demo .rdx-row.rdx-row-muted {
+  opacity: 1;
+}
+
+/*
+ * Standard is the only redaction level the product ships. fairtrade's segmented control renders
+ * minimal, standard, and maximum unconditionally, so the two that are gone are removed here —
+ * `display: none` takes them out of the accessibility tree as well as the page, so nothing offers
+ * a reader a level they cannot get.
+ *
+ * The selected option is the one that survives, and `RedactionDemo` passes no `onLevel`, so the
+ * selection cannot move off standard and strand the panel with every option hidden.
+ */
+.pj-redaction-demo .rdx-seg-opt:not([aria-pressed="true"]) {
+  display: none;
+}
+
+/*
+ * The level track wraps. With one option left it no longer overflows a 320px screen on its own,
+ * but the summary line beside it still can, and a control nobody can tab into is not a thing to
+ * leave one label away from returning.
+ */
+.pj-redaction-demo .rdx-seg {
+  flex-wrap: wrap;
+}
