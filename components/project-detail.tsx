@@ -3,10 +3,10 @@ import {
   EVIDENCE,
   type EvidenceId,
   type EvidenceRecord,
-  type HeroFigureContent,
   type ProjectPageContent,
 } from "@/lib/projects";
-import { Breadcrumb, Card } from "@peasant-labs/fairtrade/ui";
+import { Breadcrumb, Card } from "@/components/fairtrade-client";
+import { UnderConstruction } from "@/components/under-construction";
 import type { ReactNode } from "react";
 
 export function EvidenceCitations({ ids }: { ids: readonly EvidenceId[] }) {
@@ -51,22 +51,6 @@ export function EvidenceCitations({ ids }: { ids: readonly EvidenceId[] }) {
         );
       })}
     </ul>
-  );
-}
-
-export function HeroFigure({ figure }: { figure: HeroFigureContent }) {
-  return (
-    <figure
-      className="pj-figure pj-hero-figure"
-      data-project-figure
-      data-hero-figure
-      aria-label={figure.accessibleName}
-    >
-      <div className="pj-figure-state" data-figure-state>
-        <span className="pj-figure-label">{figure.stateText}</span>
-      </div>
-      <figcaption>{figure.caption}</figcaption>
-    </figure>
   );
 }
 
@@ -161,10 +145,13 @@ export function ProjectDetail({
   project,
   flow,
   proof,
+  underConstruction = false,
 }: {
   project: ProjectPageContent;
   flow: ReactNode;
   proof: ReactNode;
+  /** When true, show the shared under-construction notice under the breadcrumb. */
+  underConstruction?: boolean;
 }) {
   return (
     <main id="content" className="pj-main" tabIndex={-1}>
@@ -176,6 +163,8 @@ export function ProjectDetail({
           { label: project.name },
         ]}
       />
+
+      {underConstruction ? <UnderConstruction projectName={project.name} /> : null}
 
       <header className="pj-detail-hero">
         <div className="pj-hero-copy">
@@ -201,7 +190,6 @@ export function ProjectDetail({
           </p>
           <EvidenceCitations ids={project.availability.evidence} />
         </aside>
-        <HeroFigure figure={project.figure} />
       </header>
 
       <section className="pj-section" aria-labelledby={`${project.slug}-features`}>

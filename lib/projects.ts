@@ -4,23 +4,10 @@ export const SITE_URL = "https://peasantlabs.org" as const;
 export const SITE_NAME = "peasant labs" as const;
 
 export type ProjectSlug = "peasant" | "village";
+export type Three<T> = readonly [T, T, T];
+export type Four<T> = readonly [T, T, T, T];
 export type Five<T> = readonly [T, T, T, T, T];
-export type Fourteen<T> = readonly [
-  T,
-  T,
-  T,
-  T,
-  T,
-  T,
-  T,
-  T,
-  T,
-  T,
-  T,
-  T,
-  T,
-  T,
-];
+export type Six<T> = readonly [T, T, T, T, T, T];
 
 export type AdvertisedState =
   | "public-release"
@@ -29,11 +16,7 @@ export type AdvertisedState =
   | "private-contributor-development"
   | "not-publicly-available";
 
-export type ComparisonStatus =
-  | "supported"
-  | "partial"
-  | "not-documented"
-  | "not-in-current-scope";
+export type ComparisonStatus = "yes" | "partial" | "not-documented";
 
 export type SourceScope =
   | AdvertisedState
@@ -658,18 +641,84 @@ export type HeroFigureContent = Readonly<{
   caption: string;
 }>;
 
+export type ProjectCard = Readonly<{
+  /** the one word the card is filed under in the two-tools section. */
+  kind: string;
+  outcome: string;
+  proof: readonly [string, string, string];
+  action: string;
+  availability: string;
+}>;
+
+/** one situation peasant helps with, stated in a reader's own terms. */
+export type PeasantUse = Readonly<{
+  id: string;
+  title: string;
+  body: string;
+}>;
+
+/**
+ * The peasant detail page explains one product to a first-time reader, so it
+ * carries plain copy and the sequence that gets them running. Source-scoped
+ * evidence, availability qualifiers, and the comparison stay on /projects,
+ * where a reader has already asked for them.
+ */
+export type PeasantPageContent = Readonly<{
+  slug: "peasant";
+  name: "peasant";
+  route: "/projects/peasant";
+  metadata: RouteMetadata;
+  card: ProjectCard;
+  hero: Readonly<{ title: string; body: string }>;
+  start: StartSection;
+  usesTitle: string;
+  usesIntro: string;
+  uses: Three<PeasantUse>;
+  related: readonly [ProjectLink, ...ProjectLink[]];
+}>;
+
+export type VillageExampleCollective = Readonly<{
+/** one collective card shown as an example of a community to join. */
+  head: string;
+  title: string;
+  desc: string;
+  bullets: readonly [string, string];
+  members: string;
+  transcripts: string;
+  linked: string;
+}>;
+
+/**
+ * The village detail page is a short product explainer: title, the same
+ * get-started wizard pattern as peasant, and a join-community example.
+ */
+export type VillagePageContent = Readonly<{
+  slug: "village";
+  name: "village";
+  route: "/projects/village";
+  metadata: RouteMetadata;
+  card: ProjectCard;
+  hero: Readonly<{ title: string; body: string }>;
+  start: StartSection;
+  community: Readonly<{
+    title: string;
+    body: string;
+    joinLabel: string;
+  }>;
+  example: VillageExampleCollective;
+  governance: Readonly<{
+    title: string;
+    body: string;
+  }>;
+  related: readonly [ProjectLink, ...ProjectLink[]];
+}>;
+
 export type ProjectPageContent = Readonly<{
   slug: ProjectSlug;
   name: "peasant" | "village";
   route: `/projects/${ProjectSlug}`;
   metadata: RouteMetadata;
-  card: EvidenceBacked &
-    Readonly<{
-      outcome: string;
-      proof: readonly [string, string, string];
-      action: string;
-      availability: string;
-    }>;
+  card: ProjectCard;
   hero: EvidenceBacked &
     Readonly<{
       title: string;
@@ -683,7 +732,6 @@ export type ProjectPageContent = Readonly<{
       qualification: string;
       state: AdvertisedState;
     }>;
-  figure: HeroFigureContent;
   features: Five<ProjectFeature>;
   flow: EvidenceBacked &
     Readonly<{
@@ -710,49 +758,171 @@ export const PROJECT_ORDER = ["peasant", "village"] as const satisfies readonly 
   ProjectSlug,
 ];
 
+/**
+ * One line of the install terminal: a shell comment saying what the step is
+ * for, and the command that does it. A step without a command is a
+ * prerequisite the reader satisfies away from the terminal.
+ */
+export type StartStep = Readonly<{
+  id: string;
+  title: string;
+  comment: string;
+  command?: string;
+}>;
+
+/**
+ * One step of the /projects walkthrough, shaped for fairtrade's CliSteps: a
+ * numbered marker, a title, the prose that says why, and the command that does
+ * it. Unlike a terminal line the body is prose rather than a shell comment,
+ * because the component sets it in the body face beside the command block.
+ */
+export type StoryStep = Readonly<{
+  id: string;
+  title: string;
+  body: string;
+  command: string;
+}>;
+
+/** the first-run wizard: a rail of named steps, one command in view at a time. */
+export type StartSection = Readonly<{
+  title: string;
+  intro: string;
+  stepsLabel: string;
+  continueLabel: string;
+  doneLabel: string;
+  backLabel: string;
+  copyAllLabel: string;
+  steps: Five<StartStep>;
+}>;
+
+/** one question a first-time reader actually asks, answered without hedging. */
+export type SuiteQuestion = Readonly<{
+  id: string;
+  question: string;
+  answer: string;
+}>;
+
 export const SUITE = {
   metadata: {
     title: "projects | peasant labs",
     description:
-      "peasant keeps supported coding-agent session history local. village publishes selected records to a governed commons.",
+      "peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.",
     canonical: "/projects",
   },
-  title: "keep the work. share what matters.",
+  title: "a commons for AI coding transcripts",
   intro:
-    "peasant builds a local record from retained sessions across supported harnesses. village receives only the copies a user explicitly publishes, then applies discovery and governance around those copies.",
-  figure: {
-    accessibleName:
-      "placeholder for the peasant labs suite workflow showing a selected local record, deliberate review, and its governed published copy",
-    stateText: "peasant labs suite workflow screenshot forthcoming",
-    caption:
-      "the future image will show a selected local record in peasant, its deliberate review boundary, and the governed copy explicitly published to village.",
-  } satisfies HeroFigureContent,
-  storyTitle: "from local history to shared context",
-  story: [
-    {
-      id: "record",
-      title: "record locally",
-      body: "discover selected retained sessions, normalize their turns and tool activity, and keep the working record in peasant.",
-    },
-    {
-      id: "review",
-      title: "review deliberately",
-      body: "inspect project context and redaction findings before taking an explicit sharing action.",
-    },
-    {
-      id: "share",
-      title: "share a selected copy",
-      body: "publish a chosen record to village for governed discovery, then pull permitted foreign context into a separate local namespace.",
-    },
-  ] as const,
-  contractTitle: "one contract from local to shared",
-  contractBody:
-    "the public schema contract carries ordered turns, tool calls, outcomes, Git context, annotations, and sharing metadata between the two products. peasant and village were observed on schema rc9 while rc10 was the public schema release on 2026-07-28.",
-  contractEvidence: [
-    "schema-rc10",
-    "peasant-schema-pin",
-    "village-schema-pin",
-  ] as const satisfies readonly [EvidenceId, ...EvidenceId[]],
+    "peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.",
+  /*
+   * The heading is the question a colleague actually asks, and the paragraph
+   * under it is the situation that question arrives in. The transcript browser
+   * below is the answer, so the demo does not need to be announced as one — only
+   * declared as sample data, which the note under the heading does.
+   */
+  viewerTitle: "\"hey, can you help me review this?\"",
+  viewerIntro:
+    "you spent friday afternoon working through a nasty bug with an agent. on monday someone asks how you fixed it. you want to show them that one session, not hand over everything else you have ever done.",
+  /* Under the panel rather than above it: the run of steps connects straight
+   * into the viewer, and a line of small print in that gap breaks the join. */
+  viewerNote: "sample data, not a real record.",
+  viewerLabel: "sample session in the transcript browser",
+  install: {
+    command: "curl -fsSL https://peasantlabs.org/install | bash",
+  },
+  whatTitle: "what is peasant labs?",
+  // Not "an open source project": the peasant-license evidence record states the
+  // product ships under a placeholder license and must not be called open
+  // source. The FAQ answers the licensing question in full.
+  whatIntro:
+    "peasant labs makes your coding agent sessions shareable only with people you trust, private, and searchable. it is made of two tools:",
+  /* Two lines: the section is what we make, then what that means. The break is
+   * authored rather than left to wrapping — `white-space: pre-line` on the
+   * heading keeps it wherever the line lands. */
+  cardsTitle: "our projects,\nlocal and open-source",
+  cardsIntro: "peasant runs on your machine. village is where published copies live.",
+  story: {
+    title: "install, share, and leverage your data",
+    situation:
+      "install peasant, read back what your agents already saved, then publish only the session you choose. four commands, and everything before the last one stays on your machine.",
+    stepsLabel: "getting started, install to published copy",
+    steps: [
+      {
+        id: "install",
+        title: "install",
+        body: "one line, no account. puts the peasant binary on your PATH, and everything it does from here runs on this machine.",
+        command: "curl -fsSL https://peasantlabs.org/install | bash",
+      },
+      {
+        id: "ingest",
+        title: "ingest your transcripts",
+        body: "reads the sessions Claude Code, Codex, Cursor, and OpenCode already saved on your disk, and records them locally.",
+        command: "peasant ingest",
+      },
+      {
+        id: "open-the-dashboard",
+        title: "open the dashboard",
+        body: "browse what was found, read any session back, and set what stays private before any of it leaves.",
+        command: "peasant web start",
+      },
+      {
+        id: "contribute-to-the-commons",
+        title: "contribute to the commons",
+        body: "sends the one session you approved to village, with your redactions applied. the original stays local and nothing else goes with it.",
+        command: "peasant village push",
+      },
+    ] as Four<StoryStep>,
+  },
+  community: {
+    title: "building for community first",
+    body:
+      "the sessions are yours first: they sit on your machine and nothing leaves until you send it. village exists for the ones you do send, so the work behind a fix becomes something other people can learn from instead of something that disappears.",
+    points: [
+      "publishing is always a deliberate act, never a default",
+      "every shared session carries the reuse license you picked",
+      "groups set their own rules, open to all or approved by the owner",
+    ] as Three<string>,
+  },
+  faq: {
+    title: "questions",
+    label: "frequently asked questions",
+    questions: [
+      {
+        id: "open-source",
+        question: "is it open source?",
+        answer:
+          "the schema that peasant and village share is public and Apache-2.0. peasant itself ships under a placeholder license while it is in private preview, so it is not open source yet.",
+      },
+      {
+        id: "agents",
+        question: "which coding agents does it read?",
+        answer:
+          "it reads sessions from Claude Code, Codex, Cursor, and OpenCode. sessions your tools have already deleted cannot be recovered.",
+      },
+      {
+        id: "uploads",
+        question: "does anything get uploaded on its own?",
+        answer:
+          "no. peasant stores everything locally and only sends a copy when you run a publish command.",
+      },
+      {
+        id: "search",
+        question: "how good is the search?",
+        answer:
+          "it is keyword search across the text of your saved sessions. it does not search by meaning, so exact words work better than descriptions.",
+      },
+      {
+        id: "others-work",
+        question: "what about sessions other people publish?",
+        answer:
+          "you can pull the ones you are allowed to read into a separate local space. they stay theirs, and you cannot republish them.",
+      },
+      {
+        id: "village",
+        question: "do i have to use village?",
+        answer:
+          "no. peasant works on its own as a local record. village only ever holds copies you send it.",
+      },
+    ] as readonly [SuiteQuestion, ...SuiteQuestion[]],
+  },
 } as const;
 
 export const PROJECTS = {
@@ -767,213 +937,80 @@ export const PROJECTS = {
       canonical: "/projects/peasant",
     },
     card: {
-      outcome:
-        "turn retained sessions from supported harnesses into one inspectable local project record.",
+      kind: "local",
+      outcome: "saves the sessions from the coding agents you use to your own machine.",
       proof: [
-        "four current-source adapters",
-        "local SQLite analysis",
-        "explicit review and sharing",
+        "reads Claude Code, Codex, Cursor, and OpenCode",
+        "search and reread everything locally",
+        "nothing is shared unless you say so",
       ],
       action: "explore peasant",
-      availability: "private preview and current source",
-      evidence: ["peasant-adapters", "peasant-readme"],
+      availability: "private preview",
     },
     hero: {
-      title: "one history across the supported tools you use",
+      title: "keep your coding-agent transcripts. share the ones you choose.",
       body:
-        "peasant imports retained sessions from a finite set of supported coding-agent harnesses, normalizes them into one local record, and keeps sharing as an explicit choice.",
-      state: "current-source",
-      evidence: ["peasant-adapters", "peasant-readme"],
+        "peasant collects the sessions Claude Code, Codex, Cursor, and OpenCode already save on your disk and keeps them in one place you can search and read back. nothing goes anywhere else unless you send it.",
     },
-    availability: {
-      title: "private preview",
-      body:
-        "the observed product release is private v0.1.0-rc2. newer behavior on this page is verified in current source and is not presented as a signed-out public download.",
-      qualification:
-        "preview repository or release access is required before any install or run command can work.",
-      state: "private-preview",
-      evidence: ["peasant-rc2-private-release", "peasant-license"],
-    },
-    figure: {
-      accessibleName:
-        "placeholder for the peasant project timeline showing selected sessions and available Git associations",
-      stateText: "peasant project timeline screenshot forthcoming",
-      caption:
-        "the future image will show a local project history with session context and association limits visible.",
-    },
-    features: [
-      {
-        id: "supported-harness-history",
-        title: "one history across supported harnesses",
-        body:
-          "current source has four adapter factories feeding one canonical session-detail path, so retained work is not confined to one supported transcript format.",
-        qualification:
-          "adapter coverage is finite and current-source behavior may be newer than private rc2.",
-        state: "current-source",
-        evidence: ["peasant-adapters", "peasant-readme"],
-      },
-      {
-        id: "project-context",
-        title: "project context beyond the transcript",
-        body:
-          "selection, project and branch identity, timing, tool activity, and durable session-to-commit records add context around the conversation.",
-        qualification:
-          "Git associations appear only where peasant detects them; no association is promised for every session.",
-        state: "current-source",
-        evidence: ["peasant-readme", "peasant-selection-redaction"],
-      },
-      {
-        id: "local-analysis",
-        title: "local analysis before publication",
-        body:
-          "the local store supports transcript browsing, metrics, project views, and full-text search over recorded message entries.",
-        qualification:
-          "search is local full-text search, not semantic search, and optional network actions remain separate.",
-        state: "current-source",
-        evidence: ["peasant-readme", "peasant-search"],
-      },
-      {
-        id: "redaction-review",
-        title: "review what leaves the machine",
-        body:
-          "a user chooses a redaction level and can inspect an explicit publish path instead of enabling background publication.",
-        qualification:
-          "redaction reduces exposure but cannot guarantee that every sensitive value is detected.",
-        state: "current-source",
-        evidence: ["peasant-selection-redaction", "peasant-readme"],
-      },
-      {
-        id: "schema-backed-sharing",
-        title: "one typed record from local to shared",
-        body:
-          "the schema-backed detail carries ordered turns, tool calls, outcomes, timing, Git context, annotations, and sharing metadata instead of flattening work into chat text.",
-        qualification:
-          "the public Apache-2.0 license applies to schema only, not to the private peasant product.",
-        state: "current-source",
-        evidence: ["schema-rc10", "peasant-schema-pin", "peasant-readme"],
-      },
-    ],
-    flow: {
-      title: "from session to project history",
+    start: {
+      title: "get started",
       intro:
-        "the record grows through explicit, bounded steps. missing source files or undetected associations remain missing rather than being inferred.",
+        "five commands, start to finish. everything here runs on your own machine.",
+      stepsLabel: "setup steps",
+      continueLabel: "continue",
+      doneLabel: "done",
+      backLabel: "back",
+      copyAllLabel: "copy all commands",
       steps: [
-        "discover retained sessions selected from supported local stores",
-        "normalize messages, turns, tool calls, and session metadata",
-        "store and analyze the record in local SQLite-backed surfaces",
-        "attach project and Git context where source evidence supports it",
-        "review redaction and explicitly choose whether to publish a copy",
-      ],
-      evidence: [
-        "peasant-adapters",
-        "peasant-readme",
-        "peasant-selection-redaction",
-      ],
+        {
+          id: "install",
+          title: "install",
+          comment: "# one line, puts peasant on your PATH",
+          command: "curl -fsSL https://peasantlabs.org/install | bash",
+        },
+        {
+          id: "set-up",
+          title: "set up",
+          comment: "# choose which projects and sessions to keep",
+          command: "peasant kickstart",
+        },
+        {
+          id: "bring-work-in",
+          title: "bring your work in",
+          comment: "# reads what your agents already saved",
+          command: "peasant ingest",
+        },
+        {
+          id: "open-it",
+          title: "open it",
+          comment: "# browse and search at localhost:8690",
+          command: "peasant web start",
+        },
+        {
+          id: "share-one",
+          title: "share one",
+          comment: "# sends one copy to village, only when you ask",
+          command: "peasant village push",
+        },
+      ] as Five<StartStep>,
     },
-    proof: {
-      title: "history, redaction, and local analysis",
-      body:
-        "peasant keeps source facts and user interpretation distinct: detected associations remain durable facts, while annotations and publishing require deliberate actions.",
-      points: [
-        "selected project and branch discovery bounds what enters the record",
-        "local full-text search opens recorded message context without claiming semantic retrieval",
-        "configurable redaction and dry-run publishing keep review before transfer",
-      ],
-      evidence: [
-        "peasant-selection-redaction",
-        "peasant-search",
-        "peasant-readme",
-      ],
-    },
-    access: [
+    usesTitle: "where it helps",
+    usesIntro: "three things that get easier once every session is in one place.",
+    uses: [
       {
-        id: "preview-access",
-        title: "obtain preview access",
-        body:
-          "use a private preview release or repository checkout supplied by a maintainer. there is no signed-out public artifact linked from this page.",
-        qualification:
-          "the observed private baseline is v0.1.0-rc2 and its placeholder product license is not a public open-source grant.",
-        state: "private-preview",
-        evidence: ["peasant-rc2-private-release", "peasant-license"],
-      },
-    ],
-    run: [
-      {
-        id: "configure",
-        title: "configure selected sources",
-        body:
-          "run the setup wizard after the preview binary is available on PATH.",
-        qualification: "post-access command for a private preview build.",
-        state: "private-preview",
-        command: "peasant kickstart",
-        evidence: ["peasant-readme", "peasant-selection-redaction"],
+        id: "remember-why",
+        title: "you forgot how something got built",
+        body: "find the session behind a change and read what you and the agent actually did.",
       },
       {
-        id: "ingest",
-        title: "ingest retained sessions",
-        body:
-          "process discovered sessions that match the configured selection.",
-        qualification:
-          "results depend on retained source transcripts, supported formats, selection, and successful parsing.",
-        state: "current-source",
-        command: "peasant ingest",
-        evidence: ["peasant-readme", "peasant-selection-redaction"],
+        id: "one-list-for-every-tool",
+        title: "you use more than one coding agent",
+        body: "every tool's sessions land in the same list, so you search once instead of four times.",
       },
       {
-        id: "open-dashboard",
-        title: "open the local dashboard",
-        body: "start the dashboard backed by the local peasant store.",
-        qualification: "post-access command; the documented default port is 8690.",
-        state: "private-preview",
-        command: "peasant web start",
-        evidence: ["peasant-readme"],
-      },
-    ],
-    stories: [
-      {
-        id: "multi-harness-developer",
-        actor: "a developer working across supported harnesses",
-        need: "needs one place to review retained work across branches",
-        action:
-          "selects the relevant projects and sessions, then ingests them into peasant",
-        outcome:
-          "gets one local project record without claiming coverage of unsupported or deleted source data",
-        evidence: ["peasant-adapters", "peasant-selection-redaction"],
-      },
-      {
-        id: "maintainer-context",
-        actor: "a maintainer reviewing a change",
-        need: "needs the session context behind a feature when an association exists",
-        action:
-          "opens the project history and follows an observed session-to-commit association",
-        outcome:
-          "can inspect the reasoning and tool activity while an unavailable association remains visibly unavailable",
-        evidence: ["peasant-readme"],
-      },
-      {
-        id: "review-before-share",
-        actor: "a developer preparing one session for sharing",
-        need: "needs to reduce sensitive exposure without publishing every local session",
-        action:
-          "reviews the selected session under a configured redaction level before an explicit push",
-        outcome:
-          "keeps non-selected local history local and sees the limits of redaction before transfer",
-        evidence: ["peasant-selection-redaction", "peasant-readme"],
-      },
-    ],
-    outputs: [
-      {
-        id: "kickstart-summary",
-        label: "illustrative setup summary from the current Kickstart guide",
-        qualification:
-          "documentation fixture only. counts describe the guide example, not product performance or availability.",
-        state: "current-source",
-        lines: [
-          "Redaction:    standard",
-          "Selected:     12 session(s)",
-          "New branches: Auto-ingest",
-        ],
-        evidence: ["peasant-selection-redaction"],
+        id: "share-just-one",
+        title: "you want to share one session",
+        body: "check it, hide what should stay private, and publish that copy to village.",
       },
     ],
     related: [
@@ -991,28 +1028,10 @@ export const PROJECTS = {
       },
       {
         id: "comparison",
-        label: "compare the operating models",
+        label: "compare with similar tools",
         href: "/projects#comparison",
         kind: "internal",
       },
-      {
-        id: "schema",
-        label: "view the public schema release",
-        href: "https://github.com/peasant-labs/schema/releases/tag/v0.1.0-rc10",
-        kind: "public-source",
-      },
-    ],
-    requiredEvidence: [
-      "peasant-rc2-private-release",
-      "peasant-current-corpus-2026-07-28",
-      "peasant-readme",
-      "peasant-adapters",
-      "peasant-selection-redaction",
-      "peasant-search",
-      "peasant-pull",
-      "peasant-license",
-      "peasant-schema-pin",
-      "schema-rc10",
     ],
   },
   village: {
@@ -1026,217 +1045,85 @@ export const PROJECTS = {
       canonical: "/projects/village",
     },
     card: {
-      outcome:
-        "publish selected session copies into a commons with explicit access, reuse, and policy history.",
+      kind: "open-source",
+      outcome: "holds the copies you publish, with clear rules on who can read and reuse them.",
       proof: [
-        "published copies, not source replacement",
-        "open or curated collectives",
-        "one-way authorized pull",
+        "published copies, originals stay local",
+        "open or owner-approved groups",
+        "pull other people's work in, one way",
       ],
       action: "explore village",
       availability: "private contributor development",
-      evidence: ["village-readme", "village-collectives", "village-governance"],
     },
     hero: {
       title: "a commons for selected agent work",
       body:
         "village receives copies that a peasant user explicitly publishes, then applies discovery, collective access, optional reuse licensing, and governance history around those copies.",
-      state: "current-source",
-      evidence: ["village-readme", "village-governance"],
     },
-    availability: {
-      title: "private contributor development",
-      body:
-        "no public hosted service, release, product license, or self-host distribution was verified. the documented Docker Compose path is for contributors with private repository access.",
-      qualification:
-        "repository access, GitHub OAuth credentials, a GitHub token, Docker, Go, Node, and pnpm are prerequisites.",
-      state: "private-contributor-development",
-      evidence: ["village-readme"],
-    },
-    figure: {
-      accessibleName:
-        "placeholder for the village collective view showing published session copies and governance state",
-      stateText: "village collective view screenshot forthcoming",
-      caption:
-        "the future image will show a published copy, its collective access, reuse license, and policy history.",
-    },
-    features: [
-      {
-        id: "published-copy-boundary",
-        title: "publish a copy, keep the local source",
-        body:
-          "village stores selected published copies and indexes them for discovery and sharing while peasant remains the local source store.",
-        qualification:
-          "publication is an explicit peasant action; village does not ingest every local harness file.",
-        state: "current-source",
-        evidence: ["village-readme", "peasant-readme"],
-      },
-      {
-        id: "collective-sharing",
-        title: "share through collectives",
-        body:
-          "collectives organize people and shared records with open contribution or owner-curated approval modes.",
-        qualification:
-          "access still follows the configured collective and transcript permissions.",
-        state: "current-source",
-        evidence: ["village-collectives"],
-      },
-      {
-        id: "access-and-license",
-        title: "choose access and reuse separately",
-        body:
-          "visibility uses the closed public, private, or shared set while an optional contract-defined CC license records the reuse grant.",
-        qualification:
-          "an unset license grants nothing, CC grants cannot be cleared for prior recipients, and this page is not legal advice.",
-        state: "current-source",
-        evidence: ["village-governance", "schema-rc10"],
-      },
-      {
-        id: "governance-history",
-        title: "preserve a policy change history",
-        body:
-          "database triggers write append-only events for publication, visibility, license, combined governance changes, and retraction.",
-        qualification:
-          "this is a product audit history, not a claim of regulatory certification or compliance.",
-        state: "current-source",
-        evidence: ["village-governance"],
-      },
-      {
-        id: "one-way-pull",
-        title: "pull context without republishing it",
-        body:
-          "authorized foreign transcripts and annotations return to a separate local namespace for reference.",
-        qualification:
-          "pulled records do not enter owned analytics or become current re-push candidates.",
-        state: "current-source",
-        evidence: ["peasant-pull", "village-governance"],
-      },
-    ],
-    flow: {
-      title: "publish. discover. pull.",
+    start: {
+      title: "get started",
       intro:
-        "the shared record moves only through explicit actions and permission checks. the local source and the published copy keep different ownership roles.",
+        "five commands, start to finish. everything here runs on your own machine.",
+      stepsLabel: "setup steps",
+      continueLabel: "continue",
+      doneLabel: "done",
+      backLabel: "back",
+      copyAllLabel: "copy all commands",
+      // Same install sequence as peasant — village is reached after you share a copy.
       steps: [
-        "select and review a locally owned session in peasant",
-        "explicitly publish a redacted copy with visibility and optional license",
-        "discover permitted copies through village and its collectives",
-        "apply trigger-written history when visibility or licensing changes",
-        "pull authorized foreign context into peasant's separate one-way namespace",
-      ],
-      evidence: [
-        "village-readme",
-        "village-collectives",
-        "village-governance",
-        "peasant-pull",
-      ],
-    },
-    proof: {
-      title: "commons, governance, and ownership",
-      body:
-        "village separates three questions that are easy to collapse: who can access a copy now, which reuse grant applies, and what policy changes were recorded.",
-      points: [
-        "public, private, and shared visibility define current access scope",
-        "optional CC identifiers travel through the publish and pull contract",
-        "append-only policy events retain the actor and post-change snapshot",
-      ],
-      evidence: ["village-governance", "schema-rc10", "peasant-pull"],
-    },
-    access: [
-      {
-        id: "contributor-access",
-        title: "open the village source repository",
-        body:
-          "peasant labs is open-sourcing the governance and access-control layer for agentic coding data in the village repository.",
-        qualification:
-          "the repository is private now, so signed-out visitors may receive a 404 until its visibility changes. this link is not a public download, self-host release, product license, or license grant.",
-        state: "not-publicly-available",
-        action: {
-          label: "open the village repository",
-          accessibleName: "open the village repository on GitHub; currently private",
-          href: "https://github.com/peasant-labs/village",
+        {
+          id: "install",
+          title: "install",
+          comment: "# one line, puts peasant on your PATH",
+          command: "curl -fsSL https://peasantlabs.org/install | bash",
         },
-        evidence: ["village-readme"],
-      },
-      {
-        id: "configure-development",
-        title: "configure the private development stack",
-        body:
-          "copy the environment template, then supply GitHub OAuth credentials, a GitHub token, and the other documented secrets.",
-        qualification:
-          "private contributor-development command; it is not a public install path.",
-        state: "private-contributor-development",
-        command: "cp .env.example .env",
-        evidence: ["village-readme"],
-      },
-    ],
-    run: [
-      {
-        id: "publish-from-peasant",
-        title: "publish from peasant",
-        body:
-          "after authentication and review, publishing is initiated by the peasant CLI rather than an upload control in village.",
-        qualification:
-          "private current-source flow; publication remains an explicit user action.",
-        state: "current-source",
-        command: "peasant village push",
-        evidence: ["peasant-readme", "village-readme"],
-      },
-    ],
-    stories: [
-      {
-        id: "selected-publisher",
-        actor: "a project maintainer",
-        need: "wants to publish one useful session while keeping other local work private",
-        action:
-          "selects, reviews, redacts, and explicitly publishes one copy from peasant",
-        outcome:
-          "village receives only the chosen published copy with its configured governance state",
-        evidence: ["peasant-readme", "village-readme", "village-governance"],
-      },
-      {
-        id: "collective-curator",
-        actor: "a collective owner",
-        need: "wants contributions reviewed before they join a curated collection",
-        action:
-          "uses the curated acceptance mode to approve or reject submitted shares",
-        outcome:
-          "the collective exposes only contributions accepted under its documented mode",
-        evidence: ["village-collectives"],
-      },
-      {
-        id: "authorized-pull",
-        actor: "a permitted teammate",
-        need: "needs the transcript and annotations behind a shared decision in local tools",
-        action: "pulls the allowed published copy through the authorized village surface",
-        outcome:
-          "gets a separately identified foreign record that cannot silently become owned or re-publishable",
-        evidence: ["peasant-pull", "village-governance"],
-      },
-      {
-        id: "policy-steward",
-        actor: "a commons steward",
-        need: "needs to know when access or licensing changed",
-        action: "reviews the trigger-written governance event sequence",
-        outcome:
-          "sees actor-attributed policy snapshots ordered independently of the mutable transcript row",
-        evidence: ["village-governance"],
-      },
-    ],
-    outputs: [
-      {
-        id: "governance-record",
-        label: "illustrative governance record derived from current invariants",
-        qualification:
-          "illustrative field values only. no account, hosted service, or completed publication is implied.",
-        state: "current-source",
-        lines: [
-          "event: governance_changed",
-          "visibility: shared",
-          "license: CC-BY-4.0",
-        ],
-        evidence: ["village-governance", "schema-rc10"],
-      },
-    ],
+        {
+          id: "set-up",
+          title: "set up",
+          comment: "# choose which projects and sessions to keep",
+          command: "peasant kickstart",
+        },
+        {
+          id: "bring-work-in",
+          title: "bring your work in",
+          comment: "# reads what your agents already saved",
+          command: "peasant ingest",
+        },
+        {
+          id: "open-it",
+          title: "open it",
+          comment: "# browse and search at localhost:8690",
+          command: "peasant web start",
+        },
+        {
+          id: "share-one",
+          title: "share one",
+          comment: "# sends one copy to village, only when you ask",
+          command: "peasant village push",
+        },
+      ] as Five<StartStep>,
+    },
+    community: {
+      title: "join your community",
+      body:
+        "collectives are where selected sessions live for a team. open an example of work people already share, then join when you are ready to contribute and learn from the same record.",
+      joinLabel: "join collective",
+    },
+    example: {
+      head: "example collective",
+      title: "desert archivists",
+      desc:
+        "a shared shelf for redacted transcripts about data pipelines and ingestion.",
+      bullets: ["verified-only acceptance", "redaction review required"],
+      members: "24",
+      transcripts: "118",
+      linked: "linked",
+    },
+    governance: {
+      title: "making governance sane and transparent",
+      body:
+        "every join is a deliberate boundary crossing. owners see who is asking to participate so they can review membership and contributions; everyone else still sees you as anon. the terms are written out before you consent — no silent profile leaks, no mystery about who can see what.",
+    },
     related: [
       {
         id: "all-projects",
@@ -1256,375 +1143,203 @@ export const PROJECTS = {
         href: "/projects#comparison",
         kind: "internal",
       },
-      {
-        id: "schema",
-        label: "view the public schema release",
-        href: "https://github.com/peasant-labs/schema/releases/tag/v0.1.0-rc10",
-        kind: "public-source",
-      },
-    ],
-    requiredEvidence: [
-      "village-readme",
-      "village-collectives",
-      "village-governance",
-      "village-schema-pin",
-      "peasant-readme",
-      "peasant-pull",
-      "schema-rc10",
     ],
   },
-} as const satisfies Record<ProjectSlug, ProjectPageContent>;
-
-export type ComparisonGroup =
-  | "shared-baseline"
-  | "retrieval-and-continuation"
-  | "sharing-and-governance"
-  | "infrastructure-and-maturity";
-
+} as const satisfies Readonly<{
+  peasant: PeasantPageContent;
+  village: VillagePageContent;
+}>;
 export type ComparisonCell = Readonly<{
   status: ComparisonStatus;
-  sourceScope: SourceScope;
   qualification: string;
   evidence: readonly [EvidenceId, ...EvidenceId[]];
 }>;
 
 export type ComparisonRow = Readonly<{
   id: string;
-  group: ComparisonGroup;
   capability: string;
   peasantLabs: ComparisonCell;
   entire: ComparisonCell;
-  takeaway: string;
 }>;
 
+/** one flagged string in the redaction demo, before and after the rewrite. */
+export type RedactionMatch = Readonly<{
+  id: string;
+  category: string;
+  confidence: number;
+  secret: string;
+  after: string;
+  /** true when the reader opted out and the original goes with the copy. */
+  kept?: boolean;
+}>;
+
+/**
+ * The redaction review, shown with demonstration matches. Every value here is
+ * invented for the page — no real key, address, or token appears — and the
+ * section says so above the panel, the same way the transcript demo does. The
+ * kept match is deliberate: the honest version of this screen shows that opting
+ * out is possible and says plainly what it costs.
+ */
+export const REDACTION = {
+  title: "what stays private when you share",
+  intro:
+    "before a copy leaves your machine, peasant scans it for secrets, personal details, and internal links, then shows you every match it found. you decide what stays hidden, and what it does not catch stays your call rather than a silent pass.",
+  note: "sample data, not a real scan.",
+  label: "redaction review on a sample session",
+  /*
+   * Standard is the only level the product ships — minimal and maximum are being
+   * removed — so the panel states the level in force rather than offering a
+   * choice between three. fairtrade's segmented control still renders all three
+   * options; `app/globals.css` hides the two that are not selected.
+   */
+  level: "standard",
+  scanned: 12,
+  total: 12,
+  matches: [
+    {
+      id: "api-key",
+      category: "api-key",
+      confidence: 0.98,
+      secret: 'const BILLING_KEY = "sk_demo_000000000000000000example"',
+      after: 'const BILLING_KEY = "sk_demo_••••••••••••••••••••••"',
+    },
+    {
+      id: "email",
+      category: "email",
+      confidence: 0.91,
+      secret: "// reported by alex.rivera@example.com on the 0.4 rollout",
+      after: "// reported by ‹redacted-email› on the 0.4 rollout",
+      kept: true,
+    },
+    {
+      id: "bearer-token",
+      category: "bearer-token",
+      confidence: 0.87,
+      secret: 'Authorization: "Bearer demo.example.token.value"',
+      after: 'Authorization: "Bearer ‹redacted-token›"',
+    },
+  ] as Three<RedactionMatch>,
+} as const;
+
+export const COMPARISON_MARKS = {
+  yes: { glyph: "✓", label: "yes" },
+  partial: { glyph: "~", label: "partial" },
+  "not-documented": { glyph: "–", label: "not documented" },
+} as const satisfies Record<ComparisonStatus, { glyph: string; label: string }>;
+
 export const COMPARISON = {
-  title: "an independent comparison with Entire",
-  scrollHelp: "scroll horizontally to compare all columns.",
-  caption:
-    "independent comparison: peasant plus village plus schema versus Entire CLI plus Entire.io and its documented repository service. verified 2026-07-28.",
+  title: "how it compares to similar tools",
+  intro:
+    "here is what peasant labs does next to the closest public tools in this space, checked against their public docs and our own source.",
   bundleDefinition:
-    "peasant labs means peasant, village, and the public schema contract. Entire means Entire CLI, Entire.io, and its documented repository service.",
-  verifiedOn: "2026-07-28",
-  reverifyBy: "2026-08-27",
-  reviewOwner: "peasant labs website maintainers",
+    "peasant labs means peasant, village, and the schema they share. the other column covers similar tools and the documentation they publish.",
   meaningNote:
-    "not documented means no equivalent was found in the reviewed materials, not that one cannot exist.",
-  changeNote:
-    "product capabilities change. this comparison uses public Entire documentation and source-scoped peasant labs evidence reviewed on 2026-07-28.",
-  groups: [
-    { id: "shared-baseline", label: "shared baseline" },
-    {
-      id: "retrieval-and-continuation",
-      label: "retrieval and continuation",
-    },
-    { id: "sharing-and-governance", label: "sharing and governance" },
-    {
-      id: "infrastructure-and-maturity",
-      label: "infrastructure and maturity",
-    },
-  ] as const,
+    "a dash means we did not find it in those tools' public docs. it does not mean they cannot do it.",
+  /*
+   * `qualification` and `evidence` below are no longer rendered — the page shows
+   * marks only. They stay as the internal record of what each mark was checked
+   * against, and the fixture still resolves every evidence id, so a claim cannot
+   * drift away from its source unnoticed.
+   */
   rows: [
     {
-      id: "existing-local-agent-history",
-      group: "shared-baseline",
-      capability: "bring existing local agent history into one tool",
+      id: "keep-it-local",
+      capability: "keep everything on your own machine",
       peasantLabs: {
-        status: "supported",
-        sourceScope: "current-source",
+        status: "yes",
         qualification:
-          "four current-source adapters feed one canonical peasant session-detail path.",
-        evidence: ["peasant-adapters", "peasant-readme", "schema-rc10"],
-      },
-      entire: {
-        status: "supported",
-        sourceScope: "vendor-documented",
-        qualification:
-          "Entire documents historical import, eight named built-ins, and executable plugins.",
-        evidence: ["entire-agents", "entire-import-history"],
-      },
-      takeaway:
-        "both import cross-agent history; Entire documents broader integration coverage.",
-    },
-    {
-      id: "session-context-linked-to-git",
-      group: "shared-baseline",
-      capability: "connect session context to Git work",
-      peasantLabs: {
-        status: "partial",
-        sourceScope: "current-source",
-        qualification:
-          "peasant stores durable associations only where commit detection observes them.",
+          "sessions are stored in a local database, and anything leaving it is an explicit action.",
         evidence: ["peasant-readme"],
       },
       entire: {
-        status: "supported",
-        sourceScope: "vendor-documented",
-        qualification:
-          "Entire documents automatic Git-linked checkpoints as a core workflow.",
-        evidence: ["entire-quickstart", "entire-agents"],
-      },
-      takeaway:
-        "both connect context to Git; Entire's automatic checkpoint model is the clearer public promise.",
-    },
-    {
-      id: "keep-captured-history-local",
-      group: "shared-baseline",
-      capability: "keep captured history local",
-      peasantLabs: {
-        status: "supported",
-        sourceScope: "current-source",
-        qualification:
-          "local SQLite is the base store; optional network actions are separate and explicit.",
-        evidence: ["peasant-readme"],
-      },
-      entire: {
-        status: "supported",
-        sourceScope: "vendor-documented",
-        qualification:
-          "Entire documents local checkpoints with push disabled and multiple storage placements.",
+        status: "yes",
+        qualification: "Entire documents local checkpoints with pushing turned off.",
         evidence: ["entire-checkpoint-storage", "entire-keep-local"],
       },
-      takeaway: "both offer local operation modes; neither gets an exclusivity claim.",
     },
     {
-      id: "cross-product-language-contract",
-      group: "retrieval-and-continuation",
-      capability: "use one typed contract across products and languages",
+      id: "read-past-sessions",
+      capability: "read the sessions your agents already saved",
       peasantLabs: {
-        status: "supported",
-        sourceScope: "public-release",
+        status: "yes",
         qualification:
-          "public schema rc10 exposes Go, TypeScript, Zod, and OpenAPI contracts; both products were observed on rc9.",
-        evidence: ["schema-rc10", "peasant-schema-pin", "village-schema-pin"],
+          "reads Claude Code, OpenCode, Codex, and Cursor sessions into one record.",
+        evidence: ["peasant-adapters", "peasant-readme"],
       },
       entire: {
-        status: "not-documented",
-        sourceScope: "vendor-documented",
+        status: "yes",
         qualification:
-          "no equivalent affirmative cross-language transcript contract was found in the declared official corpus.",
-        evidence: ["entire-declared-corpus-2026-07-28"],
+          "Entire documents importing past agent history and covers more integrations.",
+        evidence: ["entire-import-history", "entire-agents"],
       },
-      takeaway:
-        "peasant labs has a public source-backed contract; Entire's equivalent is not documented, not absent.",
     },
     {
-      id: "analyze-session-and-project-behavior",
-      group: "retrieval-and-continuation",
-      capability: "analyze session and project behavior",
-      peasantLabs: {
-        status: "supported",
-        sourceScope: "current-source",
-        qualification:
-          "peasant documents local transcripts, metrics, trends, project views, changes, and search.",
-        evidence: ["peasant-readme", "peasant-search"],
-      },
-      entire: {
-        status: "supported",
-        sourceScope: "vendor-documented",
-        qualification:
-          "Entire documents sessions, checkpoints, diffs, activity, search, review, and summaries.",
-        evidence: ["entire-platform", "entire-search", "entire-dispatches"],
-      },
-      takeaway:
-        "peasant emphasizes local analysis; Entire emphasizes Git checkpoint review and retrieval.",
-    },
-    {
-      id: "search-past-intent",
-      group: "retrieval-and-continuation",
-      capability: "search past intent",
+      id: "search-past-work",
+      capability: "search your past work",
       peasantLabs: {
         status: "partial",
-        sourceScope: "current-source",
-        qualification:
-          "peasant provides local FTS5 full-text search over recorded message entries, not semantic search.",
+        qualification: "keyword search over saved messages, not meaning-based search.",
         evidence: ["peasant-search"],
       },
       entire: {
-        status: "supported",
-        sourceScope: "vendor-documented",
-        qualification:
-          "Entire documents hybrid semantic and keyword search across checkpoints, sessions, and commits.",
+        status: "yes",
+        qualification: "Entire documents combined meaning-based and keyword search.",
         evidence: ["entire-search"],
       },
-      takeaway:
-        "Entire documents semantic and cross-repository search; peasant currently claims local full-text search only.",
     },
     {
-      id: "continue-work-across-agents",
-      group: "retrieval-and-continuation",
-      capability: "continue work across agents",
+      id: "publish-selected",
+      capability: "publish only the sessions you pick",
       peasantLabs: {
-        status: "not-documented",
-        sourceScope: "current-source",
-        qualification:
-          "no general cross-agent resume contract was verified in the declared peasant current-source corpus.",
-        evidence: ["peasant-current-corpus-2026-07-28"],
+        status: "yes",
+        qualification: "publishing is one command per copy, and the original stays local.",
+        evidence: ["peasant-readme", "village-readme"],
       },
       entire: {
-        status: "partial",
-        sourceScope: "vendor-documented",
+        status: "yes",
         qualification:
-          "Entire advertises resume across agents with explicit integration-specific limits.",
-        evidence: ["entire-home", "entire-agents"],
+          "Entire documents sharing through Entire.io and its repository service.",
+        evidence: ["entire-platform", "entire-dispatches"],
       },
-      takeaway: "Entire has the documented advantage, with visible integration limits.",
     },
     {
-      id: "publish-and-share-selected-context",
-      group: "sharing-and-governance",
-      capability: "publish and share selected context",
+      id: "reuse-license",
+      capability: "set a reuse license on what you share",
       peasantLabs: {
-        status: "supported",
-        sourceScope: "current-source",
+        status: "yes",
         qualification:
-          "private current source supports explicit peasant publishing into village visibility and collective controls.",
-        evidence: [
-          "peasant-readme",
-          "village-readme",
-          "village-collectives",
-          "village-governance",
-        ],
-      },
-      entire: {
-        status: "supported",
-        sourceScope: "vendor-documented",
-        qualification:
-          "Entire documents repository access, Entire.io sharing, checkpoints, and dispatches.",
-        evidence: ["entire-platform", "entire-checkpoint-storage", "entire-dispatches"],
-      },
-      takeaway: "both share context through different access and storage models.",
-    },
-    {
-      id: "per-transcript-reuse-license",
-      group: "sharing-and-governance",
-      capability: "apply a per-transcript reuse license",
-      peasantLabs: {
-        status: "supported",
-        sourceScope: "current-source",
-        qualification:
-          "private current source carries an optional CC selection through publish and pull; legal copy remains qualified.",
-        evidence: ["village-governance", "peasant-pull", "schema-rc10"],
+          "an optional Creative Commons choice travels with each published copy.",
+        evidence: ["village-governance", "peasant-pull"],
       },
       entire: {
         status: "not-documented",
-        sourceScope: "vendor-documented",
         qualification:
-          "no equivalent affirmative per-transcript reuse-license behavior was found in the declared official corpus.",
+          "we found no per-session reuse license in Entire's public docs.",
         evidence: ["entire-declared-corpus-2026-07-28"],
       },
-      takeaway:
-        "this is a source-backed peasant labs distinction; it does not establish that Entire lacks the capability.",
     },
     {
-      id: "collective-contribution-governance",
-      group: "sharing-and-governance",
-      capability: "govern collective contributions",
+      id: "shared-groups",
+      capability: "share into a group other people can join",
       peasantLabs: {
-        status: "supported",
-        sourceScope: "current-source",
+        status: "yes",
         qualification:
-          "village current source documents open contribution and owner-curated approval modes.",
+          "village groups are either open to contributions or approved by the owner.",
         evidence: ["village-collectives"],
       },
       entire: {
         status: "not-documented",
-        sourceScope: "vendor-documented",
         qualification:
-          "no equivalent affirmative collective moderation model was found in the declared official corpus.",
+          "we found no equivalent group moderation model in Entire's public docs.",
         evidence: ["entire-declared-corpus-2026-07-28"],
       },
-      takeaway:
-        "peasant labs documents open and curated collectives; Entire's equivalent is not documented.",
     },
-    {
-      id: "visibility-license-change-history",
-      group: "sharing-and-governance",
-      capability: "preserve visibility and license change history",
-      peasantLabs: {
-        status: "supported",
-        sourceScope: "current-source",
-        qualification:
-          "village current source documents trigger-written append-only governance events with policy snapshots.",
-        evidence: ["village-governance"],
-      },
-      entire: {
-        status: "not-documented",
-        sourceScope: "vendor-documented",
-        qualification:
-          "no equivalent affirmative transcript policy-history behavior was found in the declared official corpus.",
-        evidence: ["entire-declared-corpus-2026-07-28"],
-      },
-      takeaway:
-        "this is a narrow policy-history distinction, not a certification or compliance claim.",
-    },
-    {
-      id: "one-way-pull-with-foreign-ownership",
-      group: "sharing-and-governance",
-      capability: "pull shared foreign context without changing ownership",
-      peasantLabs: {
-        status: "supported",
-        sourceScope: "current-source",
-        qualification:
-          "pulled village records land in a separate one-way namespace outside owned analytics and re-push candidates.",
-        evidence: ["peasant-pull", "village-governance"],
-      },
-      entire: {
-        status: "not-documented",
-        sourceScope: "vendor-documented",
-        qualification:
-          "this ownership and non-republication boundary was not found; Entire documents different resume and shared-history behavior.",
-        evidence: [
-          "entire-declared-corpus-2026-07-28",
-          "entire-agents",
-          "entire-platform",
-        ],
-      },
-      takeaway: "the products document different semantics, not a generic feature advantage.",
-    },
-    {
-      id: "distributed-git-mirrors",
-      group: "infrastructure-and-maturity",
-      capability: "operate distributed Git mirrors for agent workloads",
-      peasantLabs: {
-        status: "not-in-current-scope",
-        sourceScope: "bundle-definition",
-        qualification:
-          "distributed Git mirrors are outside the defined peasant plus village plus schema bundle.",
-        evidence: ["bundle-definition"],
-      },
-      entire: {
-        status: "supported",
-        sourceScope: "vendor-documented",
-        qualification:
-          "Entire documents regional EntireDB mirrors while GitHub remains the source repository.",
-        evidence: ["entire-repositories"],
-      },
-      takeaway: "Entire has the documented advantage.",
-    },
-    {
-      id: "public-cli-release-maturity",
-      group: "infrastructure-and-maturity",
-      capability: "consume a stable public CLI release",
-      peasantLabs: {
-        status: "partial",
-        sourceScope: "private-preview",
-        qualification:
-          "the observed peasant release is private prerelease v0.1.0-rc2; signed-out public availability was not verified.",
-        evidence: [
-          "peasant-rc2-private-release",
-          "peasant-readme",
-          "peasant-license",
-        ],
-      },
-      entire: {
-        status: "supported",
-        sourceScope: "public-release",
-        qualification: "Entire CLI v0.9.0 is a verified stable public release.",
-        evidence: ["entire-cli-v0.9.0"],
-      },
-      takeaway: "Entire is further along in verified public CLI release maturity.",
-    },
-  ] as Fourteen<ComparisonRow>,
+    /*
+     * No availability row: the table compares what the products do, and a
+     * release-date gap stops being a capability difference the moment peasant
+     * ships. The advertised state still lives on each product card.
+     */
+  ] as Six<ComparisonRow>,
 } as const;
 
 export const SITEMAP_URLS = [

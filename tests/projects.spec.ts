@@ -5,12 +5,7 @@ import { resolve } from "node:path";
 import { parseDocument } from "yaml";
 
 const FIXTURE_PATH = resolve("testdata/projects/projects.yaml");
-const COMPARISON_STATUSES = [
-  "supported",
-  "partial",
-  "not-documented",
-  "not-in-current-scope",
-] as const;
+const COMPARISON_STATUSES = ["yes", "partial", "not-documented"] as const;
 const ADVERTISED_STATES = [
   "public-release",
   "private-preview",
@@ -23,19 +18,17 @@ const SOURCE_SCOPES = [
   "vendor-documented",
   "bundle-definition",
 ] as const;
-const COMPARISON_GROUPS = [
-  "shared-baseline",
-  "retrieval-and-continuation",
-  "sharing-and-governance",
-  "infrastructure-and-maturity",
-] as const;
+const COMPARISON_MARKS = {
+  yes: "✓",
+  partial: "~",
+  "not-documented": "–",
+} as const;
 const THEMES = ["dark", "light"] as const;
 const PROJECT_IDS = ["peasant", "village"] as const;
 
 type ComparisonStatus = (typeof COMPARISON_STATUSES)[number];
 type AdvertisedState = (typeof ADVERTISED_STATES)[number];
 type SourceScope = (typeof SOURCE_SCOPES)[number];
-type ComparisonGroup = (typeof COMPARISON_GROUPS)[number];
 type Theme = (typeof THEMES)[number];
 type ProjectId = (typeof PROJECT_IDS)[number];
 
@@ -86,21 +79,35 @@ type HeroFigureFixture = {
   aspectRatio: string;
 };
 
-type ProductFixture = {
-  id: ProjectId;
+type VillageFixture = {
   route: string;
-  advertisedState: AdvertisedState;
-  availabilityTitle: string;
-  availabilityQualification: string;
-  evidenceSummary: string;
-  figure: HeroFigureFixture;
-  features: Array<EvidenceRefFixture & { heading: string }>;
-  access: InstructionFixture[];
-  run: InstructionFixture[];
-  stories: EvidenceRefFixture[];
-  outputs: Array<EvidenceRefFixture & { lines: string[] }>;
+  hero: { title: string };
+  start: {
+    title: string;
+    stepsLabel: string;
+    continueLabel: string;
+    doneLabel: string;
+    backLabel: string;
+    copyAllLabel: string;
+    steps: StartStepFixture[];
+  };
+  community: {
+    title: string;
+    joinLabel: string;
+  };
+  example: {
+    head: string;
+    title: string;
+    desc: string;
+    bullets: string[];
+    members: string;
+    transcripts: string;
+    linked: string;
+  };
+  governance: {
+    title: string;
+  };
   related: Array<{ id: string; target: string }>;
-  requiredEvidence: string[];
 };
 
 type EvidenceFixture = {
@@ -117,17 +124,29 @@ type EvidenceFixture = {
 
 type ComparisonCellFixture = {
   status: ComparisonStatus;
-  sourceScope: SourceScope;
   qualification: string;
   sources: string[];
 };
 
 type ComparisonRowFixture = {
   id: string;
-  group: ComparisonGroup;
+  capability: string;
   peasantLabs: ComparisonCellFixture;
   entire: ComparisonCellFixture;
-  takeaway: string;
+};
+
+type StartStepFixture = {
+  id: string;
+  title: string;
+  comment: string;
+  command: string | null;
+};
+
+/** a walkthrough step in fairtrade's onboarding component: title plus its command. */
+type StoryStepFixture = {
+  id: string;
+  title: string;
+  command: string;
 };
 
 type ProjectFixture = {
@@ -141,27 +160,80 @@ type ProjectFixture = {
     sitemap: string[];
   };
   catalog: {
-    storyTitle: string;
-    figure: HeroFigureFixture;
     cards: Array<{
       id: ProjectId;
       label: string;
       target: string;
       action: string;
+      kind: string;
+    }>;
+    whatTitle: string;
+    cardsTitle: string;
+  };
+  viewer: {
+    title: string;
+    label: string;
+    sessionId: string;
+    disclosure: string;
+    turns: number;
+    /** the tab the viewer opens on, and one it must still be able to reach. */
+    openingTab: string;
+    otherTab: string;
+  };
+  install: {
+    command: string;
+  };
+  story: {
+    title: string;
+    stepsLabel: string;
+    steps: StoryStepFixture[];
+  };
+  redaction: {
+    title: string;
+    note: string;
+    level: string;
+    /** the levels that were withdrawn — the panel must offer none of them. */
+    removedLevels: string[];
+    matches: Array<{
+      id: string;
+      category: string;
+      kept: boolean;
+      secret: string;
+      after: string;
     }>;
   };
-  products: ProductFixture[];
+  community: {
+    title: string;
+    points: string[];
+  };
+  faq: {
+    title: string;
+    label: string;
+    forbiddenClaims: string[];
+    questions: Array<{ id: string; question: string }>;
+  };
+  peasant: {
+    route: string;
+    hero: { title: string };
+    start: {
+      title: string;
+      stepsLabel: string;
+      continueLabel: string;
+      doneLabel: string;
+      backLabel: string;
+      copyAllLabel: string;
+      steps: StartStepFixture[];
+    };
+    uses: Array<{ id: string; title: string }>;
+    related: Array<{ id: string; target: string }>;
+  };
+  village: VillageFixture;
   evidence: EvidenceFixture[];
   comparison: {
     title: string;
-    scrollHelp: string;
-    caption: string;
+    intro: string;
     bundleDefinition: string;
-    verifiedOn: string;
-    reverifyBy: string;
-    reviewOwner: string;
     meaningNote: string;
-    groups: ComparisonGroup[];
     rows: ComparisonRowFixture[];
   };
   viewports: Array<{
@@ -446,99 +518,97 @@ function parseHeroFigure(value: unknown, location: string): HeroFigureFixture {
   };
 }
 
-function parseProduct(value: unknown, location: string): ProductFixture {
+function parseVillage(value: unknown, location: string): VillageFixture {
   const object = exactObject(value, location, [
-    "id",
     "route",
-    "advertisedState",
-    "availabilityTitle",
-    "availabilityQualification",
-    "evidenceSummary",
-    "figure",
-    "features",
-    "access",
-    "run",
-    "stories",
-    "outputs",
+    "hero",
+    "start",
+    "community",
+    "example",
+    "governance",
     "related",
-    "requiredEvidence",
   ]);
-  const features = nonEmptyArray(object.features, `${location}.features`).map((item, index) => {
-    const feature = exactObject(item, `${location}.features[${index}]`, [
-      "id",
-      "heading",
-      "evidence",
-    ]);
-    return {
-      id: nonEmptyString(feature.id, `${location}.features[${index}].id`),
-      heading: nonEmptyString(feature.heading, `${location}.features[${index}].heading`),
-      evidence: stringArray(feature.evidence, `${location}.features[${index}].evidence`),
-    };
-  });
-  if (features.length !== 5) {
-    fixtureError(`${location}.features`, `expected exactly five features, found ${features.length}`, "restore the reviewed five-feature set");
+  const hero = exactObject(object.hero, `${location}.hero`, ["title"]);
+  const startObject = exactObject(object.start, `${location}.start`, [
+    "title",
+    "stepsLabel",
+    "continueLabel",
+    "doneLabel",
+    "backLabel",
+    "copyAllLabel",
+    "steps",
+  ]);
+  const steps = nonEmptyArray(startObject.steps, `${location}.start.steps`).map((item, index) =>
+    parseStartStep(item, `${location}.start.steps[${index}]`),
+  );
+  uniqueBy(steps, (step) => step.id, `${location}.start.steps.id`);
+  if (steps.filter((step) => step.command !== null).length < 2) {
+    fixtureError(
+      `${location}.start.steps`,
+      "fewer than two steps carry a command",
+      "a copy-all control only earns its place over a multi-command sequence",
+    );
   }
-
-  const access = nonEmptyArray(object.access, `${location}.access`).map((item, index) =>
-    parseInstruction(item, `${location}.access[${index}]`),
-  );
-  const run = nonEmptyArray(object.run, `${location}.run`).map((item, index) =>
-    parseInstruction(item, `${location}.run[${index}]`),
-  );
-  const stories = nonEmptyArray(object.stories, `${location}.stories`).map((item, index) =>
-    parseEvidenceRef(item, `${location}.stories[${index}]`),
-  );
-  const outputs = nonEmptyArray(object.outputs, `${location}.outputs`).map((item, index) => {
-    const output = exactObject(item, `${location}.outputs[${index}]`, ["id", "evidence", "lines"]);
-    return {
-      id: nonEmptyString(output.id, `${location}.outputs[${index}].id`),
-      evidence: stringArray(output.evidence, `${location}.outputs[${index}].evidence`),
-      lines: stringArray(output.lines, `${location}.outputs[${index}].lines`),
-    };
-  });
+  const community = exactObject(object.community, `${location}.community`, [
+    "title",
+    "joinLabel",
+  ]);
+  const example = exactObject(object.example, `${location}.example`, [
+    "head",
+    "title",
+    "desc",
+    "bullets",
+    "members",
+    "transcripts",
+    "linked",
+  ]);
+  const bullets = stringArray(example.bullets, `${location}.example.bullets`);
+  if (bullets.length !== 2) {
+    fixtureError(
+      `${location}.example.bullets`,
+      `expected exactly two bullets, found ${bullets.length}`,
+      "keep the fairtrade collective card's two policy bullets",
+    );
+  }
+  const governance = exactObject(object.governance, `${location}.governance`, ["title"]);
   const related = nonEmptyArray(object.related, `${location}.related`).map((item, index) => {
     const link = exactObject(item, `${location}.related[${index}]`, ["id", "target"]);
-    const target = nonEmptyString(link.target, `${location}.related[${index}].target`);
-    if (target.startsWith("http")) {
-      httpsUrl(target, `${location}.related[${index}].target`);
-    } else {
-      internalPath(target, `${location}.related[${index}].target`);
-    }
     return {
       id: nonEmptyString(link.id, `${location}.related[${index}].id`),
-      target,
+      target: nonEmptyString(link.target, `${location}.related[${index}].target`),
     };
   });
-
-  uniqueBy(features, (item) => item.id, `${location}.features`);
-  uniqueBy(access, (item) => item.id, `${location}.access`);
-  uniqueBy(run, (item) => item.id, `${location}.run`);
-  uniqueBy(stories, (item) => item.id, `${location}.stories`);
-  uniqueBy(outputs, (item) => item.id, `${location}.outputs`);
-  uniqueBy(related, (item) => item.id, `${location}.related`);
+  uniqueBy(related, (link) => link.id, `${location}.related.id`);
 
   return {
-    id: enumValue(object.id, PROJECT_IDS, `${location}.id`),
     route: internalPath(nonEmptyString(object.route, `${location}.route`), `${location}.route`),
-    advertisedState: enumValue(
-      object.advertisedState,
-      ADVERTISED_STATES,
-      `${location}.advertisedState`,
-    ),
-    availabilityTitle: nonEmptyString(object.availabilityTitle, `${location}.availabilityTitle`),
-    availabilityQualification: nonEmptyString(
-      object.availabilityQualification,
-      `${location}.availabilityQualification`,
-    ),
-    evidenceSummary: nonEmptyString(object.evidenceSummary, `${location}.evidenceSummary`),
-    figure: parseHeroFigure(object.figure, `${location}.figure`),
-    features,
-    access,
-    run,
-    stories,
-    outputs,
+    hero: { title: nonEmptyString(hero.title, `${location}.hero.title`) },
+    start: {
+      title: nonEmptyString(startObject.title, `${location}.start.title`),
+      stepsLabel: nonEmptyString(startObject.stepsLabel, `${location}.start.stepsLabel`),
+      continueLabel: nonEmptyString(startObject.continueLabel, `${location}.start.continueLabel`),
+      doneLabel: nonEmptyString(startObject.doneLabel, `${location}.start.doneLabel`),
+      backLabel: nonEmptyString(startObject.backLabel, `${location}.start.backLabel`),
+      copyAllLabel: nonEmptyString(startObject.copyAllLabel, `${location}.start.copyAllLabel`),
+      steps,
+    },
+    community: {
+      title: nonEmptyString(community.title, `${location}.community.title`),
+      joinLabel: nonEmptyString(community.joinLabel, `${location}.community.joinLabel`),
+    },
+    example: {
+      head: nonEmptyString(example.head, `${location}.example.head`),
+      title: nonEmptyString(example.title, `${location}.example.title`),
+      desc: nonEmptyString(example.desc, `${location}.example.desc`),
+      bullets,
+      members: nonEmptyString(example.members, `${location}.example.members`),
+      transcripts: nonEmptyString(example.transcripts, `${location}.example.transcripts`),
+      linked: nonEmptyString(example.linked, `${location}.example.linked`),
+    },
+    governance: {
+      title: nonEmptyString(governance.title, `${location}.governance.title`),
+    },
     related,
-    requiredEvidence: stringArray(object.requiredEvidence, `${location}.requiredEvidence`),
   };
 }
 
@@ -587,14 +657,8 @@ function parseEvidence(value: unknown, location: string): EvidenceFixture {
 }
 
 function parseComparisonCell(value: unknown, location: string): ComparisonCellFixture {
-  const object = exactObject(value, location, [
-    "status",
-    "sourceScope",
-    "qualification",
-    "sources",
-  ]);
+  const object = exactObject(value, location, ["status", "qualification", "sources"]);
   const status = enumValue(object.status, COMPARISON_STATUSES, `${location}.status`);
-  const sourceScope = enumValue(object.sourceScope, SOURCE_SCOPES, `${location}.sourceScope`);
   const qualification = nonEmptyString(object.qualification, `${location}.qualification`);
   const sources = stringArray(object.sources, `${location}.sources`);
   if (status === "not-documented" && !sources.includes("entire-declared-corpus-2026-07-28") && location.endsWith(".entire")) {
@@ -611,10 +675,39 @@ function parseComparisonCell(value: unknown, location: string): ComparisonCellFi
       "cite the dated peasant corpus evidence ID",
     );
   }
-  if (status === "not-in-current-scope" && !sources.includes("bundle-definition")) {
-    fixtureError(location, "not-in-current-scope lacks bundle reasoning", "cite bundle-definition");
+  return { status, qualification, sources };
+}
+
+/**
+ * A story step is not a terminal line: it carries no shell comment, and every
+ * step names a real command, so the walkthrough cannot grow a step the product
+ * has no way to run.
+ */
+function parseStoryStep(value: unknown, location: string): StoryStepFixture {
+  const object = exactObject(value, location, ["id", "title", "command"]);
+  return {
+    id: nonEmptyString(object.id, `${location}.id`),
+    title: nonEmptyString(object.title, `${location}.title`),
+    command: nonEmptyString(object.command, `${location}.command`),
+  };
+}
+
+function parseStartStep(value: unknown, location: string): StartStepFixture {
+  const object = exactObject(value, location, ["id", "title", "comment", "command"]);
+  const comment = nonEmptyString(object.comment, `${location}.comment`);
+  if (!comment.startsWith("# ")) {
+    fixtureError(
+      `${location}.comment`,
+      `terminal annotation is not a shell comment: ${JSON.stringify(comment)}`,
+      "start the annotation with '# ' so it reads as a comment beside the command",
+    );
   }
-  return { status, sourceScope, qualification, sources };
+  return {
+    id: nonEmptyString(object.id, `${location}.id`),
+    title: nonEmptyString(object.title, `${location}.title`),
+    comment,
+    command: nullableString(object.command, `${location}.command`),
+  };
 }
 
 function loadFixture(): ProjectFixture {
@@ -641,7 +734,14 @@ function loadFixture(): ProjectFixture {
     "copyPolicy",
     "site",
     "catalog",
-    "products",
+    "viewer",
+    "install",
+    "story",
+    "redaction",
+    "community",
+    "faq",
+    "peasant",
+    "village",
     "evidence",
     "comparison",
     "viewports",
@@ -697,14 +797,52 @@ function loadFixture(): ProjectFixture {
     fixtureError("site.sitemap", "sitemap does not exactly match route order", "list the four route canonicals in route order");
   }
 
-  const catalogObject = exactObject(root.catalog, "catalog", ["storyTitle", "figure", "cards"]);
+  const catalogObject = exactObject(root.catalog, "catalog", [
+    "cards",
+    "whatTitle",
+    "cardsTitle",
+  ]);
+  const viewerObject = exactObject(root.viewer, "viewer", [
+    "title",
+    "label",
+    "sessionId",
+    "disclosure",
+    "turns",
+    "openingTab",
+    "otherTab",
+  ]);
+  const openingTab = nonEmptyString(viewerObject.openingTab, "viewer.openingTab");
+  const otherTab = nonEmptyString(viewerObject.otherTab, "viewer.otherTab");
+  if (openingTab === otherTab) {
+    fixtureError(
+      "viewer.otherTab",
+      "the second tab is the one the viewer already opens on",
+      "name a different tab, so switching away is what gets proven",
+    );
+  }
+  const installObject = exactObject(root.install, "install", ["command"]);
+  const installCommand = nonEmptyString(installObject.command, "install.command");
+  if (!installCommand.startsWith("curl ")) {
+    fixtureError(
+      "install.command",
+      `not a one-line install command: ${JSON.stringify(installCommand)}`,
+      "give the reader a single copyable curl line",
+    );
+  }
   const cards = nonEmptyArray(catalogObject.cards, "catalog.cards").map((item, index) => {
-    const card = exactObject(item, `catalog.cards[${index}]`, ["id", "label", "target", "action"]);
+    const card = exactObject(item, `catalog.cards[${index}]`, [
+      "id",
+      "label",
+      "target",
+      "action",
+      "kind",
+    ]);
     return {
       id: enumValue(card.id, PROJECT_IDS, `catalog.cards[${index}].id`),
       label: nonEmptyString(card.label, `catalog.cards[${index}].label`),
       target: internalPath(nonEmptyString(card.target, `catalog.cards[${index}].target`), `catalog.cards[${index}].target`),
       action: nonEmptyString(card.action, `catalog.cards[${index}].action`),
+      kind: nonEmptyString(card.kind, `catalog.cards[${index}].kind`),
     };
   });
   if (cards.length !== 2 || cards.some((card, index) => card.id !== PROJECT_IDS[index])) {
@@ -712,17 +850,156 @@ function loadFixture(): ProjectFixture {
   }
   uniqueBy(cards, (card) => card.id, "catalog.cards.id");
 
-  const products = nonEmptyArray(root.products, "products").map((item, index) =>
-    parseProduct(item, `products[${index}]`),
+  const storyObject = exactObject(root.story, "story", ["title", "stepsLabel", "steps"]);
+  const storySteps = nonEmptyArray(storyObject.steps, "story.steps").map((item, index) =>
+    parseStoryStep(item, `story.steps[${index}]`),
   );
-  if (products.length !== 2 || products.some((product, index) => product.id !== PROJECT_IDS[index])) {
-    fixtureError("products", "products must be exactly peasant then village", "restore the two-product order");
+  uniqueBy(storySteps, (step) => step.id, "story.steps.id");
+
+  const redactionObject = exactObject(root.redaction, "redaction", [
+    "title",
+    "note",
+    "level",
+    "removedLevels",
+    "matches",
+  ]);
+  const redactionLevel = nonEmptyString(redactionObject.level, "redaction.level");
+  const removedLevels = stringArray(redactionObject.removedLevels, "redaction.removedLevels");
+  if (removedLevels.includes(redactionLevel)) {
+    fixtureError(
+      "redaction.removedLevels",
+      `the level in force, ${JSON.stringify(redactionLevel)}, is also listed as withdrawn`,
+      "list only the levels the product no longer ships",
+    );
   }
-  uniqueBy(products, (product) => product.id, "products.id");
-  uniqueBy(products, (product) => product.route, "products.route");
-  for (const [index, product] of products.entries()) {
-    if (product.route !== cards[index].target) {
-      fixtureError(`products[${index}].route`, "product route differs from its catalog target", "use one exact route per product");
+  const redactionMatches = nonEmptyArray(redactionObject.matches, "redaction.matches").map(
+    (item, index) => {
+      const location = `redaction.matches[${index}]`;
+      const match = exactObject(item, location, ["id", "category", "kept", "secret", "after"]);
+      const kept = match.kept;
+      if (typeof kept !== "boolean") {
+        fixtureError(
+          `${location}.kept`,
+          `expected a boolean, found ${JSON.stringify(kept)}`,
+          "state outright whether this match is sent or withheld",
+        );
+      }
+      return {
+        id: nonEmptyString(match.id, `${location}.id`),
+        category: nonEmptyString(match.category, `${location}.category`),
+        kept: kept as boolean,
+        secret: nonEmptyString(match.secret, `${location}.secret`),
+        after: nonEmptyString(match.after, `${location}.after`),
+      };
+    },
+  );
+  uniqueBy(redactionMatches, (match) => match.id, "redaction.matches.id");
+  // A redaction demo that hides nothing, or hides everything, teaches the wrong
+  // lesson: the panel exists to show that keeping a match is possible and counted.
+  if (!redactionMatches.some((match) => match.kept)) {
+    fixtureError(
+      "redaction.matches",
+      "no match is kept un-redacted",
+      "keep one match so the panel shows what opting out looks like",
+    );
+  }
+  if (!redactionMatches.some((match) => !match.kept)) {
+    fixtureError(
+      "redaction.matches",
+      "every match is kept un-redacted",
+      "redact at least one match so the default behaviour is visible",
+    );
+  }
+
+  const communityObject = exactObject(root.community, "community", ["title", "points"]);
+  const communityPoints = stringArray(communityObject.points, "community.points");
+
+  const faqObject = exactObject(root.faq, "faq", [
+    "title",
+    "label",
+    "forbiddenClaims",
+    "questions",
+  ]);
+  const forbiddenClaims = stringArray(faqObject.forbiddenClaims, "faq.forbiddenClaims");
+  const faqQuestions = nonEmptyArray(faqObject.questions, "faq.questions").map((item, index) => {
+    const entry = exactObject(item, `faq.questions[${index}]`, ["id", "question"]);
+    const question = nonEmptyString(entry.question, `faq.questions[${index}].question`);
+    if (!question.endsWith("?")) {
+      fixtureError(
+        `faq.questions[${index}].question`,
+        `not phrased as a question: ${JSON.stringify(question)}`,
+        "write the reader's actual question, ending in a question mark",
+      );
+    }
+    return { id: nonEmptyString(entry.id, `faq.questions[${index}].id`), question };
+  });
+  uniqueBy(faqQuestions, (entry) => entry.id, "faq.questions.id");
+
+  const peasantObject = exactObject(root.peasant, "peasant", [
+    "route",
+    "hero",
+    "start",
+    "uses",
+    "related",
+  ]);
+  const peasantHero = exactObject(peasantObject.hero, "peasant.hero", ["title"]);
+  const startObject = exactObject(peasantObject.start, "peasant.start", [
+    "title",
+    "stepsLabel",
+    "continueLabel",
+    "doneLabel",
+    "backLabel",
+    "copyAllLabel",
+    "steps",
+  ]);
+  const startSteps = nonEmptyArray(startObject.steps, "peasant.start.steps").map((item, index) =>
+    parseStartStep(item, `peasant.start.steps[${index}]`),
+  );
+  uniqueBy(startSteps, (step) => step.id, "peasant.start.steps.id");
+  if (startSteps.filter((step) => step.command !== null).length < 2) {
+    fixtureError(
+      "peasant.start.steps",
+      "fewer than two steps carry a command",
+      "a copy-all control only earns its place over a multi-command sequence",
+    );
+  }
+  const peasantUses = nonEmptyArray(peasantObject.uses, "peasant.uses").map((item, index) => {
+    const use = exactObject(item, `peasant.uses[${index}]`, ["id", "title"]);
+    return {
+      id: nonEmptyString(use.id, `peasant.uses[${index}].id`),
+      title: nonEmptyString(use.title, `peasant.uses[${index}].title`),
+    };
+  });
+  uniqueBy(peasantUses, (use) => use.id, "peasant.uses.id");
+  const peasantRelated = nonEmptyArray(peasantObject.related, "peasant.related").map(
+    (item, index) => {
+      const link = exactObject(item, `peasant.related[${index}]`, ["id", "target"]);
+      return {
+        id: nonEmptyString(link.id, `peasant.related[${index}].id`),
+        target: nonEmptyString(link.target, `peasant.related[${index}].target`),
+      };
+    },
+  );
+  uniqueBy(peasantRelated, (link) => link.id, "peasant.related.id");
+
+  const village = parseVillage(root.village, "village");
+  // both product detail pages are plain explainers now; comparison still carries
+  // the source-scoped evidence. Both routes must still be reachable from a card.
+  const peasantRoute = internalPath(
+    nonEmptyString(peasantObject.route, "peasant.route"),
+    "peasant.route",
+  );
+  const routeByCard = new Map<string, string>([
+    ["peasant", peasantRoute],
+    ["village", village.route],
+  ]);
+  for (const card of cards) {
+    if (card.target !== routeByCard.get(card.id)) {
+      fixtureError(
+        `catalog.cards.${card.id}.target`,
+        `card target ${card.target} differs from the page route ${routeByCard.get(card.id)}`,
+        "use one exact route per product",
+      );
     }
   }
 
@@ -734,63 +1011,43 @@ function loadFixture(): ProjectFixture {
 
   const comparisonObject = exactObject(root.comparison, "comparison", [
     "title",
-    "scrollHelp",
-    "caption",
+    "intro",
     "bundleDefinition",
-    "verifiedOn",
-    "reverifyBy",
-    "reviewOwner",
     "meaningNote",
-    "groups",
     "rows",
   ]);
-  const comparisonVerifiedOn = checkedDate(comparisonObject.verifiedOn, "comparison.verifiedOn");
-  const comparisonReverifyBy = checkedDate(comparisonObject.reverifyBy, "comparison.reverifyBy");
-  checkReviewWindow(comparisonVerifiedOn, comparisonReverifyBy, "comparison");
-  const groups = stringArray(comparisonObject.groups, "comparison.groups").map((group, index) =>
-    enumValue(group, COMPARISON_GROUPS, `comparison.groups[${index}]`),
-  );
-  if (JSON.stringify(groups) !== JSON.stringify(COMPARISON_GROUPS)) {
-    fixtureError("comparison.groups", "comparison group order drifted", "restore the four workflow groups in canonical order");
-  }
   const rows = nonEmptyArray(comparisonObject.rows, "comparison.rows").map((item, index) => {
     const row = exactObject(item, `comparison.rows[${index}]`, [
       "id",
-      "group",
+      "capability",
       "peasantLabs",
       "entire",
-      "takeaway",
     ]);
     return {
       id: nonEmptyString(row.id, `comparison.rows[${index}].id`),
-      group: enumValue(row.group, COMPARISON_GROUPS, `comparison.rows[${index}].group`),
+      capability: nonEmptyString(row.capability, `comparison.rows[${index}].capability`),
       peasantLabs: parseComparisonCell(row.peasantLabs, `comparison.rows[${index}].peasantLabs`),
       entire: parseComparisonCell(row.entire, `comparison.rows[${index}].entire`),
-      takeaway: nonEmptyString(row.takeaway, `comparison.rows[${index}].takeaway`),
     };
   });
-  if (rows.length !== 14) {
-    fixtureError("comparison.rows", `expected fourteen rows, found ${rows.length}`, "restore the balanced row inventory");
+  if (rows.length !== 6) {
+    fixtureError("comparison.rows", `expected six rows, found ${rows.length}`, "restore the balanced row inventory");
   }
   uniqueBy(rows, (row) => row.id, "comparison.rows.id");
-  if (!rows.some((row) => row.group === "shared-baseline" && row.peasantLabs.status === "supported" && row.entire.status === "supported")) {
-    fixtureError("comparison.rows", "shared baseline is missing", "retain at least one supported overlap row");
+  uniqueBy(rows, (row) => row.capability, "comparison.rows.capability");
+  if (!rows.some((row) => row.peasantLabs.status === "yes" && row.entire.status === "yes")) {
+    fixtureError("comparison.rows", "shared baseline is missing", "retain at least one row both products satisfy");
   }
-  if (!rows.some((row) => row.takeaway.toLowerCase().includes("entire") && (row.entire.status === "supported" || row.entire.status === "partial"))) {
-    fixtureError("comparison.rows", "Entire advantage is missing", "retain a sourced Entire advantage row");
+  if (!rows.some((row) => row.entire.status === "yes" && row.peasantLabs.status !== "yes")) {
+    fixtureError("comparison.rows", "Entire advantage is missing", "retain a sourced row where Entire is ahead");
+  }
+  if (!rows.some((row) => row.peasantLabs.status === "yes" && row.entire.status !== "yes")) {
+    fixtureError("comparison.rows", "peasant labs distinction is missing", "retain a sourced row where peasant labs is ahead");
   }
 
   const referencedEvidence: Array<{ location: string; ids: string[] }> = [];
   for (const item of evidence) {
     referencedEvidence.push({ location: `evidence.${item.id}.sourceIds`, ids: item.sourceIds });
-  }
-  for (const product of products) {
-    referencedEvidence.push({ location: `products.${product.id}.requiredEvidence`, ids: product.requiredEvidence });
-    for (const collection of [product.features, product.access, product.run, product.stories, product.outputs]) {
-      for (const item of collection) {
-        referencedEvidence.push({ location: `products.${product.id}.${item.id}.evidence`, ids: item.evidence });
-      }
-    }
   }
   for (const row of rows) {
     referencedEvidence.push({ location: `comparison.${row.id}.peasantLabs`, ids: row.peasantLabs.sources });
@@ -874,22 +1131,66 @@ function loadFixture(): ProjectFixture {
     copyPolicy: { preservedSentenceStarts },
     site: { baseUrl, routes, sitemap },
     catalog: {
-      storyTitle: nonEmptyString(catalogObject.storyTitle, "catalog.storyTitle"),
-      figure: parseHeroFigure(catalogObject.figure, "catalog.figure"),
       cards,
+      whatTitle: nonEmptyString(catalogObject.whatTitle, "catalog.whatTitle"),
+      cardsTitle: nonEmptyString(catalogObject.cardsTitle, "catalog.cardsTitle"),
     },
-    products,
+    viewer: {
+      title: nonEmptyString(viewerObject.title, "viewer.title"),
+      label: nonEmptyString(viewerObject.label, "viewer.label"),
+      sessionId: nonEmptyString(viewerObject.sessionId, "viewer.sessionId"),
+      disclosure: nonEmptyString(viewerObject.disclosure, "viewer.disclosure"),
+      turns: positiveInteger(viewerObject.turns, "viewer.turns"),
+      openingTab,
+      otherTab,
+    },
+    install: {
+      command: installCommand,
+    },
+    story: {
+      title: nonEmptyString(storyObject.title, "story.title"),
+      stepsLabel: nonEmptyString(storyObject.stepsLabel, "story.stepsLabel"),
+      steps: storySteps,
+    },
+    redaction: {
+      title: nonEmptyString(redactionObject.title, "redaction.title"),
+      note: nonEmptyString(redactionObject.note, "redaction.note"),
+      level: redactionLevel,
+      removedLevels,
+      matches: redactionMatches,
+    },
+    community: {
+      title: nonEmptyString(communityObject.title, "community.title"),
+      points: communityPoints,
+    },
+    faq: {
+      title: nonEmptyString(faqObject.title, "faq.title"),
+      label: nonEmptyString(faqObject.label, "faq.label"),
+      forbiddenClaims,
+      questions: faqQuestions,
+    },
+    peasant: {
+      route: peasantRoute,
+      hero: { title: nonEmptyString(peasantHero.title, "peasant.hero.title") },
+      start: {
+        title: nonEmptyString(startObject.title, "peasant.start.title"),
+        stepsLabel: nonEmptyString(startObject.stepsLabel, "peasant.start.stepsLabel"),
+        continueLabel: nonEmptyString(startObject.continueLabel, "peasant.start.continueLabel"),
+        doneLabel: nonEmptyString(startObject.doneLabel, "peasant.start.doneLabel"),
+        backLabel: nonEmptyString(startObject.backLabel, "peasant.start.backLabel"),
+        copyAllLabel: nonEmptyString(startObject.copyAllLabel, "peasant.start.copyAllLabel"),
+        steps: startSteps,
+      },
+      uses: peasantUses,
+      related: peasantRelated,
+    },
+    village,
     evidence,
     comparison: {
       title: nonEmptyString(comparisonObject.title, "comparison.title"),
-      scrollHelp: nonEmptyString(comparisonObject.scrollHelp, "comparison.scrollHelp"),
-      caption: nonEmptyString(comparisonObject.caption, "comparison.caption"),
+      intro: nonEmptyString(comparisonObject.intro, "comparison.intro"),
       bundleDefinition: nonEmptyString(comparisonObject.bundleDefinition, "comparison.bundleDefinition"),
-      verifiedOn: comparisonVerifiedOn,
-      reverifyBy: comparisonReverifyBy,
-      reviewOwner: nonEmptyString(comparisonObject.reviewOwner, "comparison.reviewOwner"),
       meaningNote: nonEmptyString(comparisonObject.meaningNote, "comparison.meaningNote"),
-      groups,
       rows,
     },
     viewports,
@@ -903,7 +1204,6 @@ function loadFixture(): ProjectFixture {
 }
 
 const fixture = loadFixture();
-const productById = new Map(fixture.products.map((product) => [product.id, product]));
 const evidenceById = new Map(fixture.evidence.map((evidence) => [evidence.id, evidence]));
 
 function evidenceIds(locator: Locator): Promise<string[]> {
@@ -970,11 +1270,9 @@ function numericAspectRatio(value: string): number {
   return width / height;
 }
 
-function heroFigureForRoute(route: RouteFixture): HeroFigureFixture | null {
-  if (route.id === "projects") {
-    return fixture.catalog.figure;
-  }
-  return fixture.products.find((product) => product.route === route.path)?.figure ?? null;
+function heroFigureForRoute(_route: RouteFixture): HeroFigureFixture | null {
+  // product detail pages ship without hero figures until real screenshots exist.
+  return null;
 }
 
 async function expectHeroFigure(page: Page, expected: HeroFigureFixture) {
@@ -1034,7 +1332,16 @@ function uppercaseSentenceOpenings(value: string): string[] {
 
 async function authoredTextNodes(page: Page): Promise<string[]> {
   return page.locator(".pj-main").evaluate((main) => {
-    const excluded = ".pj-citations, .pj-evidence-ledger, code, pre";
+    // The demo transcript is quoted session content, not authored site copy, so
+    // it keeps its natural sentence casing the same way code and citations do.
+    //
+    // Text hidden from assistive technology is decoration by definition, never
+    // prose a reader is meant to read — the design system's avatars derive
+    // uppercase initials from a name ("desert archivists" renders "DA"), and
+    // this guard is about how sentences were authored, not about glyphs a
+    // component generated.
+    const excluded =
+      ".pj-citations, .pj-evidence-ledger, [data-transcript-demo], [data-redaction-demo], code, pre, [aria-hidden='true']";
     const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
     const values: string[] = [];
     let node = walker.nextNode();
@@ -1052,15 +1359,20 @@ async function authoredTextNodes(page: Page): Promise<string[]> {
 
 test("the fixture is a complete independent oracle", () => {
   expect(fixture.catalog.cards.map((card) => card.id)).toEqual([...PROJECT_IDS]);
-  expect(fixture.products.map((product) => product.features.length)).toEqual([5, 5]);
-  expect(fixture.comparison.rows).toHaveLength(14);
+  expect(fixture.village.start.steps.length).toBeGreaterThanOrEqual(3);
+  expect(fixture.viewer.turns).toBeGreaterThanOrEqual(3);
+  expect(fixture.peasant.start.steps.length).toBeGreaterThanOrEqual(3);
+  expect(fixture.story.steps.length).toBeGreaterThanOrEqual(2);
+  expect(fixture.community.points.length).toBeGreaterThanOrEqual(3);
+  expect(fixture.faq.questions.length).toBeGreaterThanOrEqual(4);
+  expect(fixture.comparison.rows).toHaveLength(6);
   expect(new Set(fixture.comparison.rows.flatMap((row) => [row.peasantLabs.status, row.entire.status]))).toEqual(
     new Set(COMPARISON_STATUSES),
   );
 });
 
 test("project copy is authored lowercase without corrupting preserved literals", async ({ page }) => {
-  const projectRoutes = fixture.site.routes.filter((route) => heroFigureForRoute(route) !== null);
+  const projectRoutes = fixture.site.routes.filter((route) => route.path.startsWith("/projects"));
   const violations: Array<{ route: string; sentence: string }> = [];
   for (const route of projectRoutes) {
     await page.goto(route.path);
@@ -1073,15 +1385,29 @@ test("project copy is authored lowercase without corrupting preserved literals",
       .locator(
         ".pj-main h1, .pj-main h2, .pj-main h3, [data-reading-text], [data-qualification], figcaption, [data-takeaway]",
       )
-      .evaluateAll((elements) => elements.map((element) => getComputedStyle(element).textTransform));
+      .evaluateAll((elements) =>
+        elements
+          .filter((element) => !element.closest("[data-transcript-demo]"))
+          .map((element) => getComputedStyle(element).textTransform),
+      );
     expect(textTransforms, `${route.path} must use authored casing rather than CSS coercion`).toEqual(
       textTransforms.map(() => "none"),
     );
   }
   expect(violations).toEqual([]);
-  expect(uppercaseSentenceOpenings(fixture.catalog.figure.accessibleName)).toEqual([]);
-  for (const product of fixture.products) {
-    expect(uppercaseSentenceOpenings(product.figure.accessibleName)).toEqual([]);
+});
+
+test("the page never claims a license the source review forbids", async ({ page }) => {
+  // peasant ships under a placeholder license, so "open source" may only ever
+  // appear as part of a denial. A stray affirmative claim is a licensing error.
+  for (const route of ["/projects", fixture.peasant.route]) {
+    const response = await page.goto(route);
+    const serverHtml = (await response!.text()).toLowerCase();
+    for (const claim of fixture.faq.forbiddenClaims) {
+      expect(serverHtml, `${route} asserts ${JSON.stringify(claim)}`).not.toContain(
+        claim.toLowerCase(),
+      );
+    }
   }
 });
 
@@ -1091,9 +1417,10 @@ for (const route of fixture.site.routes) {
     expect(response?.status()).toBe(200);
     const serverHtml = await response!.text();
     expect(serverHtml).toContain(route.h1);
-    const product = fixture.products.find((candidate) => candidate.route === route.path);
-    for (const feature of product?.features ?? []) {
-      expect(serverHtml).toContain(feature.heading);
+    if (route.path === fixture.village.route) {
+      expect(serverHtml).toContain(fixture.village.start.title);
+      expect(serverHtml).toContain(fixture.village.community.title);
+      expect(serverHtml).toContain(fixture.village.example.title);
     }
     await expect(page.locator("main")).toHaveCount(1);
     await expect(page.locator("h1")).toHaveCount(1);
@@ -1143,180 +1470,706 @@ test("the catalog has exactly two whole-card routes and working focus transfer",
   }
 });
 
-for (const product of fixture.products) {
-  test(`${product.id} renders exact features, instructions, stories, output, and evidence`, async ({ page }) => {
-    const response = await page.goto(product.route);
-    const serverHtml = await response!.text();
-    const availability = page.locator("[data-availability]");
-    await expect(availability).toHaveAttribute("data-advertised-state", product.advertisedState);
-    await expect(availability).toContainText(product.availabilityTitle);
-    await expect(availability).toContainText(product.availabilityQualification);
+test("village renders the title, get-started wizard, and join-community example", async ({ page }) => {
+  const response = await page.goto(fixture.village.route);
+  expect(response?.status()).toBe(200);
+  const serverHtml = await response!.text();
 
-    const features = page.locator("[data-project-feature]");
-    await expect(features).toHaveCount(5);
-    expect(await features.evaluateAll((elements) => elements.map((element) => element.getAttribute("data-project-feature")))).toEqual(
-      product.features.map((feature) => feature.id),
+  await expect(page.locator("h1")).toHaveText(fixture.village.hero.title);
+  await expect(page.locator("[data-availability]")).toHaveCount(0);
+  await expect(page.locator("[data-project-feature]")).toHaveCount(0);
+  await expect(page.locator("[data-evidence-disclosure]")).toHaveCount(0);
+  await expect(page.locator(".pj-citations")).toHaveCount(0);
+
+  // Same get-started chrome as peasant: title, copy-all, fairtrade wizard.
+  const start = page.locator("[data-start]");
+  await expect(start).toHaveCount(1);
+  await expect(start.locator("h2")).toHaveText(fixture.village.start.title);
+  expect(serverHtml).toContain("five commands, start to finish. everything here runs on your own machine.");
+  await expect(page.locator("[data-copy-all]")).toHaveAttribute(
+    "aria-label",
+    `copy ${fixture.village.start.copyAllLabel}`,
+  );
+
+  const wizard = start.locator(
+    `section.swz[aria-label="${fixture.village.start.stepsLabel}"]`,
+  );
+  await expect(wizard).toHaveCount(1);
+  const rail = wizard.locator("nav.swz-rail .swz-step");
+  await expect(rail).toHaveCount(fixture.village.start.steps.length);
+  for (const [index, expected] of fixture.village.start.steps.entries()) {
+    await expect(rail.nth(index).locator(".swz-label")).toHaveText(expected.title);
+    expect(serverHtml).toContain(expected.title);
+  }
+
+  // Village runs the same wizard as peasant, so it inherits the same rule: a check
+  // marks a step the reader is past, and on arrival they are past none of them.
+  await expect(wizard.locator(".swz-mark-check")).toHaveCount(0);
+  const villageFoot = wizard.locator(".swz-foot");
+  await villageFoot.getByRole("button").last().click();
+  await expect(wizard.locator(".swz-mark-check")).toHaveCount(1);
+  await villageFoot.getByRole("button").first().click();
+  await expect(wizard.locator(".swz-mark-check")).toHaveCount(0);
+  // ...including the rail: every marker is a jump target here too.
+  await rail.last().click();
+  await expect(wizard.locator(".swz-body-kicker")).toHaveText(
+    `step ${fixture.village.start.steps.length}: ${fixture.village.start.steps.at(-1)!.title}`,
+  );
+  await rail.first().click();
+  await expect(wizard.locator(".swz-mark-check")).toHaveCount(0);
+
+  const join = page.locator("[data-village-join]");
+  await expect(join.locator("h2")).toHaveText(fixture.village.community.title);
+  const example = page.locator("[data-village-example]");
+  await expect(example).toContainText(fixture.village.example.head);
+  await expect(example).toContainText(fixture.village.example.title);
+  await expect(example).toContainText(fixture.village.example.desc);
+  for (const bullet of fixture.village.example.bullets) {
+    await expect(example).toContainText(bullet);
+  }
+  await expect(example).toContainText(fixture.village.example.members);
+  await expect(example).toContainText("members");
+  await expect(example).toContainText(fixture.village.example.transcripts);
+  await expect(example).toContainText("transcripts");
+  await expect(example).toContainText(fixture.village.example.linked);
+  // the imagery band is what makes it a card-img rather than a plain card.
+  await expect(example.locator(".card-thumb img")).toHaveCount(1);
+  // fairtrade writes its own join control as a small primary button leading with a
+  // decorative UserPlus, so this one does too rather than inventing a plain button.
+  const joinControl = page.locator("[data-join-collective]");
+  await expect(joinControl).toHaveText(fixture.village.community.joinLabel);
+  await expect(joinControl).toHaveClass(/\bbtn\b/);
+  await expect(joinControl).toHaveClass(/\bbtn-sm\b/);
+  await expect(joinControl).toHaveClass(/\bbtn-primary\b/);
+  await expect(joinControl.locator("svg.lucide[aria-hidden='true']")).toHaveCount(1);
+
+  const governance = page.locator("[data-village-governance]");
+  await expect(governance).toHaveCount(1);
+  await expect(governance.locator("h2")).toHaveText(fixture.village.governance.title);
+  const governanceCard = governance.locator("[data-village-governance-card]");
+  await expect(governanceCard).toContainText("governance axes");
+  // every axis a collective governs, not just the one a join moves.
+  for (const axis of ["identity", "data access", "contribution", "retention"]) {
+    await expect(governanceCard).toContainText(axis);
+  }
+
+  const joinButton = page.locator("[data-join-collective]");
+  await joinButton.click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText(fixture.village.community.joinLabel);
+  await expect(dialog).toContainText("not discoverable");
+  // the dialog addresses the collective by handle, the way village does, not by the
+  // display name the card is titled with.
+  await expect(dialog).toContainText(
+    fixture.village.example.title.trim().replace(/\s+/g, "-"),
+  );
+
+  // three plain rows, each a key over the thing a join makes true. Not ConsentSummary:
+  // that boxes every icon in a chip and sets the key beside its value instead.
+  await expect(dialog.locator(".cns-summary")).toHaveCount(0);
+  const axes = dialog.locator("[data-join-axes]");
+  for (const [key, value] of [
+    ["identity", "profile shown to owners only"],
+    ["to other members", "you stay anon"],
+    ["your transcripts", "none contributed on joining"],
+  ]) {
+    await expect(axes).toContainText(key);
+    await expect(axes).toContainText(value);
+  }
+  await expect(axes.locator(".pj-village-join-axis")).toHaveCount(3);
+
+  await expect(dialog).toContainText("i understand and consent");
+  await expect(dialog.getByRole("button", { name: "reveal & join" })).toHaveCount(1);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+
+  for (const link of fixture.village.related) {
+    await expect(page.locator(`[data-related-link="${link.id}"]`)).toHaveAttribute(
+      "href",
+      link.target,
     );
-    for (const [index, expected] of product.features.entries()) {
-      await expect(features.nth(index).locator("h3")).toHaveText(expected.heading);
-      expect(await evidenceIds(features.nth(index))).toEqual(expected.evidence);
+  }
+  const sibling = fixture.village.related.find((link) => link.id === "peasant");
+  expect(sibling).toBeDefined();
+  await page.locator(`[data-related-link="${sibling!.id}"]`).click();
+  await expect(page).toHaveURL(new RegExp(`${sibling!.target}$`));
+  await expect(page.locator("h1")).toBeFocused();
+});
+
+test("the getting-started wizard walks every step and copies each command", async ({ page }) => {
+  // The sequence lives with the product it installs, not in the catalog.
+  const response = await page.goto(`${fixture.peasant.route}#get-started`);
+  const serverHtml = await response!.text();
+  const start = page.locator("[data-start]");
+  await expect(start).toHaveCount(1);
+
+  // fairtrade's wizard surface and its own rail. The shell around the rail is ours
+  // because fairtrade's StepWizard owns its position uncontrolled and only ever adds
+  // to its completed set, which left a check standing over a re-opened step.
+  const wizard = start.locator(`section.swz[aria-label="${fixture.peasant.start.stepsLabel}"]`);
+  await expect(wizard).toHaveCount(1);
+  await expect(start.locator("[data-terminal]")).toHaveCount(0);
+
+  // The rail names the whole sequence up front, even though one step is in view.
+  const rail = wizard.locator("nav.swz-rail .swz-step");
+  await expect(rail).toHaveCount(fixture.peasant.start.steps.length);
+  for (const [index, expected] of fixture.peasant.start.steps.entries()) {
+    await expect(rail.nth(index).locator(".swz-label")).toHaveText(expected.title);
+    // Step names are server-rendered, so the sequence is findable without JavaScript.
+    expect(serverHtml).toContain(expected.title);
+  }
+
+  const body = wizard.locator(".swz-body");
+  const back = wizard.getByRole("button", { name: fixture.peasant.start.backLabel, exact: true });
+  const forward = wizard.locator(".swz-foot").getByRole("button").last();
+
+  for (const [index, expected] of fixture.peasant.start.steps.entries()) {
+    const isLast = index === fixture.peasant.start.steps.length - 1;
+
+    // The rail marks exactly one step current, and it is the one on show.
+    await expect(rail.nth(index)).toHaveAttribute("aria-current", "step");
+    await expect(wizard.locator('[aria-current="step"]')).toHaveCount(1);
+    // A check means "you are past this", so the rail carries exactly one per step
+    // behind the reader — and none at all while they are still on the first.
+    await expect(wizard.locator(".swz-mark-check")).toHaveCount(index);
+    await expect(body.locator(".swz-body-kicker")).toHaveText(`step ${index + 1}: ${expected.title}`);
+    await expect(body.locator(`[data-start-step="${expected.id}"]`)).toHaveCount(1);
+
+    // The shell sigil belongs to the terminal on /projects, not to step prose.
+    const prose = expected.comment.replace(/^#\s*/, "");
+    await expect(body.locator("[data-reading-text]")).toHaveText(prose);
+    expect(prose).not.toMatch(/^#/);
+
+    // Only the step in view carries a command: the wizard shows one at a time.
+    await expect(wizard.locator(".cli-cmd")).toHaveCount(expected.command === null ? 0 : 1);
+    if (expected.command !== null) {
+      await expect(body.locator("code")).toHaveText(`$ ${expected.command}`);
+
+      const copy = body.getByRole("button", { name: /^copy / });
+      await copy.focus();
+      await page.keyboard.press("Enter");
+      await expect(body.getByRole("button", { name: /^copied / })).toBeVisible();
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(expected.command);
     }
 
-    for (const [kind, instructions] of [
-      ["access", product.access],
-      ["run", product.run],
-    ] as const) {
-      await expect(page.locator(`[data-instruction-kind="${kind}"]`)).toHaveCount(
-        instructions.length,
-      );
-      for (const instruction of instructions) {
-        const item = page.locator(
-          `[data-instruction-kind="${kind}"][data-instruction-id="${instruction.id}"]`,
-        );
-        await expect(item.locator("[data-reading-text]")).toHaveText(instruction.body);
-        await expect(item.locator("[data-qualification]")).toHaveText(instruction.qualification);
-        expect(await evidenceIds(item)).toEqual(instruction.evidence);
-        if (instruction.command === null) {
-          await expect(item.locator("code")).toHaveCount(0);
-        } else {
-          await expect(item.locator("code")).toContainText(instruction.command);
-        }
-        const action = item.locator("[data-instruction-action]");
-        if (instruction.action === null) {
-          await expect(action).toHaveCount(0);
-        } else {
-          await expect(action).toHaveAttribute("href", instruction.action.target);
-          await expect(action).toHaveAttribute("target", "_blank");
-          await expect(action).toHaveAttribute("rel", "noopener noreferrer");
-          await expect(action).toHaveAttribute("aria-label", instruction.action.accessibleName);
-          await expect(action).toHaveText(instruction.action.label);
-          await expect(action).toHaveClass(/\bbtn-primary\b/);
-          await action.focus();
-          await expect(action).toBeFocused();
-          expect(serverHtml).toContain(instruction.action.target);
-        }
-      }
+    // Back is dead on the first step and live everywhere after it.
+    if (index === 0) {
+      await expect(back).toBeDisabled();
+    } else {
+      await expect(back).toBeEnabled();
     }
-    const expectedCommands = [...product.access, ...product.run]
-      .map((instruction) => instruction.command)
-      .filter((command): command is string => command !== null)
-      .map((command) => `$ ${command}`);
-    expect(
-      await page.locator("[data-instruction-kind] code").allTextContents(),
-    ).toEqual(expectedCommands);
-
-    const stories = page.locator("[data-project-story]");
-    expect(await stories.evaluateAll((elements) => elements.map((element) => element.getAttribute("data-project-story")))).toEqual(
-      product.stories.map((story) => story.id),
+    // The last step closes the sequence rather than promising another one.
+    await expect(forward).toHaveText(
+      isLast ? fixture.peasant.start.doneLabel : fixture.peasant.start.continueLabel,
     );
-    for (const [index, story] of product.stories.entries()) {
-      expect(await evidenceIds(stories.nth(index))).toEqual(story.evidence);
-    }
 
-    const outputs = page.locator("[data-project-output]");
-    expect(await outputs.evaluateAll((elements) => elements.map((element) => element.getAttribute("data-project-output")))).toEqual(
-      product.outputs.map((output) => output.id),
+    if (!isLast) {
+      await forward.click();
+    }
+  }
+
+  // Walking back re-opens a finished step rather than locking the reader forward,
+  // and the check over it goes with it — a reader standing on a step is not past it.
+  await back.click();
+  await expect(body.locator(".swz-body-kicker")).toHaveText(
+    `step ${fixture.peasant.start.steps.length - 1}: ${fixture.peasant.start.steps.at(-2)!.title}`,
+  );
+  await expect(wizard.locator(".swz-mark-check")).toHaveCount(
+    fixture.peasant.start.steps.length - 2,
+  );
+  // Every marker is a jump target, forward as well as back. Nothing here is gated,
+  // so a reader who wants step four says so rather than pressing continue three times.
+  await expect(rail.last()).toBeEnabled();
+  await rail.last().click();
+  await expect(body.locator(".swz-body-kicker")).toHaveText(
+    `step ${fixture.peasant.start.steps.length}: ${fixture.peasant.start.steps.at(-1)!.title}`,
+  );
+  await expect(wizard.locator(".swz-mark-check")).toHaveCount(
+    fixture.peasant.start.steps.length - 1,
+  );
+
+  // A completed marker is a jump target, so the rail is navigable both ways.
+  await rail.first().click();
+  await expect(body.locator(".swz-body-kicker")).toHaveText(
+    `step 1: ${fixture.peasant.start.steps[0].title}`,
+  );
+  // Back at the top of the sequence, nothing behind the reader is claimed as done.
+  await expect(wizard.locator(".swz-mark-check")).toHaveCount(0);
+
+  const expectedCommands = fixture.peasant.start.steps
+    .map((step) => step.command)
+    .filter((command): command is string => command !== null);
+
+  // "copy all" sits above the wizard and yields the whole sequence, in order.
+  const copyAll = start.locator("[data-copy-all]");
+  await expect(copyAll).toHaveCount(1);
+  await expect(copyAll).toHaveAttribute("aria-label", `copy ${fixture.peasant.start.copyAllLabel}`);
+  const wizardBox = await wizard.boundingBox();
+  const copyAllBox = await copyAll.boundingBox();
+  expect(copyAllBox).not.toBeNull();
+  // above the rail and flush with the wizard's right edge, not inside the body
+  expect(copyAllBox!.y + copyAllBox!.height).toBeLessThanOrEqual(wizardBox!.y);
+  expect(copyAllBox!.x + copyAllBox!.width).toBeCloseTo(wizardBox!.x + wizardBox!.width, 0);
+  await copyAll.focus();
+  await expect(copyAll).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(start.getByRole("button", { name: `copied ${fixture.peasant.start.copyAllLabel}` })).toBeVisible();
+  // The page writes "\n"; the Windows clipboard hands back "\r\n". Compare line by line.
+  const clipboard = await page.evaluate(() => navigator.clipboard.readText());
+  expect(clipboard.split(/\r?\n/)).toEqual(expectedCommands);
+
+  // The install block is plain copy: source citations live with the comparison.
+  await expect(start.locator(".pj-citations")).toHaveCount(0);
+});
+
+test("the install line sits above the explanation and is copyable", async ({ page }) => {
+  const response = await page.goto("/projects");
+  const serverHtml = await response!.text();
+  expect(serverHtml).toContain(fixture.install.command);
+
+  const install = page.locator("[data-install]");
+  await expect(install).toHaveCount(1);
+  await expect(install.locator("code")).toHaveText(`$ ${fixture.install.command}`);
+  // The command stands alone: no note under it, and nothing else in the section.
+  await expect(install.locator(".pj-install-note")).toHaveCount(0);
+  await expect(install.locator("p")).toHaveCount(0);
+
+  // Order matters: a reader who has decided should not have to scroll past prose,
+  // and the viewer comes after the case for the project rather than before it.
+  const order = await page.evaluate(() => {
+    const marks = [
+      ["install", "[data-install]"],
+      ["what", "[data-what]"],
+      ["story", "[data-story]"],
+      ["viewer", "[data-viewer]"],
+      ["community", "[data-community]"],
+      ["redaction", "[data-redaction]"],
+      ["tools", "[data-tools]"],
+      ["comparison", "[data-comparison]"],
+      ["faq", "[data-faq]"],
+    ] as const;
+    return [...document.querySelectorAll(marks.map(([, selector]) => selector).join(", "))].map(
+      (node) => marks.find(([, selector]) => node.matches(selector))![0],
     );
-    for (const [index, output] of product.outputs.entries()) {
-      await expect(outputs.nth(index).locator("code")).toHaveText(output.lines.join("\n"));
-      expect(await evidenceIds(outputs.nth(index))).toEqual(output.evidence);
-    }
-
-    const disclosure = page.locator("details[data-evidence-disclosure]");
-    const summary = disclosure.locator("summary[data-evidence-summary]");
-    await expect(disclosure).toHaveCount(1);
-    await expect(summary).toHaveText(product.evidenceSummary);
-    expect(await disclosure.evaluate((element) => element.hasAttribute("open"))).toBe(false);
-    await summary.focus();
-    await expect(summary).toBeFocused();
-    await page.keyboard.press("Enter");
-    expect(await disclosure.evaluate((element) => element.hasAttribute("open"))).toBe(true);
-    await page.keyboard.press("Enter");
-    expect(await disclosure.evaluate((element) => element.hasAttribute("open"))).toBe(false);
-    await page.keyboard.press("Space");
-    expect(await disclosure.evaluate((element) => element.hasAttribute("open"))).toBe(true);
-    await expect(disclosure.locator("[data-project-evidence]")).toBeVisible();
-
-    const pageEvidence = new Set(
-      await page.locator("[data-project-evidence] [data-evidence-id]").evaluateAll((elements) =>
-        elements.map((element) => element.getAttribute("data-evidence-id")),
-      ),
-    );
-    for (const evidenceId of product.requiredEvidence) {
-      expect(pageEvidence.has(evidenceId), `missing ${evidenceId} on ${product.route}`).toBe(true);
-      const expectedEvidence = evidenceById.get(evidenceId);
-      expect(expectedEvidence).toBeDefined();
-      expect(serverHtml).toContain(expectedEvidence!.id);
-      await expectEvidenceReference(
-        page.locator(`[data-project-evidence] [data-evidence-id="${evidenceId}"]`),
-        expectedEvidence!,
-        true,
-      );
-    }
-
-    for (const link of product.related) {
-      await expect(page.locator(`[data-related-link="${link.id}"]`)).toHaveAttribute("href", link.target);
-    }
-    await expect(
-      page.locator('[data-access] a[href^="http"]:not([data-instruction-action])'),
-    ).toHaveCount(0);
-    const sibling = product.related.find((link) => link.id === "peasant" || link.id === "village");
-    expect(sibling).toBeDefined();
-    await page.locator(`[data-related-link="${sibling!.id}"]`).click();
-    await expect(page).toHaveURL(new RegExp(`${sibling!.target}$`));
-    await expect(page.locator("h1")).toBeFocused();
   });
-}
+  expect(order).toEqual([
+    "install",
+    "what",
+    "story",
+    "viewer",
+    "community",
+    "redaction",
+    "tools",
+    "comparison",
+    "faq",
+  ]);
 
-test("the comparison is one balanced native table with exact statuses and citations", async ({ page }) => {
+  // The full sequence belongs to the peasant page; the catalog keeps the one line.
+  await expect(page.locator("[data-start]")).toHaveCount(0);
+  await expect(page.locator("section.swz")).toHaveCount(0);
+
+  const copy = install.getByRole("button", { name: /^copy / });
+  await copy.focus();
+  await page.keyboard.press("Enter");
+  await expect(install.getByRole("button", { name: /^copied / })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    fixture.install.command,
+  );
+});
+
+test("the transcript viewer mounts the real component over demo data", async ({ page }) => {
+  await page.goto("/projects");
+  const viewer = page.locator("[data-viewer]");
+  await expect(viewer.locator("#viewer-heading")).toHaveText(fixture.viewer.title);
+
+  // Sample data must announce itself, so a reader never mistakes it for a record.
+  await expect(viewer).toContainText(fixture.viewer.disclosure);
+
+  const demo = viewer.locator("[data-transcript-demo]");
+  await expect(demo).toHaveCount(1);
+  await expect(demo).toHaveAttribute("aria-label", fixture.viewer.label);
+  await expect(demo).toHaveAttribute("data-contained-overflow", "true");
+
+  // The fairtrade composite itself, not a screenshot of it.
+  const app = demo.locator(".txn-app");
+  await expect(app).toHaveCount(1);
+  await expect(demo.locator("img")).toHaveCount(0);
+  await expect(app).toContainText(fixture.viewer.sessionId);
+
+  // It follows the site theme rather than shipping its own.
+  await expect(app).toHaveAttribute("data-theme", "dark");
+  await page.locator("[data-theme-toggle]").click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(app).toHaveAttribute("data-theme", "light");
+
+  // Read-only: every capability is off, so no mutating action is offered. Match
+  // whole names — the transcript's own tool rows are labelled "Edit <path>".
+  for (const name of ["edit", "contribute", "export", "change visibility", "label"]) {
+    await expect(demo.getByRole("button", { name, exact: true })).toHaveCount(0);
+  }
+
+  // The transcript is real enough to have derived its own tabs and turns.
+  await expect(demo.getByRole("tab")).not.toHaveCount(0);
+
+  /*
+   * It opens on its own summary rather than in the middle of the raw log —
+   * fairtrade's own default is the trace. The tab is a controlled prop, so the
+   * switch is exercised too: owning the state wrongly renders tabs that refuse
+   * to move, which looks identical until you click one.
+   */
+  await expect(demo.getByRole("tab", { selected: true })).toContainText(
+    fixture.viewer.openingTab,
+  );
+  const other = demo.getByRole("tab", { name: new RegExp(`^${fixture.viewer.otherTab}\\b`) });
+  await other.click();
+  await expect(other).toHaveAttribute("aria-selected", "true");
+});
+
+test("the walkthrough rail runs unbroken from the last step into the viewer", async ({
+  page,
+}) => {
+  await page.goto("/projects");
+  const rail = await page.evaluate(() => {
+    const y = window.scrollY;
+    const edges = (selector: string) => {
+      const element = document.querySelector(selector);
+      if (!element) {
+        throw new Error(`Rail geometry could not be measured: ${selector} is missing.`);
+      }
+      const rect = element.getBoundingClientRect();
+      return { top: rect.top + y, bottom: rect.bottom + y, left: rect.left };
+    };
+    const painted = (selector: string, part: "::before" | "::after") => {
+      const element = document.querySelector(selector)!;
+      const style = getComputedStyle(element, part);
+      return {
+        content: style.content,
+        background: style.backgroundColor,
+        left: style.left,
+        top: style.top,
+        width: style.width,
+        height: style.height,
+        position: style.position,
+      };
+    };
+    const marker = document
+      .querySelector("[data-story-steps] .cli-step:last-child .cli-step-marker")!
+      .getBoundingClientRect();
+
+    return {
+      story: edges("[data-story]"),
+      viewer: edges("[data-viewer]"),
+      heading: edges("[data-viewer] > .pj-section-heading"),
+      demo: edges("[data-transcript-demo]"),
+      marker: { top: marker.top + y, bottom: marker.bottom + y, centre: marker.left + marker.width / 2 },
+      lastStepTop:
+        document
+          .querySelector("[data-story-steps] .cli-step:last-child")!
+          .getBoundingClientRect().top + y,
+      step: painted("[data-story-steps] .cli-step:last-child", "::before"),
+      lead: painted("[data-viewer]", "::before"),
+      tail: painted("[data-viewer] > .pj-section-heading", "::after"),
+      viewerBorderTop: getComputedStyle(document.querySelector("[data-viewer]")!).borderTopWidth,
+      clear: Number.parseFloat(
+        getComputedStyle(document.querySelector(".pj-main")!).getPropertyValue(
+          "--pj-title-clear",
+        ),
+      ),
+    };
+  });
+
+  // Every run is actually painted, in one colour, on one vertical line.
+  const runs = [rail.step, rail.lead, rail.tail];
+  for (const run of runs) {
+    expect(run.content).toBe('""');
+    expect(run.position).toBe("absolute");
+    expect(run.background).not.toBe("rgba(0, 0, 0, 0)");
+  }
+  expect(new Set(runs.map((run) => run.background)).size).toBe(1);
+  expect(new Set(runs.map((run) => run.left)).size).toBe(1);
+  expect(new Set(runs.map((run) => run.width)).size).toBe(1);
+
+  // The line stands on the centre of the numbered markers it threads.
+  const offset = Number.parseFloat(rail.step.left);
+  expect(rail.story.left + offset).toBeCloseTo(rail.marker.centre, 0);
+
+  /*
+   * It leaves each marker at the marker's own edge rather than restarting some
+   * way below it — never overlapping the number, and never more than half a
+   * marker clear of it, which is the break fairtrade's own `--sp-7` start left.
+   */
+  const railStart = rail.lastStepTop + Number.parseFloat(rail.step.top);
+  const markerHeight = rail.marker.bottom - rail.marker.top;
+  expect(railStart).toBeGreaterThanOrEqual(rail.marker.bottom);
+  expect(railStart).toBeLessThanOrEqual(rail.marker.bottom + markerHeight / 2);
+
+  /*
+   * The two runs bridge the question: out of the last step down to it, then out
+   * from under it onto the panel.
+   *
+   * Each is measured at both ends. The ends away from the question have to meet
+   * what the rail connects — the step above and the panel below — exactly, since
+   * a short run there is a visible break in the line. The ends at the question
+   * stop clear of it by `--pj-title-clear`, equally on both sides: that gap is
+   * deliberate, and getting it by accident from a mis-sized run would look the
+   * same on the page while meaning something quite different.
+   */
+  const leadStart = rail.viewer.top + Number.parseFloat(rail.lead.top);
+  const leadEnd = leadStart + Number.parseFloat(rail.lead.height);
+  const tailStart = rail.heading.top + Number.parseFloat(rail.tail.top);
+  const tailEnd = tailStart + Number.parseFloat(rail.tail.height);
+
+  expect(leadStart).toBeCloseTo(rail.story.bottom, 0);
+  expect(tailEnd).toBeCloseTo(rail.demo.top, 0);
+  expect(rail.heading.top - leadEnd).toBeCloseTo(rail.clear, 0);
+  expect(tailStart - rail.heading.bottom).toBeCloseTo(rail.clear, 0);
+
+  // The section rule is dropped: a divider across the run would cut it in two.
+  expect(rail.viewerBorderTop).toBe("0px");
+});
+
+test("what-it-is answers in one paragraph and hands the cards to their own section", async ({
+  page,
+}) => {
+  await page.goto("/projects");
+  const what = page.locator("[data-what]");
+  await expect(what.locator("h2")).toHaveText(fixture.catalog.whatTitle);
+  // The cards moved out: this section is the sentence, not a choice between products.
+  await expect(what.locator("[data-project-card]")).toHaveCount(0);
+
+  const tools = page.locator("[data-tools]");
+  /*
+   * The heading is two authored lines. `toHaveText` normalises whitespace and
+   * would pass on a heading that had lost its break, so the newline is asserted
+   * against raw text, and the rule that renders it is asserted beside it.
+   */
+  const cardsHeading = tools.locator("h2");
+  expect(await cardsHeading.evaluate((element) => element.textContent)).toBe(
+    fixture.catalog.cardsTitle,
+  );
+  expect(fixture.catalog.cardsTitle.split("\n")).toHaveLength(2);
+  expect(await cardsHeading.evaluate((element) => getComputedStyle(element).whiteSpace)).toBe(
+    "pre-line",
+  );
+  await expect(tools.locator("[data-project-card]")).toHaveCount(fixture.catalog.cards.length);
+  for (const expected of fixture.catalog.cards) {
+    const card = tools.locator(`[data-project-card="${expected.id}"]`);
+    await expect(card.locator(".pj-card-kind")).toHaveText(expected.kind);
+  }
+
+  // The evidence apparatus is gone from this page entirely.
+  await expect(page.locator(".pj-citations")).toHaveCount(0);
+  await expect(page.locator("[data-comparison-sources]")).toHaveCount(0);
+});
+
+test("the redaction review runs the real component over labelled sample matches", async ({
+  page,
+}) => {
+  await page.goto("/projects");
+  const redaction = page.locator("[data-redaction]");
+  await expect(redaction.locator("h2")).toHaveText(fixture.redaction.title);
+
+  // Invented data must say so before a reader takes a number off the panel.
+  await expect(redaction.locator(".pj-demo-note")).toHaveText(fixture.redaction.note);
+
+  // The fairtrade composite itself, not a screenshot of it.
+  const panel = redaction.locator("[data-redaction-demo] .rdx-review");
+  await expect(panel).toHaveCount(1);
+  await expect(redaction.locator("img")).toHaveCount(0);
+
+  const matches = panel.locator(".rdx-list > li");
+  await expect(matches).toHaveCount(fixture.redaction.matches.length);
+  for (const [index, expected] of fixture.redaction.matches.entries()) {
+    const match = matches.nth(index);
+    await expect(match).toContainText(expected.category);
+    // Both halves of the diff are shown: what was found and what replaces it.
+    await expect(match).toContainText(expected.secret);
+    await expect(match).toContainText(expected.after);
+  }
+
+  // The kept match is the honest case — it is counted, and the panel says so.
+  const kept = fixture.redaction.matches.filter((match) => match.kept);
+  await expect(panel.locator(".rdx-summary-kept")).toHaveCount(kept.length > 0 ? 1 : 0);
+  if (kept.length > 0) {
+    await expect(panel.locator(".rdx-summary-kept")).toContainText(String(kept.length));
+  }
+
+  // Standard is the only level that ships, so the panel states it rather than
+  // offering a choice, and the withdrawn levels are gone from the accessibility
+  // tree as well as the page.
+  const level = panel.getByRole("button", { name: fixture.redaction.level, exact: true });
+  await expect(level).toHaveCount(1);
+  await expect(level).toHaveAttribute("aria-pressed", "true");
+  for (const removed of fixture.redaction.removedLevels) {
+    await expect(panel.getByRole("button", { name: removed, exact: true })).toHaveCount(0);
+  }
+  await expect(panel.locator(".rdx-seg-opt:visible")).toHaveCount(1);
+});
+
+test("the user story runs the getting-started sequence in the onboarding component", async ({ page }) => {
+  await page.goto("/projects");
+  const story = page.locator("[data-story]");
+  await expect(story.locator("h2")).toHaveText(fixture.story.title);
+
+  const steps = story.locator("[data-story-steps]");
+  await expect(steps).toHaveCount(1);
+  await expect(steps).toHaveAttribute("aria-label", fixture.story.stepsLabel);
+
+  const items = steps.locator(".cli-step");
+  await expect(items).toHaveCount(fixture.story.steps.length);
+  for (const [index, expected] of fixture.story.steps.entries()) {
+    const step = items.nth(index);
+    // The marker numbers the sequence; the title and command are the authored pair.
+    await expect(step.locator(".cli-step-marker")).toHaveText(String(index + 1));
+    await expect(step.locator(".cli-step-title")).toHaveText(expected.title);
+    await expect(step.locator("code")).toHaveText(`$ ${expected.command}`);
+  }
+
+  // Every step is copyable where a reader is already reading about it.
+  await expect(steps.getByRole("button", { name: /^copy / })).toHaveCount(
+    fixture.story.steps.length,
+  );
+
+  // The terminal panel and the screenshot placeholder it sat beside are gone.
+  await expect(story.locator("[data-terminal]")).toHaveCount(0);
+  await expect(story.locator("figure")).toHaveCount(0);
+
+  // Step titles are authored lowercase, never coerced by the component's chrome CSS.
+  const transforms = await items
+    .locator(".cli-step-title")
+    .evaluateAll((elements) => elements.map((element) => getComputedStyle(element).textTransform));
+  expect(transforms).toEqual(transforms.map(() => "none"));
+});
+
+test("the community section states its commitment and supporting points", async ({ page }) => {
+  const response = await page.goto("/projects");
+  const serverHtml = await response!.text();
+  const community = page.locator("[data-community]");
+  await expect(community.locator("h2")).toHaveText(fixture.community.title);
+  const points = community.locator("[data-community-point]");
+  await expect(points).toHaveCount(fixture.community.points.length);
+  for (const [index, expected] of fixture.community.points.entries()) {
+    await expect(points.nth(index)).toHaveText(expected);
+    expect(serverHtml).toContain(expected);
+  }
+});
+
+test("the FAQ is a keyboard-operable accordion carrying every fixture question", async ({ page }) => {
+  const response = await page.goto("/projects");
+  const serverHtml = await response!.text();
+  const faq = page.locator("[data-faq]");
+  await expect(faq.locator("h2")).toHaveText(fixture.faq.title);
+
+  for (const expected of fixture.faq.questions) {
+    // Questions are server-rendered, so they are findable without JavaScript.
+    expect(serverHtml).toContain(expected.question);
+  }
+
+  const triggers = faq.getByRole("button");
+  await expect(triggers).toHaveCount(fixture.faq.questions.length);
+  for (const [index, expected] of fixture.faq.questions.entries()) {
+    await expect(triggers.nth(index)).toHaveText(expected.question);
+  }
+
+  // Authored casing survives: the accordion chrome must not lowercase the copy.
+  const transforms = await triggers.evaluateAll((elements) => [
+    ...new Set(elements.map((element) => getComputedStyle(element).textTransform)),
+  ]);
+  expect(transforms).toEqual(["none"]);
+
+  const first = triggers.first();
+  await expect(first).toHaveAttribute("aria-expanded", "false");
+  await first.focus();
+  await expect(first).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(first).toHaveAttribute("aria-expanded", "true");
+  const panelId = await first.getAttribute("aria-controls");
+  expect(panelId).toBeTruthy();
+  await expect(page.locator(`#${panelId}`)).toBeVisible();
+});
+
+test("the peasant page is a plain explainer with no evidence apparatus", async ({ page }) => {
+  const response = await page.goto(fixture.peasant.route);
+  expect(response?.status()).toBe(200);
+  const serverHtml = await response!.text();
+
+  await expect(page.locator("h1")).toHaveText(fixture.peasant.hero.title);
+
+  // The sequence that gets a reader running now lives here, headed by its own id.
+  const start = page.locator("#get-started[data-start]");
+  await expect(start).toHaveCount(1);
+  await expect(start.locator("h2")).toHaveText(fixture.peasant.start.title);
+  expect(serverHtml).toContain(fixture.peasant.start.title);
+
+  const uses = page.locator("[data-peasant-use]");
+  expect(
+    await uses.evaluateAll((elements) => elements.map((element) => element.getAttribute("data-peasant-use"))),
+  ).toEqual(fixture.peasant.uses.map((use) => use.id));
+  for (const [index, expected] of fixture.peasant.uses.entries()) {
+    await expect(uses.nth(index).locator("h3")).toHaveText(expected.title);
+  }
+
+  // The evidence apparatus and the comparison stay on /projects.
+  await expect(page.locator(".pj-citations")).toHaveCount(0);
+  await expect(page.locator("[data-evidence-disclosure]")).toHaveCount(0);
+  await expect(page.locator("[data-comparison]")).toHaveCount(0);
+
+  for (const link of fixture.peasant.related) {
+    await expect(page.locator(`[data-related-link="${link.id}"]`)).toHaveAttribute("href", link.target);
+  }
+  await page.locator('[data-related-link="village"]').click();
+  await expect(page).toHaveURL(/\/projects\/village$/);
+  await expect(page.locator("h1")).toBeFocused();
+});
+
+test("the comparison is one balanced native table of marks and nothing else", async ({ page }) => {
   await page.goto("/projects#comparison");
   const comparison = page.locator("[data-comparison]");
   const table = comparison.locator("table.tbl");
   await expect(table).toHaveCount(1);
-  await expect(table.locator("caption")).toHaveText(fixture.comparison.caption);
   await expect(comparison.locator("[data-bundle-definition]")).toHaveText(fixture.comparison.bundleDefinition);
-  await expect(comparison).toContainText(`verified ${fixture.comparison.verifiedOn}`);
-  await expect(comparison).toContainText(`reverify by ${fixture.comparison.reverifyBy}`);
-  await expect(comparison).toContainText(fixture.comparison.reviewOwner);
+  await expect(comparison).toContainText(fixture.comparison.intro);
   await expect(comparison).toContainText(fixture.comparison.meaningNote);
-  await expect(table.locator('thead th[scope="col"]')).toHaveCount(4);
-  await expect(table.locator('tbody th[scope="row"]')).toHaveCount(14);
+
+  // The review metadata and the sources disclosure are gone from the page.
+  await expect(table.locator("caption")).toHaveCount(0);
+  await expect(comparison.locator(".pj-comparison-meta")).toHaveCount(0);
+  await expect(comparison.locator("details")).toHaveCount(0);
+  await expect(comparison).not.toContainText(/reverify by/i);
+  await expect(comparison).not.toContainText(/review owner/i);
+  // Dropping the caption must not cost the table its accessible name.
+  await expect(table).toHaveAttribute("aria-labelledby", "comparison-heading");
+
+  await expect(table.locator('thead th[scope="col"]')).toHaveCount(3);
+  await expect(table.locator('tbody th[scope="row"]')).toHaveCount(fixture.comparison.rows.length);
 
   const rows = table.locator("tbody tr[data-comparison-row]");
   expect(await rows.evaluateAll((elements) => elements.map((element) => element.getAttribute("data-comparison-row")))).toEqual(
     fixture.comparison.rows.map((row) => row.id),
   );
+
+  // The table itself stays a scannable mark grid: one labelled mark per side, no prose, no citations.
   for (const expected of fixture.comparison.rows) {
     const row = rows.filter({ has: page.locator(`[data-row-id="${expected.id}"]`) });
+    await expect(row.locator('th[scope="row"]')).toHaveText(expected.capability);
     for (const [side, cellFixture] of [
       ["peasant-labs", expected.peasantLabs],
       ["entire", expected.entire],
     ] as const) {
-        const cell = row.locator(`[data-comparison-side="${side}"]`);
-      await expect(cell).toHaveAttribute("data-source-scope", cellFixture.sourceScope);
-      await expect(cell.locator("[data-status]")).toHaveText(cellFixture.status);
-      expect(await evidenceIds(cell)).toEqual(cellFixture.sources);
-      await expect(cell.locator("[data-qualification]")).toHaveText(cellFixture.qualification);
-      for (const evidenceId of cellFixture.sources) {
-        const expectedEvidence = evidenceById.get(evidenceId);
-        expect(expectedEvidence).toBeDefined();
-        await expectEvidenceReference(
-          cell.locator(`[data-evidence-id="${evidenceId}"]`),
-          expectedEvidence!,
-        );
-      }
+      const cell = row.locator(`[data-comparison-side="${side}"]`);
+      const mark = cell.locator("[data-status]");
+      await expect(mark).toHaveAttribute("data-status", cellFixture.status);
+      await expect(mark).toContainText(cellFixture.status.replace("-", " "));
+      await expect(mark).toContainText(COMPARISON_MARKS[cellFixture.status]);
+      expect(await evidenceIds(cell)).toEqual([]);
     }
-    await expect(row.locator("[data-takeaway]")).toHaveText(expected.takeaway);
   }
 
   const overflow = comparison.locator("[data-table-scroll]");
-  const scrollHelp = comparison.locator("#comparison-scroll-help");
-  await expect(scrollHelp).toBeVisible();
-  await expect(scrollHelp).toHaveText(fixture.comparison.scrollHelp);
   await expect(overflow).toHaveAttribute("role", "region");
   await expect(overflow).toHaveAttribute("tabindex", "0");
   await expect(overflow).toHaveAttribute("aria-label", /comparison/i);
-  await expect(overflow).toHaveAttribute("aria-describedby", "comparison-scroll-help");
   await overflow.focus();
   await expect(overflow).toBeFocused();
   await expect(comparison).not.toContainText(/\b(score|total|winner|staircase)\b/i);
@@ -1366,15 +2219,16 @@ test("skip navigation, route focus, theme persistence, and command copy work by 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   expect(await page.evaluate(() => window.localStorage.getItem("peasant-labs-theme"))).toBe("light");
 
-  const product = productById.get("peasant");
-  expect(product).toBeDefined();
   await page.locator('[data-project-card="peasant"]').click();
+  await expect(page).toHaveURL(new RegExp(`${fixture.peasant.route}$`));
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(page.locator("h1")).toBeFocused();
 
-  const firstCommand = product!.run.find((instruction) => instruction.command !== null);
+  // The wizard opens on the first step, so its command is the one in view.
+  const firstCommand = fixture.peasant.start.steps.find((step) => step.command !== null);
   expect(firstCommand).toBeDefined();
-  const command = page.locator(`[data-instruction-id="${firstCommand!.id}"] .cli-cmd`);
+  expect(fixture.peasant.start.steps.indexOf(firstCommand!)).toBe(0);
+  const command = page.locator("section.swz .swz-body .cli-cmd");
   const copy = command.getByRole("button", { name: /^copy / });
   await copy.focus();
   await page.keyboard.press("Enter");
@@ -1408,11 +2262,13 @@ test("Atkinson fonts and canonical fairtrade component styles mount from real pr
 
   const computed = await page.evaluate(() => {
     const card = document.querySelector<HTMLElement>("[data-project-card]");
-    const breadcrumb = document.querySelector<HTMLElement>(".crumb");
+    // The catalog dropped its breadcrumb for the header nav, which wears the
+    // same fairtrade mono chrome — so the nav is what this probe measures now.
+    const chrome = document.querySelector<HTMLElement>(".pj-nav .iu-subnav-item");
     const button = document.querySelector<HTMLElement>(".btn");
     const prose = document.querySelector<HTMLElement>("[data-reading-text]");
-    if (!card || !breadcrumb || !button || !prose) {
-      throw new Error("Mounted fairtrade style probe could not find card, breadcrumb, button, and prose targets.");
+    if (!card || !chrome || !button || !prose) {
+      throw new Error("Mounted fairtrade style probe could not find card, nav, button, and prose targets.");
     }
     const root = getComputedStyle(document.documentElement);
     const cardStyle = getComputedStyle(card);
@@ -1425,7 +2281,7 @@ test("Atkinson fonts and canonical fairtrade component styles mount from real pr
       proseFamily: proseStyle.fontFamily,
       proseSize: proseStyle.fontSize,
       proseLineHeight: proseStyle.lineHeight,
-      breadcrumbFamily: getComputedStyle(breadcrumb).fontFamily,
+      chromeFamily: getComputedStyle(chrome).fontFamily,
       buttonHeight: button.getBoundingClientRect().height,
     };
   });
@@ -1437,7 +2293,7 @@ test("Atkinson fonts and canonical fairtrade component styles mount from real pr
   expect(computed.proseFamily).not.toContain("Mono");
   expect(computed.proseSize).toBe("16px");
   expect(Number.parseFloat(computed.proseLineHeight)).toBeGreaterThanOrEqual(24);
-  expect(computed.breadcrumbFamily).toContain("Atkinson Hyperlegible Mono");
+  expect(computed.chromeFamily).toContain("Atkinson Hyperlegible Mono");
   expect(computed.buttonHeight).toBeGreaterThanOrEqual(28);
 
   await page.goto("/projects/peasant");
@@ -1481,6 +2337,25 @@ for (const viewport of fixture.viewports) {
           ),
           `${route.path} has page-level overflow at ${viewport.id}`,
         ).toBe(false);
+      }
+
+      // A narrow wizard rail drops its step names to numbers rather than letting
+      // five of them collide. The names stay in the accessible layer regardless.
+      if (route.path === fixture.peasant.route) {
+        const rail = await page.evaluate(() => {
+          const marks = [...document.querySelectorAll<HTMLElement>("nav.swz-rail .swz-step")];
+          const boxes = marks.map((mark) => mark.getBoundingClientRect());
+          return {
+            names: marks.map((mark) => (mark.textContent ?? "").trim()),
+            overlapping: boxes.some((box, index) =>
+              boxes.slice(index + 1).some((other) => box.right > other.left + 1 && box.left < other.right - 1),
+            ),
+          };
+        });
+        expect(rail.names, `${route.path} rail names at ${viewport.id}`).toEqual(
+          fixture.peasant.start.steps.map((step, index) => `${index + 1}${step.title}`),
+        );
+        expect(rail.overlapping, `${route.path} rail names collide at ${viewport.id}`).toBe(false);
       }
     }
 
@@ -1557,6 +2432,10 @@ for (const viewport of fixture.viewports) {
         const unowned = [...document.querySelectorAll<HTMLElement>("body *")]
           .filter((element) => element.scrollWidth > element.clientWidth + 1)
           .filter((element) => !element.closest("[data-contained-overflow]"))
+          // Visually-hidden text is clipped to a 1px box by design — the sr-only
+          // pattern always measures as overflowing, and a box that narrow cannot
+          // push anything sideways. This guard is about visible content escaping.
+          .filter((element) => element.clientWidth > 1)
           .map((element) => element.tagName.toLowerCase() + "." + element.className);
         return {
           page: root.scrollWidth > root.clientWidth + 1,
@@ -1572,23 +2451,12 @@ for (const viewport of fixture.viewports) {
       }));
       expect(tableOverflow).toEqual({ contained: true, labelled: true });
 
-      for (const product of fixture.products) {
-        await page.goto(product.route);
-        const detailOverflow = await page.evaluate(() => {
-          const commands = [...document.querySelectorAll<HTMLElement>("[data-command-scroll]")];
-          return {
-            page: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-            commandCount: commands.length,
-            commandsLabelled: commands.every(
-              (element) =>
-                element.getAttribute("role") === "region" &&
-                Boolean(element.getAttribute("aria-label")),
-            ),
-          };
-        });
-        expect(detailOverflow.page).toBe(false);
-        expect(detailOverflow.commandCount).toBeGreaterThan(0);
-        expect(detailOverflow.commandsLabelled).toBe(true);
+      for (const route of [fixture.peasant.route, fixture.village.route]) {
+        await page.goto(route);
+        const detailOverflow = await page.evaluate(() => ({
+          page: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+        }));
+        expect(detailOverflow.page, `${route} overflows at 320`).toBe(false);
       }
     }
   });

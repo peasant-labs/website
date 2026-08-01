@@ -40,23 +40,23 @@ site:
           description: forthcoming — on the quiet enclosure of the transcript commons.
     - id: projects
       path: /projects
-      h1: keep the work. share what matters.
+      h1: a commons for AI coding transcripts
       metadata:
         title: projects | peasant labs
-        description: peasant keeps supported coding-agent session history local. village publishes selected records to a governed commons.
+        description: peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.
         canonical: https://peasantlabs.org/projects
         openGraph:
           title: projects | peasant labs
-          description: peasant keeps supported coding-agent session history local. village publishes selected records to a governed commons.
+          description: peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.
           url: https://peasantlabs.org/projects
           type: website
         twitter:
           card: summary_large_image
           title: projects | peasant labs
-          description: peasant keeps supported coding-agent session history local. village publishes selected records to a governed commons.
+          description: peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.
     - id: peasant
       path: /projects/peasant
-      h1: one history across the supported tools you use
+      h1: keep your coding-agent transcripts. share the ones you choose.
       metadata:
         title: "peasant: local coding-agent project history"
         description: peasant normalizes supported coding-agent sessions into a local project history for analysis, review, redaction, and explicit sharing.
@@ -92,184 +92,145 @@ site:
     - https://peasantlabs.org/projects/peasant
     - https://peasantlabs.org/projects/village
 catalog:
-  storyTitle: from local history to shared context
-  figure:
-    accessibleName: placeholder for the peasant labs suite workflow showing a selected local record, deliberate review, and its governed published copy
-    stateText: peasant labs suite workflow screenshot forthcoming
-    caption: the future image will show a selected local record in peasant, its deliberate review boundary, and the governed copy explicitly published to village.
-    aspectRatio: "16 / 9"
   cards:
     - id: peasant
       label: peasant
       target: /projects/peasant
       action: explore peasant
+      kind: local
     - id: village
       label: village
       target: /projects/village
       action: explore village
-products:
-  - id: peasant
-    route: /projects/peasant
-    advertisedState: private-preview
-    availabilityTitle: private preview
-    availabilityQualification: preview repository or release access is required before any install or run command can work.
-    evidenceSummary: open the full evidence ledger / 10 source records with scope, revision, and provenance
-    figure:
-      accessibleName: placeholder for the peasant project timeline showing selected sessions and available Git associations
-      stateText: peasant project timeline screenshot forthcoming
-      caption: the future image will show a local project history with session context and association limits visible.
-      aspectRatio: "16 / 9"
-    features:
-      - id: supported-harness-history
-        heading: one history across supported harnesses
-        evidence: [peasant-adapters, peasant-readme]
-      - id: project-context
-        heading: project context beyond the transcript
-        evidence: [peasant-readme, peasant-selection-redaction]
-      - id: local-analysis
-        heading: local analysis before publication
-        evidence: [peasant-readme, peasant-search]
-      - id: redaction-review
-        heading: review what leaves the machine
-        evidence: [peasant-selection-redaction, peasant-readme]
-      - id: schema-backed-sharing
-        heading: one typed record from local to shared
-        evidence: [schema-rc10, peasant-schema-pin, peasant-readme]
-    access:
-      - id: preview-access
-        body: use a private preview release or repository checkout supplied by a maintainer. there is no signed-out public artifact linked from this page.
-        command: null
-        action: null
-        qualification: the observed private baseline is v0.1.0-rc2 and its placeholder product license is not a public open-source grant.
-        evidence: [peasant-rc2-private-release, peasant-license]
-    run:
-      - id: configure
-        body: run the setup wizard after the preview binary is available on PATH.
-        command: peasant kickstart
-        action: null
-        qualification: post-access command for a private preview build.
-        evidence: [peasant-readme, peasant-selection-redaction]
-      - id: ingest
-        body: process discovered sessions that match the configured selection.
-        command: peasant ingest
-        action: null
-        qualification: results depend on retained source transcripts, supported formats, selection, and successful parsing.
-        evidence: [peasant-readme, peasant-selection-redaction]
-      - id: open-dashboard
-        body: start the dashboard backed by the local peasant store.
-        command: peasant web start
-        action: null
-        qualification: post-access command; the documented default port is 8690.
-        evidence: [peasant-readme]
-    stories:
-      - id: multi-harness-developer
-        evidence: [peasant-adapters, peasant-selection-redaction]
-      - id: maintainer-context
-        evidence: [peasant-readme]
-      - id: review-before-share
-        evidence: [peasant-selection-redaction, peasant-readme]
-    outputs:
-      - id: kickstart-summary
-        evidence: [peasant-selection-redaction]
-        lines:
-          - "Redaction:    standard"
-          - "Selected:     12 session(s)"
-          - "New branches: Auto-ingest"
-    related:
-      - { id: all-projects, target: /projects }
-      - { id: village, target: /projects/village }
-      - { id: comparison, target: /projects#comparison }
-      - { id: schema, target: https://github.com/peasant-labs/schema/releases/tag/v0.1.0-rc10 }
-    requiredEvidence:
-      - peasant-rc2-private-release
-      - peasant-current-corpus-2026-07-28
-      - peasant-readme
-      - peasant-adapters
-      - peasant-selection-redaction
-      - peasant-search
-      - peasant-pull
-      - peasant-license
-      - peasant-schema-pin
-      - schema-rc10
-  - id: village
-    route: /projects/village
-    advertisedState: private-contributor-development
-    availabilityTitle: private contributor development
-    availabilityQualification: repository access, GitHub OAuth credentials, a GitHub token, Docker, Go, Node, and pnpm are prerequisites.
-    evidenceSummary: open the full evidence ledger / 7 source records with scope, revision, and provenance
-    figure:
-      accessibleName: placeholder for the village collective view showing published session copies and governance state
-      stateText: village collective view screenshot forthcoming
-      caption: the future image will show a published copy, its collective access, reuse license, and policy history.
-      aspectRatio: "16 / 9"
-    features:
-      - id: published-copy-boundary
-        heading: publish a copy, keep the local source
-        evidence: [village-readme, peasant-readme]
-      - id: collective-sharing
-        heading: share through collectives
-        evidence: [village-collectives]
-      - id: access-and-license
-        heading: choose access and reuse separately
-        evidence: [village-governance, schema-rc10]
-      - id: governance-history
-        heading: preserve a policy change history
-        evidence: [village-governance]
-      - id: one-way-pull
-        heading: pull context without republishing it
-        evidence: [peasant-pull, village-governance]
-    access:
-      - id: contributor-access
-        body: peasant labs is open-sourcing the governance and access-control layer for agentic coding data in the village repository.
-        command: null
-        action:
-          label: open the village repository
-          accessibleName: open the village repository on GitHub; currently private
-          target: https://github.com/peasant-labs/village
-        qualification: the repository is private now, so signed-out visitors may receive a 404 until its visibility changes. this link is not a public download, self-host release, product license, or license grant.
-        evidence: [village-readme]
-      - id: configure-development
-        body: copy the environment template, then supply GitHub OAuth credentials, a GitHub token, and the other documented secrets.
-        command: cp .env.example .env
-        action: null
-        qualification: private contributor-development command; it is not a public install path.
-        evidence: [village-readme]
-    run:
-      - id: publish-from-peasant
-        body: after authentication and review, publishing is initiated by the peasant CLI rather than an upload control in village.
-        command: peasant village push
-        action: null
-        qualification: private current-source flow; publication remains an explicit user action.
-        evidence: [peasant-readme, village-readme]
-    stories:
-      - id: selected-publisher
-        evidence: [peasant-readme, village-readme, village-governance]
-      - id: collective-curator
-        evidence: [village-collectives]
-      - id: authorized-pull
-        evidence: [peasant-pull, village-governance]
-      - id: policy-steward
-        evidence: [village-governance]
-    outputs:
-      - id: governance-record
-        evidence: [village-governance, schema-rc10]
-        lines:
-          - "event: governance_changed"
-          - "visibility: shared"
-          - "license: CC-BY-4.0"
-    related:
-      - { id: all-projects, target: /projects }
-      - { id: peasant, target: /projects/peasant }
-      - { id: comparison, target: /projects#comparison }
-      - { id: schema, target: https://github.com/peasant-labs/schema/releases/tag/v0.1.0-rc10 }
-    requiredEvidence:
-      - village-readme
-      - village-collectives
-      - village-governance
-      - village-schema-pin
-      - peasant-readme
-      - peasant-pull
-      - schema-rc10
+      kind: open-source
+  # "what is peasant labs?" is the one-paragraph answer and carries no cards;
+  # the cards have a section of their own immediately before the comparison.
+  whatTitle: what is peasant labs?
+  # two authored lines: the break is a real newline in the DOM, rendered by CSS
+  # rather than left to wherever the column happens to wrap.
+  cardsTitle: "our projects,\nlocal and open-source"
+viewer:
+  title: '"hey, can you help me review this?"'
+  label: sample session in the transcript browser
+  sessionId: sess_7f2a91
+  # the demo transcript must never read as a real record
+  disclosure: sample data, not a real record
+  turns: 7
+  # the viewer opens on its own summary, not in the middle of the raw log
+  openingTab: highlights
+  otherTab: full trace
+# one line and nothing under it: the story section says what it does.
+install:
+  command: curl -fsSL https://peasantlabs.org/install | bash
+# the walkthrough runs in fairtrade's own onboarding component: every step
+# carries the command it runs, so there is no unsourced step and no screenshot
+# placeholder standing in for one.
+story:
+  title: install, share, and leverage your data
+  stepsLabel: getting started, install to published copy
+  steps:
+    - { id: install, title: install, command: curl -fsSL https://peasantlabs.org/install | bash }
+    - { id: ingest, title: ingest your transcripts, command: peasant ingest }
+    - { id: open-the-dashboard, title: open the dashboard, command: peasant web start }
+    - { id: contribute-to-the-commons, title: contribute to the commons, command: peasant village push }
+# the redaction panel runs on invented matches. no real key, address, or token
+# appears on the page, and the section says so above the panel.
+redaction:
+  title: what stays private when you share
+  note: sample data, not a real scan.
+  # standard is the only level that ships; minimal and maximum are gone.
+  level: standard
+  removedLevels: [minimal, maximum]
+  matches:
+    - { id: api-key, category: api-key, kept: false, secret: 'const BILLING_KEY = "sk_demo_000000000000000000example"', after: 'const BILLING_KEY = "sk_demo_••••••••••••••••••••••"' }
+    - { id: email, category: email, kept: true, secret: "// reported by alex.rivera@example.com on the 0.4 rollout", after: "// reported by ‹redacted-email› on the 0.4 rollout" }
+    - { id: bearer-token, category: bearer-token, kept: false, secret: 'Authorization: "Bearer demo.example.token.value"', after: 'Authorization: "Bearer ‹redacted-token›"' }
+community:
+  title: building for community first
+  points:
+    - publishing is always a deliberate act, never a default
+    - every shared session carries the reuse license you picked
+    - groups set their own rules, open to all or approved by the owner
+faq:
+  title: questions
+  label: frequently asked questions
+  # The licensing answer is load-bearing: the peasant-license evidence record
+  # forbids describing the product as open source, so this page must not.
+  forbiddenClaims:
+    - an open source project
+    - is open source.
+  questions:
+    - { id: open-source, question: "is it open source?" }
+    - { id: agents, question: "which coding agents does it read?" }
+    - { id: uploads, question: "does anything get uploaded on its own?" }
+    - { id: search, question: "how good is the search?" }
+    - { id: others-work, question: "what about sessions other people publish?" }
+    - { id: village, question: "do i have to use village?" }
+peasant:
+  route: /projects/peasant
+  hero:
+    title: keep your coding-agent transcripts. share the ones you choose.
+  # no hero figure yet — peasant ships without a screenshot placeholder.
+  # the install sequence lives with the product it installs, not in the catalog.
+  start:
+    title: get started
+    stepsLabel: setup steps
+    continueLabel: continue
+    doneLabel: done
+    backLabel: back
+    copyAllLabel: copy all commands
+    steps:
+      - { id: install, title: install, comment: "# one line, puts peasant on your PATH", command: curl -fsSL https://peasantlabs.org/install | bash }
+      - { id: set-up, title: set up, comment: "# choose which projects and sessions to keep", command: peasant kickstart }
+      - { id: bring-work-in, title: bring your work in, comment: "# reads what your agents already saved", command: peasant ingest }
+      - { id: open-it, title: open it, comment: "# browse and search at localhost:8690", command: peasant web start }
+      - { id: share-one, title: share one, comment: "# sends one copy to village, only when you ask", command: peasant village push }
+  uses:
+    - { id: remember-why, title: you forgot how something got built }
+    - { id: one-list-for-every-tool, title: you use more than one coding agent }
+    - { id: share-just-one, title: you want to share one session }
+  related:
+    - { id: all-projects, target: /projects }
+    - { id: village, target: /projects/village }
+    - { id: comparison, target: /projects#comparison }
+# village is a short launch surface now (title, get-started wizard, join community).
+# comparison still cites village evidence records below.
+village:
+  route: /projects/village
+  hero:
+    title: a commons for selected agent work
+  start:
+    title: get started
+    stepsLabel: setup steps
+    continueLabel: continue
+    doneLabel: done
+    backLabel: back
+    copyAllLabel: copy all commands
+    steps:
+      - { id: install, title: install, comment: "# one line, puts peasant on your PATH", command: curl -fsSL https://peasantlabs.org/install | bash }
+      - { id: set-up, title: set up, comment: "# choose which projects and sessions to keep", command: peasant kickstart }
+      - { id: bring-work-in, title: bring your work in, comment: "# reads what your agents already saved", command: peasant ingest }
+      - { id: open-it, title: open it, comment: "# browse and search at localhost:8690", command: peasant web start }
+      - { id: share-one, title: share one, comment: "# sends one copy to village, only when you ask", command: peasant village push }
+  community:
+    title: join your community
+    joinLabel: join collective
+  example:
+    head: example collective
+    title: desert archivists
+    desc: a shared shelf for redacted transcripts about data pipelines and ingestion.
+    bullets:
+      - verified-only acceptance
+      - redaction review required
+    members: "24"
+    transcripts: "118"
+    linked: linked
+  governance:
+    title: making governance sane and transparent
+  related:
+    - { id: all-projects, target: /projects }
+    - { id: peasant, target: /projects/peasant }
+    - { id: comparison, target: /projects#comparison }
 evidence:
   - id: peasant-rc2-private-release
     sourceScope: private-preview
@@ -368,202 +329,71 @@ evidence:
     publicHref: https://docs.entire.io/llms.txt
     internalProvenance: Complete official Entire capability corpus
 comparison:
-  title: an independent comparison with Entire
-  scrollHelp: scroll horizontally to compare all columns.
-  caption: "independent comparison: peasant plus village plus schema versus Entire CLI plus Entire.io and its documented repository service. verified 2026-07-28."
-  bundleDefinition: peasant labs means peasant, village, and the public schema contract. Entire means Entire CLI, Entire.io, and its documented repository service.
-  verifiedOn: 2026-07-28
-  reverifyBy: 2026-08-27
-  reviewOwner: peasant labs website maintainers
-  meaningNote: not documented means no equivalent was found in the reviewed materials, not that one cannot exist.
-  groups:
-    - shared-baseline
-    - retrieval-and-continuation
-    - sharing-and-governance
-    - infrastructure-and-maturity
+  title: how it compares to similar tools
+  intro: here is what peasant labs does next to the closest public tools in this space, checked against their public docs and our own source.
+  bundleDefinition: peasant labs means peasant, village, and the schema they share. the other column covers similar tools and the documentation they publish.
+  meaningNote: a dash means we did not find it in those tools' public docs. it does not mean they cannot do it.
   rows:
-    - id: existing-local-agent-history
-      group: shared-baseline
+    - id: keep-it-local
+      capability: keep everything on your own machine
       peasantLabs:
-        status: supported
-        sourceScope: current-source
-        qualification: four current-source adapters feed one canonical peasant session-detail path.
-        sources: [peasant-adapters, peasant-readme, schema-rc10]
-      entire:
-        status: supported
-        sourceScope: vendor-documented
-        qualification: Entire documents historical import, eight named built-ins, and executable plugins.
-        sources: [entire-agents, entire-import-history]
-      takeaway: both import cross-agent history; Entire documents broader integration coverage.
-    - id: session-context-linked-to-git
-      group: shared-baseline
-      peasantLabs:
-        status: partial
-        sourceScope: current-source
-        qualification: peasant stores durable associations only where commit detection observes them.
+        status: "yes"
+        qualification: sessions are stored in a local database, and anything leaving it is an explicit action.
         sources: [peasant-readme]
       entire:
-        status: supported
-        sourceScope: vendor-documented
-        qualification: Entire documents automatic Git-linked checkpoints as a core workflow.
-        sources: [entire-quickstart, entire-agents]
-      takeaway: both connect context to Git; Entire's automatic checkpoint model is the clearer public promise.
-    - id: keep-captured-history-local
-      group: shared-baseline
-      peasantLabs:
-        status: supported
-        sourceScope: current-source
-        qualification: local SQLite is the base store; optional network actions are separate and explicit.
-        sources: [peasant-readme]
-      entire:
-        status: supported
-        sourceScope: vendor-documented
-        qualification: Entire documents local checkpoints with push disabled and multiple storage placements.
+        status: "yes"
+        qualification: Entire documents local checkpoints with pushing turned off.
         sources: [entire-checkpoint-storage, entire-keep-local]
-      takeaway: both offer local operation modes; neither gets an exclusivity claim.
-    - id: cross-product-language-contract
-      group: retrieval-and-continuation
+    - id: read-past-sessions
+      capability: read the sessions your agents already saved
       peasantLabs:
-        status: supported
-        sourceScope: public-release
-        qualification: public schema rc10 exposes Go, TypeScript, Zod, and OpenAPI contracts; both products were observed on rc9.
-        sources: [schema-rc10, peasant-schema-pin, village-schema-pin]
+        status: "yes"
+        qualification: reads Claude Code, OpenCode, Codex, and Cursor sessions into one record.
+        sources: [peasant-adapters, peasant-readme]
       entire:
-        status: not-documented
-        sourceScope: vendor-documented
-        qualification: no equivalent affirmative cross-language transcript contract was found in the declared official corpus.
-        sources: [entire-declared-corpus-2026-07-28]
-      takeaway: peasant labs has a public source-backed contract; Entire's equivalent is not documented, not absent.
-    - id: analyze-session-and-project-behavior
-      group: retrieval-and-continuation
-      peasantLabs:
-        status: supported
-        sourceScope: current-source
-        qualification: peasant documents local transcripts, metrics, trends, project views, changes, and search.
-        sources: [peasant-readme, peasant-search]
-      entire:
-        status: supported
-        sourceScope: vendor-documented
-        qualification: Entire documents sessions, checkpoints, diffs, activity, search, review, and summaries.
-        sources: [entire-platform, entire-search, entire-dispatches]
-      takeaway: peasant emphasizes local analysis; Entire emphasizes Git checkpoint review and retrieval.
-    - id: search-past-intent
-      group: retrieval-and-continuation
+        status: "yes"
+        qualification: Entire documents importing past agent history and covers more integrations.
+        sources: [entire-import-history, entire-agents]
+    - id: search-past-work
+      capability: search your past work
       peasantLabs:
         status: partial
-        sourceScope: current-source
-        qualification: peasant provides local FTS5 full-text search over recorded message entries, not semantic search.
+        qualification: keyword search over saved messages, not meaning-based search.
         sources: [peasant-search]
       entire:
-        status: supported
-        sourceScope: vendor-documented
-        qualification: Entire documents hybrid semantic and keyword search across checkpoints, sessions, and commits.
+        status: "yes"
+        qualification: Entire documents combined meaning-based and keyword search.
         sources: [entire-search]
-      takeaway: Entire documents semantic and cross-repository search; peasant currently claims local full-text search only.
-    - id: continue-work-across-agents
-      group: retrieval-and-continuation
+    - id: publish-selected
+      capability: publish only the sessions you pick
       peasantLabs:
-        status: not-documented
-        sourceScope: current-source
-        qualification: no general cross-agent resume contract was verified in the declared peasant current-source corpus.
-        sources: [peasant-current-corpus-2026-07-28]
+        status: "yes"
+        qualification: publishing is one command per copy, and the original stays local.
+        sources: [peasant-readme, village-readme]
       entire:
-        status: partial
-        sourceScope: vendor-documented
-        qualification: Entire advertises resume across agents with explicit integration-specific limits.
-        sources: [entire-home, entire-agents]
-      takeaway: Entire has the documented advantage, with visible integration limits.
-    - id: publish-and-share-selected-context
-      group: sharing-and-governance
+        status: "yes"
+        qualification: Entire documents sharing through Entire.io and its repository service.
+        sources: [entire-platform, entire-dispatches]
+    - id: reuse-license
+      capability: set a reuse license on what you share
       peasantLabs:
-        status: supported
-        sourceScope: current-source
-        qualification: private current source supports explicit peasant publishing into village visibility and collective controls.
-        sources: [peasant-readme, village-readme, village-collectives, village-governance]
-      entire:
-        status: supported
-        sourceScope: vendor-documented
-        qualification: Entire documents repository access, Entire.io sharing, checkpoints, and dispatches.
-        sources: [entire-platform, entire-checkpoint-storage, entire-dispatches]
-      takeaway: both share context through different access and storage models.
-    - id: per-transcript-reuse-license
-      group: sharing-and-governance
-      peasantLabs:
-        status: supported
-        sourceScope: current-source
-        qualification: private current source carries an optional CC selection through publish and pull; legal copy remains qualified.
-        sources: [village-governance, peasant-pull, schema-rc10]
+        status: "yes"
+        qualification: an optional Creative Commons choice travels with each published copy.
+        sources: [village-governance, peasant-pull]
       entire:
         status: not-documented
-        sourceScope: vendor-documented
-        qualification: no equivalent affirmative per-transcript reuse-license behavior was found in the declared official corpus.
+        qualification: we found no per-session reuse license in Entire's public docs.
         sources: [entire-declared-corpus-2026-07-28]
-      takeaway: this is a source-backed peasant labs distinction; it does not establish that Entire lacks the capability.
-    - id: collective-contribution-governance
-      group: sharing-and-governance
+    - id: shared-groups
+      capability: share into a group other people can join
       peasantLabs:
-        status: supported
-        sourceScope: current-source
-        qualification: village current source documents open contribution and owner-curated approval modes.
+        status: "yes"
+        qualification: village groups are either open to contributions or approved by the owner.
         sources: [village-collectives]
       entire:
         status: not-documented
-        sourceScope: vendor-documented
-        qualification: no equivalent affirmative collective moderation model was found in the declared official corpus.
+        qualification: we found no equivalent group moderation model in Entire's public docs.
         sources: [entire-declared-corpus-2026-07-28]
-      takeaway: peasant labs documents open and curated collectives; Entire's equivalent is not documented.
-    - id: visibility-license-change-history
-      group: sharing-and-governance
-      peasantLabs:
-        status: supported
-        sourceScope: current-source
-        qualification: village current source documents trigger-written append-only governance events with policy snapshots.
-        sources: [village-governance]
-      entire:
-        status: not-documented
-        sourceScope: vendor-documented
-        qualification: no equivalent affirmative transcript policy-history behavior was found in the declared official corpus.
-        sources: [entire-declared-corpus-2026-07-28]
-      takeaway: this is a narrow policy-history distinction, not a certification or compliance claim.
-    - id: one-way-pull-with-foreign-ownership
-      group: sharing-and-governance
-      peasantLabs:
-        status: supported
-        sourceScope: current-source
-        qualification: pulled village records land in a separate one-way namespace outside owned analytics and re-push candidates.
-        sources: [peasant-pull, village-governance]
-      entire:
-        status: not-documented
-        sourceScope: vendor-documented
-        qualification: this ownership and non-republication boundary was not found; Entire documents different resume and shared-history behavior.
-        sources: [entire-declared-corpus-2026-07-28, entire-agents, entire-platform]
-      takeaway: the products document different semantics, not a generic feature advantage.
-    - id: distributed-git-mirrors
-      group: infrastructure-and-maturity
-      peasantLabs:
-        status: not-in-current-scope
-        sourceScope: bundle-definition
-        qualification: distributed Git mirrors are outside the defined peasant plus village plus schema bundle.
-        sources: [bundle-definition]
-      entire:
-        status: supported
-        sourceScope: vendor-documented
-        qualification: Entire documents regional EntireDB mirrors while GitHub remains the source repository.
-        sources: [entire-repositories]
-      takeaway: Entire has the documented advantage.
-    - id: public-cli-release-maturity
-      group: infrastructure-and-maturity
-      peasantLabs:
-        status: partial
-        sourceScope: private-preview
-        qualification: the observed peasant release is private prerelease v0.1.0-rc2; signed-out public availability was not verified.
-        sources: [peasant-rc2-private-release, peasant-readme, peasant-license]
-      entire:
-        status: supported
-        sourceScope: public-release
-        qualification: Entire CLI v0.9.0 is a verified stable public release.
-        sources: [entire-cli-v0.9.0]
-      takeaway: Entire is further along in verified public CLI release maturity.
 viewports:
   - { id: desktop-dark, width: 1280, height: 900, theme: dark, reflowEquivalent: null }
   - { id: desktop-light, width: 1280, height: 900, theme: light, reflowEquivalent: null }

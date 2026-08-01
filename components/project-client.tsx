@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   useEffect,
   useRef,
+  useState,
   useSyncExternalStore,
   type ButtonHTMLAttributes,
   type ComponentType,
@@ -97,6 +98,46 @@ export function ProjectInteractions() {
     >
       {nextTheme} theme
     </InteractiveButton>
+  );
+}
+
+/**
+ * Copies a whole command sequence in one go. Mirrors CommandBlock's own copy
+ * affordance — the same `.cli-copy` chrome and the same "copied" flip — so the
+ * terminal has one copy vocabulary rather than two.
+ */
+export function CopyAllCommands({
+  commands,
+  label,
+}: {
+  commands: readonly string[];
+  label: string;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = window.setTimeout(() => setCopied(false), 1500);
+    return () => window.clearTimeout(timer);
+  }, [copied]);
+
+  return (
+    <button
+      type="button"
+      className={`cli-copy pj-copy-all${copied ? " cli-copy-done" : ""}`}
+      data-copy-all
+      aria-label={copied ? `copied ${label}` : `copy ${label}`}
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(commands.join("\n"));
+          setCopied(true);
+        } catch {
+          // A denied clipboard leaves the button untouched rather than claiming success.
+        }
+      }}
+    >
+      <span className="cli-copy-word">{copied ? "copied" : "copy all"}</span>
+    </button>
   );
 }
 
