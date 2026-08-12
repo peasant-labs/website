@@ -194,6 +194,7 @@ verify() {
 # What happened, in the same shape as what was promised.
 show_result() {
   local sum="$1" size="$2"
+  local profile
 
   say ""
   say "  done."
@@ -207,10 +208,27 @@ show_result() {
       say "  next:  ${BIN} kickstart"
       ;;
     *)
-      say "  ${BIN_DIR} is not on your PATH yet. add this line to your"
-      say "  shell profile, then open a new terminal:"
-      say ""
-      say "      export PATH=\"\$HOME/.local/bin:\$PATH\""
+      case "${SHELL:-}" in
+        */zsh) profile="${HOME}/.zshrc" ;;
+        */bash) profile="${HOME}/.bashrc" ;;
+        *) profile="" ;;
+      esac
+
+      say "  ${BIN_DIR} is not on your PATH yet."
+      if [ -n "$profile" ]; then
+        say "  run these commands:"
+        say ""
+        say "      printf '\\nexport PATH=\"\$HOME/.local/bin:\$PATH\"\\n' >> \"${profile}\""
+        say "      source \"${profile}\""
+      else
+        say "  add this line to your shell configuration file:"
+        say ""
+        say "      export PATH=\"\$HOME/.local/bin:\$PATH\""
+        say ""
+        say "  then run it in this terminal:"
+        say ""
+        say "      export PATH=\"\$HOME/.local/bin:\$PATH\""
+      fi
       say ""
       say "  next:  ${BIN} kickstart"
       ;;
