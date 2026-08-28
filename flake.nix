@@ -54,7 +54,7 @@
         # protoc-gen-go      # protobuf Go codegen
         # temporal-cli       # Temporal dev server
         # tlaplus18          # TLC model checker
-        nodejs
+        nodejs_26
         pnpm
       ];
 
