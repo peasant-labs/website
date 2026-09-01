@@ -11,10 +11,10 @@ allowBuilds:
   sharp: false
   unrs-resolver: false
 
-# Supply-chain protection: a package must be published for at least 7 days
+# Supply-chain protection: a package must be published for at least 3 days
 # before pnpm will resolve it. First-party packages are exempt because they
 # are published and consumed by the same organization.
 # Docs: https://pnpm.io/settings/dependency-resolution
-minimumReleaseAge: 10080
+minimumReleaseAge: 4320
 minimumReleaseAgeExclude:
   - '@peasant-labs/*'
