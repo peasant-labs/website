@@ -1,0 +1,20 @@
+packages:
+  - '.'
+
+# No build script is allowed to run for any dependency. sharp and
+# unrs-resolver ship postinstall build scripts; both are explicitly denied
+# here so pnpm 11's strict build check does not fail the install with
+# ERR_PNPM_IGNORED_BUILDS. Their working binaries come from optional
+# platform packages, not from the denied scripts.
+# Docs: https://pnpm.io/settings/build
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+
+# Supply-chain protection: a package must be published for at least 3 days
+# before pnpm will resolve it. First-party packages are exempt because they
+# are published and consumed by the same organization.
+# Docs: https://pnpm.io/settings/dependency-resolution
+minimumReleaseAge: 4320
+minimumReleaseAgeExclude:
+  - '@peasant-labs/*'
