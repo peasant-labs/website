@@ -1397,9 +1397,9 @@ test("project copy is authored lowercase without corrupting preserved literals",
   expect(violations).toEqual([]);
 });
 
-test("the page never claims a license the source review forbids", async ({ page }) => {
-  // peasant ships under a placeholder license, so "open source" may only ever
-  // appear as part of a denial. A stray affirmative claim is a licensing error.
+test("the page does not repeat stale private-preview license copy", async ({ page }) => {
+  // Peasant is now Apache-2.0, so old private-preview license statements must
+  // not survive in server-rendered project pages.
   for (const route of ["/projects", fixture.peasant.route]) {
     const response = await page.goto(route);
     const serverHtml = (await response!.text()).toLowerCase();

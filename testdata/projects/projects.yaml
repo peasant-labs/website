@@ -14,6 +14,7 @@ copyPolicy:
     - TypeScript
     - Zod
     - OpenAPI
+    - Strike
     - Apache-2.0
     - CC0-1.0
     - CC-BY-4.0
@@ -155,10 +156,11 @@ faq:
   title: questions
   label: frequently asked questions
   # The licensing answer is load-bearing: the peasant-license evidence record
-  # forbids describing the product as open source, so this page must not.
+  # confirms Apache-2.0 source, so this page must not keep old private-preview claims.
   forbiddenClaims:
-    - an open source project
-    - is open source.
+    - private preview
+    - placeholder license
+    - not open source yet
   questions:
     - { id: open-source, question: "is it open source?" }
     - { id: agents, question: "which coding agents does it read?" }
@@ -233,77 +235,77 @@ village:
     - { id: comparison, target: /projects#comparison }
 evidence:
   - id: peasant-rc2-private-release
-    sourceScope: private-preview
-    advertisedState: private-preview
-    revisionOrVersion: v0.1.0-rc2 at 917ea1a4a03b26dffe0bfd287fe53b6ed5f12427
+    sourceScope: public-release
+    advertisedState: public-release
+    revisionOrVersion: v0.4.0 at c2b2aeeb7c9d8c82de7ac560da62d0aa4689ca7f
     sourceIds: []
-    verifiedOn: 2026-07-28
-    reverifyBy: 2026-08-27
-    publicHref: null
-    internalProvenance: peasant private release tag and commit
+    verifiedOn: 2026-09-01
+    reverifyBy: 2026-10-01
+    publicHref: https://github.com/peasant-labs/peasant/releases/tag/v0.4.0
+    internalProvenance: peasant public release tag and commit
   - id: peasant-current-corpus-2026-07-28
     sourceScope: current-source
     advertisedState: current-source
-    revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec
+    revisionOrVersion: d0eebce058e8fb170bc6f4d730f990d3a8aab569
     sourceIds: []
-    verifiedOn: 2026-07-28
-    reverifyBy: 2026-08-27
+    verifiedOn: 2026-09-01
+    reverifyBy: 2026-10-01
     publicHref: null
     internalProvenance: peasant current source reviewed at the pinned revision
-  - { id: peasant-readme, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: peasant/develop/README.md }
-  - { id: peasant-adapters, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: "peasant/develop/internal/ingest/adapter.go:50-63" }
-  - { id: peasant-selection-redaction, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: peasant/develop/docs/KICKSTART.md }
-  - { id: peasant-search, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: peasant/develop/internal/store/schema_v35.go and internal/api/provider.go }
-  - { id: peasant-pull, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: peasant/develop/docs/pull.md }
-  - { id: peasant-license, sourceScope: current-source, advertisedState: not-publicly-available, revisionOrVersion: ec322ef19d65d4a3a9085ad5601c765a4b9990ec, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: "peasant/develop/LICENSE:1-9" }
-  - { id: peasant-schema-pin, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: "peasant ec322ef19d65d4a3a9085ad5601c765a4b9990ec, schema v0.1.0-rc9", sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: "peasant/develop/go.mod:15" }
-  - { id: village-readme, sourceScope: private-contributor-development, advertisedState: private-contributor-development, revisionOrVersion: 430ab072c59f42c8917994cc4f2ddf3f68cf2529, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: village/develop/README.md }
-  - { id: village-collectives, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: 430ab072c59f42c8917994cc4f2ddf3f68cf2529, sourceIds: [village-readme], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: village/develop/frontend/src/app/groups and collective settings routes }
-  - { id: village-governance, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: 430ab072c59f42c8917994cc4f2ddf3f68cf2529, sourceIds: [village-readme], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: village/develop/docs/database-invariants.md }
-  - { id: village-schema-pin, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: "village 430ab072c59f42c8917994cc4f2ddf3f68cf2529, schema v0.1.0-rc9", sourceIds: [village-readme], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: "village/develop/backend/go.mod:16" }
+  - { id: peasant-readme, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: d0eebce058e8fb170bc6f4d730f990d3a8aab569, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: peasant/develop/README.md }
+  - { id: peasant-adapters, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: d0eebce058e8fb170bc6f4d730f990d3a8aab569, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: "peasant/develop/internal/ingest/adapter.go:251-268" }
+  - { id: peasant-selection-redaction, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: d0eebce058e8fb170bc6f4d730f990d3a8aab569, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: "peasant/develop/docs/KICKSTART.md:20-35" }
+  - { id: peasant-search, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: d0eebce058e8fb170bc6f4d730f990d3a8aab569, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: peasant/develop/internal/store/schema_v35.go and internal/api/provider.go }
+  - { id: peasant-pull, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: d0eebce058e8fb170bc6f4d730f990d3a8aab569, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: peasant/develop/docs/pull.md }
+  - { id: peasant-license, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: d0eebce058e8fb170bc6f4d730f990d3a8aab569, sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://github.com/peasant-labs/peasant/blob/develop/LICENSE, internalProvenance: "peasant/develop/LICENSE and README.md:884-891" }
+  - { id: peasant-schema-pin, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: "peasant d0eebce058e8fb170bc6f4d730f990d3a8aab569, schema v0.1.2", sourceIds: [peasant-current-corpus-2026-07-28], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: "peasant/develop/go.mod:15" }
+  - { id: village-readme, sourceScope: current-source, advertisedState: private-contributor-development, revisionOrVersion: 652390acfdff46379d2ea489fb4b178780a1982e, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: village/develop/README.md }
+  - { id: village-collectives, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: 652390acfdff46379d2ea489fb4b178780a1982e, sourceIds: [village-readme], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: village/develop/frontend/src/app/groups and collective settings routes }
+  - { id: village-governance, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: 652390acfdff46379d2ea489fb4b178780a1982e, sourceIds: [village-readme], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: village/develop/docs/database-invariants.md }
+  - { id: village-schema-pin, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: "village 652390acfdff46379d2ea489fb4b178780a1982e, schema v0.1.2", sourceIds: [village-readme], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: "village/develop/backend/go.mod:18" }
   - id: schema-rc10
     sourceScope: public-release
     advertisedState: public-release
-    revisionOrVersion: v0.1.0-rc10 at d80a744010cc4dfe0ba763a96b9073f340e75c32
+    revisionOrVersion: v0.1.3-rc1 at acc978020f1daf94bcfd12014af8a004c7155e94
     sourceIds: []
-    verifiedOn: 2026-07-28
-    reverifyBy: 2026-08-27
-    publicHref: https://github.com/peasant-labs/schema/releases/tag/v0.1.0-rc10
+    verifiedOn: 2026-09-01
+    reverifyBy: 2026-10-01
+    publicHref: https://github.com/peasant-labs/schema/releases/tag/v0.1.3-rc1
     internalProvenance: schema release and commit-pinned README
-  - { id: schema-current, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: 8870b78eba91bd28552872d2dda18797dc5afff0, sourceIds: [schema-rc10], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://github.com/peasant-labs/schema, internalProvenance: schema/develop source }
+  - { id: schema-current, sourceScope: current-source, advertisedState: current-source, revisionOrVersion: 89265812bb7856e97f2c213ee1c97128a27d7d48, sourceIds: [schema-rc10], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://github.com/peasant-labs/schema, internalProvenance: schema/develop source }
   - id: fairtrade-0.0.9
     sourceScope: public-release
     advertisedState: public-release
     revisionOrVersion: 0.0.9 at ba3ff1e1c1558e250c54c215589acba2dfdbad87
     sourceIds: []
-    verifiedOn: 2026-07-28
-    reverifyBy: 2026-08-27
+    verifiedOn: 2026-09-01
+    reverifyBy: 2026-10-01
     publicHref: https://registry.npmjs.org/@peasant-labs/fairtrade/-/fairtrade-0.0.9.tgz
     internalProvenance: sha512-roEJAbbZyed5WlkxI/sAZGa+1Ve9NyVLZ6I9Df4xuVeAVUQgVyHIh1WxJcMKYejMbOwWM9jKo3LS3sW1EDpRUw==
-  - { id: bundle-definition, sourceScope: bundle-definition, advertisedState: null, revisionOrVersion: comparison scope verified 2026-07-28, sourceIds: [peasant-current-corpus-2026-07-28, village-readme, schema-rc10, entire-declared-corpus-2026-07-28], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: null, internalProvenance: balanced comparison bundle definition }
-  - { id: entire-home, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://entire.io/, internalProvenance: Official Entire homepage }
-  - { id: entire-projects, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://entire.io/projects, internalProvenance: Official Entire projects page }
-  - { id: entire-docs-index, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor docs index reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/llms.txt, internalProvenance: Official Entire docs index }
-  - { id: entire-cli-repo, sourceScope: public-release, advertisedState: public-release, revisionOrVersion: public repository reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://github.com/entireio/cli, internalProvenance: Official Entire CLI repository }
-  - { id: entire-cli-v0.9.0, sourceScope: public-release, advertisedState: public-release, revisionOrVersion: v0.9.0 at 8b77ad43132d18f7958825c9dcd26544ab8f5d92, sourceIds: [entire-cli-repo], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://github.com/entireio/cli/releases/tag/v0.9.0, internalProvenance: Official Entire CLI release }
-  - { id: entire-quickstart, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/quickstart, internalProvenance: Official Entire quickstart }
-  - { id: entire-agents, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/agents/overview, internalProvenance: Official Entire agents overview }
-  - { id: entire-security, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/security, internalProvenance: Official Entire security docs }
-  - { id: entire-checkpoint-storage, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/checkpoints/store-checkpoint-data, internalProvenance: Official Entire checkpoint storage guide }
-  - { id: entire-keep-local, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/checkpoints/keep-checkpoints-local, internalProvenance: Official Entire local checkpoint guide }
-  - { id: entire-separate-repo, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/checkpoints/store-checkpoints-in-another-repo, internalProvenance: Official Entire separate repository guide }
-  - { id: entire-import-history, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/sessions/import-past-agent-history, internalProvenance: Official Entire import guide }
-  - { id: entire-platform, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/platforms/entire-io, internalProvenance: Official Entire platform guide }
-  - { id: entire-search, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/search/semantic-search/overview, internalProvenance: Official Entire search guide }
-  - { id: entire-dispatches, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/dispatches/overview, internalProvenance: Official Entire dispatches guide }
-  - { id: entire-repositories, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/repositories/overview, internalProvenance: Official Entire repositories guide }
-  - { id: entire-repository-limitations, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://docs.entire.io/guides/repositories/limitations, internalProvenance: Official Entire repository limitations }
-  - { id: entire-privacy, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://entire.io/privacy, internalProvenance: Official Entire privacy policy }
-  - { id: entire-terms, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-07-28, sourceIds: [], verifiedOn: 2026-07-28, reverifyBy: 2026-08-27, publicHref: https://entire.io/terms, internalProvenance: Official Entire terms }
+  - { id: bundle-definition, sourceScope: bundle-definition, advertisedState: null, revisionOrVersion: comparison scope verified 2026-09-01, sourceIds: [peasant-current-corpus-2026-07-28, village-readme, schema-rc10, entire-declared-corpus-2026-07-28], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: null, internalProvenance: balanced comparison bundle definition }
+  - { id: entire-home, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://entire.io/, internalProvenance: Official Entire homepage }
+  - { id: entire-projects, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://entire.io/projects, internalProvenance: Official Entire projects access page }
+  - { id: entire-docs-index, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor docs index reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/llms.txt, internalProvenance: Official Entire docs index }
+  - { id: entire-cli-repo, sourceScope: public-release, advertisedState: public-release, revisionOrVersion: public repository reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://github.com/entireio/cli, internalProvenance: Official Entire CLI repository }
+  - { id: entire-cli-v0.9.0, sourceScope: public-release, advertisedState: public-release, revisionOrVersion: v0.10.2 at bc990baa5bd37a6cb9d1becb02fe0bd83afdb3de, sourceIds: [entire-cli-repo], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://github.com/entireio/cli/releases/tag/v0.10.2, internalProvenance: Official Entire CLI release }
+  - { id: entire-quickstart, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/quickstart, internalProvenance: Official Entire quickstart }
+  - { id: entire-agents, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/agents/overview, internalProvenance: Official Entire agents overview }
+  - { id: entire-security, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/security, internalProvenance: Official Entire security docs }
+  - { id: entire-checkpoint-storage, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/guides/checkpoints/checkpoint-storage, internalProvenance: Official Entire checkpoint storage guide }
+  - { id: entire-keep-local, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/guides/checkpoints/keep-checkpoints-local, internalProvenance: Official Entire local checkpoint guide }
+  - { id: entire-separate-repo, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/guides/checkpoints/store-checkpoints-in-another-repo, internalProvenance: Official Entire separate repository guide }
+  - { id: entire-import-history, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/guides/sessions/import-past-agent-history, internalProvenance: Official Entire import guide }
+  - { id: entire-platform, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/platforms/entire-io, internalProvenance: Official Entire platform guide }
+  - { id: entire-search, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/guides/search/overview, internalProvenance: Official Entire search guide }
+  - { id: entire-dispatches, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/guides/dispatches/overview, internalProvenance: Official Entire dispatches guide }
+  - { id: entire-repositories, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/guides/repositories/overview, internalProvenance: Official Entire repositories guide }
+  - { id: entire-repository-limitations, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://docs.entire.io/guides/repositories/mirrors, internalProvenance: Official Entire mirrors guide }
+  - { id: entire-privacy, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://entire.io/privacy, internalProvenance: Official Entire privacy policy }
+  - { id: entire-terms, sourceScope: vendor-documented, advertisedState: null, revisionOrVersion: vendor page reviewed 2026-09-01, sourceIds: [], verifiedOn: 2026-09-01, reverifyBy: 2026-10-01, publicHref: https://entire.io/terms, internalProvenance: Official Entire terms }
   - id: entire-declared-corpus-2026-07-28
     sourceScope: vendor-documented
     advertisedState: null
-    revisionOrVersion: declared official corpus reviewed 2026-07-28
+    revisionOrVersion: declared official corpus reviewed 2026-09-01
     sourceIds:
       - entire-home
       - entire-projects
@@ -324,8 +326,8 @@ evidence:
       - entire-repository-limitations
       - entire-privacy
       - entire-terms
-    verifiedOn: 2026-07-28
-    reverifyBy: 2026-08-27
+    verifiedOn: 2026-09-01
+    reverifyBy: 2026-10-01
     publicHref: https://docs.entire.io/llms.txt
     internalProvenance: Complete official Entire capability corpus
 comparison:
@@ -348,7 +350,7 @@ comparison:
       capability: read the sessions your agents already saved
       peasantLabs:
         status: "yes"
-        qualification: reads Claude Code, OpenCode, Codex, and Cursor sessions into one record.
+        qualification: reads Claude Code, OpenCode, Codex, Cursor, and Strike sessions into one record.
         sources: [peasant-adapters, peasant-readme]
       entire:
         status: "yes"
