@@ -13,6 +13,7 @@ import {
   type ComparisonStatus,
 } from "@/lib/projects";
 import { loadHarnessSamples } from "@/lib/metadata-explorer";
+import { renderHarnessSamples } from "@/lib/schema-render";
 import { Accordion, CardImg, CliSteps } from "@/components/fairtrade-client";
 import { RedactionDemo } from "@/components/redaction-demo";
 import type { AnchorHTMLAttributes, ComponentType, HTMLAttributes } from "react";
@@ -76,7 +77,9 @@ function Viewer() {
  * reader who has just seen the product surface can see how six native shapes
  * converge on it.
  */
-function Metadata() {
+async function Metadata() {
+  const samples = loadHarnessSamples();
+  const rendered = await renderHarnessSamples(samples);
   return (
     <section
       className="pj-section pj-metadata"
@@ -90,7 +93,7 @@ function Metadata() {
       <p className="pj-demo-note" data-reading-text>
         {METADATA_EXPLORER.note}
       </p>
-      <MetadataExplorer samples={loadHarnessSamples()} />
+      <MetadataExplorer samples={samples} rendered={rendered} />
     </section>
   );
 }

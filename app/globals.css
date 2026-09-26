@@ -1897,71 +1897,34 @@
   padding: var(--sp-4);
 }
 
-.mx-json {
-  min-width: 0;
+/*
+ * The document is plain text: `JSON.stringify(value, null, 2)`, highlighted by
+ * shiki and rendered as React spans. Every line carries the field groups it
+ * belongs to, so a group's section and its lines highlight each other.
+ */
+.mx-json-pre {
+  margin: 0;
   color: var(--ink);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   line-height: var(--lh-mono);
+  white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.mx-json code {
-  color: inherit;
+.mx-json-pre code {
   font: inherit;
-  overflow-wrap: anywhere;
 }
 
-.mx-json-children {
-  display: grid;
-  gap: var(--sp-1);
-  min-width: 0;
-  margin-block: var(--sp-1);
-  padding-inline-start: var(--sp-3);
+.mx-json-line {
+  display: block;
 }
 
-.mx-json-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--sp-1) var(--sp-2);
-  min-width: 0;
-}
-
-.mx-json-row > * {
-  min-width: 0;
-}
-
-.mx-json-key {
-  color: var(--ink-2);
-}
-
-.mx-json-string {
-  color: var(--olive);
-}
-
-.mx-json-number {
-  color: var(--amber);
-}
-
-.mx-json-bool {
-  color: var(--teal);
-}
-
-.mx-json-null,
-.mx-json-punct {
-  color: var(--ink-3);
-}
-
-.mx-json-leaf {
-  display: inline;
-}
-
-.mx-json [data-region] {
+.mx-json-line[data-groups] {
   cursor: pointer;
 }
 
-.mx-json [data-active="true"] {
+.mx-json-line[data-active="true"] {
   background: color-mix(in srgb, var(--amber) 10%, transparent);
   box-shadow: inset var(--stroke-emphasis) 0 0 0 var(--amber);
 }

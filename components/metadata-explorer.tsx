@@ -1,17 +1,14 @@
 "use client";
 
 import { BrandMark } from "@/components/fairtrade-client";
-import { JsonValue } from "@/components/json-value";
-import type {
-  FieldGroup,
-  HarnessId,
-  HarnessSample,
-  SchemaView,
-} from "@/lib/metadata-explorer";
+import type { FieldGroup, HarnessId, HarnessSample } from "@/lib/metadata-explorer";
+import type { RenderedSamples, RenderedView, ShikiToken } from "@/lib/schema-render";
 import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
+  type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 
@@ -19,12 +16,23 @@ import {
  * The schema explorer.
  *
  * A reader picks a harness, toggles between its native metadata file and the
- * unified wire session, reads the document as ordinary JSON, and follows a
- * field group from an annotation section into the highlighted region it covers.
+ * unified wire session, reads the document as highlighted json, and follows a
+ * field group from an annotation section into the lines it covers.
  *
  * Scope is raw native records to unified wire only: the storage-entry IR, the
  * outcome registry, and fairtrade's transcript viewer are deliberately absent.
  */
+
+const THEME_EVENT = "peasant-labs-theme-change";
+
+function subscribeToTheme(onStoreChange: () => void) {
+  window.addEventListener(THEME_EVENT, onStoreChange);
+  return () => window.removeEventListener(THEME_EVENT, onStoreChange);
+}
+
+function currentTheme(): "dark" | "light" {
+  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+}
 
 const VIEWS = ["native", "unified"] as const;
 type ViewId = (typeof VIEWS)[number];
@@ -34,8 +42,28 @@ const VIEW_LABEL: Record<ViewId, string> = {
   unified: "unified session",
 };
 
-function selectView(sample: HarnessSample, id: ViewId): SchemaView {
+function viewOf(sample: HarnessSample, id: ViewId): HarnessSample["native"] {
   return id === "unified" ? sample.unified : sample.native;
+}
+
+/** shiki's fontStyle is a bitmask: 1 italic, 2 bold, 4 underline. */
+function tokenStyle(token: ShikiToken): CSSProperties {
+  const style: CSSProperties = {};
+  if (token.color) {
+    style.color = token.color;
+  }
+  if (token.fontStyle) {
+    if (token.fontStyle & 1) {
+      style.fontStyle = "italic";
+    }
+    if (token.fontStyle & 2) {
+      style.fontWeight = 700;
+    }
+    if (token.fontStyle & 4) {
+      style.textDecoration = "underline";
+    }
+  }
+  return style;
 }
 
 function Section({
@@ -85,8 +113,62 @@ function Section({
   );
 }
 
-export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
+function HighlightedJson({
+  rendered,
+  theme,
+  activeGroupId,
+  onActivate,
+}: {
+  rendered: RenderedView;
+  theme: "dark" | "light";
+  activeGroupId: string;
+  onActivate: (id: string) => void;
+}) {
+  return (
+    <pre className="mx-json-pre">
+      <code>
+        {rendered.lines.map((line, index) => {
+          const groups = line.groups;
+          const active = activeGroupId !== "" && groups.includes(activeGroupId);
+          const tokens = theme === "light" ? line.light : line.dark;
+          return (
+            <span
+              key={index}
+              className="mx-json-line"
+              data-line={index}
+              data-groups={groups.length > 0 ? groups.join(" ") : undefined}
+              data-active={active ? "true" : undefined}
+              onMouseEnter={groups.length > 0 ? () => onActivate(groups[0]) : undefined}
+              onClick={groups.length > 0 ? () => onActivate(groups[0]) : undefined}
+            >
+              {tokens.length > 0
+                ? tokens.map((token, tokenIndex) => (
+                    <span key={tokenIndex} style={tokenStyle(token)}>
+                      {token.content}
+                    </span>
+                  ))
+                : "\u00A0"}
+            </span>
+          );
+        })}
+      </code>
+    </pre>
+  );
+}
+
+export function MetadataExplorer({
+  samples,
+  rendered,
+}: {
+  samples: HarnessSample[];
+  rendered: RenderedSamples;
+}) {
   const first = samples[0];
+  const theme = useSyncExternalStore<"dark" | "light">(
+    subscribeToTheme,
+    currentTheme,
+    () => "dark",
+  );
   const [harnessId, setHarnessId] = useState<HarnessId>(first?.id ?? "claude-code");
   const [viewId, setViewId] = useState<ViewId>("native");
   const [activeGroupId, setActiveGroupId] = useState<string>(
@@ -97,30 +179,36 @@ export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
   const pendingScrollRef = useRef(false);
 
   const active = samples.find((sample) => sample.id === harnessId) ?? first;
-  const view = active ? selectView(active, viewId) : undefined;
+  const view = active ? viewOf(active, viewId) : undefined;
+  const viewRender = active ? rendered[active.id]?.[viewId] : undefined;
+  const groups = view?.groups ?? [];
 
-  // A section header click or focus brings its JSON region into view; hovering a
-  // region only highlights it, so the reader can scan without the pane jumping.
+  // A section header click or focus brings its first line into view; hovering a
+  // line only highlights it, so the reader can scan without the pane jumping.
   useEffect(() => {
     if (!pendingScrollRef.current) {
       return;
     }
     pendingScrollRef.current = false;
     const pane = paneRef.current;
-    if (!pane || activeGroupId === "") {
+    if (!pane || !viewRender || activeGroupId === "") {
+      return;
+    }
+    const line = viewRender.groupFirstLine[activeGroupId];
+    if (line === undefined) {
       return;
     }
     pane
-      .querySelector<HTMLElement>(`[data-region~="${activeGroupId}"]`)
+      .querySelector<HTMLElement>(`[data-line="${line}"]`)
       ?.scrollIntoView({ block: "nearest" });
-  }, [activeGroupId]);
+  }, [activeGroupId, viewRender]);
 
   function selectGroupFromSection(id: string) {
     pendingScrollRef.current = true;
     setActiveGroupId(id);
   }
 
-  if (!first || !active || !view) {
+  if (!first || !active || !view || !viewRender) {
     return null;
   }
 
@@ -130,9 +218,8 @@ export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
       return;
     }
     setHarnessId(next.id);
-    // The first group of the active view is selected by default, matching the
-    // reference's "first region highlighted" state.
-    setActiveGroupId(selectView(next, viewId).groups[0]?.id ?? "");
+    setActiveGroupId(viewOf(next, viewId).groups[0]?.id ?? "");
+    paneRef.current?.scrollTo({ top: 0 });
   }
 
   function selectViewId(id: ViewId) {
@@ -140,7 +227,8 @@ export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
       return;
     }
     setViewId(id);
-    setActiveGroupId(selectView(active, id).groups[0]?.id ?? "");
+    setActiveGroupId(viewOf(active, id).groups[0]?.id ?? "");
+    paneRef.current?.scrollTo({ top: 0 });
   }
 
   function onTabKeyDown(event: ReactKeyboardEvent<HTMLButtonElement>, index: number) {
@@ -238,11 +326,10 @@ export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
                 aria-label={`${view.label} document`}
                 tabIndex={0}
               >
-                <JsonValue
-                  value={view.document}
-                  path={[]}
-                  groups={view.groups}
-                  activeGroup={activeGroupId}
+                <HighlightedJson
+                  rendered={viewRender}
+                  theme={theme}
+                  activeGroupId={activeGroupId}
                   onActivate={setActiveGroupId}
                 />
               </div>
@@ -250,7 +337,7 @@ export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
           </div>
 
           <div className="mx-sections" data-schema-sections>
-            {view.groups.map((group) => (
+            {groups.map((group) => (
               <Section
                 key={`${active.id}-${view.id}-${group.id}`}
                 group={group}

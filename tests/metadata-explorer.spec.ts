@@ -7,6 +7,7 @@ import {
   matchSelector,
   validateHarnessSamples,
 } from "../lib/metadata-explorer";
+import { buildJsonLines } from "../lib/json-lines";
 
 /**
  * The schema explorer is a data surface: it reads six authored fixtures and
@@ -57,6 +58,10 @@ test("the fixtures are a complete independent oracle", () => {
           ).toBe(true);
         }
       }
+      expect(
+        buildJsonLines(view.document).text,
+        `${sample.id} ${view.id} renders as canonical json`,
+      ).toBe(JSON.stringify(view.document, null, 2));
     }
     expect(sample.unified.document).toMatchObject({ harness: sample.id });
   }
@@ -106,7 +111,7 @@ test("the segmented control switches to the unified document and resets the acti
     "true",
   );
   await expect(
-    root.locator(`[data-region~="${firstUnified.id}"][data-active="true"]`).first(),
+    root.locator(`[data-line][data-groups~="${firstUnified.id}"][data-active="true"]`).first(),
   ).toBeAttached();
 });
 
@@ -123,7 +128,7 @@ test("the first region is active on load and a section header activates its regi
     "true",
   );
   await expect(
-    root.locator(`[data-region~="${firstGroup.id}"][data-active="true"]`).first(),
+    root.locator(`[data-line][data-groups~="${firstGroup.id}"][data-active="true"]`).first(),
   ).toBeAttached();
 
   await root.locator(`[data-section="${target.id}"] button`).click();
@@ -133,7 +138,7 @@ test("the first region is active on load and a section header activates its regi
     "true",
   );
   await expect(
-    root.locator(`[data-region~="${target.id}"][data-active="true"]`).first(),
+    root.locator(`[data-line][data-groups~="${target.id}"][data-active="true"]`).first(),
   ).toBeAttached();
   await expect(root.locator(`[data-section="${firstGroup.id}"]`)).not.toHaveAttribute(
     "data-active",
@@ -151,7 +156,7 @@ test("hovering a JSON region marks its section active", async ({ page }) => {
     throw new Error("expected a blocks group on the claude-code native view");
   }
 
-  await root.locator(`[data-region~="${blocks.id}"]`).first().hover();
+  await root.locator(`[data-line][data-groups~="${blocks.id}"]`).first().hover();
 
   await expect(root.locator(`[data-section="${blocks.id}"]`)).toHaveAttribute(
     "data-active",
