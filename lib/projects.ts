@@ -1223,6 +1223,20 @@ export const REDACTION = {
   ] as Three<RedactionMatch>,
 } as const;
 
+/**
+ * The metadata explorer: one invented mock session, shown as the raw native
+ * records each harness writes beside the single unified wire session peasant
+ * lowers them into. A well-formed kind the vocabulary does not declare is
+ * retained as evidence rather than dropped; every sample here is invented.
+ */
+export const METADATA_EXPLORER = {
+  title: "one session, six harnesses",
+  intro:
+    "claude code, codex, cursor, strike, opencode, and pi each record their own kinds in their own file. peasant lowers all six into one wire session, and a well-formed kind the vocabulary does not declare is retained as evidence rather than dropped. pick a harness and a raw record to see which unified turns it produced.",
+  note: "sample data, not a real record.",
+  label: "metadata explorer on a sample session",
+} as const;
+
 export const COMPARISON_MARKS = {
   yes: { glyph: "✓", label: "yes" },
   partial: { glyph: "~", label: "partial" },

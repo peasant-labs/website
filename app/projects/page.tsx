@@ -1,8 +1,10 @@
 import { ProjectCommand } from "@/components/project-client";
+import { MetadataExplorer } from "@/components/metadata-explorer";
 import { TranscriptDemo } from "@/components/transcript-demo";
 import {
   COMPARISON,
   COMPARISON_MARKS,
+  METADATA_EXPLORER,
   PROJECT_ORDER,
   PROJECTS,
   REDACTION,
@@ -10,6 +12,7 @@ import {
   metadataForRoute,
   type ComparisonStatus,
 } from "@/lib/projects";
+import { loadHarnessSamples } from "@/lib/metadata-explorer";
 import { Accordion, CardImg, CliSteps } from "@/components/fairtrade-client";
 import { RedactionDemo } from "@/components/redaction-demo";
 import type { AnchorHTMLAttributes, ComponentType, HTMLAttributes } from "react";
@@ -63,6 +66,31 @@ function Viewer() {
       <p className="pj-demo-note pj-demo-note-after" data-reading-text>
         {SUITE.viewerNote}
       </p>
+    </section>
+  );
+}
+
+/**
+ * The metadata explorer: the raw native records each harness writes beside the
+ * one unified wire session peasant lowers them into. It follows the viewer so a
+ * reader who has just seen the product surface can see how six native shapes
+ * converge on it.
+ */
+function Metadata() {
+  return (
+    <section
+      className="pj-section pj-metadata"
+      data-metadata
+      aria-labelledby="metadata-heading"
+    >
+      <div className="pj-section-heading">
+        <h2 id="metadata-heading">{METADATA_EXPLORER.title}</h2>
+        <p data-reading-text>{METADATA_EXPLORER.intro}</p>
+      </div>
+      <p className="pj-demo-note" data-reading-text>
+        {METADATA_EXPLORER.note}
+      </p>
+      <MetadataExplorer samples={loadHarnessSamples()} />
     </section>
   );
 }
@@ -324,6 +352,7 @@ export default function ProjectsPage() {
       <WhatItIs />
       <Story />
       <Viewer />
+      <Metadata />
       <Community />
       <Redaction />
       <Tools />
