@@ -1224,17 +1224,17 @@ export const REDACTION = {
 } as const;
 
 /**
- * The metadata explorer: one invented mock session, shown as the raw native
- * records each harness writes beside the single unified wire session peasant
- * lowers them into. A well-formed kind the vocabulary does not declare is
- * retained as evidence rather than dropped; every sample here is invented.
+ * The schema explorer: one invented mock session, shown as the native metadata
+ * file each harness writes beside the single unified wire session peasant lowers
+ * it into. Every field group is linked to the region of the document it
+ * explains, and every sample here is invented.
  */
 export const METADATA_EXPLORER = {
   title: "one session, six harnesses",
   intro:
-    "claude code, codex, cursor, strike, opencode, and pi each record their own kinds in their own file. peasant lowers all six into one wire session, and a well-formed kind the vocabulary does not declare is retained as evidence rather than dropped. pick a harness and a raw record to see which unified turns it produced.",
+    "claude code, codex, cursor, strike, opencode, and pi each record their own kinds in their own file. pick a harness, then read its native file line by line beside the unified session peasant lowers it into; each field group is linked to the region of the document it explains.",
   note: "sample data, not a real record.",
-  label: "metadata explorer on a sample session",
+  label: "schema explorer on a sample session",
 } as const;
 
 export const COMPARISON_MARKS = {

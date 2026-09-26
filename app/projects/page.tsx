@@ -71,8 +71,8 @@ function Viewer() {
 }
 
 /**
- * The metadata explorer: the raw native records each harness writes beside the
- * one unified wire session peasant lowers them into. It follows the viewer so a
+ * The schema explorer: the native metadata file each harness writes beside the
+ * one unified wire session peasant lowers it into. It follows the viewer so a
  * reader who has just seen the product surface can see how six native shapes
  * converge on it.
  */

@@ -1755,12 +1755,19 @@
 }
 
 /*
- * ─── metadata explorer ──────────────────────────────────────────────────────
+ * ─── schema explorer ────────────────────────────────────────────────────────
  *
- * The raw-record-to-unified-wire explorer. Tokens only, radius 0, the mono face
- * for record data and the body face for prose. The two data columns sit side by
- * side once there is room and stack below that; the annotation spans the full
- * width underneath, because it explains the record selected in either column.
+ * The native-file-to-unified-wire explorer: a JSON window split into labelled
+ * field-group regions beside a stack of collapsible annotation sections that
+ * explain each field line by line. Tokens only, radius 0, the mono face for
+ * data and chrome and the body face for prose. The two columns sit side by side
+ * once there is room and stack below that.
+ *
+ * fairtrade 0.0.9 has no standalone `red` or `group-y` colour token, so those
+ * two accent identifiers borrow the nearest canonical tokens here rather than
+ * inventing a colour: `group-y` uses the chart mauve and `red` mixes the danger
+ * hue toward amber. The accent is decoration only; every section keeps its text
+ * title, so no meaning rides on colour.
  */
 .mx {
   display: grid;
@@ -1799,7 +1806,9 @@
 }
 
 .mx-tab:focus-visible,
-.mx-record:focus-visible {
+.mx-view-option:focus-visible,
+.mx-section-head:focus-visible,
+.mx-json-pane:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring);
   outline-offset: var(--stroke-emphasis);
 }
@@ -1808,162 +1817,86 @@
   flex: none;
 }
 
+.mx-view {
+  display: inline-flex;
+  flex-wrap: wrap;
+  border: var(--bd-strong);
+  background: var(--surface);
+}
+
+.mx-view-option {
+  min-height: var(--target-comfortable);
+  padding: var(--sp-2) var(--sp-4);
+  border: 0;
+  border-inline-start: var(--bd);
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  text-transform: lowercase;
+  cursor: pointer;
+}
+
+.mx-view-option:first-child {
+  border-inline-start: 0;
+}
+
+.mx-view-option:hover {
+  color: var(--ink);
+  background: var(--surface-hover);
+}
+
+.mx-view-option[aria-pressed="true"] {
+  background: var(--amber-fill);
+  color: var(--amber-fill-ink);
+  font-weight: 600;
+}
+
+.mx-view-option[aria-pressed="true"]:hover {
+  background: var(--amber-fill);
+}
+
 .mx-panel {
   min-width: 0;
+}
+
+.mx-intro {
+  max-width: var(--measure-prose);
+  margin: 0 0 var(--sp-4);
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
 }
 
 .mx-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--sp-4);
+  gap: var(--sp-5);
   min-width: 0;
 }
 
-.mx-col {
-  display: grid;
-  gap: var(--sp-3);
-  align-content: start;
+.mx-json-column,
+.mx-sections {
   min-width: 0;
+}
+
+.mx-terminal-format {
+  color: var(--ink-4);
+  text-transform: lowercase;
+}
+
+/*
+ * The document is long and deeply nested. Capped to its own focusable scroll
+ * pane it stops deciding the section height, and a keyboard reader can scroll
+ * it without a pointer.
+ */
+.mx-json-pane {
+  max-block-size: min(72vh, 46rem);
+  overflow: auto;
+  overscroll-behavior: contain;
   padding: var(--sp-4);
-  border: var(--bd);
-  background: var(--surface);
-}
-
-.mx-col > h3 {
-  margin: 0;
-  color: var(--ink-strong);
-}
-
-.mx-native-intro,
-.mx-native-note {
-  margin: 0;
-  color: var(--ink-2);
-  font-family: var(--font-body);
-  font-size: var(--fs-body);
-}
-
-.mx-native-meta,
-.mx-summary {
-  display: grid;
-  gap: var(--sp-2);
-  margin: 0;
-}
-
-.mx-native-meta {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.mx-native-meta > div,
-.mx-summary > div {
-  display: grid;
-  gap: var(--sp-1);
-  min-width: 0;
-}
-
-.mx-native-meta dt,
-.mx-summary dt {
-  margin: 0;
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  line-height: var(--lh-mono);
-  text-transform: lowercase;
-}
-
-.mx-native-meta dd,
-.mx-summary dd {
-  margin: 0;
-  color: var(--ink-strong);
-  font-family: var(--font-mono);
-  font-size: var(--fs-body);
-  line-height: var(--lh-mono);
-  overflow-wrap: anywhere;
-}
-
-.mx-tnum {
-  font-variant-numeric: tabular-nums;
-}
-
-.mx-records {
-  display: grid;
-  gap: var(--sp-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.mx-record {
-  display: grid;
-  gap: var(--sp-2);
-  inline-size: 100%;
-  min-height: var(--target-comfortable);
-  padding: var(--sp-3);
-  border: var(--bd);
-  background: var(--canvas);
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: var(--fs-body);
-  text-align: start;
-  cursor: pointer;
-}
-
-.mx-record[aria-pressed="true"] {
-  border-color: var(--rule-strong);
-  background: var(--surface-2);
-}
-
-.mx-record-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-2);
-  min-width: 0;
-}
-
-.mx-record-kind {
-  color: var(--ink-2);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  overflow-wrap: anywhere;
-}
-
-.mx-record-note {
-  color: var(--ink-2);
-}
-
-.mx-outcome {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-1);
-  padding: var(--sp-1) var(--sp-2);
-  border: var(--bd);
-  background: var(--surface-2);
-  color: var(--ink-strong);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  line-height: var(--lh-mono);
-  text-transform: lowercase;
-  white-space: nowrap;
-}
-
-.mx-outcome-glyph {
-  color: var(--ink-2);
-}
-
-.mx-outcome[data-outcome="text"] {
-  border-color: var(--rule-strong);
-}
-
-.mx-outcome[data-outcome="tool_call"] {
-  border-color: var(--amber-dim);
-}
-
-.mx-outcome[data-outcome="tool_result"] {
-  border-color: var(--olive);
-}
-
-.mx-outcome[data-outcome="opaque"] {
-  border-color: var(--clay);
 }
 
 .mx-json {
@@ -1973,23 +1906,6 @@
   font-size: var(--fs-label);
   line-height: var(--lh-mono);
   overflow-wrap: anywhere;
-}
-
-/*
- * The unified payload is a long, deeply nested document. Capped to its own
- * scroll pane it stops deciding the section height, so the record list and its
- * annotation stay visible beside it instead of sitting above a wall of JSON.
- */
-.mx-unified-tree {
-  max-block-size: min(72vh, 46rem);
-  overflow: auto;
-  overscroll-behavior: contain;
-  padding-inline-end: var(--sp-2);
-}
-
-.mx-unified-tree:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring);
-  outline-offset: var(--stroke-emphasis);
 }
 
 .mx-json code {
@@ -2039,62 +1955,90 @@
   color: var(--ink-3);
 }
 
-.mx-turn {
+.mx-json-leaf {
+  display: inline;
+}
+
+.mx-json [data-region] {
+  cursor: pointer;
+}
+
+.mx-json [data-active="true"] {
+  background: color-mix(in srgb, var(--amber) 10%, transparent);
+  box-shadow: inset 2px 0 0 0 var(--amber);
+}
+
+.mx-sections {
   display: grid;
-  gap: var(--sp-2);
-  inline-size: 100%;
-  min-width: 0;
-  padding: var(--sp-3);
-  border: var(--bd);
-  background: var(--canvas);
+  gap: var(--sp-4);
+  align-content: start;
 }
 
-.mx-turn[data-highlighted="true"] {
-  border-color: var(--amber);
-  background: var(--surface-2);
-}
-
-.mx-turn-link {
-  color: var(--amber);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  line-height: var(--lh-mono);
-  text-transform: lowercase;
-}
-
-.mx-annotation-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-2);
-}
-
-.mx-annotation-note,
-.mx-annotation-targets {
-  margin: 0;
-  color: var(--ink-2);
-  font-family: var(--font-body);
-  font-size: var(--fs-body);
-}
-
-.mx-legend {
-  display: grid;
-  gap: var(--sp-3);
-  margin: 0;
-  padding: var(--sp-4);
+.mx-section {
+  --mx-accent: var(--rule-strong);
   border: var(--bd);
   background: var(--surface);
 }
 
-.mx-legend > div {
-  display: grid;
-  gap: var(--sp-1);
+.mx-section[data-accent="olive"] {
+  --mx-accent: var(--olive);
 }
 
-.mx-legend dt {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
+.mx-section[data-accent="teal"] {
+  --mx-accent: var(--teal);
+}
+
+.mx-section[data-accent="clay"] {
+  --mx-accent: var(--clay);
+}
+
+.mx-section[data-accent="group-y"] {
+  --mx-accent: var(--mauve);
+}
+
+.mx-section[data-accent="red"] {
+  --mx-accent: color-mix(in srgb, var(--danger) 68%, var(--amber));
+}
+
+.mx-section[data-accent="amber"] {
+  --mx-accent: var(--amber);
+}
+
+/*
+ * The accent bar is the button's own inline start border: 3px via the focus
+ * ring width token. Inactive sections dim the bar; the active one reads at full
+ * strength and also carries a text "selected" marker, so state is never colour
+ * alone.
+ */
+.mx-section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-height: var(--target-comfortable);
+  padding: var(--sp-3) var(--sp-4);
+  border: 0;
+  border-inline-start: var(--focus-ring-width) solid
+    color-mix(in srgb, var(--mx-accent) 45%, transparent);
+  background: transparent;
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+}
+
+.mx-section[data-active="true"] .mx-section-head {
+  border-inline-start-color: var(--mx-accent);
+  background: var(--surface-2);
+}
+
+.mx-section-head-text {
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.mx-section-title {
   color: var(--ink-strong);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
@@ -2102,53 +2046,81 @@
   text-transform: lowercase;
 }
 
-.mx-legend dd {
+.mx-section-summary {
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.mx-section-selected {
+  align-self: start;
+  flex: none;
+  padding: var(--sp-1) var(--sp-2);
+  border: var(--bd);
+  background: var(--surface);
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+.mx-section-chevron {
+  flex: none;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+}
+
+.mx-section-fields {
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  border-block-start: var(--bd);
+}
+
+.mx-field {
+  display: grid;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.mx-field-key {
+  margin: 0;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  overflow-wrap: anywhere;
+}
+
+.mx-field-note {
   margin: 0;
   color: var(--ink-2);
   font-family: var(--font-body);
   font-size: var(--fs-body);
-}
-
-@media (min-width: 30rem) {
-  .mx-legend > div {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--sp-1) var(--sp-4);
-    align-items: baseline;
-  }
+  line-height: var(--lh-body);
 }
 
 @media (min-width: 60rem) {
   .mx-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
-    grid-template-areas:
-      "native unified"
-      "annotation unified";
-  }
-
-  .mx-native {
-    grid-area: native;
-  }
-
-  .mx-unified {
-    grid-area: unified;
-  }
-
-  .mx-annotation {
-    grid-area: annotation;
-  }
-
-  .mx-native-meta,
-  .mx-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: start;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .mx-tab,
-  .mx-record {
+  .mx-view-option,
+  .mx-section-head {
     transition:
       border-color var(--dur-1) var(--ease-standard),
       background var(--dur-1) var(--ease-standard),
       color var(--dur-1) var(--ease-standard);
   }
 }
+
