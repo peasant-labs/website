@@ -1,0 +1,141 @@
+{
+  "id": "strike",
+  "label": "strike",
+  "brand": "strike",
+  "native": {
+    "path": ".strike/sessions/<id>.jsonl",
+    "format": "jsonl",
+    "note": "one JSON object per line; the kind field names a lifecycle, message, or tool event"
+  },
+  "intro": "strike appends one JSON object per session event to a JSONL file beside the project.",
+  "records": [
+    {
+      "id": "session-started",
+      "kind": "session.started",
+      "outcome": "control",
+      "note": "session.started opens the log and names the workspace; it writes no turn",
+      "raw": {"kind":"session.started","sessionId":"sess_mx_strike","at":"2026-08-04T09:15:00Z","cwd":"~/src/peasant","branch":"webhook-retry"},
+      "mapsTo": []
+    },
+    {
+      "id": "session-titled",
+      "kind": "session.titled",
+      "outcome": "ignored",
+      "note": "a generated title is metadata rather than a reader turn; it is recorded and ignored for the timeline",
+      "raw": {"kind":"session.titled","sessionId":"sess_mx_strike","title":"retry webhook delivery"},
+      "mapsTo": []
+    },
+    {
+      "id": "user-1",
+      "kind": "user.message",
+      "outcome": "text",
+      "note": "user.message lowers to OutcomeText and becomes a user turn",
+      "raw": {"kind":"user.message","id":"m1","at":"2026-08-04T09:15:02Z","text":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff."},
+      "mapsTo": [0]
+    },
+    {
+      "id": "assistant-read",
+      "kind": "assistant.text",
+      "outcome": "text",
+      "note": "assistant.text lowers to OutcomeText and opens turn 1",
+      "raw": {"kind":"assistant.text","id":"a1","at":"2026-08-04T09:15:20Z","text":"I will read the worker, then add a bounded retry with backoff."},
+      "mapsTo": [1]
+    },
+    {
+      "id": "tool-read-begin",
+      "kind": "tool.begin",
+      "outcome": "tool_call",
+      "note": "tool.begin lowers to OutcomeToolCall and attaches to turn 1",
+      "raw": {"kind":"tool.begin","id":"t1","at":"2026-08-04T09:15:21Z","callId":"toolu_read_01","name":"Read","input":{"path":"internal/webhook/deliver.go"}},
+      "mapsTo": [1]
+    },
+    {
+      "id": "tool-read-output",
+      "kind": "tool.output",
+      "outcome": "tool_result",
+      "note": "tool.output lowers to OutcomeToolResult and attaches to the matching call on turn 1",
+      "raw": {"kind":"tool.output","id":"t1","at":"2026-08-04T09:15:24Z","callId":"toolu_read_01","output":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"},
+      "mapsTo": [1]
+    },
+    {
+      "id": "assistant-edit",
+      "kind": "assistant.text",
+      "outcome": "text",
+      "note": "the second assistant.text becomes turn 2",
+      "raw": {"kind":"assistant.text","id":"a2","at":"2026-08-04T09:16:02Z","text":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."},
+      "mapsTo": [2]
+    },
+    {
+      "id": "tool-edit-begin",
+      "kind": "tool.begin",
+      "outcome": "tool_call",
+      "note": "the edit tool.begin lowers to OutcomeToolCall and attaches to turn 2",
+      "raw": {"kind":"tool.begin","id":"t2","at":"2026-08-04T09:16:03Z","callId":"toolu_edit_01","name":"Edit","input":{"path":"internal/webhook/deliver.go","old_string":"return post(ctx, e)","new_string":"return postWithRetry(ctx, e, 5)"}},
+      "mapsTo": [2]
+    },
+    {
+      "id": "tool-edit-output",
+      "kind": "tool.output",
+      "outcome": "tool_result",
+      "note": "the edit result lowers to OutcomeToolResult and attaches to the matching call on turn 2",
+      "raw": {"kind":"tool.output","id":"t2","at":"2026-08-04T09:16:05Z","callId":"toolu_edit_01","output":"{\"ok\":true,\"additions\":34,\"deletions\":4}"},
+      "mapsTo": [2]
+    },
+    {
+      "id": "assistant-final",
+      "kind": "assistant.text",
+      "outcome": "text",
+      "note": "the closing assistant.text becomes the final turn",
+      "raw": {"kind":"assistant.text","id":"a3","at":"2026-08-04T09:16:40Z","text":"The retry is bounded at five attempts with backoff, and the worker tests pass."},
+      "mapsTo": [3]
+    },
+    {
+      "id": "turn-completed",
+      "kind": "turn.completed",
+      "outcome": "control",
+      "note": "turn.completed closes the exchange; it writes no turn and does not block completeness",
+      "raw": {"kind":"turn.completed","id":"turn1","at":"2026-08-04T09:16:40Z","reason":"end_turn"},
+      "mapsTo": []
+    },
+    {
+      "id": "retained-unknown",
+      "kind": "session.telemetry",
+      "outcome": "opaque",
+      "note": "a well-formed event kind the vocabulary does not declare is retained as complete redacted evidence instead of being dropped",
+      "raw": {"kind":"session.telemetry","at":"2026-08-04T09:16:41Z","route":"/v1/sessions","latencyMs":41},
+      "mapsTo": []
+    }
+  ],
+  "unified": {
+    "id": "sess_mx_strike",
+    "harness": "strike",
+    "model": "claude-sonnet-5",
+    "outcome": "resolved",
+    "project": "peasant",
+    "workingDirectory": "~/src/peasant",
+    "startTime": "2026-08-04T09:15:02Z",
+    "endTime": "2026-08-04T09:16:40Z",
+    "durationMins": 2,
+    "turnCount": 4,
+    "toolCallCount": 2,
+    "totalTokens": 3180,
+    "tokensIn": 2450,
+    "tokensOut": 730,
+    "gitBranch": "webhook-retry",
+    "gitContext": {
+      "branch": "webhook-retry",
+      "remote": "git@github.com:example/peasant-demo.git",
+      "user": "you",
+      "workingDirectory": "~/src/peasant",
+      "commits": [
+        {"hash":"8f3c2d1e4a5b6c7d8e9f0a1b2c3d4e5f","message":"retry webhook delivery with backoff","timestamp":"2026-08-04T09:17:00Z","filesChanged":2,"insertions":38,"deletions":4,"session":true}
+      ]
+    },
+    "turns": [
+      {"index":0,"role":"user","depth":0,"entryType":"text","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff.","timestamp":"2026-08-04T09:15:02Z","tokensIn":320,"tokensOut":0},
+      {"index":1,"role":"assistant","depth":0,"entryType":"text","content":"I will read the worker, then add a bounded retry with backoff.","timestamp":"2026-08-04T09:15:20Z","tokensIn":0,"tokensOut":210,"toolCalls":[{"id":"toolu_read_01","name":"Read","toolKind":"read","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\"}","result":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
+      {"index":2,"role":"assistant","depth":0,"entryType":"text","content":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","timestamp":"2026-08-04T09:16:02Z","tokensIn":0,"tokensOut":360,"toolCalls":[{"id":"toolu_edit_01","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\",\"old_string\":\"return post(ctx, e)\",\"new_string\":\"return postWithRetry(ctx, e, 5)\"}","result":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
+      {"index":3,"role":"assistant","depth":0,"entryType":"text","content":"The retry is bounded at five attempts with backoff, and the worker tests pass.","timestamp":"2026-08-04T09:16:40Z","tokensIn":0,"tokensOut":160,"stopReason":"end_turn"}
+    ]
+  }
+}
