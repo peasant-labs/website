@@ -1975,6 +1975,23 @@
   overflow-wrap: anywhere;
 }
 
+/*
+ * The unified payload is a long, deeply nested document. Capped to its own
+ * scroll pane it stops deciding the section height, so the record list and its
+ * annotation stay visible beside it instead of sitting above a wall of JSON.
+ */
+.mx-unified-tree {
+  max-block-size: min(72vh, 46rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding-inline-end: var(--sp-2);
+}
+
+.mx-unified-tree:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--stroke-emphasis);
+}
+
 .mx-json code {
   color: inherit;
   font: inherit;
@@ -1986,7 +2003,7 @@
   gap: var(--sp-1);
   min-width: 0;
   margin-block: var(--sp-1);
-  padding-inline-start: var(--sp-4);
+  padding-inline-start: var(--sp-3);
 }
 
 .mx-json-row {
@@ -2102,11 +2119,22 @@
 
 @media (min-width: 60rem) {
   .mx-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    grid-template-areas:
+      "native unified"
+      "annotation unified";
+  }
+
+  .mx-native {
+    grid-area: native;
+  }
+
+  .mx-unified {
+    grid-area: unified;
   }
 
   .mx-annotation {
-    grid-column: 1 / -1;
+    grid-area: annotation;
   }
 
   .mx-native-meta,

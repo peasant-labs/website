@@ -3,7 +3,12 @@
 import { BrandMark } from "@/components/fairtrade-client";
 import { JsonValue } from "@/components/json-value";
 import type { HarnessId, HarnessSample, Outcome } from "@/lib/metadata-explorer";
-import { useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 
 /**
  * The interactive metadata explorer.
@@ -43,6 +48,20 @@ const LEGEND: ReadonlyArray<{ outcome: Outcome; description: string }> = [
   { outcome: "opaque", description: "an undeclared kind kept as evidence, not dropped" },
 ];
 
+/**
+ * Why a selected record writes no turn. Each outcome says something different:
+ * `opaque` is the only one kept as publishable evidence, while control and
+ * ignored records are accounted for without ever blocking completeness.
+ */
+const NO_TURN_NOTE: Record<Outcome, string> = {
+  text: "reader-visible prose, but it lowers no turn of its own",
+  tool_call: "a tool invocation that attaches to a turn created elsewhere",
+  tool_result: "a tool result that attaches to a call created elsewhere",
+  control: "lifecycle or bookkeeping, so it does not block completeness",
+  ignored: "recorded metadata the timeline does not render",
+  opaque: "an undeclared kind kept as complete redacted evidence, not dropped",
+};
+
 function OutcomeBadge({ outcome }: { outcome: Outcome }) {
   return (
     <span className="mx-outcome" data-outcome={outcome}>
@@ -61,6 +80,23 @@ export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
     first?.records[0]?.id ?? "",
   );
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const treeRef = useRef<HTMLDivElement | null>(null);
+
+  /*
+   * The unified payload is capped to its own scroll pane, so a freshly selected
+   * record has to bring the turn it produced back into view. `block: "nearest"`
+   * keeps the page itself still when the pane already shows the turn.
+   */
+  useEffect(() => {
+    const tree = treeRef.current;
+    if (!tree) {
+      return;
+    }
+    tree.scrollTop = 0;
+    tree
+      .querySelector<HTMLElement>('[data-highlighted="true"]')
+      ?.scrollIntoView({ block: "nearest" });
+  }, [activeId, activeRecordId]);
 
   if (!first) {
     return null;
@@ -218,30 +254,39 @@ export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
                 <dd className="mx-tnum">{active.unified.toolCallCount}</dd>
               </div>
             </dl>
-            <JsonValue value={session} name="session" />
-            <div className="mx-json mx-json-array">
-              <span className="mx-json-key">turns</span>
-              <span className="mx-json-punct">[</span>
-              <div className="mx-json-children">
-                {turns.map((turn) => {
-                  const highlighted = activeRecord.mapsTo.includes(turn.index);
-                  return (
-                    <div className="mx-json-row" key={turn.index}>
-                      <div
-                        className="mx-turn"
-                        data-turn-index={turn.index}
-                        data-highlighted={highlighted ? "true" : undefined}
-                      >
-                        {highlighted ? (
-                          <span className="mx-turn-link">from {activeRecord.kind}</span>
-                        ) : null}
-                        <JsonValue value={turn} name={String(turn.index)} />
+            <div
+              className="mx-unified-tree"
+              data-unified-tree
+              ref={treeRef}
+              role="group"
+              aria-label="unified session payload"
+              tabIndex={0}
+            >
+              <JsonValue value={session} name="session" />
+              <div className="mx-json mx-json-array">
+                <span className="mx-json-key">turns</span>
+                <span className="mx-json-punct">[</span>
+                <div className="mx-json-children">
+                  {turns.map((turn) => {
+                    const highlighted = activeRecord.mapsTo.includes(turn.index);
+                    return (
+                      <div className="mx-json-row" key={turn.index}>
+                        <div
+                          className="mx-turn"
+                          data-turn-index={turn.index}
+                          data-highlighted={highlighted ? "true" : undefined}
+                        >
+                          {highlighted ? (
+                            <span className="mx-turn-link">from {activeRecord.kind}</span>
+                          ) : null}
+                          <JsonValue value={turn} name={String(turn.index)} />
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+                <span className="mx-json-punct">]</span>
               </div>
-              <span className="mx-json-punct">]</span>
             </div>
           </div>
 
@@ -259,7 +304,7 @@ export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
             ) : (
               <p className="mx-annotation-targets" data-no-turn>
                 this record writes no unified turn. it is{" "}
-                {OUTCOME_LABEL[activeRecord.outcome]} and is kept only as evidence.
+                {OUTCOME_LABEL[activeRecord.outcome]}: {NO_TURN_NOTE[activeRecord.outcome]}.
               </p>
             )}
             <JsonValue value={activeRecord.raw} name="raw" />
