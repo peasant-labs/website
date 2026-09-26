@@ -7,7 +7,6 @@ import {
   useEffect,
   useRef,
   useState,
-  useSyncExternalStore,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
@@ -23,17 +22,6 @@ import {
  * outcome registry, and fairtrade's transcript viewer are deliberately absent.
  */
 
-const THEME_EVENT = "peasant-labs-theme-change";
-
-function subscribeToTheme(onStoreChange: () => void) {
-  window.addEventListener(THEME_EVENT, onStoreChange);
-  return () => window.removeEventListener(THEME_EVENT, onStoreChange);
-}
-
-function currentTheme(): "dark" | "light" {
-  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
-}
-
 const VIEWS = ["native", "unified"] as const;
 type ViewId = (typeof VIEWS)[number];
 
@@ -46,24 +34,9 @@ function viewOf(sample: HarnessSample, id: ViewId): HarnessSample["native"] {
   return id === "unified" ? sample.unified : sample.native;
 }
 
-/** shiki's fontStyle is a bitmask: 1 italic, 2 bold, 4 underline. */
+/** Each token carries its fairtrade-token colour from the shiki theme. */
 function tokenStyle(token: ShikiToken): CSSProperties {
-  const style: CSSProperties = {};
-  if (token.color) {
-    style.color = token.color;
-  }
-  if (token.fontStyle) {
-    if (token.fontStyle & 1) {
-      style.fontStyle = "italic";
-    }
-    if (token.fontStyle & 2) {
-      style.fontWeight = 700;
-    }
-    if (token.fontStyle & 4) {
-      style.textDecoration = "underline";
-    }
-  }
-  return style;
+  return token.color ? { color: token.color } : {};
 }
 
 function Section({
@@ -115,12 +88,10 @@ function Section({
 
 function HighlightedJson({
   rendered,
-  theme,
   activeGroupId,
   onActivate,
 }: {
   rendered: RenderedView;
-  theme: "dark" | "light";
   activeGroupId: string;
   onActivate: (id: string) => void;
 }) {
@@ -130,7 +101,7 @@ function HighlightedJson({
         {rendered.lines.map((line, index) => {
           const groups = line.groups;
           const active = activeGroupId !== "" && groups.includes(activeGroupId);
-          const tokens = theme === "light" ? line.light : line.dark;
+          const tokens = line.tokens;
           return (
             <span
               key={index}
@@ -164,11 +135,6 @@ export function MetadataExplorer({
   rendered: RenderedSamples;
 }) {
   const first = samples[0];
-  const theme = useSyncExternalStore<"dark" | "light">(
-    subscribeToTheme,
-    currentTheme,
-    () => "dark",
-  );
   const [harnessId, setHarnessId] = useState<HarnessId>(first?.id ?? "claude-code");
   const [viewId, setViewId] = useState<ViewId>("native");
   const [activeGroupId, setActiveGroupId] = useState<string>(
@@ -328,7 +294,6 @@ export function MetadataExplorer({
               >
                 <HighlightedJson
                   rendered={viewRender}
-                  theme={theme}
                   activeGroupId={activeGroupId}
                   onActivate={setActiveGroupId}
                 />

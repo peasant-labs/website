@@ -1,27 +1,28 @@
-import { codeToTokens } from "shiki";
-import type { ThemedToken } from "shiki";
+import { codeToTokens, type ThemeRegistrationRaw } from "shiki";
+import { DS_COLOR, isDsColor, type DsColor } from "@/lib/design-tokens";
 import { buildJsonLines, groupLines } from "@/lib/json-lines";
 import type { FieldGroup, HarnessSample } from "@/lib/metadata-explorer";
 import { parseSelector } from "@/lib/schema-selector";
 
 /**
  * Server-only: turn each schema-explorer document into highlighted, line-addressable
- * json with shiki, the code highlighter the site already depends on. The client
- * receives structured tokens and renders them through React; no html string is
- * ever injected. Both themes are tokenized once so the window can follow the
- * site theme without shipping shiki to the browser.
+ * json with shiki, the code highlighter the site already depends on.
+ *
+ * The theme is written in fairtrade design tokens, not borrowed colours: every
+ * foreground is a `var(--...)` reference, so the window re-themes with the rest
+ * of the site and no second tokenization is needed. The client receives
+ * structured tokens and renders them through React; no html string is ever
+ * injected.
  */
 
 export type ShikiToken = {
   content: string;
-  color?: string;
-  fontStyle?: number;
+  color?: DsColor;
 };
 
 export type RenderedLine = {
   groups: string[];
-  dark: ShikiToken[];
-  light: ShikiToken[];
+  tokens: ShikiToken[];
 };
 
 export type RenderedView = {
@@ -35,17 +36,43 @@ export type RenderedSamples = Record<
   { native: RenderedView; unified: RenderedView }
 >;
 
-const THEME_DARK = "github-dark";
-const THEME_LIGHT = "github-light";
+/**
+ * The textmate scopes the json grammar emits for the parts a reader distinguishes.
+ * Named here rather than spelled inline, so the theme below reads as a table.
+ */
+const JSON_SCOPE = {
+  propertyName: "support.type.property-name",
+  string: "string",
+  numeric: "constant.numeric",
+  language: "constant.language",
+  punctuation: "punctuation",
+} as const;
 
-function toShikiTokens(tokens: ThemedToken[] | undefined): ShikiToken[] {
+/**
+ * A shiki theme whose colours are fairtrade tokens. `type` only sets shiki's
+ * default foreground for whitespace, which is never seen; every visible scope is
+ * named here.
+ */
+const SYNTAX_THEME: ThemeRegistrationRaw = {
+  name: "fairtrade-syntax",
+  type: "dark",
+  colors: {},
+  settings: [
+    { scope: [JSON_SCOPE.propertyName], settings: { foreground: DS_COLOR.ink2 } },
+    { scope: [JSON_SCOPE.string], settings: { foreground: DS_COLOR.olive } },
+    { scope: [JSON_SCOPE.numeric], settings: { foreground: DS_COLOR.clay } },
+    { scope: [JSON_SCOPE.language], settings: { foreground: DS_COLOR.teal } },
+    { scope: [JSON_SCOPE.punctuation], settings: { foreground: DS_COLOR.ink3 } },
+  ],
+};
+
+function toShikiTokens(tokens: { content: string; color?: string }[] | undefined): ShikiToken[] {
   if (!tokens) {
     return [];
   }
   return tokens.map((token) => ({
     content: token.content,
-    color: token.color,
-    fontStyle: token.fontStyle,
+    color: isDsColor(token.color) ? token.color : undefined,
   }));
 }
 
@@ -75,13 +102,11 @@ async function renderDocument(
     }
   }
 
-  const dark = await codeToTokens(text, { lang: "json", theme: THEME_DARK });
-  const light = await codeToTokens(text, { lang: "json", theme: THEME_LIGHT });
+  const highlighted = await codeToTokens(text, { lang: "json", theme: SYNTAX_THEME });
 
   const rendered: RenderedLine[] = lines.map((_, index) => ({
     groups: lineGroups[index] ?? [],
-    dark: toShikiTokens(dark.tokens[index]),
-    light: toShikiTokens(light.tokens[index]),
+    tokens: toShikiTokens(highlighted.tokens[index]),
   }));
 
   const groupFirstLine: Record<string, number> = {};
