@@ -1,14 +1,26 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import type { TranscriptWireInput } from "@peasant-labs/fairtrade/ui";
+import {
+  collectNodePaths,
+  matchSelector,
+  parseSelector,
+} from "./schema-selector";
+
+export {
+  collectNodePaths,
+  matchSelector,
+  nodeInGroup,
+  parseSelector,
+} from "./schema-selector";
 
 /**
- * The interactive metadata explorer on /projects: for one invented mock session
- * it shows the raw native records each harness writes and the unified wire
- * session peasant lowers them into, with the record-to-turn links made explicit.
+ * The schema explorer on /projects: for one invented mock session it shows the
+ * raw native document each harness writes, line by line, beside the unified wire
+ * session peasant lowers it into. Every rendered field group is linked to a
+ * labelled region of the document.
  *
  * This module is the only reader of `testdata/metadata/*.json`. Its runtime
- * imports are `node:fs`, `node:path`, and a type-only fairtrade import, so the
+ * imports are `node:fs`, `node:path`, and the pure selector parser, so the
  * Playwright spec can import the loader and the validator directly without
  * pulling the design system or the React runtime into the test process.
  */
@@ -23,17 +35,57 @@ export const HARNESS_IDS = [
 ] as const;
 export type HarnessId = (typeof HARNESS_IDS)[number];
 
-export const OUTCOMES = [
-  "text",
-  "tool_call",
-  "tool_result",
-  "control",
-  "ignored",
-  "opaque",
+export const ACCENTS = [
+  "olive",
+  "teal",
+  "clay",
+  "group-y",
+  "red",
+  "amber",
 ] as const;
-export type Outcome = (typeof OUTCOMES)[number];
+export type Accent = (typeof ACCENTS)[number];
 
-/** the BrandMark names fairtrade accepts; `pi` has no mark and carries null. */
+export type FieldNote = { key: string; note: string };
+
+export type FieldGroup = {
+  id: string;
+  /** lowercase chrome, for example "record envelope". */
+  title: string;
+  /** the section's accent bar. */
+  accent: Accent;
+  /** one sentence. */
+  summary: string;
+  /** JSON path selectors; see lib/schema-selector.ts. */
+  selectors: string[];
+  /** line-by-line notes, keyed by JSON key name. */
+  fields: FieldNote[];
+};
+
+export type SchemaView = {
+  id: "native" | "unified";
+  /** "native metadata" | "unified session". */
+  label: string;
+  /** for example "claude-code.jsonl" / "session.json". */
+  filename: string;
+  /** "jsonl" | "json". */
+  format: string;
+  /** the JSON to render. */
+  document: unknown;
+  groups: FieldGroup[];
+};
+
+export type HarnessSample = {
+  id: HarnessId;
+  /** lowercase display name, for example "claude code". */
+  label: string;
+  brand: BrandName | null;
+  /** one sentence: where this harness keeps sessions. */
+  intro: string;
+  native: SchemaView;
+  unified: SchemaView;
+};
+
+/** the BrandMark names fairtrade accepts; `pi` and `strike` have no mark. */
 export const BRAND_NAMES = [
   "claude",
   "openai",
@@ -45,33 +97,123 @@ export type BrandName = (typeof BRAND_NAMES)[number];
 
 export const UNIFIED_OUTCOMES = ["resolved", "partial", "failed"] as const;
 
-export type RawRecord = {
-  /** unique within the sample, kebab-case. */
-  id: string;
-  /** the provider's own kind label, for example "assistant". */
-  kind: string;
-  /** what the parser concluded about this record. */
-  outcome: Outcome;
-  /** one or two sentences: what this record is and where it lands. */
-  note: string;
-  /** the native record object, exactly as the harness writes it. */
-  raw: unknown;
-  /** unified turn indexes this record produced; [] for control/ignored/opaque. */
-  mapsTo: number[];
-};
-
-export type HarnessSample = {
-  id: HarnessId;
-  /** lowercase display name, for example "claude code". */
-  label: string;
-  brand: BrandName | null;
-  native: { path: string; format: string; note: string };
-  /** one sentence: where this harness keeps sessions. */
-  intro: string;
-  records: RawRecord[];
-  /** flat payload, the same shape as lib/demo-session.ts. */
-  unified: TranscriptWireInput;
-};
+/**
+ * The unified wire schema is identical for every harness, so its field groups
+ * are a shared constant. Fixtures leave `unified.groups` empty and the loader
+ * substitutes this list.
+ *
+ * The `group-y` and `red` accent identifiers have no matching colour token in
+ * fairtrade 0.0.9, so `app/globals.css` maps them onto the nearest canonical
+ * tokens rather than inventing new colours.
+ */
+export const UNIFIED_GROUPS: FieldGroup[] = [
+  {
+    id: "identity",
+    title: "identity",
+    accent: "teal",
+    summary: "what the session is and which model recorded it",
+    selectors: ["id", "harness", "model"],
+    fields: [
+      { key: "id", note: "the stable session id" },
+      { key: "harness", note: "which harness recorded the session" },
+      { key: "model", note: "the model that answered" },
+    ],
+  },
+  {
+    id: "session",
+    title: "session & timing",
+    accent: "olive",
+    summary: "outcome, project, working directory, and when it ran",
+    selectors: [
+      "outcome",
+      "project",
+      "workingDirectory",
+      "startTime",
+      "endTime",
+      "durationMins",
+    ],
+    fields: [
+      { key: "outcome", note: "resolved, partial, or failed" },
+      { key: "project", note: "the project the session belongs to" },
+      { key: "workingDirectory", note: "where the harness ran" },
+      { key: "startTime", note: "when the session started" },
+      { key: "endTime", note: "when it ended" },
+      { key: "durationMins", note: "wall-clock minutes" },
+    ],
+  },
+  {
+    id: "usage",
+    title: "usage",
+    accent: "clay",
+    summary: "the counts a reader scans first",
+    selectors: [
+      "turnCount",
+      "toolCallCount",
+      "totalTokens",
+      "tokensIn",
+      "tokensOut",
+    ],
+    fields: [
+      { key: "turnCount", note: "turns after normalisation" },
+      { key: "toolCallCount", note: "tool calls across every turn" },
+      { key: "totalTokens", note: "total tokens" },
+      { key: "tokensIn", note: "input tokens" },
+      { key: "tokensOut", note: "output tokens" },
+    ],
+  },
+  {
+    id: "git",
+    title: "git context",
+    accent: "group-y",
+    summary: "the branch, remote, and commits the session is bound to",
+    selectors: ["gitBranch", "gitContext"],
+    fields: [
+      { key: "gitBranch", note: "the branch the session ran on" },
+      { key: "gitContext.remote", note: "the origin remote" },
+      { key: "gitContext.user", note: "the local git user" },
+      { key: "gitContext.commits", note: "the commits bound to the session" },
+    ],
+  },
+  {
+    id: "turns",
+    title: "turns",
+    accent: "amber",
+    summary: "the conversation, one turn per index",
+    selectors: ["turns"],
+    fields: [
+      { key: "role", note: "user, assistant, tool, or system" },
+      {
+        key: "entryType",
+        note: "text, tool_use, tool_result, thinking, system, error, result",
+      },
+      { key: "content", note: "the turn's reader-visible text" },
+      { key: "depth", note: "0 for the main thread" },
+      { key: "toolCalls", note: "the calls attached to this turn" },
+      { key: "stopReason", note: "why the model stopped, when it did" },
+    ],
+  },
+  {
+    id: "tool-calls",
+    title: "tool calls",
+    accent: "red",
+    summary: "each call attached to a turn",
+    selectors: ["turns[*].toolCalls"],
+    fields: [
+      { key: "id", note: "the call id, matched by its result" },
+      { key: "name", note: "the tool's own name" },
+      {
+        key: "toolKind",
+        note: "the normalised kind: read, edit, search, execute, ...",
+      },
+      { key: "filePath", note: "the file the call touched, when it did" },
+      { key: "arguments", note: "the call input, as a JSON string" },
+      {
+        key: "result",
+        note: "what the tool returned, as text or a JSON string",
+      },
+    ],
+  },
+];
 
 const METADATA_DIR = resolve("testdata/metadata");
 
@@ -107,13 +249,6 @@ function requireString(value: unknown, location: string): string {
   return value;
 }
 
-function requireInteger(value: unknown, location: string): number {
-  if (typeof value !== "number" || !Number.isInteger(value)) {
-    fail(location, `expected an integer, found ${describe(value)}`, "supply a whole number");
-  }
-  return value;
-}
-
 function requireEnum<const T extends readonly string[]>(
   value: unknown,
   allowed: T,
@@ -130,42 +265,51 @@ function requireEnum<const T extends readonly string[]>(
   return candidate as T[number];
 }
 
-function parseRecord(value: unknown, location: string, turnCount: number): RawRecord {
-  const record = requireObject(value, location);
-  if (!("raw" in record)) {
-    fail(`${location}.raw`, "missing native record", "include the provider's own record object");
+function validateGroup(value: unknown, location: string): FieldGroup {
+  const group = requireObject(value, location);
+  const id = requireString(group.id, `${location}.id`);
+  const title = requireString(group.title, `${location}.title`);
+  const summary = requireString(group.summary, `${location}.summary`);
+  const accent = requireEnum(group.accent, ACCENTS, `${location}.accent`);
+
+  const selectorsValue = group.selectors;
+  if (!Array.isArray(selectorsValue) || selectorsValue.length === 0) {
+    fail(`${location}.selectors`, "expected a non-empty array", "point at least one selector at the document");
   }
-  const mapsToValue = record.mapsTo;
-  if (!Array.isArray(mapsToValue)) {
-    fail(`${location}.mapsTo`, `expected an array, found ${describe(mapsToValue)}`, "use [] or turn indexes");
-  }
-  const mapsTo = mapsToValue.map((entry, index) => {
-    const turn = requireInteger(entry, `${location}.mapsTo[${index}]`);
-    if (turn < 0 || turn >= turnCount) {
+  const selectors = selectorsValue.map((entry, index) => {
+    const selector = requireString(entry, `${location}.selectors[${index}]`);
+    try {
+      parseSelector(selector);
+    } catch (error) {
       fail(
-        `${location}.mapsTo[${index}]`,
-        `turn index ${turn} is outside 0..${turnCount - 1}`,
-        "point the record at a real unified turn, or use [] when it writes none",
+        `${location}.selectors[${index}]`,
+        `invalid selector: ${String(error)}`,
+        "use keys joined with . and array steps like [0] or [*]",
       );
     }
-    return turn;
+    return selector;
   });
 
-  return {
-    id: requireString(record.id, `${location}.id`),
-    kind: requireString(record.kind, `${location}.kind`),
-    outcome: requireEnum(record.outcome, OUTCOMES, `${location}.outcome`),
-    note: requireString(record.note, `${location}.note`),
-    raw: record.raw,
-    mapsTo,
-  };
+  const fieldsValue = group.fields;
+  if (!Array.isArray(fieldsValue) || fieldsValue.length === 0) {
+    fail(`${location}.fields`, "expected a non-empty array", "supply the line-by-line notes");
+  }
+  const fields = fieldsValue.map((entry, index) => {
+    const field = requireObject(entry, `${location}.fields[${index}]`);
+    return {
+      key: requireString(field.key, `${location}.fields[${index}].key`),
+      note: requireString(field.note, `${location}.fields[${index}].note`),
+    };
+  });
+
+  return { id, title, accent, summary, selectors, fields };
 }
 
-function validateUnified(
+function validateUnifiedDocument(
   value: unknown,
   sampleId: HarnessId,
   location: string,
-): TranscriptWireInput {
+): void {
   const unified = requireObject(value, location);
   if (unified.harness !== sampleId) {
     fail(
@@ -207,7 +351,58 @@ function validateUnified(
     );
   }
   requireEnum(unified.outcome, UNIFIED_OUTCOMES, `${location}.outcome`);
-  return unified as unknown as TranscriptWireInput;
+}
+
+function validateSchemaView(
+  value: unknown,
+  location: string,
+  harnessId: HarnessId,
+): SchemaView {
+  const view = requireObject(value, location);
+  const id = requireEnum(view.id, ["native", "unified"] as const, `${location}.id`);
+  const label = requireString(view.label, `${location}.label`);
+  const filename = requireString(view.filename, `${location}.filename`);
+  const format = requireString(view.format, `${location}.format`);
+  if (!("document" in view) || view.document === undefined) {
+    fail(`${location}.document`, "missing document", "include the JSON to render");
+  }
+
+  const groupsValue = view.groups;
+  let groups: FieldGroup[];
+  if (Array.isArray(groupsValue) && groupsValue.length > 0) {
+    groups = groupsValue.map((entry, index) =>
+      validateGroup(entry, `${location}.groups[${index}]`),
+    );
+  } else if (id === "unified" && Array.isArray(groupsValue)) {
+    // The unified schema is shared, so a fixture leaves its groups empty and the
+    // loader substitutes the canonical list.
+    groups = UNIFIED_GROUPS;
+  } else {
+    fail(
+      `${location}.groups`,
+      `expected a non-empty array, found ${describe(groupsValue)}`,
+      "supply the field groups for this view",
+    );
+  }
+
+  if (id === "unified") {
+    validateUnifiedDocument(view.document, harnessId, `${location}.document`);
+  }
+
+  const paths = collectNodePaths(view.document);
+  for (const group of groups) {
+    for (const selector of group.selectors) {
+      if (!paths.some((path) => matchSelector(selector, path))) {
+        fail(
+          `${location}.groups.${group.id}.selectors`,
+          `selector ${describe(selector)} matches no node in the document`,
+          "point the selector at a key the document actually carries",
+        );
+      }
+    }
+  }
+
+  return { id, label, filename, format, document: view.document, groups };
 }
 
 function validateSample(value: unknown, location: string): HarnessSample {
@@ -223,43 +418,21 @@ function validateSample(value: unknown, location: string): HarnessSample {
     );
   }
 
-  const native = requireObject(sample.native, `${location}.native`);
-  const nativePath = requireString(native.path, `${location}.native.path`);
-  const nativeFormat = requireString(native.format, `${location}.native.format`);
-  const nativeNote = requireString(native.note, `${location}.native.note`);
-
-  const recordsValue = sample.records;
-  if (!Array.isArray(recordsValue) || recordsValue.length === 0) {
-    fail(`${location}.records`, "expected a non-empty array", "supply the native records");
+  const native = validateSchemaView(sample.native, `${location}.native`, id);
+  if (native.id !== "native") {
+    fail(`${location}.native.id`, `expected "native", found ${describe(native.id)}`, 'set the native view id to "native"');
   }
-
-  const unified = validateUnified(sample.unified, id, `${location}.unified`);
-  const turnCount = Array.isArray((unified as { turns?: unknown }).turns)
-    ? ((unified as { turns: unknown[] }).turns.length as number)
-    : 0;
-
-  const records = recordsValue.map((record, index) =>
-    parseRecord(record, `${location}.records[${index}]`, turnCount),
-  );
-  const recordIds = new Set<string>();
-  for (const record of records) {
-    if (recordIds.has(record.id)) {
-      fail(
-        `${location}.records`,
-        `duplicate record id ${describe(record.id)}`,
-        "give every record in a sample a unique id",
-      );
-    }
-    recordIds.add(record.id);
+  const unified = validateSchemaView(sample.unified, `${location}.unified`, id);
+  if (unified.id !== "unified") {
+    fail(`${location}.unified.id`, `expected "unified", found ${describe(unified.id)}`, 'set the unified view id to "unified"');
   }
 
   return {
     id,
     label: requireString(sample.label, `${location}.label`),
     brand: brand as BrandName | null,
-    native: { path: nativePath, format: nativeFormat, note: nativeNote },
     intro: requireString(sample.intro, `${location}.intro`),
-    records,
+    native,
     unified,
   };
 }
@@ -276,7 +449,8 @@ function orderSamples(samples: HarnessSample[]): HarnessSample[] {
 
 /**
  * Validate a decoded fixture array, throwing an actionable Error on any
- * structural, identity, or lowering mistake so a stale fixture cannot render.
+ * structural, identity, lowering, or selector mistake so a stale fixture cannot
+ * render.
  */
 export function validateHarnessSamples(raw: unknown): HarnessSample[] {
   if (!Array.isArray(raw)) {

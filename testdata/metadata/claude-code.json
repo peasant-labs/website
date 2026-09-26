@@ -2,100 +2,134 @@
   "id": "claude-code",
   "label": "claude code",
   "brand": "claude",
-  "native": {
-    "path": "~/.claude/projects/<project>/<session-id>.jsonl",
-    "format": "jsonl",
-    "note": "one JSON object per line; the type field names the record kind"
-  },
   "intro": "claude code appends one JSON object per transcript event to a per-project JSONL file.",
-  "records": [
-    {
-      "id": "user-1",
-      "kind": "user",
-      "outcome": "text",
-      "note": "a user record lowers to OutcomeText and becomes a user turn",
-      "raw": {"type":"user","uuid":"c1a1","sessionId":"sess_mx_claude","timestamp":"2026-08-04T09:15:02Z","cwd":"~/src/peasant","gitBranch":"webhook-retry","message":{"role":"user","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff."}},
-      "mapsTo": [0]
-    },
-    {
-      "id": "assistant-read",
-      "kind": "assistant",
-      "outcome": "text",
-      "note": "the record lowers to OutcomeText; its tool_use content block lowers separately to OutcomeToolCall and becomes that turn's tool call",
-      "raw": {"type":"assistant","uuid":"c1a2","timestamp":"2026-08-04T09:15:20Z","message":{"role":"assistant","content":[{"type":"text","text":"I will read the worker, then add a bounded retry with backoff."},{"type":"tool_use","id":"toolu_read_01","name":"Read","input":{"file_path":"internal/webhook/deliver.go"}}]}},
-      "mapsTo": [1]
-    },
-    {
-      "id": "tool-result-read",
-      "kind": "tool_result",
-      "outcome": "tool_result",
-      "note": "the tool_result content block lowers to OutcomeToolResult and attaches to the matching tool call on turn 1",
-      "raw": {"type":"user","uuid":"c1a3","timestamp":"2026-08-04T09:15:24Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_read_01","content":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]}},
-      "mapsTo": [1]
-    },
-    {
-      "id": "assistant-edit",
-      "kind": "assistant",
-      "outcome": "text",
-      "note": "a second assistant record: the text becomes turn 2 and its Edit tool_use becomes that turn's tool call",
-      "raw": {"type":"assistant","uuid":"c1a4","timestamp":"2026-08-04T09:16:02Z","message":{"role":"assistant","content":[{"type":"text","text":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."},{"type":"tool_use","id":"toolu_edit_01","name":"Edit","input":{"file_path":"internal/webhook/deliver.go","old_string":"return post(ctx, e)","new_string":"return postWithRetry(ctx, e, 5)"}}]}},
-      "mapsTo": [2]
-    },
-    {
-      "id": "assistant-final",
-      "kind": "assistant",
-      "outcome": "text",
-      "note": "the closing assistant text becomes the final turn",
-      "raw": {"type":"assistant","uuid":"c1a5","timestamp":"2026-08-04T09:16:40Z","message":{"role":"assistant","content":[{"type":"text","text":"The retry is bounded at five attempts with backoff, and the worker tests pass."}]}},
-      "mapsTo": [3]
-    },
-    {
-      "id": "attachment-hook",
-      "kind": "attachment",
-      "outcome": "control",
-      "note": "an attachment control record has nothing reader-visible; it writes no turn and does not block completeness",
-      "raw": {"type":"attachment","uuid":"c1a6","timestamp":"2026-08-04T09:15:01Z","attachment":{"type":"hook_success","hookName":"SessionStart","exitCode":0}},
-      "mapsTo": []
-    },
-    {
-      "id": "retained-unknown",
-      "kind": "telemetry-snapshot",
-      "outcome": "opaque",
-      "note": "a well-formed record kind the vocabulary does not declare is retained as complete redacted evidence with its position instead of being dropped or refused",
-      "raw": {"type":"telemetry-snapshot","uuid":"c1a7","timestamp":"2026-08-04T09:16:41Z","snapshot":{"route":"/v1/sessions","latencyMs":41}},
-      "mapsTo": []
-    }
-  ],
-  "unified": {
-    "id": "sess_mx_claude",
-    "harness": "claude-code",
-    "model": "claude-opus-5",
-    "outcome": "resolved",
-    "project": "peasant",
-    "workingDirectory": "~/src/peasant",
-    "startTime": "2026-08-04T09:15:02Z",
-    "endTime": "2026-08-04T09:16:40Z",
-    "durationMins": 2,
-    "turnCount": 4,
-    "toolCallCount": 2,
-    "totalTokens": 3180,
-    "tokensIn": 2450,
-    "tokensOut": 730,
-    "gitBranch": "webhook-retry",
-    "gitContext": {
-      "branch": "webhook-retry",
-      "remote": "git@github.com:example/peasant-demo.git",
-      "user": "you",
-      "workingDirectory": "~/src/peasant",
-      "commits": [
-        {"hash":"8f3c2d1e4a5b6c7d8e9f0a1b2c3d4e5f","message":"retry webhook delivery with backoff","timestamp":"2026-08-04T09:17:00Z","filesChanged":2,"insertions":38,"deletions":4,"session":true}
+  "native": {
+    "id": "native",
+    "label": "native metadata",
+    "filename": "claude-code.jsonl",
+    "format": "jsonl",
+    "document": {
+      "path": "~/.claude/projects/<project>/<session-id>.jsonl",
+      "format": "jsonl",
+      "records": [
+        {"type":"user","uuid":"c1a1","sessionId":"sess_mx_claude","timestamp":"2026-08-04T09:15:02Z","cwd":"~/src/peasant","gitBranch":"webhook-retry","message":{"role":"user","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff."}},
+        {"type":"assistant","uuid":"c1a2","timestamp":"2026-08-04T09:15:20Z","message":{"role":"assistant","content":[{"type":"text","text":"I will read the worker, then add a bounded retry with backoff."},{"type":"tool_use","id":"toolu_read_01","name":"Read","input":{"file_path":"internal/webhook/deliver.go"}}]}},
+        {"type":"user","uuid":"c1a3","timestamp":"2026-08-04T09:15:24Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_read_01","content":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]}},
+        {"type":"assistant","uuid":"c1a4","timestamp":"2026-08-04T09:16:02Z","message":{"role":"assistant","content":[{"type":"text","text":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."},{"type":"tool_use","id":"toolu_edit_01","name":"Edit","input":{"file_path":"internal/webhook/deliver.go","old_string":"return post(ctx, e)","new_string":"return postWithRetry(ctx, e, 5)"}}]}},
+        {"type":"assistant","uuid":"c1a5","timestamp":"2026-08-04T09:16:40Z","message":{"role":"assistant","content":[{"type":"text","text":"The retry is bounded at five attempts with backoff, and the worker tests pass."}]}},
+        {"type":"attachment","uuid":"c1a6","timestamp":"2026-08-04T09:15:01Z","attachment":{"type":"hook_success","hookName":"SessionStart","exitCode":0}},
+        {"type":"telemetry-snapshot","uuid":"c1a7","timestamp":"2026-08-04T09:16:41Z","snapshot":{"route":"/v1/sessions","latencyMs":41}}
       ]
     },
-    "turns": [
-      {"index":0,"role":"user","depth":0,"entryType":"text","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff.","timestamp":"2026-08-04T09:15:02Z","tokensIn":320,"tokensOut":0},
-      {"index":1,"role":"assistant","depth":0,"entryType":"text","content":"I will read the worker, then add a bounded retry with backoff.","timestamp":"2026-08-04T09:15:20Z","tokensIn":0,"tokensOut":210,"toolCalls":[{"id":"toolu_read_01","name":"Read","toolKind":"read","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\"}","result":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
-      {"index":2,"role":"assistant","depth":0,"entryType":"text","content":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","timestamp":"2026-08-04T09:16:02Z","tokensIn":0,"tokensOut":360,"toolCalls":[{"id":"toolu_edit_01","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\",\"old_string\":\"return post(ctx, e)\",\"new_string\":\"return postWithRetry(ctx, e, 5)\"}","result":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
-      {"index":3,"role":"assistant","depth":0,"entryType":"text","content":"The retry is bounded at five attempts with backoff, and the worker tests pass.","timestamp":"2026-08-04T09:16:40Z","tokensIn":0,"tokensOut":160,"stopReason":"end_turn"}
+    "groups": [
+      {
+        "id": "file",
+        "title": "session file",
+        "accent": "olive",
+        "summary": "where claude code keeps the session and how it is encoded",
+        "selectors": ["path", "format"],
+        "fields": [
+          { "key": "path", "note": "one JSONL file per project and session id" },
+          { "key": "format", "note": "jsonl: one JSON object per line" }
+        ]
+      },
+      {
+        "id": "envelope",
+        "title": "record envelope",
+        "accent": "teal",
+        "summary": "the fields every record carries; type names the record kind",
+        "selectors": [
+          "records[*].type",
+          "records[*].uuid",
+          "records[*].sessionId",
+          "records[*].timestamp",
+          "records[*].cwd",
+          "records[*].gitBranch"
+        ],
+        "fields": [
+          { "key": "type", "note": "the record kind; the parser lowers each declared kind by its outcome" },
+          { "key": "uuid", "note": "the record id, kept for source ordering" },
+          { "key": "timestamp", "note": "the record time, used to order turns" },
+          { "key": "cwd", "note": "the working directory, redacted as a path" },
+          { "key": "gitBranch", "note": "the branch, carried into the unified git context" }
+        ]
+      },
+      {
+        "id": "message",
+        "title": "message body",
+        "accent": "clay",
+        "summary": "user and assistant records carry a role and content",
+        "selectors": ["records[*].message"],
+        "fields": [
+          { "key": "role", "note": "user or assistant; becomes the unified turn role" },
+          { "key": "content", "note": "a string or an array of content blocks" }
+        ]
+      },
+      {
+        "id": "blocks",
+        "title": "content blocks",
+        "accent": "group-y",
+        "summary": "text, tool_use, and tool_result blocks inside a message",
+        "selectors": ["records[*].message.content[*]"],
+        "fields": [
+          { "key": "type", "note": "text to a turn; tool_use to a tool call; tool_result to a tool result" },
+          { "key": "text", "note": "the prose of a text block" },
+          { "key": "id", "note": "the tool call id, matched by its result" },
+          { "key": "name", "note": "the tool name" },
+          { "key": "input", "note": "the tool call arguments" },
+          { "key": "tool_use_id", "note": "the call this result answers" }
+        ]
+      },
+      {
+        "id": "control-and-retained",
+        "title": "control and retained records",
+        "accent": "red",
+        "summary": "records that write no turn, and a kind this build does not declare",
+        "selectors": ["records[*].attachment", "records[*].snapshot"],
+        "fields": [
+          { "key": "attachment", "note": "a control record: it writes no turn and does not block completeness" },
+          { "key": "snapshot", "note": "an undeclared kind kept as complete redacted evidence, not dropped" }
+        ]
+      }
     ]
+  },
+  "unified": {
+    "id": "unified",
+    "label": "unified session",
+    "filename": "session.json",
+    "format": "json",
+    "document": {
+      "id": "sess_mx_claude",
+      "harness": "claude-code",
+      "model": "claude-opus-5",
+      "outcome": "resolved",
+      "project": "peasant",
+      "workingDirectory": "~/src/peasant",
+      "startTime": "2026-08-04T09:15:02Z",
+      "endTime": "2026-08-04T09:16:40Z",
+      "durationMins": 2,
+      "turnCount": 4,
+      "toolCallCount": 2,
+      "totalTokens": 3180,
+      "tokensIn": 2450,
+      "tokensOut": 730,
+      "gitBranch": "webhook-retry",
+      "gitContext": {
+        "branch": "webhook-retry",
+        "remote": "git@github.com:example/peasant-demo.git",
+        "user": "you",
+        "workingDirectory": "~/src/peasant",
+        "commits": [
+          {"hash":"8f3c2d1e4a5b6c7d8e9f0a1b2c3d4e5f","message":"retry webhook delivery with backoff","timestamp":"2026-08-04T09:17:00Z","filesChanged":2,"insertions":38,"deletions":4,"session":true}
+        ]
+      },
+      "turns": [
+        {"index":0,"role":"user","depth":0,"entryType":"text","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff.","timestamp":"2026-08-04T09:15:02Z","tokensIn":320,"tokensOut":0},
+        {"index":1,"role":"assistant","depth":0,"entryType":"text","content":"I will read the worker, then add a bounded retry with backoff.","timestamp":"2026-08-04T09:15:20Z","tokensIn":0,"tokensOut":210,"toolCalls":[{"id":"toolu_read_01","name":"Read","toolKind":"read","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\"}","result":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
+        {"index":2,"role":"assistant","depth":0,"entryType":"text","content":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","timestamp":"2026-08-04T09:16:02Z","tokensIn":0,"tokensOut":360,"toolCalls":[{"id":"toolu_edit_01","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\",\"old_string\":\"return post(ctx, e)\",\"new_string\":\"return postWithRetry(ctx, e, 5)\"}","result":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
+        {"index":3,"role":"assistant","depth":0,"entryType":"text","content":"The retry is bounded at five attempts with backoff, and the worker tests pass.","timestamp":"2026-08-04T09:16:40Z","tokensIn":0,"tokensOut":160,"stopReason":"end_turn"}
+      ]
+    },
+    "groups": []
   }
 }
