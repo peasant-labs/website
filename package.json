@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:projects": "playwright test tests/projects.spec.ts",
-    "validate": "pnpm test:projects"
+    "validate": "playwright test"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
