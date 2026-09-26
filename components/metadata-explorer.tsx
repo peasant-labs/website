@@ -228,9 +228,6 @@ export function MetadataExplorer({ samples }: { samples: HarnessSample[] }) {
                 <p className="pj-terminal-name">
                   <span className="pj-terminal-dot" aria-hidden="true" />
                   <span data-schema-filename>{view.filename}</span>
-                  <span className="mx-terminal-format" data-schema-format>
-                    {view.format}
-                  </span>
                 </p>
               </div>
               <div

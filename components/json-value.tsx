@@ -10,11 +10,13 @@ import { matchSelector, nodeInGroup } from "@/lib/schema-selector";
  * inside `<code>`: they are data, not authored page copy, and the site's
  * lowercase-copy scan treats code the same way it treats the other demos.
  *
- * When `groups` is supplied each node carries the ids of the field groups that
- * cover it (`data-groups`); a node whose path is exactly a selector root is a
- * linkable region (`data-region`) and activates its group on pointer input.
- * Regions are pointer affordances only: the section list is the keyboard
- * control, so no region takes focus or a button role.
+ * Objects render `key: value` members, arrays render their elements without an
+ * index label, and every member carries a trailing comma, so the document reads
+ * like the JSON it is. When `groups` is supplied each node carries the ids of
+ * the field groups that cover it (`data-groups`); a node whose path is exactly a
+ * selector root is a linkable region (`data-region`) and activates its group on
+ * pointer input. Regions are pointer affordances only: the section list is the
+ * keyboard control, so no region takes focus or a button role.
  */
 
 export type JsonValueProps = {
@@ -24,6 +26,8 @@ export type JsonValueProps = {
   groups?: FieldGroup[];
   activeGroup?: string | null;
   onActivate?: (id: string) => void;
+  /** Append a trailing comma, so a member reads like ordinary JSON. */
+  comma?: boolean;
 };
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -54,11 +58,25 @@ function Primitive({ value }: { value: unknown }): ReactNode {
   );
 }
 
+/**
+ * An object member's name. The non-breaking space keeps the value off the
+ * name's closing colon even when the line wraps, so the pair never reads as one
+ * token.
+ */
 function Label({ name }: { name?: string }): ReactNode {
   if (name === undefined) {
     return null;
   }
-  return <span className="mx-json-key">{name}</span>;
+  return (
+    <>
+      <span className="mx-json-key">{name}</span>
+      <span className="mx-json-punct">{":\u00A0"}</span>
+    </>
+  );
+}
+
+function Comma(): ReactNode {
+  return <span className="mx-json-punct">,</span>;
 }
 
 export function JsonValue({
@@ -68,6 +86,7 @@ export function JsonValue({
   groups = [],
   activeGroup = null,
   onActivate,
+  comma = false,
 }: JsonValueProps): ReactNode {
   const groupIds = groups
     .filter((group) => group.selectors.some((selector) => nodeInGroup(selector, path)))
@@ -111,16 +130,17 @@ export function JsonValue({
             <div className="mx-json-row" key={index}>
               <JsonValue
                 value={item}
-                name={String(index)}
                 path={[...path, index]}
                 groups={groups}
                 activeGroup={activeGroup}
                 onActivate={onActivate}
+                comma
               />
             </div>
           ))}
         </div>
         <span className="mx-json-punct">]</span>
+        {comma ? <Comma /> : null}
       </div>
     );
   }
@@ -140,11 +160,13 @@ export function JsonValue({
                 groups={groups}
                 activeGroup={activeGroup}
                 onActivate={onActivate}
+                comma
               />
             </div>
           ))}
         </div>
         <span className="mx-json-punct">{"}"}</span>
+        {comma ? <Comma /> : null}
       </div>
     );
   }
@@ -153,6 +175,7 @@ export function JsonValue({
     <span className="mx-json-leaf" {...common}>
       <Label name={name} />
       <Primitive value={value} />
+      {comma ? <Comma /> : null}
     </span>
   );
 }

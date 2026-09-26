@@ -156,6 +156,8 @@
     z-index: var(--z-nav);
     border-bottom: var(--bd);
     background: var(--nav-bg);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
   }
 
   .pj-header-inner {
@@ -1825,6 +1827,7 @@
 }
 
 .mx-view-option {
+  flex: 1 1 auto;
   min-height: var(--target-comfortable);
   padding: var(--sp-2) var(--sp-4);
   border: 0;
@@ -1880,11 +1883,6 @@
 .mx-json-column,
 .mx-sections {
   min-width: 0;
-}
-
-.mx-terminal-format {
-  color: var(--ink-4);
-  text-transform: lowercase;
 }
 
 /*
@@ -1965,7 +1963,7 @@
 
 .mx-json [data-active="true"] {
   background: color-mix(in srgb, var(--amber) 10%, transparent);
-  box-shadow: inset 2px 0 0 0 var(--amber);
+  box-shadow: inset var(--stroke-emphasis) 0 0 0 var(--amber);
 }
 
 .mx-sections {
@@ -2104,6 +2102,31 @@
   font-family: var(--font-body);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
+}
+
+/*
+ * Narrow: a two-up segmented control with a lone active half reads as a broken
+ * box, and a tall inner scroll pane leaves no room for the sections below it.
+ * Stack the control and shorten the pane so the column stays legible on a phone.
+ */
+@media (max-width: 30rem) {
+  .mx-view {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    inline-size: 100%;
+  }
+
+  .mx-view-option {
+    border-inline-start: 0;
+  }
+
+  .mx-view-option + .mx-view-option {
+    border-block-start: var(--bd);
+  }
+
+  .mx-json-pane {
+    max-block-size: min(58vh, 30rem);
+  }
 }
 
 @media (min-width: 60rem) {
