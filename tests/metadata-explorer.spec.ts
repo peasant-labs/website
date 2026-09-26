@@ -173,9 +173,12 @@ test("arrow keys move the active harness tab", async ({ page }) => {
   await expect(root.locator("[data-schema-filename]")).toHaveText(samples[1].native.filename);
 });
 
-test("section headers are keyboard operable", async ({ page }) => {
+test("section headers are keyboard operable and only the active one expands", async ({
+  page,
+}) => {
   await page.goto("/projects");
   const root = page.locator("[data-metadata-explorer]");
+  const first = samples[0].native.groups[0];
   const target = samples[0].native.groups[2];
   const header = root.locator(`[data-section="${target.id}"] button`);
 
@@ -184,12 +187,10 @@ test("section headers are keyboard operable", async ({ page }) => {
     "data-active",
     "true",
   );
-
-  const expandedBefore = await header.getAttribute("aria-expanded");
-  await page.keyboard.press("Enter");
-  await expect(header).toHaveAttribute(
+  await expect(header).toHaveAttribute("aria-expanded", "true");
+  await expect(root.locator(`[data-section="${first.id}"] button`)).toHaveAttribute(
     "aria-expanded",
-    expandedBefore === "true" ? "false" : "true",
+    "false",
   );
 });
 

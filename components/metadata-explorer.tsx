@@ -47,7 +47,6 @@ function Section({
   active: boolean;
   onSelect: (id: string) => void;
 }) {
-  const [open, setOpen] = useState(true);
   const fieldsId = `mx-fields-${group.id}`;
 
   return (
@@ -60,12 +59,9 @@ function Section({
       <button
         type="button"
         className="mx-section-head"
-        aria-expanded={open}
+        aria-expanded={active}
         aria-controls={fieldsId}
-        onClick={() => {
-          onSelect(group.id);
-          setOpen((current) => !current);
-        }}
+        onClick={() => onSelect(group.id)}
         onFocus={() => onSelect(group.id)}
       >
         <span className="mx-section-head-text">
@@ -74,10 +70,10 @@ function Section({
         </span>
         {active ? <span className="mx-section-selected">selected</span> : null}
         <span className="mx-section-chevron" aria-hidden="true">
-          {open ? "▾" : "▸"}
+          {active ? "▾" : "▸"}
         </span>
       </button>
-      <dl className="mx-section-fields" id={fieldsId} hidden={!open}>
+      <dl className="mx-section-fields" id={fieldsId} hidden={!active}>
         {group.fields.map((field) => (
           <div className="mx-field" key={field.key}>
             <dt className="mx-field-key">{field.key}</dt>
