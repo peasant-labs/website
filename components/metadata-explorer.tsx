@@ -241,13 +241,21 @@ export function MetadataExplorer({
     return null;
   }
 
+  // Both views carry the same categories, so a harness or view switch keeps the
+  // reader on the category they were reading instead of resetting to the first.
+  function keepActiveGroup(groups: FieldGroup[]) {
+    setActiveGroupId((current) =>
+      groups.some((group) => group.id === current) ? current : (groups[0]?.id ?? ""),
+    );
+  }
+
   function selectTab(index: number) {
     const next = samples[index];
     if (!next) {
       return;
     }
     setHarnessId(next.id);
-    setActiveGroupId(viewOf(next, viewId).groups[0]?.id ?? "");
+    keepActiveGroup(viewOf(next, viewId).groups);
     paneRef.current?.scrollTo({ top: 0 });
   }
 
@@ -256,7 +264,7 @@ export function MetadataExplorer({
       return;
     }
     setViewId(id);
-    setActiveGroupId(viewOf(active, id).groups[0]?.id ?? "");
+    keepActiveGroup(viewOf(active, id).groups);
     paneRef.current?.scrollTo({ top: 0 });
   }
 

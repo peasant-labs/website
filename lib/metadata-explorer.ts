@@ -19,6 +19,11 @@ export {
  * session peasant lowers it into. Every rendered field group is linked to a
  * labelled region of the document.
  *
+ * Both views render the same categories — the unified session's field groups.
+ * The native view maps each category to the native fields that feed it, the
+ * unified view to the lowered fields, so the reader follows one schema and sees
+ * where each harness's shape lands in it.
+ *
  * This module is the only reader of `testdata/metadata/*.json`. Its runtime
  * imports are `node:fs`, `node:path`, and the pure selector parser, so the
  * Playwright spec can import the loader and the validator directly without
@@ -61,6 +66,18 @@ export type FieldGroup = {
   fields: FieldNote[];
 };
 
+/**
+ * A native view's mapping into one unified category: the category id plus the
+ * selectors and notes for the native document. The category's title, summary,
+ * and accent come from `UNIFIED_GROUPS`, so both views always render the same
+ * categories.
+ */
+export type GroupMapping = {
+  id: string;
+  selectors: string[];
+  fields: FieldNote[];
+};
+
 export type SchemaView = {
   id: "native" | "unified";
   /** "native metadata" | "unified session". */
@@ -99,8 +116,10 @@ export const UNIFIED_OUTCOMES = ["resolved", "partial", "failed"] as const;
 
 /**
  * The unified wire schema is identical for every harness, so its field groups
- * are a shared constant. Fixtures leave `unified.groups` empty and the loader
- * substitutes this list.
+ * are the shared category list. Both views render these categories: the unified
+ * view uses the selectors and notes below, while a native view supplies its own
+ * selectors and notes per category (see `GroupMapping`). Fixtures leave
+ * `unified.groups` empty and the loader substitutes this list.
  *
  * The `group-y` and `red` accent identifiers have no matching colour token in
  * fairtrade 0.0.9, so `app/globals.css` maps them onto the nearest canonical
@@ -178,7 +197,7 @@ export const UNIFIED_GROUPS: FieldGroup[] = [
     id: "turns",
     title: "turns",
     accent: "amber",
-    summary: "the conversation, one turn per index",
+    summary: "the conversation, one turn per index, including subagent turns",
     selectors: ["turns"],
     fields: [
       { key: "role", note: "user, assistant, tool, or system" },
@@ -187,7 +206,8 @@ export const UNIFIED_GROUPS: FieldGroup[] = [
         note: "text, tool_use, tool_result, thinking, system, error, result",
       },
       { key: "content", note: "the turn's reader-visible text" },
-      { key: "depth", note: "0 for the main thread" },
+      { key: "depth", note: "0 for a message turn, 1 for a content part" },
+      { key: "agentName", note: "the subagent that produced the turn, when a launch did" },
       { key: "toolCalls", note: "the calls attached to this turn" },
       { key: "stopReason", note: "why the model stopped, when it did" },
     ],
@@ -265,16 +285,13 @@ function requireEnum<const T extends readonly string[]>(
   return candidate as T[number];
 }
 
-function validateGroup(value: unknown, location: string): FieldGroup {
+function validateGroupMapping(value: unknown, location: string): GroupMapping {
   const group = requireObject(value, location);
   const id = requireString(group.id, `${location}.id`);
-  const title = requireString(group.title, `${location}.title`);
-  const summary = requireString(group.summary, `${location}.summary`);
-  const accent = requireEnum(group.accent, ACCENTS, `${location}.accent`);
 
   const selectorsValue = group.selectors;
   if (!Array.isArray(selectorsValue) || selectorsValue.length === 0) {
-    fail(`${location}.selectors`, "expected a non-empty array", "point at least one selector at the document");
+    fail(`${location}.selectors`, "expected a non-empty array", "point at least one selector at the native document");
   }
   const selectors = selectorsValue.map((entry, index) => {
     const selector = requireString(entry, `${location}.selectors[${index}]`);
@@ -302,7 +319,39 @@ function validateGroup(value: unknown, location: string): FieldGroup {
     };
   });
 
-  return { id, title, accent, summary, selectors, fields };
+  return { id, selectors, fields };
+}
+
+/**
+ * Both views render the same categories. A native view supplies a mapping per
+ * unified category; compose each with the category's shared title, summary, and
+ * accent, and refuse a fixture that misses or invents a category.
+ */
+function composeNativeGroups(mappings: GroupMapping[], location: string): FieldGroup[] {
+  const byId = new Map(mappings.map((mapping) => [mapping.id, mapping]));
+  if (byId.size !== mappings.length) {
+    fail(`${location}.groups`, "a category id is repeated", "give each unified category exactly one mapping");
+  }
+  const groups = UNIFIED_GROUPS.map((category) => {
+    const mapping = byId.get(category.id);
+    if (!mapping) {
+      fail(
+        `${location}.groups`,
+        `missing the ${describe(category.id)} category`,
+        `map every unified category: ${UNIFIED_GROUPS.map((group) => group.id).join(" | ")}`,
+      );
+    }
+    byId.delete(category.id);
+    return { ...category, selectors: mapping.selectors, fields: mapping.fields };
+  });
+  if (byId.size > 0) {
+    fail(
+      `${location}.groups`,
+      `unknown categories ${[...byId.keys()].map(describe).join(", ")}`,
+      `use only ${UNIFIED_GROUPS.map((group) => group.id).join(" | ")}`,
+    );
+  }
+  return groups;
 }
 
 function validateUnifiedDocument(
@@ -369,19 +418,37 @@ function validateSchemaView(
 
   const groupsValue = view.groups;
   let groups: FieldGroup[];
-  if (Array.isArray(groupsValue) && groupsValue.length > 0) {
-    groups = groupsValue.map((entry, index) =>
-      validateGroup(entry, `${location}.groups[${index}]`),
-    );
-  } else if (id === "unified" && Array.isArray(groupsValue)) {
-    // The unified schema is shared, so a fixture leaves its groups empty and the
-    // loader substitutes the canonical list.
+  if (id === "unified") {
+    // The categories are shared. A fixture leaves them empty; a loaded sample
+    // (re-validated in tests) already carries the canonical list, so accept that
+    // too, and refuse anything else.
+    if (Array.isArray(groupsValue) && groupsValue.length > 0) {
+      const ids = groupsValue.map(
+        (entry, index) => requireObject(entry, `${location}.groups[${index}]`).id,
+      );
+      const canonical = UNIFIED_GROUPS.map((group) => group.id);
+      if (
+        ids.length !== canonical.length ||
+        ids.some((value, index) => value !== canonical[index])
+      ) {
+        fail(
+          `${location}.groups`,
+          "the unified categories are shared, not authored per fixture",
+          "leave the unified groups empty; the loader substitutes the canonical list",
+        );
+      }
+    }
     groups = UNIFIED_GROUPS;
+  } else if (Array.isArray(groupsValue) && groupsValue.length > 0) {
+    const mappings = groupsValue.map((entry, index) =>
+      validateGroupMapping(entry, `${location}.groups[${index}]`),
+    );
+    groups = composeNativeGroups(mappings, location);
   } else {
     fail(
       `${location}.groups`,
       `expected a non-empty array, found ${describe(groupsValue)}`,
-      "supply the field groups for this view",
+      "map every unified category for this native document",
     );
   }
 

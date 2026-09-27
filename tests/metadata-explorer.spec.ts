@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import {
   HARNESS_IDS,
+  UNIFIED_GROUPS,
   collectNodePaths,
   loadHarnessSamples,
   matchSelector,
@@ -68,6 +69,36 @@ test("the fixtures are a complete independent oracle", () => {
 
   // The unified document still validates exactly as before.
   expect(() => validateHarnessSamples(structuredClone(samples))).not.toThrow();
+});
+
+test("both views render the same unified categories", () => {
+  const canonical = UNIFIED_GROUPS.map((group) => group.id);
+  for (const sample of samples) {
+    expect(sample.native.groups.map((group) => group.id), `${sample.id} native`).toEqual(
+      canonical,
+    );
+    expect(sample.unified.groups.map((group) => group.id), `${sample.id} unified`).toEqual(
+      canonical,
+    );
+  }
+});
+
+test("the example session launches a subagent", () => {
+  for (const sample of samples) {
+    const turns = (
+      sample.unified.document as {
+        turns: Array<{ agentName?: string; toolCalls?: Array<{ name: string }> }>;
+      }
+    ).turns;
+    expect(
+      turns.some((turn) => turn.agentName === "test-writer"),
+      `${sample.id} carries a subagent turn`,
+    ).toBe(true);
+    expect(
+      turns.some((turn) => (turn.toolCalls ?? []).some((call) => call.name === "Task")),
+      `${sample.id} carries a subagent launch`,
+    ).toBe(true);
+  }
 });
 
 test("validation rejects an out-of-range turn index and a selector that matches nothing", () => {
@@ -149,17 +180,17 @@ test("the first region is active on load and a section header activates its regi
 test("a JSON region selects its section on click, not on hover", async ({ page }) => {
   await page.goto("/projects");
   const root = page.locator("[data-metadata-explorer]");
-  const blocks = sampleById("claude-code").native.groups.find(
-    (group) => group.id === "blocks",
+  const toolCalls = sampleById("claude-code").native.groups.find(
+    (group) => group.id === "tool-calls",
   );
-  if (!blocks) {
-    throw new Error("expected a blocks group on the claude-code native view");
+  if (!toolCalls) {
+    throw new Error("expected a tool-calls group on the claude-code native view");
   }
   const firstGroup = samples[0].native.groups[0];
-  const region = root.locator(`[data-line][data-groups~="${blocks.id}"]`).first();
+  const region = root.locator(`[data-line][data-groups~="${toolCalls.id}"]`).first();
 
   await region.hover();
-  await expect(root.locator(`[data-section="${blocks.id}"]`)).not.toHaveAttribute(
+  await expect(root.locator(`[data-section="${toolCalls.id}"]`)).not.toHaveAttribute(
     "data-active",
     "true",
   );
@@ -169,7 +200,7 @@ test("a JSON region selects its section on click, not on hover", async ({ page }
   );
 
   await region.click();
-  await expect(root.locator(`[data-section="${blocks.id}"]`)).toHaveAttribute(
+  await expect(root.locator(`[data-section="${toolCalls.id}"]`)).toHaveAttribute(
     "data-active",
     "true",
   );

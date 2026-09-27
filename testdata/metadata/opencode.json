@@ -12,92 +12,75 @@
       "path": "~/.local/share/opencode/project/<project>/storage/session/<id>.json",
       "format": "json",
       "records": [
-        {"messageID":"msg_u1","sessionID":"sess_mx_opencode","type":"text","text":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff."},
-        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"reasoning","text":"The worker posts once, so the retry belongs around the post call."},
-        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"text","text":"I will read the worker, then add a bounded retry with backoff."},
-        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"tool","callID":"toolu_read_01","tool":"read","state":{"status":"completed","input":{"filePath":"internal/webhook/deliver.go"},"output":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}},
-        {"messageID":"msg_a2","sessionID":"sess_mx_opencode","type":"text","text":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."},
-        {"messageID":"msg_a2","sessionID":"sess_mx_opencode","type":"tool","callID":"toolu_edit_01","tool":"edit","state":{"status":"completed","input":{"filePath":"internal/webhook/deliver.go","oldString":"return post(ctx, e)","newString":"return postWithRetry(ctx, e, 5)"},"output":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}},
-        {"messageID":"msg_a3","sessionID":"sess_mx_opencode","type":"text","text":"The retry is bounded at five attempts with backoff, and the worker tests pass."},
-        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"step-start"},
-        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"step-finish","cost":0.031,"tokens":{"input":320,"output":210}},
-        {"messageID":"msg_u1","sessionID":"sess_mx_opencode","type":"file","mime":"text/markdown","filename":"~/src/peasant/scratch.md"}
+        {"messageID":"msg_s0","sessionID":"sess_mx_opencode","type":"session","cwd":"~/src/peasant","gitBranch":"webhook-retry","model":"claude-opus-5","at":"2026-08-04T09:15:00Z"},
+        {"messageID":"msg_u1","sessionID":"sess_mx_opencode","type":"text","text":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test.","at":"2026-08-04T09:15:02Z"},
+        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"reasoning","text":"The worker posts once, so the retry belongs around the post call.","at":"2026-08-04T09:15:18Z"},
+        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"text","text":"I will read the worker, then hand the test to a subagent while I add the retry.","at":"2026-08-04T09:15:20Z"},
+        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"tool","callID":"toolu_read_01","tool":"read","state":{"status":"completed","input":{"filePath":"internal/webhook/deliver.go"},"output":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"},"at":"2026-08-04T09:15:21Z"},
+        {"messageID":"msg_a2","sessionID":"sess_mx_opencode","type":"tool","callID":"toolu_task_01","tool":"task","state":{"status":"completed","input":{"subagent_type":"test-writer","description":"cover the webhook retry","prompt":"Add a regression test for the bounded retry in internal/webhook/deliver.go."},"output":"Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."},"at":"2026-08-04T09:15:26Z"},
+        {"messageID":"msg_a2","sessionID":"sess_mx_opencode","type":"text","text":"The worker calls post once, so the test should fail the first posts and assert a retry.","agent":"test-writer","at":"2026-08-04T09:16:00Z"},
+        {"messageID":"msg_a2","sessionID":"sess_mx_opencode","type":"tool","callID":"toolu_edit_02","tool":"edit","agent":"test-writer","state":{"status":"completed","input":{"filePath":"internal/webhook/deliver_test.go","oldString":"func TestDeliver(t *testing.T) {","newString":"func TestDeliverRetries(t *testing.T) {"},"output":"{\"ok\":true,\"additions\":22,\"deletions\":0}"},"at":"2026-08-04T09:16:00Z"},
+        {"messageID":"msg_a3","sessionID":"sess_mx_opencode","type":"text","text":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","at":"2026-08-04T09:16:20Z"},
+        {"messageID":"msg_a3","sessionID":"sess_mx_opencode","type":"tool","callID":"toolu_edit_01","tool":"edit","state":{"status":"completed","input":{"filePath":"internal/webhook/deliver.go","oldString":"return post(ctx, e)","newString":"return postWithRetry(ctx, e, 5)"},"output":"{\"ok\":true,\"additions\":34,\"deletions\":4}"},"at":"2026-08-04T09:16:21Z"},
+        {"messageID":"msg_a4","sessionID":"sess_mx_opencode","type":"text","text":"The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery.","at":"2026-08-04T09:16:40Z"},
+        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"step-start","at":"2026-08-04T09:15:18Z"},
+        {"messageID":"msg_a1","sessionID":"sess_mx_opencode","type":"step-finish","cost":0.031,"tokens":{"input":2450,"output":730},"at":"2026-08-04T09:16:40Z"},
+        {"messageID":"msg_u1","sessionID":"sess_mx_opencode","type":"file","mime":"text/markdown","filename":"~/src/peasant/scratch.md","at":"2026-08-04T09:16:41Z"}
       ]
     },
     "groups": [
       {
-        "id": "file",
-        "title": "session file",
-        "accent": "olive",
-        "summary": "where opencode keeps the session and how it is encoded",
-        "selectors": ["path", "format"],
+        "id": "identity",
+        "selectors": ["path", "records[*].sessionID", "records[*].model"],
         "fields": [
           { "key": "path", "note": "one JSON document per session under the data directory" },
-          { "key": "format", "note": "json: a single document, not a line log" }
+          { "key": "sessionID", "note": "the session id on every row; becomes the unified id" },
+          { "key": "model", "note": "the model that served the run" }
         ]
       },
       {
-        "id": "envelope",
-        "title": "row envelope",
-        "accent": "teal",
-        "summary": "the message, session, and part type every row carries",
-        "selectors": [
-          "records[*].messageID",
-          "records[*].sessionID",
-          "records[*].type"
-        ],
+        "id": "session",
+        "selectors": ["records[*].cwd", "records[*].at"],
         "fields": [
+          { "key": "cwd", "note": "the working directory; becomes workingDirectory" },
+          { "key": "at", "note": "the row time; the first and last become startTime and endTime" }
+        ]
+      },
+      {
+        "id": "usage",
+        "selectors": ["records[*].tokens"],
+        "fields": [
+          { "key": "tokens.input", "note": "input tokens; summed into tokensIn" },
+          { "key": "tokens.output", "note": "output tokens; summed into tokensOut" }
+        ]
+      },
+      {
+        "id": "git",
+        "selectors": ["records[*].gitBranch"],
+        "fields": [
+          { "key": "gitBranch", "note": "the branch; becomes the unified git context" }
+        ]
+      },
+      {
+        "id": "turns",
+        "selectors": ["records"],
+        "fields": [
+          { "key": "type", "note": "text, reasoning, tool, step-start, step-finish, or file" },
           { "key": "messageID", "note": "the message the part belongs to" },
-          { "key": "sessionID", "note": "the session the row belongs to" },
-          { "key": "type", "note": "text, reasoning, tool, step-start, step-finish, or file" }
+          { "key": "agent", "note": "a subagent part; it lowers to a turn carrying the agent name" },
+          { "key": "cost", "note": "step-finish bookkeeping: it writes no turn and does not block completeness" },
+          { "key": "filename", "note": "a file part kept as complete redacted evidence, not dropped" }
         ]
       },
       {
-        "id": "content",
-        "title": "text parts",
-        "accent": "clay",
-        "summary": "the prose and reasoning of a message",
-        "selectors": ["records[*].text"],
-        "fields": [
-          { "key": "text", "note": "a text or reasoning part, lowered to a turn" }
-        ]
-      },
-      {
-        "id": "tools",
-        "title": "tool parts",
-        "accent": "group-y",
-        "summary": "a tool part carries its call and completed state together",
-        "selectors": [
-          "records[*].callID",
-          "records[*].tool",
-          "records[*].state",
-          "records[*].state.input",
-          "records[*].state.output"
-        ],
+        "id": "tool-calls",
+        "selectors": ["records[*].callID", "records[*].tool", "records[*].state"],
         "fields": [
           { "key": "callID", "note": "the call id, matched by its state" },
-          { "key": "tool", "note": "the tool's own name" },
+          { "key": "tool", "note": "the tool's own name; task launches a subagent" },
           { "key": "state.status", "note": "completed once the call returned" },
           { "key": "state.input", "note": "the tool call arguments" },
           { "key": "state.output", "note": "what the tool returned" }
-        ]
-      },
-      {
-        "id": "control-and-retained",
-        "title": "control and retained parts",
-        "accent": "red",
-        "summary": "step bookkeeping, and a part type this build does not declare",
-        "selectors": [
-          "records[*].cost",
-          "records[*].tokens",
-          "records[*].filename",
-          "records[*].mime"
-        ],
-        "fields": [
-          { "key": "cost", "note": "step-finish bookkeeping: it writes no turn" },
-          { "key": "tokens", "note": "the step's token counts" },
-          { "key": "filename", "note": "a file part kept as complete redacted evidence, not dropped" },
-          { "key": "mime", "note": "the retained part's media type" }
         ]
       }
     ]
@@ -117,8 +100,8 @@
       "startTime": "2026-08-04T09:15:02Z",
       "endTime": "2026-08-04T09:16:40Z",
       "durationMins": 2,
-      "turnCount": 4,
-      "toolCallCount": 2,
+      "turnCount": 6,
+      "toolCallCount": 4,
       "totalTokens": 3180,
       "tokensIn": 2450,
       "tokensOut": 730,
@@ -133,10 +116,12 @@
         ]
       },
       "turns": [
-        {"index":0,"role":"user","depth":0,"entryType":"text","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff.","timestamp":"2026-08-04T09:15:02Z","tokensIn":320,"tokensOut":0},
-        {"index":1,"role":"assistant","depth":0,"entryType":"text","content":"I will read the worker, then add a bounded retry with backoff.","timestamp":"2026-08-04T09:15:20Z","tokensIn":0,"tokensOut":210,"toolCalls":[{"id":"toolu_read_01","name":"Read","toolKind":"read","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\"}","result":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
-        {"index":2,"role":"assistant","depth":0,"entryType":"text","content":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","timestamp":"2026-08-04T09:16:02Z","tokensIn":0,"tokensOut":360,"toolCalls":[{"id":"toolu_edit_01","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\",\"old_string\":\"return post(ctx, e)\",\"new_string\":\"return postWithRetry(ctx, e, 5)\"}","result":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
-        {"index":3,"role":"assistant","depth":0,"entryType":"text","content":"The retry is bounded at five attempts with backoff, and the worker tests pass.","timestamp":"2026-08-04T09:16:40Z","tokensIn":0,"tokensOut":160,"stopReason":"end_turn"}
+        {"index":0,"role":"user","depth":0,"entryType":"text","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test.","timestamp":"2026-08-04T09:15:02Z","tokensIn":340,"tokensOut":0},
+        {"index":1,"role":"assistant","depth":0,"entryType":"text","content":"I will read the worker, then hand the test to a subagent while I add the retry.","timestamp":"2026-08-04T09:15:20Z","tokensIn":0,"tokensOut":180,"toolCalls":[{"id":"toolu_read_01","name":"Read","toolKind":"read","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\"}","result":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
+        {"index":2,"role":"assistant","depth":0,"entryType":"tool_use","content":"","timestamp":"2026-08-04T09:15:26Z","tokensIn":0,"tokensOut":90,"toolCalls":[{"id":"toolu_task_01","name":"Task","toolKind":"other","arguments":"{\"subagent_type\":\"test-writer\",\"description\":\"cover the webhook retry\",\"prompt\":\"Add a regression test for the bounded retry in internal/webhook/deliver.go.\"}","result":"Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."}]},
+        {"index":3,"role":"assistant","agentName":"test-writer","depth":0,"entryType":"text","content":"The worker calls post once, so the test should fail the first posts and assert a retry.","timestamp":"2026-08-04T09:16:00Z","tokensIn":0,"tokensOut":140,"toolCalls":[{"id":"toolu_edit_02","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver_test.go","arguments":"{\"file_path\":\"internal/webhook/deliver_test.go\",\"old_string\":\"func TestDeliver(t *testing.T) {\",\"new_string\":\"func TestDeliverRetries(t *testing.T) {\"}","result":"{\"ok\":true,\"additions\":22,\"deletions\":0}"}]},
+        {"index":4,"role":"assistant","depth":0,"entryType":"text","content":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","timestamp":"2026-08-04T09:16:20Z","tokensIn":0,"tokensOut":210,"toolCalls":[{"id":"toolu_edit_01","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\",\"old_string\":\"return post(ctx, e)\",\"new_string\":\"return postWithRetry(ctx, e, 5)\"}","result":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
+        {"index":5,"role":"assistant","depth":0,"entryType":"text","content":"The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery.","timestamp":"2026-08-04T09:16:40Z","tokensIn":0,"tokensOut":160,"stopReason":"end_turn"}
       ]
     },
     "groups": []
