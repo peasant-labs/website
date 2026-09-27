@@ -5,11 +5,19 @@ import type { FieldGroup, HarnessId, HarnessSample } from "@/lib/metadata-explor
 import type { RenderedSamples, RenderedView, ShikiToken } from "@/lib/schema-render";
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
+
+/*
+ * Measure before paint on the client and never on the server, so the shared
+ * column height is right on the first paint without a server-render warning.
+ */
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
  * The schema explorer.
@@ -142,7 +150,9 @@ export function MetadataExplorer({
   );
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const paneRef = useRef<HTMLDivElement | null>(null);
+  const sectionsRef = useRef<HTMLDivElement | null>(null);
   const pendingScrollRef = useRef(false);
+  const [panelHeight, setPanelHeight] = useState(0);
 
   const active = samples.find((sample) => sample.id === harnessId) ?? first;
   const view = active ? viewOf(active, viewId) : undefined;
@@ -168,6 +178,58 @@ export function MetadataExplorer({
       .querySelector<HTMLElement>(`[data-line="${line}"]`)
       ?.scrollIntoView({ block: "nearest" });
   }, [activeGroupId, viewRender]);
+
+  // The two columns share one height, and it must not move when a section opens
+  // or closes. The annotation column decides that height: measure it with each
+  // section open in turn and keep the tallest, so the document pane is as tall
+  // as the largest section and stays put while the reader switches between them.
+  useIsomorphicLayoutEffect(() => {
+    const sections = sectionsRef.current;
+    if (!sections) {
+      return;
+    }
+    const measure = () => {
+      const lists = Array.from(
+        sections.querySelectorAll<HTMLElement>(".mx-section-fields"),
+      );
+      const items = Array.from(sections.querySelectorAll<HTMLElement>(".mx-section"));
+      if (lists.length === 0 || items.length === 0) {
+        setPanelHeight(0);
+        return;
+      }
+      const gap = Number.parseFloat(getComputedStyle(sections).rowGap) || 0;
+      const wasHidden = lists.map((list) => list.hidden);
+      let tallest = 0;
+      for (let open = 0; open < lists.length; open += 1) {
+        lists.forEach((list, index) => {
+          list.hidden = index !== open;
+        });
+        // The open section shows a "selected" marker, which narrows its head and
+        // can wrap a summary to another line. Show it while measuring too, so
+        // the height is the one the reader actually gets.
+        const head = items[open]?.querySelector<HTMLElement>(".mx-section-head");
+        let marker: HTMLElement | null = null;
+        if (head && !head.querySelector(".mx-section-selected")) {
+          marker = document.createElement("span");
+          marker.className = "mx-section-selected";
+          marker.textContent = "selected";
+          head.appendChild(marker);
+        }
+        const height =
+          items.reduce((sum, item) => sum + item.getBoundingClientRect().height, 0) +
+          gap * (items.length - 1);
+        marker?.remove();
+        tallest = Math.max(tallest, height);
+      }
+      lists.forEach((list, index) => {
+        list.hidden = wasHidden[index];
+      });
+      setPanelHeight(Math.ceil(tallest));
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [active.id, viewId]);
 
   function selectGroupFromSection(id: string) {
     pendingScrollRef.current = true;
@@ -275,7 +337,14 @@ export function MetadataExplorer({
       >
         <p className="mx-intro">{active.intro}</p>
 
-        <div className="mx-grid">
+        <div
+          className="mx-grid"
+          style={
+            panelHeight > 0
+              ? ({ "--mx-row-h": `${panelHeight}px` } as CSSProperties)
+              : undefined
+          }
+        >
           <div className="mx-json-column">
             <div className="pj-terminal mx-terminal">
               <div className="pj-terminal-head">
@@ -301,7 +370,7 @@ export function MetadataExplorer({
             </div>
           </div>
 
-          <div className="mx-sections" data-schema-sections>
+          <div className="mx-sections" data-schema-sections ref={sectionsRef}>
             {groups.map((group) => (
               <Section
                 key={`${active.id}-${view.id}-${group.id}`}
