@@ -12,89 +12,388 @@
       "path": "~/.cursor/projects/<workspace>/agent-transcripts/<session-id>/<session-id>.jsonl",
       "format": "jsonl",
       "records": [
-        {"type":"session","id":"sess_mx_cursor","model":"gpt-5.2","cwd":"~/src/peasant","gitBranch":"webhook-retry","at":"2026-08-04T09:15:00Z","usage":{"input_tokens":2450,"output_tokens":730}},
-        {"role":"user","at":"2026-08-04T09:15:02Z","content":[{"type":"text","text":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test."}]},
-        {"role":"assistant","at":"2026-08-04T09:15:20Z","content":[{"type":"text","text":"I will read the worker, then hand the test to a subagent while I add the retry."},{"type":"tool_use","id":"toolu_read_01","name":"Read","input":{"path":"internal/webhook/deliver.go"}}]},
-        {"role":"user","at":"2026-08-04T09:15:24Z","content":[{"type":"tool_result","tool_use_id":"toolu_read_01","content":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
-        {"role":"assistant","at":"2026-08-04T09:15:26Z","content":[{"type":"tool_use","id":"toolu_task_01","name":"Task","input":{"subagent_type":"test-writer","description":"cover the webhook retry","prompt":"Add a regression test for the bounded retry in internal/webhook/deliver.go."}}]},
-        {"role":"user","at":"2026-08-04T09:16:00Z","content":[{"type":"tool_result","tool_use_id":"toolu_task_01","content":"Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."}]},
-        {"role":"assistant","agentName":"test-writer","at":"2026-08-04T09:16:00Z","content":[{"type":"text","text":"The worker calls post once, so the test should fail the first posts and assert a retry."},{"type":"tool_use","id":"toolu_edit_02","name":"Edit","input":{"path":"internal/webhook/deliver_test.go","old_string":"func TestDeliver(t *testing.T) {","new_string":"func TestDeliverRetries(t *testing.T) {"}}]},
-        {"role":"user","at":"2026-08-04T09:16:02Z","content":[{"type":"tool_result","tool_use_id":"toolu_edit_02","content":"{\"ok\":true,\"additions\":22,\"deletions\":0}"}]},
-        {"role":"assistant","at":"2026-08-04T09:16:20Z","content":[{"type":"text","text":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."},{"type":"tool_use","id":"toolu_edit_01","name":"Edit","input":{"path":"internal/webhook/deliver.go","old_string":"return post(ctx, e)","new_string":"return postWithRetry(ctx, e, 5)"}}]},
-        {"role":"user","at":"2026-08-04T09:16:24Z","content":[{"type":"tool_result","tool_use_id":"toolu_edit_01","content":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
-        {"role":"assistant","at":"2026-08-04T09:16:40Z","content":[{"type":"text","text":"The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery."}]},
-        {"type":"turn_ended","reason":"end_turn","at":"2026-08-04T09:16:40Z"},
-        {"role":"assistant","at":"2026-08-04T09:16:41Z","content":[{"type":"web_search","query":"bounded retry with backoff"}]}
-      ]
+        {
+          "role": "user",
+          "timestamp": "2026-08-04T09:15:02Z",
+          "message": {
+            "content": [
+              {
+                "type": "text",
+                "text": "The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test."
+              }
+            ]
+          }
+        },
+        {
+          "role": "assistant",
+          "timestamp": "2026-08-04T09:15:20Z",
+          "message": {
+            "model": "gpt-5.2",
+            "content": [
+              {
+                "type": "text",
+                "text": "I will read the worker, then hand the test to a subagent while I add the retry."
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_read_01",
+                "name": "Read",
+                "input": {
+                  "path": "internal/webhook/deliver.go"
+                }
+              }
+            ],
+            "usage": {
+              "input_tokens": 2450,
+              "output_tokens": 180
+            }
+          }
+        },
+        {
+          "role": "user",
+          "timestamp": "2026-08-04T09:15:24Z",
+          "message": {
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "toolu_read_01",
+                "content": "package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"
+              }
+            ]
+          }
+        },
+        {
+          "role": "assistant",
+          "timestamp": "2026-08-04T09:15:26Z",
+          "message": {
+            "model": "gpt-5.2",
+            "content": [
+              {
+                "type": "tool_use",
+                "id": "toolu_task_01",
+                "name": "Task",
+                "input": {
+                  "subagent_type": "test-writer",
+                  "description": "cover the webhook retry",
+                  "prompt": "Add a regression test for the bounded retry in internal/webhook/deliver.go."
+                }
+              }
+            ],
+            "usage": {
+              "input_tokens": 120,
+              "output_tokens": 90
+            }
+          }
+        },
+        {
+          "role": "user",
+          "timestamp": "2026-08-04T09:16:00Z",
+          "message": {
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "toolu_task_01",
+                "content": "Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."
+              }
+            ]
+          }
+        },
+        {
+          "role": "assistant",
+          "timestamp": "2026-08-04T09:16:20Z",
+          "message": {
+            "model": "gpt-5.2",
+            "content": [
+              {
+                "type": "text",
+                "text": "The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_edit_01",
+                "name": "Edit",
+                "input": {
+                  "path": "internal/webhook/deliver.go",
+                  "old_string": "return post(ctx, e)",
+                  "new_string": "return postWithRetry(ctx, e, 5)"
+                }
+              }
+            ],
+            "usage": {
+              "input_tokens": 180,
+              "output_tokens": 210
+            }
+          }
+        },
+        {
+          "role": "user",
+          "timestamp": "2026-08-04T09:16:24Z",
+          "message": {
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "toolu_edit_01",
+                "content": "{\"ok\":true,\"additions\":34,\"deletions\":4}"
+              }
+            ]
+          }
+        },
+        {
+          "role": "assistant",
+          "timestamp": "2026-08-04T09:16:40Z",
+          "message": {
+            "model": "gpt-5.2",
+            "content": [
+              {
+                "type": "text",
+                "text": "The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery."
+              }
+            ],
+            "usage": {
+              "input_tokens": 60,
+              "output_tokens": 160
+            }
+          }
+        },
+        {
+          "type": "turn_ended",
+          "timestamp": "2026-08-04T09:16:40Z",
+          "reason": "end_turn"
+        },
+        {
+          "role": "assistant",
+          "timestamp": "2026-08-04T09:16:41Z",
+          "message": {
+            "content": [
+              {
+                "type": "web_search",
+                "query": "bounded retry with backoff"
+              }
+            ]
+          }
+        }
+      ],
+      "subagent": {
+        "path": "~/.cursor/projects/<workspace>/agent-transcripts/<session-id>/subagents/<subagent-id>.jsonl",
+        "format": "jsonl",
+        "records": [
+          {
+            "role": "user",
+            "timestamp": "2026-08-04T09:15:27Z",
+            "message": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Add a regression test for the bounded retry in internal/webhook/deliver.go."
+                }
+              ]
+            }
+          },
+          {
+            "role": "assistant",
+            "timestamp": "2026-08-04T09:16:00Z",
+            "message": {
+              "model": "gpt-5.2",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The worker calls post once, so the test should fail the first posts and assert a retry."
+                },
+                {
+                  "type": "tool_use",
+                  "id": "toolu_edit_02",
+                  "name": "Edit",
+                  "input": {
+                    "path": "internal/webhook/deliver_test.go",
+                    "old_string": "func TestDeliver(t *testing.T) {",
+                    "new_string": "func TestDeliverRetries(t *testing.T) {"
+                  }
+                }
+              ],
+              "usage": {
+                "input_tokens": 80,
+                "output_tokens": 140
+              }
+            }
+          },
+          {
+            "role": "user",
+            "timestamp": "2026-08-04T09:16:02Z",
+            "message": {
+              "content": [
+                {
+                  "type": "tool_result",
+                  "tool_use_id": "toolu_edit_02",
+                  "content": "{\"ok\":true,\"additions\":22,\"deletions\":0}"
+                }
+              ]
+            }
+          }
+        ]
+      }
     },
     "groups": [
       {
         "id": "identity",
-        "selectors": ["path", "records[*].id", "records[*].model"],
+        "selectors": [
+          "path",
+          "records[*].message.model"
+        ],
         "fields": [
-          { "key": "path", "note": "one JSON Lines transcript per session under its workspace's agent-transcripts directory" },
-          { "key": "id", "note": "the session id; becomes the unified id" },
-          { "key": "model", "note": "the model that answered" }
+          {
+            "key": "path",
+            "note": "one transcript per session under agent-transcripts; the directory and file name carry the session id"
+          },
+          {
+            "key": "message.model",
+            "note": "the model that answered; absent when Cursor omits it"
+          },
+          {
+            "key": "subagent.path",
+            "note": "a subagent transcript nested under its parent's directory"
+          }
         ]
       },
       {
         "id": "session",
-        "selectors": ["records[*].cwd", "records[*].at"],
+        "selectors": [
+          "path",
+          "records[*].timestamp"
+        ],
         "fields": [
-          { "key": "cwd", "note": "the working directory; becomes workingDirectory" },
-          { "key": "at", "note": "the record time; the first and last become startTime and endTime" }
+          {
+            "key": "path",
+            "note": "the workspace directory in the path identifies the project; becomes workingDirectory"
+          },
+          {
+            "key": "timestamp",
+            "note": "the record time; the first and last become startTime and endTime"
+          }
         ]
       },
       {
         "id": "usage",
-        "selectors": ["records[*].usage"],
+        "selectors": [
+          "records[*].message.usage",
+          "subagent.records[*].message.usage"
+        ],
         "fields": [
-          { "key": "input_tokens", "note": "input tokens; summed into tokensIn" },
-          { "key": "output_tokens", "note": "output tokens; summed into tokensOut" }
+          {
+            "key": "input_tokens",
+            "note": "input tokens; summed into tokensIn"
+          },
+          {
+            "key": "output_tokens",
+            "note": "output tokens; summed into tokensOut"
+          }
         ]
       },
       {
         "id": "git",
-        "selectors": ["records[*].gitBranch"],
+        "selectors": [
+          "path"
+        ],
         "fields": [
-          { "key": "gitBranch", "note": "the branch; becomes the unified git context" }
+          {
+            "key": "path",
+            "note": "the workspace path identifies the repository; branch and remote are resolved with git, not recorded in the transcript"
+          }
         ]
       },
       {
         "id": "turns",
-        "selectors": ["records"],
+        "selectors": [
+          "records",
+          "subagent.records"
+        ],
         "fields": [
-          { "key": "role", "note": "user or assistant; becomes the unified turn role" },
-          { "key": "at", "note": "the record time, used to order turns" },
-          { "key": "agentName", "note": "a subagent record; it lowers to a turn with agentName" },
-          { "key": "type", "note": "turn_ended: a control record that writes no turn and does not block completeness" },
-          { "key": "content", "note": "the record's blocks; an undeclared block type is kept as complete redacted evidence, not dropped" }
+          {
+            "key": "role",
+            "note": "user or assistant; becomes the unified turn role"
+          },
+          {
+            "key": "timestamp",
+            "note": "the record time, used to order turns"
+          },
+          {
+            "key": "type",
+            "note": "turn_ended: a control record that writes no turn and does not block completeness"
+          },
+          {
+            "key": "message.content",
+            "note": "the record's blocks; a nested subagent transcript holds its own records"
+          },
+          {
+            "key": "content",
+            "note": "an undeclared block type (web_search) is kept as complete redacted evidence, not dropped"
+          }
         ]
       },
       {
         "id": "tool-calls",
-        "selectors": ["records[*].content[*]"],
+        "selectors": [
+          "records[*].message.content[*]",
+          "subagent.records[*].message.content[*]"
+        ],
         "fields": [
-          { "key": "type", "note": "text, tool_use, or tool_result" },
-          { "key": "id", "note": "the call id, matched by its result" },
-          { "key": "name", "note": "the tool name; Task launches a subagent" },
-          { "key": "input", "note": "the call arguments" }
+          {
+            "key": "type",
+            "note": "text, tool_use, or tool_result"
+          },
+          {
+            "key": "id",
+            "note": "the call id, matched by its result"
+          },
+          {
+            "key": "name",
+            "note": "the tool name; Task launches a subagent"
+          },
+          {
+            "key": "input",
+            "note": "the call arguments"
+          },
+          {
+            "key": "tool_use_id",
+            "note": "on a tool_result, the call it answers"
+          },
+          {
+            "key": "content",
+            "note": "what the tool returned"
+          }
         ]
       },
       {
         "id": "turn-identity",
-        "selectors": ["records[*].model"],
+        "selectors": [
+          "records[*].message.model",
+          "subagent.records[*].message.model"
+        ],
         "fields": [
-          { "key": "model", "note": "the model that produced the turn; the session-level model repeats here per turn" },
-          { "key": "agentName", "note": "a subagent turn; it carries the subagent's own model" }
+          {
+            "key": "message.model",
+            "note": "the model that produced the turn; repeated per assistant record"
+          },
+          {
+            "key": "subagent.records",
+            "note": "the subagent transcript's own turns carry the subagent's model"
+          }
         ]
       },
       {
         "id": "turn-usage",
-        "selectors": ["records[*].usage"],
+        "selectors": [
+          "records[*].message.usage",
+          "subagent.records[*].message.usage"
+        ],
         "fields": [
-          { "key": "usage.input_tokens", "note": "the turn's input tokens; summed into tokensIn" },
-          { "key": "usage.output_tokens", "note": "the turn's output tokens; summed into tokensOut" }
+          {
+            "key": "message.usage.input_tokens",
+            "note": "the turn's input tokens; summed into tokensIn"
+          },
+          {
+            "key": "message.usage.output_tokens",
+            "note": "the turn's output tokens; summed into tokensOut"
+          }
         ]
       }
     ]

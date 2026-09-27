@@ -12,88 +12,508 @@
       "path": "~/.claude/projects/<project>/<session-id>.jsonl",
       "format": "jsonl",
       "records": [
-        {"type":"user","uuid":"c1a1","sessionId":"sess_mx_claude","timestamp":"2026-08-04T09:15:02Z","cwd":"~/src/peasant","gitBranch":"webhook-retry","message":{"role":"user","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test."}},
-        {"type":"assistant","uuid":"c1a2","timestamp":"2026-08-04T09:15:20Z","message":{"role":"assistant","model":"claude-opus-5","usage":{"input_tokens":2450,"output_tokens":180},"content":[{"type":"text","text":"I will read the worker, then hand the test to a subagent while I add the retry."},{"type":"tool_use","id":"toolu_read_01","name":"Read","input":{"file_path":"internal/webhook/deliver.go"}}]}},
-        {"type":"user","uuid":"c1a3","timestamp":"2026-08-04T09:15:24Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_read_01","content":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]}},
-        {"type":"assistant","uuid":"c1a4","timestamp":"2026-08-04T09:15:26Z","message":{"role":"assistant","model":"claude-opus-5","usage":{"input_tokens":120,"output_tokens":90},"content":[{"type":"tool_use","id":"toolu_task_01","name":"Task","input":{"subagent_type":"test-writer","description":"cover the webhook retry","prompt":"Add a regression test for the bounded retry in internal/webhook/deliver.go."}}]}},
-        {"type":"user","uuid":"c1a5","timestamp":"2026-08-04T09:16:00Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_task_01","content":"Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."}]}},
-        {"type":"assistant","uuid":"c1a6","isSidechain":true,"timestamp":"2026-08-04T09:16:00Z","message":{"role":"assistant","model":"claude-opus-5","usage":{"input_tokens":80,"output_tokens":140},"content":[{"type":"text","text":"The worker calls post once, so the test should fail the first posts and assert a retry."},{"type":"tool_use","id":"toolu_edit_02","name":"Edit","input":{"file_path":"internal/webhook/deliver_test.go","old_string":"func TestDeliver(t *testing.T) {","new_string":"func TestDeliverRetries(t *testing.T) {"}}]}},
-        {"type":"user","uuid":"c1a7","isSidechain":true,"timestamp":"2026-08-04T09:16:02Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_edit_02","content":"{\"ok\":true,\"additions\":22,\"deletions\":0}"}]}},
-        {"type":"assistant","uuid":"c1a8","timestamp":"2026-08-04T09:16:20Z","message":{"role":"assistant","model":"claude-opus-5","usage":{"input_tokens":180,"output_tokens":210},"content":[{"type":"text","text":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."},{"type":"tool_use","id":"toolu_edit_01","name":"Edit","input":{"file_path":"internal/webhook/deliver.go","old_string":"return post(ctx, e)","new_string":"return postWithRetry(ctx, e, 5)"}}]}},
-        {"type":"user","uuid":"c1a9","timestamp":"2026-08-04T09:16:24Z","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_edit_01","content":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]}},
-        {"type":"assistant","uuid":"c1aa","timestamp":"2026-08-04T09:16:40Z","message":{"role":"assistant","model":"claude-opus-5","usage":{"input_tokens":60,"output_tokens":160},"content":[{"type":"text","text":"The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery."}]}},
-        {"type":"attachment","uuid":"c1ab","timestamp":"2026-08-04T09:15:01Z","attachment":{"type":"hook_success","hookName":"SessionStart","exitCode":0}},
-        {"type":"telemetry-snapshot","uuid":"c1ac","timestamp":"2026-08-04T09:16:41Z","snapshot":{"route":"/v1/sessions","latencyMs":41}}
+        {
+          "type": "user",
+          "uuid": "c1a10000-0000-4000-8000-000000000001",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:15:02Z",
+          "message": {
+            "role": "user",
+            "content": "The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test."
+          }
+        },
+        {
+          "type": "assistant",
+          "uuid": "c1a10000-0000-4000-8000-000000000002",
+          "parentUuid": "c1a10000-0000-4000-8000-000000000001",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:15:20Z",
+          "message": {
+            "id": "msg_mx_claude_01",
+            "type": "message",
+            "role": "assistant",
+            "model": "claude-opus-5",
+            "stop_reason": "tool_use",
+            "usage": {
+              "input_tokens": 2450,
+              "output_tokens": 180,
+              "cache_creation_input_tokens": 1024,
+              "cache_read_input_tokens": 8192
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "I will read the worker, then hand the test to a subagent while I add the retry."
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_read_01",
+                "name": "Read",
+                "input": {
+                  "file_path": "internal/webhook/deliver.go"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "user",
+          "uuid": "c1a10000-0000-4000-8000-000000000003",
+          "parentUuid": "c1a10000-0000-4000-8000-000000000002",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:15:24Z",
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "toolu_read_01",
+                "content": "package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"
+              }
+            ]
+          }
+        },
+        {
+          "type": "assistant",
+          "uuid": "c1a10000-0000-4000-8000-000000000004",
+          "parentUuid": "c1a10000-0000-4000-8000-000000000003",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:15:26Z",
+          "message": {
+            "id": "msg_mx_claude_02",
+            "type": "message",
+            "role": "assistant",
+            "model": "claude-opus-5",
+            "stop_reason": "tool_use",
+            "usage": {
+              "input_tokens": 120,
+              "output_tokens": 90
+            },
+            "content": [
+              {
+                "type": "tool_use",
+                "id": "toolu_task_01",
+                "name": "Task",
+                "input": {
+                  "subagent_type": "test-writer",
+                  "description": "cover the webhook retry",
+                  "prompt": "Add a regression test for the bounded retry in internal/webhook/deliver.go."
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "user",
+          "uuid": "c1a10000-0000-4000-8000-000000000005",
+          "parentUuid": "c1a10000-0000-4000-8000-000000000004",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:16:00Z",
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "toolu_task_01",
+                "content": "Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."
+              }
+            ]
+          }
+        },
+        {
+          "type": "assistant",
+          "uuid": "c1a10000-0000-4000-8000-000000000006",
+          "parentUuid": "c1a10000-0000-4000-8000-000000000005",
+          "agentId": "agent-a083060",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": true,
+          "timestamp": "2026-08-04T09:16:00Z",
+          "message": {
+            "id": "msg_mx_claude_03",
+            "type": "message",
+            "role": "assistant",
+            "model": "claude-opus-5",
+            "stop_reason": "tool_use",
+            "usage": {
+              "input_tokens": 80,
+              "output_tokens": 140
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "The worker calls post once, so the test should fail the first posts and assert a retry."
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_edit_02",
+                "name": "Edit",
+                "input": {
+                  "file_path": "internal/webhook/deliver_test.go",
+                  "old_string": "func TestDeliver(t *testing.T) {",
+                  "new_string": "func TestDeliverRetries(t *testing.T) {"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "user",
+          "uuid": "c1a10000-0000-4000-8000-000000000007",
+          "parentUuid": "c1a10000-0000-4000-8000-000000000006",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": true,
+          "timestamp": "2026-08-04T09:16:02Z",
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "toolu_edit_02",
+                "content": "{\"ok\":true,\"additions\":22,\"deletions\":0}"
+              }
+            ]
+          }
+        },
+        {
+          "type": "assistant",
+          "uuid": "c1a10000-0000-4000-8000-000000000008",
+          "parentUuid": "c1a10000-0000-4000-8000-000000000005",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:16:20Z",
+          "message": {
+            "id": "msg_mx_claude_04",
+            "type": "message",
+            "role": "assistant",
+            "model": "claude-opus-5",
+            "stop_reason": "tool_use",
+            "usage": {
+              "input_tokens": 180,
+              "output_tokens": 210
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_edit_01",
+                "name": "Edit",
+                "input": {
+                  "file_path": "internal/webhook/deliver.go",
+                  "old_string": "return post(ctx, e)",
+                  "new_string": "return postWithRetry(ctx, e, 5)"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "user",
+          "uuid": "c1a10000-0000-4000-8000-000000000009",
+          "parentUuid": "c1a10000-0000-4000-8000-000000000008",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:16:24Z",
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "toolu_edit_01",
+                "content": "{\"ok\":true,\"additions\":34,\"deletions\":4}"
+              }
+            ]
+          }
+        },
+        {
+          "type": "assistant",
+          "uuid": "c1a10000-0000-4000-8000-000000000010",
+          "parentUuid": "c1a10000-0000-4000-8000-000000000009",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:16:40Z",
+          "message": {
+            "id": "msg_mx_claude_05",
+            "type": "message",
+            "role": "assistant",
+            "model": "claude-opus-5",
+            "stop_reason": "end_turn",
+            "usage": {
+              "input_tokens": 60,
+              "output_tokens": 160
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery."
+              }
+            ]
+          }
+        },
+        {
+          "type": "attachment",
+          "uuid": "c1a10000-0000-4000-8000-000000000011",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:15:01Z",
+          "attachment": {
+            "type": "hook_success",
+            "hookName": "SessionStart",
+            "exitCode": 0
+          }
+        },
+        {
+          "type": "telemetry-snapshot",
+          "uuid": "c1a10000-0000-4000-8000-000000000012",
+          "sessionId": "sess_mx_claude",
+          "cwd": "~/src/peasant",
+          "gitBranch": "webhook-retry",
+          "userType": "external",
+          "version": "2.1.0",
+          "isSidechain": false,
+          "timestamp": "2026-08-04T09:16:41Z",
+          "snapshot": {
+            "route": "/v1/sessions",
+            "latencyMs": 41
+          }
+        }
       ]
     },
     "groups": [
       {
         "id": "identity",
-        "selectors": ["path", "records[*].sessionId", "records[*].message.model"],
+        "selectors": [
+          "path",
+          "records[*].sessionId",
+          "records[*].message.model"
+        ],
         "fields": [
-          { "key": "path", "note": "one JSON Lines transcript per session under a per-project directory; its name carries the session id" },
-          { "key": "sessionId", "note": "the session id; becomes the unified id" },
-          { "key": "message.model", "note": "the model that answered" }
+          {
+            "key": "path",
+            "note": "one JSON Lines transcript per session under a per-project directory; its name carries the session id"
+          },
+          {
+            "key": "sessionId",
+            "note": "the session id on every record; becomes the unified id"
+          },
+          {
+            "key": "message.model",
+            "note": "the model that answered"
+          },
+          {
+            "key": "version",
+            "note": "the harness version stamped on every record"
+          }
         ]
       },
       {
         "id": "session",
-        "selectors": ["records[*].cwd", "records[*].timestamp"],
+        "selectors": [
+          "records[*].cwd",
+          "records[*].timestamp"
+        ],
         "fields": [
-          { "key": "cwd", "note": "the working directory; becomes workingDirectory" },
-          { "key": "timestamp", "note": "the record time; the first and last become startTime and endTime" }
+          {
+            "key": "cwd",
+            "note": "the working directory; becomes workingDirectory"
+          },
+          {
+            "key": "timestamp",
+            "note": "the record time; the first and last become startTime and endTime"
+          }
         ]
       },
       {
         "id": "usage",
-        "selectors": ["records[*].message.usage"],
+        "selectors": [
+          "records[*].message.usage"
+        ],
         "fields": [
-          { "key": "input_tokens", "note": "input tokens; summed into tokensIn" },
-          { "key": "output_tokens", "note": "output tokens; summed into tokensOut" }
+          {
+            "key": "input_tokens",
+            "note": "the non-cached input tokens; summed with the cache fields into tokensIn"
+          },
+          {
+            "key": "cache_creation_input_tokens",
+            "note": "cache-write input tokens; folded into tokensIn"
+          },
+          {
+            "key": "cache_read_input_tokens",
+            "note": "cache-read input tokens; folded into tokensIn"
+          },
+          {
+            "key": "output_tokens",
+            "note": "output tokens; summed into tokensOut"
+          }
         ]
       },
       {
         "id": "git",
-        "selectors": ["records[*].gitBranch"],
+        "selectors": [
+          "records[*].gitBranch"
+        ],
         "fields": [
-          { "key": "gitBranch", "note": "the branch; becomes the unified git context" }
+          {
+            "key": "gitBranch",
+            "note": "the branch; becomes the unified git context"
+          }
         ]
       },
       {
         "id": "turns",
-        "selectors": ["records"],
+        "selectors": [
+          "records"
+        ],
         "fields": [
-          { "key": "type", "note": "the record kind; message records lower to turns" },
-          { "key": "uuid", "note": "the record id, kept for source ordering" },
-          { "key": "isSidechain", "note": "a subagent record; it lowers to a turn with agentName" },
-          { "key": "attachment", "note": "a control record: it writes no turn and does not block completeness" },
-          { "key": "snapshot", "note": "an undeclared kind kept as complete redacted evidence, not dropped" }
+          {
+            "key": "type",
+            "note": "user and assistant records lower to turns; control records write none"
+          },
+          {
+            "key": "uuid",
+            "note": "the record id, kept for source ordering"
+          },
+          {
+            "key": "parentUuid",
+            "note": "links the record to the one before it"
+          },
+          {
+            "key": "isSidechain",
+            "note": "a subagent record; it lowers to a turn carrying the subagent's agent id"
+          },
+          {
+            "key": "message.content",
+            "note": "a string or content blocks; the reader-visible text or tool traffic"
+          },
+          {
+            "key": "attachment",
+            "note": "a control record: it writes no turn and does not block completeness"
+          },
+          {
+            "key": "snapshot",
+            "note": "an undeclared kind kept as complete redacted evidence, not dropped"
+          }
         ]
       },
       {
         "id": "tool-calls",
-        "selectors": ["records[*].message.content[*]"],
+        "selectors": [
+          "records[*].message.content[*]"
+        ],
         "fields": [
-          { "key": "type", "note": "tool_use lowers to a call; tool_result to its result" },
-          { "key": "id", "note": "the call id, matched by its result" },
-          { "key": "name", "note": "the tool name; Task launches a subagent" },
-          { "key": "input", "note": "the call arguments" }
+          {
+            "key": "type",
+            "note": "tool_use lowers to a call; tool_result to its result"
+          },
+          {
+            "key": "id",
+            "note": "the call id, matched by its result"
+          },
+          {
+            "key": "name",
+            "note": "the tool name; Task launches a subagent"
+          },
+          {
+            "key": "input",
+            "note": "the call arguments"
+          },
+          {
+            "key": "tool_use_id",
+            "note": "on a tool_result, the call it answers"
+          },
+          {
+            "key": "content",
+            "note": "what the tool returned"
+          }
         ]
       },
       {
         "id": "turn-identity",
-        "selectors": ["records[*].message.model"],
+        "selectors": [
+          "records[*].message.model",
+          "records[*].isSidechain",
+          "records[*].agentId"
+        ],
         "fields": [
-          { "key": "message.model", "note": "the model that produced the turn; the session-level model repeats here per turn" },
-          { "key": "isSidechain", "note": "a subagent turn; it carries the subagent's own model" }
+          {
+            "key": "message.model",
+            "note": "the model that produced the turn; repeated per assistant record"
+          },
+          {
+            "key": "isSidechain",
+            "note": "a subagent turn"
+          },
+          {
+            "key": "agentId",
+            "note": "the subagent that produced the sidechain turn"
+          }
         ]
       },
       {
         "id": "turn-usage",
-        "selectors": ["records[*].message.usage"],
+        "selectors": [
+          "records[*].message.usage"
+        ],
         "fields": [
-          { "key": "message.usage.input_tokens", "note": "the turn's input tokens; summed into tokensIn" },
-          { "key": "message.usage.output_tokens", "note": "the turn's output tokens; summed into tokensOut" }
+          {
+            "key": "message.usage.input_tokens",
+            "note": "the turn's input tokens; summed into tokensIn"
+          },
+          {
+            "key": "message.usage.output_tokens",
+            "note": "the turn's output tokens; summed into tokensOut"
+          }
         ]
       }
     ]
