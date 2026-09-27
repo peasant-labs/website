@@ -146,7 +146,7 @@ test("the first region is active on load and a section header activates its regi
   );
 });
 
-test("hovering a JSON region marks its section active", async ({ page }) => {
+test("a JSON region selects its section on click, not on hover", async ({ page }) => {
   await page.goto("/projects");
   const root = page.locator("[data-metadata-explorer]");
   const blocks = sampleById("claude-code").native.groups.find(
@@ -155,13 +155,59 @@ test("hovering a JSON region marks its section active", async ({ page }) => {
   if (!blocks) {
     throw new Error("expected a blocks group on the claude-code native view");
   }
+  const firstGroup = samples[0].native.groups[0];
+  const region = root.locator(`[data-line][data-groups~="${blocks.id}"]`).first();
 
-  await root.locator(`[data-line][data-groups~="${blocks.id}"]`).first().hover();
+  await region.hover();
+  await expect(root.locator(`[data-section="${blocks.id}"]`)).not.toHaveAttribute(
+    "data-active",
+    "true",
+  );
+  await expect(root.locator(`[data-section="${firstGroup.id}"]`)).toHaveAttribute(
+    "data-active",
+    "true",
+  );
 
+  await region.click();
   await expect(root.locator(`[data-section="${blocks.id}"]`)).toHaveAttribute(
     "data-active",
     "true",
   );
+});
+
+test("the active region is tinted with the active section's accent", async ({ page }) => {
+  await page.goto("/projects");
+  const root = page.locator("[data-metadata-explorer]");
+  const firstGroup = samples[0].native.groups[0];
+
+  await expect(root.locator("[data-json-pane]")).toHaveAttribute(
+    "data-accent",
+    firstGroup.accent,
+  );
+
+  const tint = await page.evaluate(() => {
+    const pane = document.querySelector("[data-json-pane]");
+    const line = document.querySelector('.mx-json-line[data-active="true"]');
+    const section = document.querySelector('.mx-section[data-active="true"]');
+    if (!pane || !line || !section) {
+      return null;
+    }
+    const accent = getComputedStyle(section).getPropertyValue("--mx-accent").trim();
+    const probe = document.createElement("span");
+    probe.style.color = accent;
+    document.body.appendChild(probe);
+    const accentColor = getComputedStyle(probe).color;
+    probe.remove();
+    const firstColor = (value: string) => value.match(/rgba?\([^)]*\)/)?.[0] ?? "";
+    return {
+      paneAccent: pane.getAttribute("data-accent"),
+      lineColor: firstColor(getComputedStyle(line).boxShadow),
+      accentColor,
+    };
+  });
+
+  expect(tint?.paneAccent).toBe(firstGroup.accent);
+  expect(tint?.lineColor).toBe(tint?.accentColor);
 });
 
 test("arrow keys move the active harness tab", async ({ page }) => {

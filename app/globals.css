@@ -1926,9 +1926,13 @@
   cursor: pointer;
 }
 
+/*
+ * The active region is tinted with the active section's accent — the same
+ * --mx-accent its section carries — so the two sides read as one selection.
+ */
 .mx-json-line[data-active="true"] {
-  background: color-mix(in srgb, var(--amber) 10%, transparent);
-  box-shadow: inset var(--stroke-emphasis) 0 0 0 var(--amber);
+  background: color-mix(in srgb, var(--mx-accent, var(--amber)) 10%, transparent);
+  box-shadow: inset var(--stroke-emphasis) 0 0 0 var(--mx-accent, var(--amber));
 }
 
 .mx-sections {
@@ -1943,27 +1947,33 @@
   background: var(--surface);
 }
 
-.mx-section[data-accent="olive"] {
+.mx-section[data-accent="olive"],
+.mx-json-pane[data-accent="olive"] {
   --mx-accent: var(--olive);
 }
 
-.mx-section[data-accent="teal"] {
+.mx-section[data-accent="teal"],
+.mx-json-pane[data-accent="teal"] {
   --mx-accent: var(--teal);
 }
 
-.mx-section[data-accent="clay"] {
+.mx-section[data-accent="clay"],
+.mx-json-pane[data-accent="clay"] {
   --mx-accent: var(--clay);
 }
 
-.mx-section[data-accent="group-y"] {
+.mx-section[data-accent="group-y"],
+.mx-json-pane[data-accent="group-y"] {
   --mx-accent: var(--mauve);
 }
 
-.mx-section[data-accent="red"] {
+.mx-section[data-accent="red"],
+.mx-json-pane[data-accent="red"] {
   --mx-accent: color-mix(in srgb, var(--danger) 68%, var(--amber));
 }
 
-.mx-section[data-accent="amber"] {
+.mx-section[data-accent="amber"],
+.mx-json-pane[data-accent="amber"] {
   --mx-accent: var(--amber);
 }
 

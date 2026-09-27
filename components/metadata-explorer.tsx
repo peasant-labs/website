@@ -117,7 +117,6 @@ function HighlightedJson({
               data-line={index}
               data-groups={groups.length > 0 ? groups.join(" ") : undefined}
               data-active={active ? "true" : undefined}
-              onMouseEnter={groups.length > 0 ? () => onActivate(groups[0]) : undefined}
               onClick={groups.length > 0 ? () => onActivate(groups[0]) : undefined}
             >
               {tokens.length > 0
@@ -158,9 +157,11 @@ export function MetadataExplorer({
   const view = active ? viewOf(active, viewId) : undefined;
   const viewRender = active ? rendered[active.id]?.[viewId] : undefined;
   const groups = view?.groups ?? [];
+  const activeAccent = groups.find((group) => group.id === activeGroupId)?.accent;
 
-  // A section header click or focus brings its first line into view; hovering a
-  // line only highlights it, so the reader can scan without the pane jumping.
+  // Selecting from a section header scrolls the group's first line into view.
+  // Selecting by clicking a region does not move the pane, and hover never
+  // selects at all, so scanning the document stays quiet.
   useEffect(() => {
     if (!pendingScrollRef.current) {
       return;
@@ -356,6 +357,7 @@ export function MetadataExplorer({
               <div
                 className="mx-json-pane"
                 data-json-pane
+                data-accent={activeAccent}
                 ref={paneRef}
                 role="group"
                 aria-label={`${view.label} document`}
