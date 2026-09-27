@@ -64,6 +64,8 @@ export type FieldGroup = {
   selectors: string[];
   /** line-by-line notes, keyed by JSON key name. */
   fields: FieldNote[];
+  /** the parent category id for a nested level; omitted at the top level. */
+  parent?: string;
 };
 
 /**
@@ -197,7 +199,7 @@ export const UNIFIED_GROUPS: FieldGroup[] = [
     id: "turns",
     title: "turns",
     accent: "amber",
-    summary: "the conversation, one turn per index, including subagent turns",
+    summary: "the conversation, one turn per index",
     selectors: ["turns"],
     fields: [
       { key: "role", note: "user, assistant, tool, or system" },
@@ -207,14 +209,13 @@ export const UNIFIED_GROUPS: FieldGroup[] = [
       },
       { key: "content", note: "the turn's reader-visible text" },
       { key: "depth", note: "0 for a message turn, 1 for a content part" },
-      { key: "agentName", note: "the subagent that produced the turn, when a launch did" },
-      { key: "toolCalls", note: "the calls attached to this turn" },
       { key: "stopReason", note: "why the model stopped, when it did" },
     ],
   },
   {
     id: "tool-calls",
     title: "tool calls",
+    parent: "turns",
     accent: "red",
     summary: "each call attached to a turn",
     selectors: ["turns[*].toolCalls"],
@@ -231,6 +232,30 @@ export const UNIFIED_GROUPS: FieldGroup[] = [
         key: "result",
         note: "what the tool returned, as text or a JSON string",
       },
+    ],
+  },
+  {
+    id: "turn-identity",
+    title: "turn identity",
+    parent: "turns",
+    accent: "teal",
+    summary: "the model that produced each turn, and the subagent when one did",
+    selectors: ["turns[*].observedModel", "turns[*].agentName"],
+    fields: [
+      { key: "observedModel", note: "the exact model that produced the turn" },
+      { key: "agentName", note: "the subagent that produced the turn, when a launch did" },
+    ],
+  },
+  {
+    id: "turn-usage",
+    title: "turn usage",
+    parent: "turns",
+    accent: "clay",
+    summary: "the tokens each turn spent, repeating the session totals",
+    selectors: ["turns[*].tokensIn", "turns[*].tokensOut"],
+    fields: [
+      { key: "tokensIn", note: "input tokens for the turn" },
+      { key: "tokensOut", note: "output tokens for the turn" },
     ],
   },
 ];

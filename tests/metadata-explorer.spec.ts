@@ -101,6 +101,23 @@ test("the example session launches a subagent", () => {
   }
 });
 
+test("the turn subcategories nest under turns", () => {
+  const parentOf = new Map(UNIFIED_GROUPS.map((group) => [group.id, group.parent]));
+  expect(parentOf.get("tool-calls")).toBe("turns");
+  expect(parentOf.get("turn-identity")).toBe("turns");
+  expect(parentOf.get("turn-usage")).toBe("turns");
+  for (const sample of samples) {
+    for (const view of [sample.native, sample.unified]) {
+      const nested = view.groups.filter((group) => group.parent === "turns").map((g) => g.id);
+      expect(nested, `${sample.id} ${view.id}`).toEqual([
+        "tool-calls",
+        "turn-identity",
+        "turn-usage",
+      ]);
+    }
+  }
+});
+
 test("validation rejects an out-of-range turn index and a selector that matches nothing", () => {
   const badTurn = structuredClone(samples);
   (badTurn[0].unified.document as { turns: Array<{ index: number }> }).turns[0].index = 99;
@@ -204,6 +221,22 @@ test("a JSON region selects its section on click, not on hover", async ({ page }
     "data-active",
     "true",
   );
+});
+
+test("a nested category renders indented under turns", async ({ page }) => {
+  await page.goto("/projects");
+  const root = page.locator("[data-metadata-explorer]");
+  const turns = root.locator('[data-section="turns"]');
+  const nested = root.locator('[data-section="turn-usage"]');
+
+  await expect(nested).toHaveAttribute("data-nested", "true");
+  const turnsBox = await turns.boundingBox();
+  const nestedBox = await nested.boundingBox();
+  expect(nestedBox?.x ?? 0).toBeGreaterThan(turnsBox?.x ?? 0);
+
+  await root.locator('[data-line][data-groups~="turn-usage"]').first().click();
+  await expect(nested).toHaveAttribute("data-active", "true");
+  await expect(turns).not.toHaveAttribute("data-active", "true");
 });
 
 test("the active region is tinted with the active section's accent", async ({ page }) => {

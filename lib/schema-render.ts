@@ -84,12 +84,24 @@ async function renderDocument(
   const perGroup = groupLines(document, groups, nodeLines);
 
   // A line can belong to a shallow group and a nested one (a tool call is inside
-  // a turn; a content block is inside a message). Order each line's groups most
-  // specific first, so hovering a line activates the tightest group that covers
-  // it.
+  // a turn; a per-turn field repeats its session-level category). Order each
+  // line's groups most specific first: deeper selectors win, and when two groups
+  // select the same field the nested category wins over its top-level namesake.
   const depthOf = (group: FieldGroup) =>
     Math.max(...group.selectors.map((selector) => parseSelector(selector).length));
-  const ordered = [...groups].sort((a, b) => depthOf(b) - depthOf(a));
+  const byId = new Map(groups.map((group) => [group.id, group]));
+  const nestingOf = (group: FieldGroup) => {
+    let depth = 0;
+    let parent = group.parent;
+    while (parent) {
+      depth += 1;
+      parent = byId.get(parent)?.parent;
+    }
+    return depth;
+  };
+  const ordered = [...groups].sort(
+    (a, b) => depthOf(b) - depthOf(a) || nestingOf(b) - nestingOf(a),
+  );
 
   const lineGroups: string[][] = lines.map(() => []);
   for (const group of ordered) {

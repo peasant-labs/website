@@ -50,10 +50,12 @@ function tokenStyle(token: ShikiToken): CSSProperties {
 function Section({
   group,
   active,
+  nested,
   onSelect,
 }: {
   group: FieldGroup;
   active: boolean;
+  nested: boolean;
   onSelect: (id: string) => void;
 }) {
   const fieldsId = `mx-fields-${group.id}`;
@@ -63,6 +65,7 @@ function Section({
       className="mx-section"
       data-section={group.id}
       data-accent={group.accent}
+      data-nested={nested ? "true" : undefined}
       data-active={active ? "true" : undefined}
     >
       <button
@@ -92,6 +95,27 @@ function Section({
       </dl>
     </div>
   );
+}
+
+/** Parents in order, each followed by its nested children, so a child reads under its parent. */
+function orderGroups(groups: FieldGroup[]): FieldGroup[] {
+  const childrenOf = new Map<string, FieldGroup[]>();
+  for (const group of groups) {
+    if (!group.parent) {
+      continue;
+    }
+    const children = childrenOf.get(group.parent) ?? [];
+    children.push(group);
+    childrenOf.set(group.parent, children);
+  }
+  const ordered: FieldGroup[] = [];
+  for (const group of groups) {
+    if (group.parent) {
+      continue;
+    }
+    ordered.push(group, ...(childrenOf.get(group.id) ?? []));
+  }
+  return ordered;
 }
 
 function HighlightedJson({
@@ -381,11 +405,12 @@ export function MetadataExplorer({
           </div>
 
           <div className="mx-sections" data-schema-sections ref={sectionsRef}>
-            {groups.map((group) => (
+            {orderGroups(groups).map((group) => (
               <Section
                 key={`${active.id}-${view.id}-${group.id}`}
                 group={group}
                 active={group.id === activeGroupId}
+                nested={group.parent !== undefined}
                 onSelect={selectGroupFromSection}
               />
             ))}

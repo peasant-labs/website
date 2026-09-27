@@ -1947,6 +1947,14 @@
   background: var(--surface);
 }
 
+/*
+ * A nested category sits under its parent: indented, so the child/parent
+ * relationship reads from position, not colour alone.
+ */
+.mx-section[data-nested="true"] {
+  margin-inline-start: var(--sp-5);
+}
+
 .mx-section[data-accent="olive"],
 .mx-json-pane[data-accent="olive"] {
   --mx-accent: var(--olive);

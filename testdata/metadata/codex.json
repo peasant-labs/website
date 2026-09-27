@@ -80,6 +80,21 @@
           { "key": "payload.arguments", "note": "the call input, as a JSON string" },
           { "key": "payload.output", "note": "what the call returned" }
         ]
+      },
+      {
+        "id": "turn-identity",
+        "selectors": ["records[*].payload.model"],
+        "fields": [
+          { "key": "payload.model", "note": "the model that produced the turn; the session-level model repeats here per turn" }
+        ]
+      },
+      {
+        "id": "turn-usage",
+        "selectors": ["records[*].payload.info"],
+        "fields": [
+          { "key": "payload.info.total_token_usage.input_tokens", "note": "the turn's input tokens; summed into tokensIn" },
+          { "key": "payload.info.total_token_usage.output_tokens", "note": "the turn's output tokens; summed into tokensOut" }
+        ]
       }
     ]
   },
@@ -115,11 +130,11 @@
       },
       "turns": [
         {"index":0,"role":"user","depth":0,"entryType":"text","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test.","timestamp":"2026-08-04T09:15:02Z","tokensIn":340,"tokensOut":0},
-        {"index":1,"role":"assistant","depth":0,"entryType":"text","content":"I will read the worker, then hand the test to a subagent while I add the retry.","timestamp":"2026-08-04T09:15:20Z","tokensIn":0,"tokensOut":180,"toolCalls":[{"id":"toolu_read_01","name":"Read","toolKind":"read","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\"}","result":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
-        {"index":2,"role":"assistant","depth":0,"entryType":"tool_use","content":"","timestamp":"2026-08-04T09:15:26Z","tokensIn":0,"tokensOut":90,"toolCalls":[{"id":"toolu_task_01","name":"Task","toolKind":"other","arguments":"{\"subagent_type\":\"test-writer\",\"description\":\"cover the webhook retry\",\"prompt\":\"Add a regression test for the bounded retry in internal/webhook/deliver.go.\"}","result":"Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."}]},
-        {"index":3,"role":"assistant","agentName":"test-writer","depth":0,"entryType":"text","content":"The worker calls post once, so the test should fail the first posts and assert a retry.","timestamp":"2026-08-04T09:16:00Z","tokensIn":0,"tokensOut":140,"toolCalls":[{"id":"toolu_edit_02","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver_test.go","arguments":"{\"file_path\":\"internal/webhook/deliver_test.go\",\"old_string\":\"func TestDeliver(t *testing.T) {\",\"new_string\":\"func TestDeliverRetries(t *testing.T) {\"}","result":"{\"ok\":true,\"additions\":22,\"deletions\":0}"}]},
-        {"index":4,"role":"assistant","depth":0,"entryType":"text","content":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","timestamp":"2026-08-04T09:16:20Z","tokensIn":0,"tokensOut":210,"toolCalls":[{"id":"toolu_edit_01","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\",\"old_string\":\"return post(ctx, e)\",\"new_string\":\"return postWithRetry(ctx, e, 5)\"}","result":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
-        {"index":5,"role":"assistant","depth":0,"entryType":"text","content":"The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery.","timestamp":"2026-08-04T09:16:40Z","tokensIn":0,"tokensOut":160,"stopReason":"end_turn"}
+        {"index":1,"role":"assistant","observedModel":"gpt-5.2-codex","depth":0,"entryType":"text","content":"I will read the worker, then hand the test to a subagent while I add the retry.","timestamp":"2026-08-04T09:15:20Z","tokensIn":0,"tokensOut":180,"toolCalls":[{"id":"toolu_read_01","name":"Read","toolKind":"read","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\"}","result":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
+        {"index":2,"role":"assistant","observedModel":"gpt-5.2-codex","depth":0,"entryType":"tool_use","content":"","timestamp":"2026-08-04T09:15:26Z","tokensIn":0,"tokensOut":90,"toolCalls":[{"id":"toolu_task_01","name":"Task","toolKind":"other","arguments":"{\"subagent_type\":\"test-writer\",\"description\":\"cover the webhook retry\",\"prompt\":\"Add a regression test for the bounded retry in internal/webhook/deliver.go.\"}","result":"Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."}]},
+        {"index":3,"role":"assistant","observedModel":"gpt-5.2-codex","agentName":"test-writer","depth":0,"entryType":"text","content":"The worker calls post once, so the test should fail the first posts and assert a retry.","timestamp":"2026-08-04T09:16:00Z","tokensIn":0,"tokensOut":140,"toolCalls":[{"id":"toolu_edit_02","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver_test.go","arguments":"{\"file_path\":\"internal/webhook/deliver_test.go\",\"old_string\":\"func TestDeliver(t *testing.T) {\",\"new_string\":\"func TestDeliverRetries(t *testing.T) {\"}","result":"{\"ok\":true,\"additions\":22,\"deletions\":0}"}]},
+        {"index":4,"role":"assistant","observedModel":"gpt-5.2-codex","depth":0,"entryType":"text","content":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","timestamp":"2026-08-04T09:16:20Z","tokensIn":0,"tokensOut":210,"toolCalls":[{"id":"toolu_edit_01","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\",\"old_string\":\"return post(ctx, e)\",\"new_string\":\"return postWithRetry(ctx, e, 5)\"}","result":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
+        {"index":5,"role":"assistant","observedModel":"gpt-5.2-codex","depth":0,"entryType":"text","content":"The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery.","timestamp":"2026-08-04T09:16:40Z","tokensIn":0,"tokensOut":160,"stopReason":"end_turn"}
       ]
     },
     "groups": []
