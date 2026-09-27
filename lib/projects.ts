@@ -1230,7 +1230,7 @@ export const REDACTION = {
  * explains, and every sample here is invented.
  */
 export const METADATA_EXPLORER = {
-  title: "one session, six harnesses",
+  title: "many harnesses, one unified schema",
   intro:
     "claude code, codex, cursor, strike, opencode, and pi each record their own kinds in their own file. pick a harness, then read its native file line by line beside the unified session peasant lowers it into; each field group is linked to the region of the document it explains.",
   note: "sample data, not a real record.",
