@@ -2,14 +2,14 @@
   "id": "codex",
   "label": "codex",
   "brand": "openai",
-  "intro": "codex writes one rollout JSONL file per session under a dated directory.",
+  "intro": "codex writes one rollout JSON Lines file per session under a dated directory.",
   "native": {
     "id": "native",
     "label": "native metadata",
     "filename": "codex.jsonl",
     "format": "jsonl",
     "document": {
-      "path": "~/.codex/sessions/<date>/rollout-<id>.jsonl",
+      "path": "~/.codex/sessions/<YYYY/MM/DD>/rollout-<timestamp>-<uuid>.jsonl",
       "format": "jsonl",
       "records": [
         {"timestamp":"2026-08-04T09:15:00Z","type":"session_meta","payload":{"id":"rollout_mx_codex","model":"gpt-5.2-codex","timestamp":"2026-08-04T09:15:00Z","cwd":"~/src/peasant","originator":"codex_cli","cli_version":"0.20.0","git":{"branch":"webhook-retry"}}},
@@ -32,7 +32,7 @@
         "id": "identity",
         "selectors": ["path", "records[*].payload.id", "records[*].payload.model"],
         "fields": [
-          { "key": "path", "note": "the dated rollout file that holds the session; its name carries the rollout id" },
+          { "key": "path", "note": "the dated rollout JSON Lines file that holds the session; its name carries the rollout id" },
           { "key": "payload.id", "note": "the rollout id; becomes the unified id" },
           { "key": "payload.model", "note": "the model that served the run" }
         ]
@@ -73,7 +73,7 @@
       },
       {
         "id": "tool-calls",
-        "selectors": ["records[*].payload.name", "records[*].payload.call_id"],
+        "selectors": ["records[*].payload.name", "records[*].payload.call_id", "records[*].payload.arguments", "records[*].payload.output"],
         "fields": [
           { "key": "payload.name", "note": "the function the call names; task launches a subagent" },
           { "key": "payload.call_id", "note": "the call id, matched by its output" },

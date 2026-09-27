@@ -2,14 +2,14 @@
   "id": "cursor",
   "label": "cursor",
   "brand": "cursor",
-  "intro": "cursor keeps one workspace-scoped JSONL file per chat session in its application support directory.",
+  "intro": "cursor keeps one JSON Lines transcript per session under an agent-transcripts directory in each workspace.",
   "native": {
     "id": "native",
     "label": "native metadata",
     "filename": "cursor.jsonl",
     "format": "jsonl",
     "document": {
-      "path": "~/Library/Application Support/Cursor/User/workspaceStorage/<hash>/<id>.jsonl",
+      "path": "~/.cursor/projects/<workspace>/agent-transcripts/<session-id>/<session-id>.jsonl",
       "format": "jsonl",
       "records": [
         {"type":"session","id":"sess_mx_cursor","model":"gpt-5.2","cwd":"~/src/peasant","gitBranch":"webhook-retry","at":"2026-08-04T09:15:00Z","usage":{"input_tokens":2450,"output_tokens":730}},
@@ -32,7 +32,7 @@
         "id": "identity",
         "selectors": ["path", "records[*].id", "records[*].model"],
         "fields": [
-          { "key": "path", "note": "the workspace-scoped file that holds the chat; its name carries the session id" },
+          { "key": "path", "note": "one JSON Lines transcript per session under its workspace's agent-transcripts directory" },
           { "key": "id", "note": "the session id; becomes the unified id" },
           { "key": "model", "note": "the model that answered" }
         ]

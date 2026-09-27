@@ -2,7 +2,7 @@
   "id": "pi",
   "label": "pi",
   "brand": null,
-  "intro": "pi appends one entry per session event to a JSONL file under its agent directory.",
+  "intro": "pi records each session as a JSON Lines file under its agent sessions directory.",
   "native": {
     "id": "native",
     "label": "native metadata",
@@ -33,7 +33,7 @@
         "id": "identity",
         "selectors": ["path", "records[*].id", "records[*].model"],
         "fields": [
-          { "key": "path", "note": "one JSONL file per session under the agent directory" },
+          { "key": "path", "note": "one JSON Lines file per session under the agent sessions directory" },
           { "key": "id", "note": "the session id; becomes the unified id" },
           { "key": "model", "note": "the model that served the run" }
         ]

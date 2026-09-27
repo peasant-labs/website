@@ -2,14 +2,14 @@
   "id": "strike",
   "label": "strike",
   "brand": "strike",
-  "intro": "strike appends one JSON object per session event to a JSONL file beside the project.",
+  "intro": "strike writes one JSON Lines event log per session under its sessions directory.",
   "native": {
     "id": "native",
     "label": "native metadata",
     "filename": "strike.jsonl",
     "format": "jsonl",
     "document": {
-      "path": ".strike/sessions/<id>.jsonl",
+      "path": "~/.strike/sessions/<session-id>.jsonl",
       "format": "jsonl",
       "records": [
         {"kind":"session.started","sessionId":"sess_mx_strike","at":"2026-08-04T09:15:00Z","cwd":"~/src/peasant","branch":"webhook-retry","model":"claude-sonnet-5"},
@@ -37,7 +37,7 @@
         "id": "identity",
         "selectors": ["path", "records[*].sessionId", "records[*].model"],
         "fields": [
-          { "key": "path", "note": "one JSONL log beside the project; its name carries the session id" },
+          { "key": "path", "note": "one JSON Lines event log per session under the sessions directory; its name carries the session id" },
           { "key": "sessionId", "note": "the session id on the lifecycle events; becomes the unified id" },
           { "key": "model", "note": "the model that served the run" }
         ]

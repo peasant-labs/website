@@ -2,7 +2,7 @@
   "id": "claude-code",
   "label": "claude code",
   "brand": "claude",
-  "intro": "claude code appends one JSON object per transcript event to a per-project JSONL file.",
+  "intro": "claude code keeps one JSON Lines transcript per session under a directory per project.",
   "native": {
     "id": "native",
     "label": "native metadata",
@@ -31,7 +31,7 @@
         "id": "identity",
         "selectors": ["path", "records[*].sessionId", "records[*].message.model"],
         "fields": [
-          { "key": "path", "note": "the JSONL file that holds the session; its name carries the session id" },
+          { "key": "path", "note": "one JSON Lines transcript per session under a per-project directory; its name carries the session id" },
           { "key": "sessionId", "note": "the session id; becomes the unified id" },
           { "key": "message.model", "note": "the model that answered" }
         ]
