@@ -1,0 +1,498 @@
+{
+  "id": "opencode",
+  "label": "opencode",
+  "brand": "opencode",
+  "intro": "opencode stores sessions in a SQLite database; the session and session_message rows are shown as JSON.",
+  "native": {
+    "id": "native",
+    "label": "native metadata",
+    "filename": "opencode.db",
+    "format": "sqlite",
+    "document": {
+      "path": "~/.local/share/opencode/opencode.db",
+      "format": "sqlite",
+      "tables": [
+        "session",
+        "session_message"
+      ],
+      "rows": [
+        {
+          "table": "session",
+          "id": "sess_mx_opencode",
+          "directory": "~/src/peasant",
+          "title": "retry webhook delivery",
+          "agent": "build",
+          "version": "1.0.0",
+          "slug": "retry-webhook-delivery",
+          "tokens_input": 2450,
+          "tokens_output": 730,
+          "cost": 0.031
+        },
+        {
+          "table": "session_message",
+          "id": "msg_u1",
+          "session_id": "sess_mx_opencode",
+          "type": "user",
+          "time_created": 1785834902000,
+          "time_updated": 1785834902000,
+          "seq": 0,
+          "data": {
+            "text": "The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test.",
+            "time": {
+              "created": 1785834902000
+            }
+          }
+        },
+        {
+          "table": "session_message",
+          "id": "msg_a1",
+          "session_id": "sess_mx_opencode",
+          "type": "assistant",
+          "time_created": 1785834918000,
+          "time_updated": 1785834924000,
+          "seq": 1,
+          "data": {
+            "agent": "build",
+            "model": {
+              "id": "claude-opus-5",
+              "providerID": "anthropic"
+            },
+            "content": [
+              {
+                "type": "reasoning",
+                "text": "The worker posts once, so the retry belongs around the post call."
+              },
+              {
+                "type": "text",
+                "text": "I will read the worker, then hand the test to a subagent while I add the retry."
+              },
+              {
+                "type": "tool",
+                "id": "toolu_read_01",
+                "name": "read",
+                "state": {
+                  "status": "completed",
+                  "input": {
+                    "filePath": "internal/webhook/deliver.go"
+                  },
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"
+                    }
+                  ]
+                }
+              }
+            ],
+            "tokens": {
+              "input": 2450,
+              "output": 180
+            },
+            "time": {
+              "created": 1785834918000,
+              "completed": 1785834924000
+            }
+          }
+        },
+        {
+          "table": "session_message",
+          "id": "msg_a2",
+          "session_id": "sess_mx_opencode",
+          "type": "assistant",
+          "time_created": 1785834926000,
+          "time_updated": 1785834960000,
+          "seq": 2,
+          "data": {
+            "agent": "build",
+            "model": {
+              "id": "claude-opus-5",
+              "providerID": "anthropic"
+            },
+            "content": [
+              {
+                "type": "tool",
+                "id": "toolu_task_01",
+                "name": "task",
+                "state": {
+                  "status": "completed",
+                  "input": {
+                    "subagent_type": "test-writer",
+                    "description": "cover the webhook retry",
+                    "prompt": "Add a regression test for the bounded retry in internal/webhook/deliver.go."
+                  },
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."
+                    }
+                  ]
+                }
+              }
+            ],
+            "tokens": {
+              "input": 120,
+              "output": 90
+            },
+            "time": {
+              "created": 1785834926000,
+              "completed": 1785834960000
+            }
+          }
+        },
+        {
+          "table": "session_message",
+          "id": "msg_a3",
+          "session_id": "sess_mx_opencode",
+          "type": "assistant",
+          "time_created": 1785834960000,
+          "time_updated": 1785834962000,
+          "seq": 3,
+          "data": {
+            "agent": "test-writer",
+            "model": {
+              "id": "claude-opus-5",
+              "providerID": "anthropic"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "The worker calls post once, so the test should fail the first posts and assert a retry."
+              },
+              {
+                "type": "tool",
+                "id": "toolu_edit_02",
+                "name": "edit",
+                "state": {
+                  "status": "completed",
+                  "input": {
+                    "filePath": "internal/webhook/deliver_test.go",
+                    "oldString": "func TestDeliver(t *testing.T) {",
+                    "newString": "func TestDeliverRetries(t *testing.T) {"
+                  },
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "{\"ok\":true,\"additions\":22,\"deletions\":0}"
+                    }
+                  ]
+                }
+              }
+            ],
+            "tokens": {
+              "input": 80,
+              "output": 140
+            },
+            "time": {
+              "created": 1785834960000,
+              "completed": 1785834962000
+            }
+          }
+        },
+        {
+          "table": "session_message",
+          "id": "msg_a4",
+          "session_id": "sess_mx_opencode",
+          "type": "assistant",
+          "time_created": 1785834980000,
+          "time_updated": 1785834984000,
+          "seq": 4,
+          "data": {
+            "agent": "build",
+            "model": {
+              "id": "claude-opus-5",
+              "providerID": "anthropic"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."
+              },
+              {
+                "type": "tool",
+                "id": "toolu_edit_01",
+                "name": "edit",
+                "state": {
+                  "status": "completed",
+                  "input": {
+                    "filePath": "internal/webhook/deliver.go",
+                    "oldString": "return post(ctx, e)",
+                    "newString": "return postWithRetry(ctx, e, 5)"
+                  },
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "{\"ok\":true,\"additions\":34,\"deletions\":4}"
+                    }
+                  ]
+                }
+              }
+            ],
+            "tokens": {
+              "input": 180,
+              "output": 210
+            },
+            "time": {
+              "created": 1785834980000,
+              "completed": 1785834984000
+            }
+          }
+        },
+        {
+          "table": "session_message",
+          "id": "msg_a5",
+          "session_id": "sess_mx_opencode",
+          "type": "assistant",
+          "time_created": 1785835000000,
+          "time_updated": 1785835000000,
+          "seq": 5,
+          "data": {
+            "agent": "build",
+            "model": {
+              "id": "claude-opus-5",
+              "providerID": "anthropic"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery."
+              }
+            ],
+            "tokens": {
+              "input": 60,
+              "output": 160
+            },
+            "time": {
+              "created": 1785835000000,
+              "completed": 1785835000000
+            }
+          }
+        }
+      ]
+    },
+    "groups": [
+      {
+        "id": "identity",
+        "selectors": [
+          "path",
+          "rows[*].session_id",
+          "rows[*].data.model.id"
+        ],
+        "fields": [
+          {
+            "key": "path",
+            "note": "the SQLite database that holds the session and session_message rows"
+          },
+          {
+            "key": "session_id",
+            "note": "the session id on every session_message row; becomes the unified id"
+          },
+          {
+            "key": "data.model.id",
+            "note": "the model recorded on an assistant message; becomes the unified model"
+          },
+          {
+            "key": "slug",
+            "note": "the session's slug on the session row"
+          }
+        ]
+      },
+      {
+        "id": "session",
+        "selectors": [
+          "rows[*].directory",
+          "rows[*].time_created"
+        ],
+        "fields": [
+          {
+            "key": "directory",
+            "note": "the working directory on the session row; becomes workingDirectory"
+          },
+          {
+            "key": "time_created",
+            "note": "the row time in epoch milliseconds; the first and last become startTime and endTime"
+          }
+        ]
+      },
+      {
+        "id": "usage",
+        "selectors": [
+          "rows[*].tokens_input",
+          "rows[*].tokens_output",
+          "rows[*].data.tokens"
+        ],
+        "fields": [
+          {
+            "key": "tokens_input",
+            "note": "session-row input tokens; becomes tokensIn"
+          },
+          {
+            "key": "tokens_output",
+            "note": "session-row output tokens; becomes tokensOut"
+          },
+          {
+            "key": "data.tokens.input",
+            "note": "the assistant message's own input tokens; summed into tokensIn"
+          },
+          {
+            "key": "data.tokens.output",
+            "note": "the assistant message's own output tokens; summed into tokensOut"
+          },
+          {
+            "key": "cost",
+            "note": "the session row's recorded cost"
+          }
+        ]
+      },
+      {
+        "id": "git",
+        "selectors": [
+          "rows[*].directory"
+        ],
+        "fields": [
+          {
+            "key": "directory",
+            "note": "the recording carries no branch; the git context is resolved from the session directory"
+          }
+        ]
+      },
+      {
+        "id": "turns",
+        "selectors": [
+          "rows"
+        ],
+        "fields": [
+          {
+            "key": "table",
+            "note": "session or session_message: the table the row came from"
+          },
+          {
+            "key": "type",
+            "note": "user or assistant; becomes the unified turn role"
+          },
+          {
+            "key": "seq",
+            "note": "the message ordering within the session"
+          },
+          {
+            "key": "data.time.created",
+            "note": "the message's own creation time in epoch milliseconds"
+          },
+          {
+            "key": "data.agent",
+            "note": "a subagent message; it lowers to a turn carrying the agent name"
+          },
+          {
+            "key": "data.content",
+            "note": "reasoning, text, and tool parts of the message JSON"
+          }
+        ]
+      },
+      {
+        "id": "tool-calls",
+        "selectors": [
+          "rows[*].data.content[*]"
+        ],
+        "fields": [
+          {
+            "key": "type",
+            "note": "text, reasoning, or tool"
+          },
+          {
+            "key": "id",
+            "note": "the call id, matched by its state"
+          },
+          {
+            "key": "name",
+            "note": "the tool's own name; task launches a subagent"
+          },
+          {
+            "key": "state.status",
+            "note": "completed once the call returned"
+          },
+          {
+            "key": "state.input",
+            "note": "the tool call arguments"
+          },
+          {
+            "key": "state.content",
+            "note": "what the tool returned"
+          }
+        ]
+      },
+      {
+        "id": "turn-identity",
+        "selectors": [
+          "rows[*].data.model",
+          "rows[*].data.agent"
+        ],
+        "fields": [
+          {
+            "key": "data.model",
+            "note": "the model that produced the turn; repeated per assistant row"
+          },
+          {
+            "key": "data.agent",
+            "note": "a subagent turn; it carries the agent name"
+          }
+        ]
+      },
+      {
+        "id": "turn-usage",
+        "selectors": [
+          "rows[*].data.tokens"
+        ],
+        "fields": [
+          {
+            "key": "data.tokens.input",
+            "note": "the turn's input tokens; summed into tokensIn"
+          },
+          {
+            "key": "data.tokens.output",
+            "note": "the turn's output tokens; summed into tokensOut"
+          }
+        ]
+      }
+    ]
+  },
+  "unified": {
+    "id": "unified",
+    "label": "unified session",
+    "filename": "session.json",
+    "format": "json",
+    "document": {
+      "id": "sess_mx_opencode",
+      "harness": "opencode",
+      "model": "claude-opus-5",
+      "outcome": "resolved",
+      "project": "peasant",
+      "workingDirectory": "~/src/peasant",
+      "startTime": "2026-08-04T09:15:02Z",
+      "endTime": "2026-08-04T09:16:40Z",
+      "durationMins": 2,
+      "turnCount": 6,
+      "toolCallCount": 4,
+      "totalTokens": 3180,
+      "tokensIn": 2450,
+      "tokensOut": 730,
+      "gitBranch": "webhook-retry",
+      "gitContext": {
+        "branch": "webhook-retry",
+        "remote": "git@github.com:example/peasant-demo.git",
+        "user": "you",
+        "workingDirectory": "~/src/peasant",
+        "commits": [
+          {"hash":"8f3c2d1e4a5b6c7d8e9f0a1b2c3d4e5f","message":"retry webhook delivery with backoff","timestamp":"2026-08-04T09:17:00Z","filesChanged":2,"insertions":38,"deletions":4,"session":true}
+        ]
+      },
+      "turns": [
+        {"index":0,"role":"user","depth":0,"entryType":"text","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test.","timestamp":"2026-08-04T09:15:02Z","tokensIn":340,"tokensOut":0},
+        {"index":1,"role":"assistant","observedModel":"claude-opus-5","depth":0,"entryType":"text","content":"I will read the worker, then hand the test to a subagent while I add the retry.","timestamp":"2026-08-04T09:15:20Z","tokensIn":0,"tokensOut":180,"toolCalls":[{"id":"toolu_read_01","name":"Read","toolKind":"read","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\"}","result":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
+        {"index":2,"role":"assistant","observedModel":"claude-opus-5","depth":0,"entryType":"tool_use","content":"","timestamp":"2026-08-04T09:15:26Z","tokensIn":0,"tokensOut":90,"toolCalls":[{"id":"toolu_task_01","name":"Task","toolKind":"other","arguments":"{\"subagent_type\":\"test-writer\",\"description\":\"cover the webhook retry\",\"prompt\":\"Add a regression test for the bounded retry in internal/webhook/deliver.go.\"}","result":"Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."}]},
+        {"index":3,"role":"assistant","observedModel":"claude-opus-5","agentName":"test-writer","depth":0,"entryType":"text","content":"The worker calls post once, so the test should fail the first posts and assert a retry.","timestamp":"2026-08-04T09:16:00Z","tokensIn":0,"tokensOut":140,"toolCalls":[{"id":"toolu_edit_02","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver_test.go","arguments":"{\"file_path\":\"internal/webhook/deliver_test.go\",\"old_string\":\"func TestDeliver(t *testing.T) {\",\"new_string\":\"func TestDeliverRetries(t *testing.T) {\"}","result":"{\"ok\":true,\"additions\":22,\"deletions\":0}"}]},
+        {"index":4,"role":"assistant","observedModel":"claude-opus-5","depth":0,"entryType":"text","content":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","timestamp":"2026-08-04T09:16:20Z","tokensIn":0,"tokensOut":210,"toolCalls":[{"id":"toolu_edit_01","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\",\"old_string\":\"return post(ctx, e)\",\"new_string\":\"return postWithRetry(ctx, e, 5)\"}","result":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
+        {"index":5,"role":"assistant","observedModel":"claude-opus-5","depth":0,"entryType":"text","content":"The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery.","timestamp":"2026-08-04T09:16:40Z","tokensIn":0,"tokensOut":160,"stopReason":"end_turn"}
+      ]
+    },
+    "groups": []
+  }
+}

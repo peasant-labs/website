@@ -1223,6 +1223,20 @@ export const REDACTION = {
   ] as Three<RedactionMatch>,
 } as const;
 
+/**
+ * The schema explorer: one invented mock session, shown as the native metadata
+ * file each harness writes beside the single unified wire session peasant lowers
+ * it into. Every field group is linked to the region of the document it
+ * explains, and every sample here is invented.
+ */
+export const METADATA_EXPLORER = {
+  title: "many harnesses, one unified schema",
+  intro:
+    "claude code, codex, cursor, strike, opencode, and pi each record their own kinds in their own file. pick a harness, then read its native file line by line beside the unified session peasant lowers it into; each field group is linked to the region of the document it explains.",
+  note: "sample data, not a real record.",
+  label: "schema explorer on a sample session",
+} as const;
+
 export const COMPARISON_MARKS = {
   yes: { glyph: "✓", label: "yes" },
   partial: { glyph: "~", label: "partial" },

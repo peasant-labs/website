@@ -156,6 +156,8 @@
     z-index: var(--z-nav);
     border-bottom: var(--bd);
     background: var(--nav-bg);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
   }
 
   .pj-header-inner {
@@ -1753,3 +1755,405 @@
 .pj-redaction-demo .rdx-seg {
   flex-wrap: wrap;
 }
+
+/*
+ * ─── schema explorer ────────────────────────────────────────────────────────
+ *
+ * The native-file-to-unified-wire explorer: a JSON window split into labelled
+ * field-group regions beside a stack of collapsible annotation sections that
+ * explain each field line by line. Tokens only, radius 0, the mono face for
+ * data and chrome and the body face for prose. The two columns sit side by side
+ * once there is room and stack below that.
+ *
+ * fairtrade 0.0.9 has no standalone `red` or `group-y` colour token, so those
+ * two accent identifiers borrow the nearest canonical tokens here rather than
+ * inventing a colour: `group-y` uses the chart mauve and `red` mixes the danger
+ * hue toward amber. The accent is decoration only; every section keeps its text
+ * title, so no meaning rides on colour.
+ */
+.mx {
+  display: grid;
+  gap: var(--sp-5);
+  min-width: 0;
+}
+
+.mx-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  padding-block-end: var(--sp-2);
+  border-block-end: var(--bd);
+}
+
+.mx-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--target-comfortable);
+  padding: var(--sp-1) var(--sp-3);
+  border: var(--bd);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  text-transform: lowercase;
+  cursor: pointer;
+}
+
+.mx-tab[aria-selected="true"] {
+  border-color: var(--rule-strong);
+  background: var(--surface-2);
+  color: var(--ink-strong);
+}
+
+.mx-tab:focus-visible,
+.mx-view-option:focus-visible,
+.mx-section-head:focus-visible,
+.mx-json-pane:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--stroke-emphasis);
+}
+
+.mx-tab .brand {
+  flex: none;
+}
+
+.mx-view {
+  display: inline-flex;
+  flex-wrap: wrap;
+  border: var(--bd-strong);
+  background: var(--surface);
+}
+
+.mx-view-option {
+  flex: 1 1 auto;
+  min-height: var(--target-comfortable);
+  padding: var(--sp-2) var(--sp-4);
+  border: 0;
+  border-inline-start: var(--bd);
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  text-transform: lowercase;
+  cursor: pointer;
+}
+
+.mx-view-option:first-child {
+  border-inline-start: 0;
+}
+
+.mx-view-option:hover {
+  color: var(--ink);
+  background: var(--surface-hover);
+}
+
+.mx-view-option[aria-pressed="true"] {
+  background: var(--amber-fill);
+  color: var(--amber-fill-ink);
+  font-weight: 600;
+}
+
+.mx-view-option[aria-pressed="true"]:hover {
+  background: var(--amber-fill);
+}
+
+.mx-panel {
+  min-width: 0;
+}
+
+.mx-intro {
+  max-width: var(--measure-prose);
+  margin: 0 0 var(--sp-4);
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.mx-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-5);
+  min-width: 0;
+}
+
+.mx-json-column,
+.mx-sections {
+  min-width: 0;
+}
+
+/*
+ * The document is long and deeply nested, so it scrolls inside its own
+ * focusable pane and a keyboard reader can move through it without a pointer.
+ * Where the pane sits above the sections (narrow) the cap keeps it from
+ * deciding the section height; where it sits beside them (wide) it fills the
+ * row instead — see the wide block at the end of this section.
+ */
+.mx-json-pane {
+  max-block-size: min(72vh, 46rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--sp-4);
+}
+
+/*
+ * The document is plain text: `JSON.stringify(value, null, 2)`, highlighted by
+ * shiki and rendered as React spans. Every line carries the field groups it
+ * belongs to, so a group's section and its lines highlight each other.
+ */
+.mx-json-pre {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.mx-json-pre code {
+  font: inherit;
+}
+
+.mx-json-line {
+  display: block;
+}
+
+.mx-json-line[data-groups] {
+  cursor: pointer;
+}
+
+/*
+ * The active region is tinted with the active section's accent — the same
+ * --mx-accent its section carries — so the two sides read as one selection.
+ */
+.mx-json-line[data-active="true"] {
+  background: color-mix(in srgb, var(--mx-accent, var(--amber)) 10%, transparent);
+  box-shadow: inset var(--stroke-emphasis) 0 0 0 var(--mx-accent, var(--amber));
+}
+
+.mx-sections {
+  display: grid;
+  gap: var(--sp-4);
+  align-content: start;
+}
+
+.mx-section {
+  --mx-accent: var(--rule-strong);
+  border: var(--bd);
+  background: var(--surface);
+}
+
+/*
+ * A nested category sits under its parent: indented, so the child/parent
+ * relationship reads from position, not colour alone.
+ */
+.mx-section[data-nested="true"] {
+  margin-inline-start: var(--sp-5);
+}
+
+.mx-section[data-accent="olive"],
+.mx-json-pane[data-accent="olive"] {
+  --mx-accent: var(--olive);
+}
+
+.mx-section[data-accent="teal"],
+.mx-json-pane[data-accent="teal"] {
+  --mx-accent: var(--teal);
+}
+
+.mx-section[data-accent="clay"],
+.mx-json-pane[data-accent="clay"] {
+  --mx-accent: var(--clay);
+}
+
+.mx-section[data-accent="group-y"],
+.mx-json-pane[data-accent="group-y"] {
+  --mx-accent: var(--mauve);
+}
+
+.mx-section[data-accent="red"],
+.mx-json-pane[data-accent="red"] {
+  --mx-accent: color-mix(in srgb, var(--danger) 68%, var(--amber));
+}
+
+.mx-section[data-accent="amber"],
+.mx-json-pane[data-accent="amber"] {
+  --mx-accent: var(--amber);
+}
+
+/*
+ * The accent bar is the button's own inline start border: 3px via the focus
+ * ring width token. Inactive sections dim the bar; the active one reads at full
+ * strength and also carries a text "selected" marker, so state is never colour
+ * alone.
+ */
+.mx-section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  inline-size: 100%;
+  min-height: var(--target-comfortable);
+  padding: var(--sp-3) var(--sp-4);
+  border: 0;
+  border-inline-start: var(--focus-ring-width) solid
+    color-mix(in srgb, var(--mx-accent) 45%, transparent);
+  background: transparent;
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+}
+
+.mx-section[data-active="true"] .mx-section-head {
+  border-inline-start-color: var(--mx-accent);
+  background: var(--surface-2);
+}
+
+.mx-section-head-text {
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.mx-section-title {
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  text-transform: lowercase;
+}
+
+.mx-section-summary {
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.mx-section-selected {
+  align-self: start;
+  flex: none;
+  padding: var(--sp-1) var(--sp-2);
+  border: var(--bd);
+  background: var(--surface);
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+.mx-section-chevron {
+  flex: none;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+}
+
+.mx-section-fields {
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  border-block-start: var(--bd);
+}
+
+.mx-field {
+  display: grid;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.mx-field-key {
+  margin: 0;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  overflow-wrap: anywhere;
+}
+
+.mx-field-note {
+  margin: 0;
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+/*
+ * Narrow: a two-up segmented control with a lone active half reads as a broken
+ * box, and a tall inner scroll pane leaves no room for the sections below it.
+ * Stack the control and shorten the pane so the column stays legible on a phone.
+ */
+@media (max-width: 30rem) {
+  .mx-view {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    inline-size: 100%;
+  }
+
+  .mx-view-option {
+    border-inline-start: 0;
+  }
+
+  .mx-view-option + .mx-view-option {
+    border-block-start: var(--bd);
+  }
+
+  .mx-json-pane {
+    max-block-size: min(58vh, 30rem);
+  }
+}
+
+/*
+ * Wide: the two columns share one height. The annotation column decides it —
+ * the component measures each section open in turn and keeps the tallest, and
+ * passes that back as `--mx-row-h`, so the document pane is as tall as the
+ * largest section and does not move when the reader opens or closes one. The
+ * document then fills the pane and scrolls inside it; the annotations never
+ * need to scroll, because the row is already as tall as their tallest state.
+ */
+@media (min-width: 60rem) {
+  .mx-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: stretch;
+    block-size: var(--mx-row-h, min(72vh, 46rem));
+  }
+
+  .mx-json-column {
+    display: flex;
+    min-block-size: 0;
+  }
+
+  .mx-terminal {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-block-size: 0;
+  }
+
+  .mx-json-pane {
+    flex: 1 1 auto;
+    min-block-size: 0;
+    max-block-size: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mx-tab,
+  .mx-view-option,
+  .mx-section-head {
+    transition:
+      border-color var(--dur-1) var(--ease-standard),
+      background var(--dur-1) var(--ease-standard),
+      color var(--dur-1) var(--ease-standard);
+  }
+}
+

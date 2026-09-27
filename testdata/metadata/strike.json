@@ -1,0 +1,497 @@
+{
+  "id": "strike",
+  "label": "strike",
+  "brand": "strike",
+  "intro": "strike writes one JSON Lines event log per session under its sessions directory.",
+  "native": {
+    "id": "native",
+    "label": "native metadata",
+    "filename": "strike.jsonl",
+    "format": "jsonl",
+    "document": {
+      "path": "~/.strike/sessions/<session-id>.jsonl",
+      "format": "jsonl",
+      "records": [
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:00Z",
+          "type": "session.started",
+          "data": {
+            "sessionId": "sess_mx_strike",
+            "cwd": "~/src/peasant",
+            "branch": "webhook-retry",
+            "model": "claude-sonnet-5",
+            "version": "0.1.0"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:01Z",
+          "type": "session.titled",
+          "data": {
+            "sessionId": "sess_mx_strike",
+            "title": "retry webhook delivery"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:01Z",
+          "type": "model.selected",
+          "data": {
+            "provider": "anthropic",
+            "model": "claude-sonnet-5"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:01Z",
+          "type": "agent.selected",
+          "data": {
+            "sessionId": "sess_mx_strike",
+            "name": "build"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:02Z",
+          "type": "user.message",
+          "data": {
+            "sessionId": "sess_mx_strike",
+            "turnId": "turn-1",
+            "text": "The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test."
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:02Z",
+          "type": "turn.started",
+          "data": {
+            "sessionId": "sess_mx_strike",
+            "turnId": "turn-1"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:20Z",
+          "type": "assistant.text",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-1",
+            "text": "I will read the worker, then hand the test to a subagent while I add the retry."
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:21Z",
+          "type": "tool.begin",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-1",
+            "callId": "toolu_read_01",
+            "name": "read",
+            "args": {
+              "filePath": "internal/webhook/deliver.go"
+            }
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:24Z",
+          "type": "tool.output",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-1",
+            "callId": "toolu_read_01",
+            "data": "package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:24Z",
+          "type": "tool.end",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-1",
+            "callId": "toolu_read_01",
+            "output": "package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:15:26Z",
+          "type": "tool.begin",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-2",
+            "callId": "toolu_task_01",
+            "name": "task",
+            "args": {
+              "subagent_type": "test-writer",
+              "description": "cover the webhook retry",
+              "prompt": "Add a regression test for the bounded retry in internal/webhook/deliver.go."
+            }
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:00Z",
+          "type": "tool.output",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-2",
+            "callId": "toolu_task_01",
+            "data": "Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:00Z",
+          "type": "child.started",
+          "data": {
+            "sessionId": "sess_mx_strike",
+            "childSessionId": "sess_mx_strike_test",
+            "agent": "test-writer",
+            "turnId": "turn-2"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:00Z",
+          "type": "assistant.text",
+          "data": {
+            "turnId": "turn-2",
+            "providerRequestId": "request-3",
+            "agent": "test-writer",
+            "text": "The worker calls post once, so the test should fail the first posts and assert a retry."
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:01Z",
+          "type": "tool.begin",
+          "data": {
+            "turnId": "turn-2",
+            "providerRequestId": "request-3",
+            "agent": "test-writer",
+            "callId": "toolu_edit_02",
+            "name": "edit",
+            "args": {
+              "filePath": "internal/webhook/deliver_test.go",
+              "oldString": "func TestDeliver(t *testing.T) {",
+              "newString": "func TestDeliverRetries(t *testing.T) {"
+            }
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:02Z",
+          "type": "tool.output",
+          "data": {
+            "turnId": "turn-2",
+            "providerRequestId": "request-3",
+            "agent": "test-writer",
+            "callId": "toolu_edit_02",
+            "data": "{\"ok\":true,\"additions\":22,\"deletions\":0}"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:02Z",
+          "type": "child.completed",
+          "data": {
+            "sessionId": "sess_mx_strike",
+            "childSessionId": "sess_mx_strike_test",
+            "agent": "test-writer",
+            "turnId": "turn-2"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:20Z",
+          "type": "assistant.text",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-4",
+            "text": "The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff."
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:21Z",
+          "type": "tool.begin",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-4",
+            "callId": "toolu_edit_01",
+            "name": "edit",
+            "args": {
+              "filePath": "internal/webhook/deliver.go",
+              "oldString": "return post(ctx, e)",
+              "newString": "return postWithRetry(ctx, e, 5)"
+            }
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:24Z",
+          "type": "tool.output",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-4",
+            "callId": "toolu_edit_01",
+            "data": "{\"ok\":true,\"additions\":34,\"deletions\":4}"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:40Z",
+          "type": "assistant.text",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-4",
+            "text": "The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery."
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:40Z",
+          "type": "turn.completed",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-4",
+            "stopReason": "end_turn"
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:40Z",
+          "type": "usage.reported",
+          "data": {
+            "turnId": "turn-1",
+            "providerRequestId": "request-4",
+            "usage": {
+              "inputTokens": 2450,
+              "outputTokens": 730
+            }
+          }
+        },
+        {
+          "schemaVersion": 1,
+          "time": "2026-08-04T09:16:41Z",
+          "type": "session.telemetry",
+          "data": {
+            "route": "/v1/sessions",
+            "latencyMs": 41
+          }
+        }
+      ]
+    },
+    "groups": [
+      {
+        "id": "identity",
+        "selectors": [
+          "path",
+          "records[*].data.sessionId",
+          "records[*].data.model"
+        ],
+        "fields": [
+          {
+            "key": "path",
+            "note": "one JSON Lines event log per session under the sessions directory; its name carries the session id"
+          },
+          {
+            "key": "data.sessionId",
+            "note": "the session id on the lifecycle and message events; becomes the unified id"
+          },
+          {
+            "key": "data.model",
+            "note": "the model on session.started and model.selected"
+          }
+        ]
+      },
+      {
+        "id": "session",
+        "selectors": [
+          "records[*].data.cwd",
+          "records[*].time"
+        ],
+        "fields": [
+          {
+            "key": "data.cwd",
+            "note": "the working directory on session.started; becomes workingDirectory"
+          },
+          {
+            "key": "time",
+            "note": "the event time; the first and last become startTime and endTime"
+          }
+        ]
+      },
+      {
+        "id": "usage",
+        "selectors": [
+          "records[*].data.usage"
+        ],
+        "fields": [
+          {
+            "key": "data.usage.inputTokens",
+            "note": "input tokens on usage.reported; summed into tokensIn"
+          },
+          {
+            "key": "data.usage.outputTokens",
+            "note": "output tokens on usage.reported; summed into tokensOut"
+          }
+        ]
+      },
+      {
+        "id": "git",
+        "selectors": [
+          "records[*].data.branch"
+        ],
+        "fields": [
+          {
+            "key": "data.branch",
+            "note": "the branch on session.started; carried into the unified git context"
+          }
+        ]
+      },
+      {
+        "id": "turns",
+        "selectors": [
+          "records"
+        ],
+        "fields": [
+          {
+            "key": "type",
+            "note": "the event kind; the parser lowers each declared kind by its outcome"
+          },
+          {
+            "key": "time",
+            "note": "the event time, used to order turns"
+          },
+          {
+            "key": "data.turnId",
+            "note": "the turn a message or tool event belongs to"
+          },
+          {
+            "key": "data.agent",
+            "note": "a subagent event; it lowers to a turn carrying the agent name"
+          },
+          {
+            "key": "data.stopReason",
+            "note": "turn.completed: a close marker that writes no turn and does not block completeness"
+          },
+          {
+            "key": "data.route",
+            "note": "session.telemetry: an undeclared kind kept as complete redacted evidence, not dropped"
+          }
+        ]
+      },
+      {
+        "id": "tool-calls",
+        "selectors": [
+          "records[*].data.callId",
+          "records[*].data.name",
+          "records[*].data.args",
+          "records[*].data.data",
+          "records[*].data.output"
+        ],
+        "fields": [
+          {
+            "key": "data.callId",
+            "note": "the call id, matched by its output"
+          },
+          {
+            "key": "data.name",
+            "note": "the tool name; task launches a subagent"
+          },
+          {
+            "key": "data.args",
+            "note": "the tool call arguments"
+          },
+          {
+            "key": "data.data",
+            "note": "a streamed tool.output chunk"
+          },
+          {
+            "key": "data.output",
+            "note": "the final tool output on tool.end"
+          }
+        ]
+      },
+      {
+        "id": "turn-identity",
+        "selectors": [
+          "records[*].data.model",
+          "records[*].data.agent"
+        ],
+        "fields": [
+          {
+            "key": "data.model",
+            "note": "the model that produced the turn; the session-level model repeats here"
+          },
+          {
+            "key": "data.agent",
+            "note": "a subagent turn; it carries the agent name"
+          }
+        ]
+      },
+      {
+        "id": "turn-usage",
+        "selectors": [
+          "records[*].data.usage"
+        ],
+        "fields": [
+          {
+            "key": "data.usage.inputTokens",
+            "note": "the turn's input tokens; summed into tokensIn"
+          },
+          {
+            "key": "data.usage.outputTokens",
+            "note": "the turn's output tokens; summed into tokensOut"
+          }
+        ]
+      }
+    ]
+  },
+  "unified": {
+    "id": "unified",
+    "label": "unified session",
+    "filename": "session.json",
+    "format": "json",
+    "document": {
+      "id": "sess_mx_strike",
+      "harness": "strike",
+      "model": "claude-sonnet-5",
+      "outcome": "resolved",
+      "project": "peasant",
+      "workingDirectory": "~/src/peasant",
+      "startTime": "2026-08-04T09:15:02Z",
+      "endTime": "2026-08-04T09:16:40Z",
+      "durationMins": 2,
+      "turnCount": 6,
+      "toolCallCount": 4,
+      "totalTokens": 3180,
+      "tokensIn": 2450,
+      "tokensOut": 730,
+      "gitBranch": "webhook-retry",
+      "gitContext": {
+        "branch": "webhook-retry",
+        "remote": "git@github.com:example/peasant-demo.git",
+        "user": "you",
+        "workingDirectory": "~/src/peasant",
+        "commits": [
+          {"hash":"8f3c2d1e4a5b6c7d8e9f0a1b2c3d4e5f","message":"retry webhook delivery with backoff","timestamp":"2026-08-04T09:17:00Z","filesChanged":2,"insertions":38,"deletions":4,"session":true}
+        ]
+      },
+      "turns": [
+        {"index":0,"role":"user","depth":0,"entryType":"text","content":"The webhook delivery worker drops events when the receiver is briefly down. Add a bounded retry with backoff, and cover it with a test.","timestamp":"2026-08-04T09:15:02Z","tokensIn":340,"tokensOut":0},
+        {"index":1,"role":"assistant","observedModel":"claude-sonnet-5","depth":0,"entryType":"text","content":"I will read the worker, then hand the test to a subagent while I add the retry.","timestamp":"2026-08-04T09:15:20Z","tokensIn":0,"tokensOut":180,"toolCalls":[{"id":"toolu_read_01","name":"Read","toolKind":"read","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\"}","result":"package webhook\n\nfunc Deliver(ctx context.Context, e Event) error {\n\treturn post(ctx, e)\n}"}]},
+        {"index":2,"role":"assistant","observedModel":"claude-sonnet-5","depth":0,"entryType":"tool_use","content":"","timestamp":"2026-08-04T09:15:26Z","tokensIn":0,"tokensOut":90,"toolCalls":[{"id":"toolu_task_01","name":"Task","toolKind":"other","arguments":"{\"subagent_type\":\"test-writer\",\"description\":\"cover the webhook retry\",\"prompt\":\"Add a regression test for the bounded retry in internal/webhook/deliver.go.\"}","result":"Added TestDeliverRetries in internal/webhook/deliver_test.go: it fails the first two posts and asserts Deliver retries and succeeds."}]},
+        {"index":3,"role":"assistant","observedModel":"claude-sonnet-5","agentName":"test-writer","depth":0,"entryType":"text","content":"The worker calls post once, so the test should fail the first posts and assert a retry.","timestamp":"2026-08-04T09:16:00Z","tokensIn":0,"tokensOut":140,"toolCalls":[{"id":"toolu_edit_02","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver_test.go","arguments":"{\"file_path\":\"internal/webhook/deliver_test.go\",\"old_string\":\"func TestDeliver(t *testing.T) {\",\"new_string\":\"func TestDeliverRetries(t *testing.T) {\"}","result":"{\"ok\":true,\"additions\":22,\"deletions\":0}"}]},
+        {"index":4,"role":"assistant","observedModel":"claude-sonnet-5","depth":0,"entryType":"text","content":"The worker posts once and gives up. I will wrap the post in a bounded retry with exponential backoff.","timestamp":"2026-08-04T09:16:20Z","tokensIn":0,"tokensOut":210,"toolCalls":[{"id":"toolu_edit_01","name":"Edit","toolKind":"edit","filePath":"internal/webhook/deliver.go","arguments":"{\"file_path\":\"internal/webhook/deliver.go\",\"old_string\":\"return post(ctx, e)\",\"new_string\":\"return postWithRetry(ctx, e, 5)\"}","result":"{\"ok\":true,\"additions\":34,\"deletions\":4}"}]},
+        {"index":5,"role":"assistant","observedModel":"claude-sonnet-5","depth":0,"entryType":"text","content":"The retry is bounded at five attempts with backoff, and the subagent's test covers the recovery.","timestamp":"2026-08-04T09:16:40Z","tokensIn":0,"tokensOut":160,"stopReason":"end_turn"}
+      ]
+    },
+    "groups": []
+  }
+}
