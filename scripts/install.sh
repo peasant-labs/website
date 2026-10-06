@@ -44,9 +44,21 @@ detect_os() {
   case "$(uname -s)" in
     Linux) printf 'linux' ;;
     Darwin) printf 'darwin' ;;
+    # Git Bash, MSYS2 and Cygwin all report a Windows kernel here. Such a shell
+    # can run this script perfectly well, but the build it would fetch is the
+    # wrong one: the native Windows binary is a peasant.exe installed by the
+    # PowerShell script, not a binary unpacked from a linux tarball.
+    MINGW* | MSYS* | CYGWIN*)
+      err "peasant: this looks like Windows, and the native Windows build installs from PowerShell:"
+      err ""
+      err "    irm https://peasantlabs.org/install.ps1 | iex"
+      err ""
+      err "to install the linux build instead, run this inside WSL"
+      exit 1
+      ;;
     *)
       err "peasant: unsupported operating system: $(uname -s)"
-      err "peasant publishes linux and macOS builds"
+      err "peasant publishes linux, macOS and Windows builds - see https://peasantlabs.org"
       exit 1
       ;;
   esac
