@@ -34,8 +34,6 @@ hero:
   # the picture under the buttons shows no words; its accessible name names the agents peasant reads
   flow:
     agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
-    pause: pause the animation
-    play: play the animation
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
 # the band under the hero: the harnesses peasant reads, each led by its mark

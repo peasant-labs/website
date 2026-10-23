@@ -15,7 +15,7 @@ export type LandingFixture = {
     title: string;
     lede: string;
     pillars: string[];
-    flow: { agents: string[]; pause: string; play: string };
+    flow: { agents: string[] };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };

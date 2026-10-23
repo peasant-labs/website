@@ -214,27 +214,22 @@
 /*
  * The hero's picture (components/landing/hero-flow.tsx). That file owns where
  * everything sits, how it is drawn and when it moves; this owns the inks, the
- * pictures' own two: near-black, lightened on the dark page, and amber, over
- * the panel's surface.
+ * pictures' own: warm-grey dots and hairlines over the panel's surface, a
+ * darker scatter on the ground, and amber.
  */
 .lp-hero-flow {
   margin-block-start: clamp(2.5rem, 5vw, 4rem);
 }
 
-/*
- * The picture sits on a panel like the landing's other pictures: the raised
- * surface with a hairline, the scene centred with room on every side, and the
- * pause control in its lower corner.
- */
+/* the picture sits on a panel like the landing's other pictures, the scene centred with room on every side */
 .hf-panel {
   --hf-ink: var(--ink-strong);
-  --hf-pad-block: clamp(3.25rem, 5vw, 3.5rem);
 
   position: relative;
   box-sizing: border-box;
   display: grid;
   justify-items: center;
-  padding: var(--hf-pad-block) var(--sp-4);
+  padding: clamp(2rem, 5vw, 3.5rem) var(--sp-4);
   border: var(--bd);
   background: var(--surface-2);
 }
@@ -287,7 +282,7 @@
 .hf-art,
 .hf-card-art,
 .hf-base,
-.hf-mesh,
+.hf-scan,
 .hf-mask svg,
 .hf-stamp svg {
   display: block;
@@ -321,27 +316,24 @@
   shape-rendering: geometricPrecision;
 }
 
-.hf-tone-light {
+/* each face's light, lit to deep: dots, plusses, checkers, solid squares */
+.hf-light-lit {
   fill: url(#hf-light);
 }
 
-.hf-tone-mid {
-  fill: url(#hf-mid);
-}
-
-.hf-tone-plus {
+.hf-light-mid {
   fill: url(#hf-plus);
 }
 
-.hf-tone-checker {
+.hf-light-shade {
   fill: url(#hf-checker);
 }
 
-.hf-tone-solid {
+.hf-light-deep {
   fill: url(#hf-solid);
 }
 
-.hf-tone-amber {
+.hf-light-amber {
   fill: url(#hf-amber);
 }
 
@@ -357,9 +349,24 @@
   fill: url(#hf-ground);
 }
 
-/* the basket that turns amber as a card lands */
+/* the scan line that runs down the laptop's screen */
+.hf-scan {
+  z-index: 11;
+  opacity: 0;
+}
+
+/* the basket that lights up as a card lands */
 .hf-notice {
   opacity: 0;
+}
+
+/* the agents' marks on the laptop's screen */
+.hf-marks {
+  inset: 0;
+}
+
+.hf-marks > .hf-mark {
+  position: absolute;
 }
 
 .hf-mark,
@@ -407,25 +414,9 @@
   height: 100%;
 }
 
-/* the base is drawn over the cards that have sunk into it, the sieve over the card passing through */
+/* the base is drawn over the cards that have sunk into it */
 .hf-base {
   z-index: 5;
-}
-
-.hf-mesh {
-  z-index: 11;
-}
-
-.hf-toggle {
-  position: absolute;
-  inset-block-end: calc((var(--hf-pad-block) - var(--target-comfortable)) / 2);
-  inset-inline-end: var(--sp-2);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hf-toggle {
-    display: none;
-  }
 }
 
 /* use cases */

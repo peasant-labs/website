@@ -41,14 +41,14 @@ export const HERO = {
   secondary: { label: "learn more", href: "#how" },
   /*
    * The picture under the buttons tells its story without words, so its
-   * accessible name says it: a card lifts out of the laptop, a sieve turns its
-   * secret amber, a stamp marks it published, and it settles on the shared
-   * stack where a small group stands. There is no reputation score: the one
-   * who lights up as it lands is the person it is credited to.
+   * accessible name says it: a card comes up on the laptop's screen, is
+   * redacted there, lifts out, is stamped as it is published and settles on
+   * the shared stack, where one of the people lifts an amber basket. There is
+   * no reputation score: that person is the one the card is credited to.
    */
   flow: {
     label:
-      "A transcript card lifts out of a laptop running Claude Code, Codex, Cursor, OpenCode, Pi and Strike, glides through a sieve that turns its secret line amber, is stamped as you publish it, and settles on a shared stack beside a small group of people: the commons. As it lands, one of them, you, lights up amber.",
+      "A transcript card comes up on the screen of a laptop running Claude Code, Codex, Cursor, OpenCode, Pi and Strike, and a scan line turns its secret line into an amber block while it is still on the computer. The card lifts out, glides over to the commons, is stamped as you publish it, and settles on a shared stack beside three peasants: as it lands, one of them, you, lifts an amber basket.",
     agents: [
       { mark: "claude", name: "Claude Code" },
       { mark: "codex", name: "Codex" },
@@ -57,8 +57,6 @@ export const HERO = {
       { mark: "pi", name: "Pi" },
       { mark: "strike", name: "Strike" },
     ],
-    pause: "pause the animation",
-    play: "play the animation",
   },
 } as const;
 

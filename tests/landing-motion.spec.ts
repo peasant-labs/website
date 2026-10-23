@@ -214,7 +214,7 @@ test("a heading that mounts after load is still revealed", async ({ page }) => {
   await expect(page.locator("#late")).toHaveAttribute("data-shown", "true");
 });
 
-test("the hero picture loops while on screen, pauses on request, and holds still for reduced motion", async ({
+test("the hero picture loops while on screen, holds while a pointer rests on it, and holds still for reduced motion", async ({
   page,
 }) => {
   const panel = page.locator(".hf-panel");
@@ -229,9 +229,10 @@ test("the hero picture loops while on screen, pauses on request, and holds still
     for (const agent of fixture.hero.flow.agents) {
       await expect(picture).toHaveAttribute("aria-label", new RegExp(agent));
     }
-    // the picture tells its story in shapes; the words are only in its accessible name
+    // the picture tells its story in shapes; the words are only in its accessible name, and it has no controls
     await expect(picture.locator(".hf-card").first()).toBeVisible();
     expect((await picture.innerText()).trim()).toBe("");
+    await expect(panel.getByRole("button")).toHaveCount(0);
     // the picture holds its height from the first paint: nothing below it moves
     const layout = () =>
       flow.evaluate((root) => ({
@@ -242,31 +243,27 @@ test("the hero picture loops while on screen, pauses on request, and holds still
     expect(before.height).toBeGreaterThan(0);
     await page.waitForTimeout(1500);
     expect(await layout()).toEqual(before);
-    // every part stays inside the picture, and the pause control inside its panel without covering the scene
-    const outside = await panel.evaluate((root) => {
-      const inside = (box: DOMRect, frame: DOMRect) =>
-        box.left >= frame.left - 1 && box.right <= frame.right + 1 && box.top >= frame.top - 1 && box.bottom <= frame.bottom + 1;
-      const scene = root.querySelector(".hf")!.getBoundingClientRect();
-      const parts = [...root.querySelectorAll(".hf-stage > *")]
+    // every part stays inside the picture
+    const outside = await flow.evaluate((root) => {
+      const frame = root.getBoundingClientRect();
+      return [...root.querySelectorAll(".hf-stage > *")]
         .map((element) => element.getBoundingClientRect())
         .filter((box) => box.width > 0 && box.height > 0)
-        .filter((box) => !inside(box, scene)).length;
-      const toggle = root.querySelector(".hf-toggle")!.getBoundingClientRect();
-      return { parts, toggle: inside(toggle, root.getBoundingClientRect()) && toggle.top >= scene.bottom };
+        .filter((box) => box.left < frame.left - 1 || box.right > frame.right + 1 || box.top < frame.top - 1 || box.bottom > frame.bottom + 1)
+        .length;
     });
-    expect(outside, `the picture overflows at ${width}`).toEqual({ parts: 0, toggle: true });
+    expect(outside, `the picture overflows at ${width}`).toBe(0);
   }
 
   expect(await running()).toEqual(["running"]);
-  await panel.getByRole("button", { name: fixture.hero.flow.pause }).click();
+  await flow.hover();
   await expect(flow).toHaveAttribute("data-paused", "true");
   expect(await running()).toEqual(["paused"]);
-  await panel.getByRole("button", { name: fixture.hero.flow.play }).click();
+  await page.mouse.move(0, 0);
   await expect(flow).toHaveAttribute("data-paused", "false");
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   expect(await running()).toEqual([]);
   await expect(card).toHaveCSS("opacity", "1");
-  await expect(panel.getByRole("button", { name: fixture.hero.flow.pause })).toBeHidden();
 });
