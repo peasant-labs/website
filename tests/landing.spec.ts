@@ -1,5 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { createHash } from "node:crypto";
+import { readdirSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { loadLandingFixture, PHONE } from "./landing-fixture";
 
 const fixture = loadLandingFixture();
@@ -249,28 +252,32 @@ test("the use cases are one row of all twelve capabilities, each tagged with its
         capability,
         detail: slide.details[index]!,
         picture: slide.pictures[index]!,
-        cta: slide.cta,
       })),
     ),
     // the last card leads on to the docs, in the same shape
-    { tag: more.tag, capability: more.text, detail: more.detail, picture: more.picture, cta: more.cta },
+    { tag: more.tag, capability: more.text, detail: more.detail, picture: more.picture },
   ];
   await expect(cards).toHaveCount(all.length);
-  for (const [index, { tag, capability, detail, picture, cta }] of all.entries()) {
+  for (const [index, { tag, capability, detail, picture }] of all.entries()) {
     const card = cards.nth(index);
     await expect(card.locator("h3")).toHaveText(capability);
     await expect(card.locator(".uc-cap-detail")).toHaveText(detail);
-    // a small tag names the audience, with its icon, the card's one icon besides the action's arrow
+    // a small tag names the audience, with its icon, the card's one icon besides the docs card's arrow
     await expect(card.locator(".uc-tag")).toHaveText(tag);
     await expect(card.locator(".uc-tag svg")).toHaveCount(1);
     await expect(card.locator("h3 svg, .uc-cap-detail svg, figure svg")).toHaveCount(0);
+    // each picture's address carries its content hash, so a redrawn picture is fetched fresh
     await expect(card.locator("img").first()).toHaveAttribute(
       "src",
-      new RegExp(`^/art/${picture}-(light|dark)\\.png$`),
+      new RegExp(`^/art/${picture}-(light|dark)\\.png\\?v=[0-9a-f]{8}$`),
     );
-    const link = card.getByRole("link", { name: cta.label, exact: true });
-    await expect(link).toHaveAttribute("href", cta.href);
   }
+  // only the docs card carries an action
+  await expect(cards.getByRole("link")).toHaveCount(1);
+  await expect(cards.last().getByRole("link", { name: more.cta.label, exact: true })).toHaveAttribute(
+    "href",
+    more.cta.href,
+  );
   // the loop's second set is hidden from assistive technology and out of the tab order
   const clones = row.locator('.uc-card[aria-hidden="true"]');
   await expect(clones).toHaveCount(all.length);
@@ -288,42 +295,109 @@ test("the use cases are one row of all twelve capabilities, each tagged with its
     expect(served, `the served page is missing ${JSON.stringify(detail)}`).toContain(detail);
   }
 
+  // once the row shows, every card's picture loads, so none pops in as its card drifts or is swiped into view
+  await row.scrollIntoViewIfNeeded();
+  await expect
+    .poll(() =>
+      cards.locator("img").evaluateAll((images) =>
+        images.filter((image) => getComputedStyle(image).display !== "none" && !(image as HTMLImageElement).naturalWidth).length,
+      ),
+    )
+    .toBe(0);
+
   // with focus the arrow keys move the row, and focus holds its drift
   await row.focus();
   const before = await row.evaluate((element) => element.scrollLeft);
   await page.keyboard.press("ArrowRight");
   await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeGreaterThan(before);
+
+  // the whole docs card is its action's target: a tap on its picture opens the docs
+  await row.hover();
+  await row.evaluate((element) => {
+    const all = [...element.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
+    element.scrollTo({ left: all.at(-1)!.offsetLeft - all[0]!.offsetLeft, behavior: "instant" });
+  });
+  const picture = (await cards.last().locator("figure").boundingBox())!;
+  await page.mouse.click(picture.x + picture.width / 2, picture.y + picture.height / 2);
+  await expect(page).toHaveURL(new RegExp(`${more.cta.href}$`));
 });
 
-test("the row's cards are one size, about three and a half across a wide screen and one and a fifth on a phone", async ({
+test("every picture on the site is addressed by its content hash, so a redrawn picture is never served stale", async ({
   page,
 }) => {
-  for (const [width, low, high] of [
-    [1440, 3.2, 3.9],
-    [390, 1.1, 1.4],
-  ] as const) {
-    await page.setViewportSize({ width, height: 900 });
+  const hashes = new Map<string, string>();
+  const folder = resolve("public/art");
+  for (const name of readdirSync(folder)) {
+    hashes.set(name, createHash("sha256").update(readFileSync(resolve(folder, name))).digest("hex").slice(0, 8));
+  }
+  for (const path of ["/", "/docs", "/blog", `/blog/${fixture.posts[0]!.slug}`]) {
+    await page.goto(path);
+    const sources = await page
+      .locator('img[src^="/art/"]')
+      .evaluateAll((images) => images.map((image) => image.getAttribute("src")!));
+    expect(sources.length, `${path} shows no picture`).toBeGreaterThan(0);
+    for (const source of sources) {
+      const [, name, version] = /^\/art\/([^?]+)\?v=([0-9a-f]{8})$/.exec(source) ?? [];
+      expect(name, `${path}: ${source} carries no content hash`).toBeTruthy();
+      expect(version, `${path}: ${source} is not addressed by its file's content`).toBe(hashes.get(name!));
+    }
+  }
+});
+
+test("every card has one shape, on the same lines across the row: picture, tag, a one-line headline on a wide screen, three lines of words", async ({
+  page,
+}) => {
+  for (const shape of fixture.useCases.shape) {
+    await page.setViewportSize({ width: shape.width, height: 900 });
     await page.goto("/");
     const geometry = await page.evaluate(() => {
       const row = document.querySelector("[data-use-cases]") as HTMLElement;
       const cards = [...row.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
-      const first = cards[0]!.getBoundingClientRect();
-      const second = cards[1]!.getBoundingClientRect();
-      const title = document.querySelector("#uses-title")!.getBoundingClientRect();
-      const box = row.getBoundingClientRect();
-      const room = cards.map((card) => {
-        const figure = card.querySelector(".uc-figure")!.getBoundingClientRect();
-        const art = card.querySelector(".uc-art")!.getBoundingClientRect();
-        return Math.min(art.left - figure.left, figure.right - art.right, art.top - figure.top, figure.bottom - art.bottom);
-      });
+      const lines = (element: Element) =>
+        element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight);
+      // unrounded, offset by the card's own left: offsetTop rounds, and the row is moving
+      const tops = (selector: string) => {
+        const values = cards.map((card) => card.querySelector(selector)!.getBoundingClientRect().top);
+        return Math.max(...values) - Math.min(...values);
+      };
+      const amber = (() => {
+        const probe = document.createElement("span");
+        probe.style.color = getComputedStyle(document.documentElement).getPropertyValue("--amber").trim();
+        document.body.append(probe);
+        const value = getComputedStyle(probe).color;
+        probe.remove();
+        return value;
+      })();
       return {
+        widths: cards.map((card) => card.getBoundingClientRect().width),
         sizes: new Set(cards.map((card) => `${card.offsetWidth}x${card.offsetHeight}`)).size,
-        tops: new Set(cards.map((card) => card.offsetTop)).size,
-        across: (box.right - first.left) / (second.left - first.left),
-        startsWithTitle: Math.abs(first.left - title.left) < 2,
+        figures: new Set(cards.map((card) => `${card.querySelector<HTMLElement>(".uc-figure")!.offsetWidth}x${card.querySelector<HTMLElement>(".uc-figure")!.offsetHeight}`)).size,
+        rows: tops(".uc-figure"),
+        tags: tops(".uc-tag"),
+        headlines: tops(".uc-cap-text"),
+        words: tops(".uc-cap-detail"),
+        headlineLines: cards.map((card) => {
+          const headline = card.querySelector(".uc-cap-text")!;
+          // the words themselves, not the room kept for them
+          const range = document.createRange();
+          range.selectNodeContents(headline);
+          return range.getClientRects().length === 0
+            ? 0
+            : Math.round(range.getBoundingClientRect().height / parseFloat(getComputedStyle(headline).lineHeight));
+        }),
+        headlineRoom: cards.map((card) => Math.round(lines(card.querySelector(".uc-cap-text")!))),
+        // the docs card's words keep only their own room, its action right under them
+        wordsRoom: cards.filter((card) => !card.querySelector(".uc-cta")).map((card) => lines(card.querySelector(".uc-cap-detail")!)),
+        docsWords: lines(cards.at(-1)!.querySelector(".uc-cap-detail")!),
+        wordsClamp: getComputedStyle(cards[0]!.querySelector(".uc-cap-detail")!).webkitLineClamp,
         fades: getComputedStyle(row).maskImage !== "none",
-        room: Math.min(...room),
-        count: cards.length,
+        room: Math.min(
+          ...cards.map((card) => {
+            const figure = card.querySelector(".uc-figure")!.getBoundingClientRect();
+            const art = card.querySelector(".uc-art")!.getBoundingClientRect();
+            return Math.min(art.left - figure.left, figure.right - art.right, art.top - figure.top, figure.bottom - art.bottom);
+          }),
+        ),
         // every picture sits on its own tinted panel, as wide as the card, so the panel's edges are the words' edges
         panels: cards.filter((card) => {
           const figure = card.querySelector(".uc-figure")!;
@@ -335,105 +409,56 @@ test("the row's cards are one size, about three and a half across a wide screen 
             Math.abs(box.width - card.getBoundingClientRect().width) < 1
           );
         }).length,
-        // amber is the picture's alone: the tag's icon and the action are in ink
-        amber: cards.filter((card) => {
-          const amber = getComputedStyle(document.documentElement).getPropertyValue("--amber").trim();
-          const probe = document.createElement("span");
-          probe.style.color = amber;
-          document.body.append(probe);
-          const value = getComputedStyle(probe).color;
-          probe.remove();
-          return [".uc-ic", ".uc-cta"].some((selector) => getComputedStyle(card.querySelector(selector)!).color === value);
-        }).length,
+        // amber is the picture's alone: the tag's icon and the docs card's action are in ink
+        amber: cards.filter((card) =>
+          [".uc-ic", ".uc-cta"].some((selector) => {
+            const element = card.querySelector(selector);
+            return element !== null && getComputedStyle(element).color === amber;
+          }),
+        ).length,
+        count: cards.length,
         pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
-    expect(geometry.sizes, `the cards are not one size at ${width}`).toBe(1);
-    expect(geometry.tops, `the cards are not one row at ${width}`).toBe(1);
-    expect(geometry.across, `cards across at ${width}`).toBeGreaterThanOrEqual(low);
-    expect(geometry.across, `cards across at ${width}`).toBeLessThanOrEqual(high);
-    expect(geometry.startsWithTitle, `the row does not start under its title at ${width}`).toBe(true);
-    expect(geometry.fades, `the row does not fade at its edges at ${width}`).toBe(true);
-    expect(geometry.room, `a picture is crowded in its space at ${width}`).toBeGreaterThanOrEqual(16);
-    expect(geometry.panels, `a picture has no panel across its card at ${width}`).toBe(geometry.count);
-    expect(geometry.amber, `a card's tag or action is amber at ${width}`).toBe(0);
-    expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
+    const at = `at ${shape.width}`;
+    const [low, high] = shape.card;
+    expect(geometry.sizes, `the cards are not one size ${at}`).toBe(1);
+    expect(geometry.figures, `the pictures' panels are not one size ${at}`).toBe(1);
+    expect(Math.min(...geometry.widths), `card width ${at}`).toBeGreaterThanOrEqual(low);
+    expect(Math.max(...geometry.widths), `card width ${at}`).toBeLessThanOrEqual(high);
+    for (const [part, spread] of [
+      ["pictures", geometry.rows],
+      ["tags", geometry.tags],
+      ["headlines", geometry.headlines],
+      ["words", geometry.words],
+    ] as const) {
+      expect(spread, `the ${part} do not share one line across the row ${at}`).toBeLessThan(1);
+    }
+    expect(
+      geometry.headlineLines.every((count) => count >= 1 && count <= shape.headline),
+      `a headline takes more than ${shape.headline} line(s) ${at}: ${geometry.headlineLines}`,
+    ).toBe(true);
+    expect(new Set(geometry.headlineRoom), `the headlines keep different room ${at}`).toEqual(new Set([shape.headline]));
+    expect(geometry.wordsClamp, `the words are not held to ${fixture.useCases.detailLines} lines ${at}`).toBe(
+      String(fixture.useCases.detailLines),
+    );
+    expect(Math.round(geometry.docsWords), `the docs card's words run past ${fixture.useCases.detailLines} lines ${at}`).toBeLessThanOrEqual(
+      fixture.useCases.detailLines,
+    );
+    for (const room of geometry.wordsRoom) {
+      expect(Math.round(room), `a card's words do not keep ${fixture.useCases.detailLines} lines ${at}`).toBe(
+        fixture.useCases.detailLines,
+      );
+    }
+    expect(geometry.fades, `the row does not fade at its edges ${at}`).toBe(true);
+    expect(geometry.room, `a picture is crowded in its space ${at}`).toBeGreaterThanOrEqual(16);
+    expect(geometry.panels, `a picture has no panel across its card ${at}`).toBe(geometry.count);
+    expect(geometry.amber, `a card's tag or action is amber ${at}`).toBe(0);
+    expect(geometry.pageOverflow, `page overflows ${at}`).toBe(false);
   }
 });
 
-test("on a phone the row steps one card at a time and rests with a whole card at the gutter", async ({ browser }) => {
-  const context = await browser.newContext(PHONE);
-  const page = await context.newPage();
-  await page.goto("/");
-  const row = page.locator("[data-use-cases]");
-  await row.scrollIntoViewIfNeeded();
-  expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("x mandatory");
-  const resting = () =>
-    row.evaluate((element) => {
-      const gutter = element.getBoundingClientRect().left + parseFloat(getComputedStyle(element).paddingLeft);
-      const cards = [...element.querySelectorAll(".uc-card")].map((card) => card.getBoundingClientRect().left);
-      return cards.some((left) => Math.abs(left - gutter) < 2);
-    });
-  await expect.poll(resting).toBe(true);
-  const start = await row.evaluate((element) => element.scrollLeft);
-  // it moves on by itself, then rests again on a whole card
-  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 8000 }).toBeGreaterThan(start + 10);
-  await expect.poll(resting).toBe(true);
-  await context.close();
-});
-
-test("a quiet line under the row shows where it is, one segment per card, filling with the time on the current one", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  const row = page.locator("[data-use-cases]");
-  const line = page.locator(".uc-progress");
-  // a reading, not a control: hidden from assistive technology, with nothing to press
-  await expect(line).toHaveAttribute("aria-hidden", "true");
-  await expect(line.locator("button, a")).toHaveCount(0);
-  const cards = await row.locator(".uc-card:not([aria-hidden])").count();
-  await expect(line.locator(".uc-progress-seg")).toHaveCount(cards);
-  // it sits under the row, on the title's edge
-  const edges = await page.evaluate(() => ({
-    line: document.querySelector(".uc-progress")!.getBoundingClientRect(),
-    row: document.querySelector("[data-use-cases]")!.getBoundingClientRect(),
-    title: document.querySelector("#uses-title")!.getBoundingClientRect().left,
-  }));
-  expect(edges.line.top).toBeGreaterThan(edges.row.bottom - 1);
-  expect(Math.abs(edges.line.left - edges.title)).toBeLessThan(2);
-
-  await row.scrollIntoViewIfNeeded();
-  await page.mouse.move(0, 0);
-  const on = line.locator('.uc-progress-seg[data-state="on"]');
-  await expect(on).toHaveCount(1);
-  const first = await line.locator(".uc-progress-seg").evaluateAll((segments) =>
-    segments.findIndex((segment) => segment.getAttribute("data-state") === "on"),
-  );
-  // the current segment fills over the time the row rests, then the row steps on and the next one takes over
-  await expect(on.locator(".uc-progress-fill")).toHaveCount(1);
-  await expect
-    .poll(
-      () =>
-        line
-          .locator(".uc-progress-seg")
-          .evaluateAll((segments) => segments.findIndex((segment) => segment.getAttribute("data-state") === "on")),
-      { timeout: 9000 },
-    )
-    .toBe(first + 1);
-  // hovering the row holds the fill where it is
-  await row.hover();
-  expect(await line.locator(".uc-progress-fill").evaluate((fill) => getComputedStyle(fill).animationPlayState)).toBe(
-    "paused",
-  );
-
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  await expect(line.locator(".uc-progress-fill")).toHaveCount(0);
-  await expect(line.locator('.uc-progress-seg[data-state="on"]')).toHaveCount(1);
-});
-
-test("every card, the last ones too, can rest whole on the title's edge, with nothing of the one before showing", async ({
+test("the row starts under its title, and every card, the last ones too, can stand whole on the title's edge", async ({
   page,
 }) => {
   for (const [width, motion] of [
@@ -446,6 +471,17 @@ test("every card, the last ones too, can rest whole on the title's edge, with no
     await page.emulateMedia({ reducedMotion: motion });
     await page.goto("/");
     const row = page.locator("[data-use-cases]");
+    // before it moves, the first card stands on the title's edge
+    expect(
+      await page.evaluate(
+        () =>
+          Math.abs(
+            document.querySelector("[data-use-cases] .uc-card")!.getBoundingClientRect().left -
+              document.querySelector("#uses-title")!.getBoundingClientRect().left,
+          ) < 2,
+      ),
+      `the row does not start under its title at ${width}, ${motion}`,
+    ).toBe(true);
     await row.scrollIntoViewIfNeeded();
     await row.hover();
     const rests = await row.evaluate(async (element) => {
@@ -459,7 +495,7 @@ test("every card, the last ones too, can rest whole on the title's edge, with no
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const left = card.getBoundingClientRect().left;
         const previous = cards[index - 1]?.getBoundingClientRect().right ?? -Infinity;
-        // the row never runs out at a rest: the next card, real or its twin, stands to the right
+        // the row never runs out: the next card, real or its twin, stands to the right
         const next = (cards[index + 1] ?? element.querySelector<HTMLElement>("[data-clone]")!).getBoundingClientRect();
         out.push({
           index,
@@ -471,14 +507,14 @@ test("every card, the last ones too, can rest whole on the title's edge, with no
       return out;
     });
     for (const rest of rests) {
-      expect(rest, `card ${rest.index + 1} does not rest on the edge at ${width}, ${motion}`).toEqual({
+      expect(rest, `card ${rest.index + 1} cannot stand on the edge at ${width}, ${motion}`).toEqual({
         index: rest.index,
         onEdge: true,
         previousHidden: true,
         neighbour: true,
       });
     }
-    // moved on by hand from the docs card, the row comes to the first card again, on the edge
+    // moved on by hand past the docs card, the row comes round to the first card again
     await row.evaluate((element) => {
       const clone = element.querySelector<HTMLElement>("[data-clone]")!;
       element.scrollTo({ left: clone.offsetLeft - (element.firstElementChild as HTMLElement).offsetLeft, behavior: "instant" });
@@ -487,43 +523,7 @@ test("every card, the last ones too, can rest whole on the title's edge, with no
   }
 });
 
-test("after the docs card the row steps on to the first card, and the line wraps back to its first segment", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  const row = page.locator("[data-use-cases]");
-  await row.scrollIntoViewIfNeeded();
-  await page.mouse.move(0, 0);
-  // stand on the last card, the docs one
-  await row.evaluate((element) => {
-    const cards = [...element.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
-    element.scrollTo({ left: cards.at(-1)!.offsetLeft - cards[0]!.offsetLeft, behavior: "instant" });
-  });
-  const segments = page.locator(".uc-progress-seg");
-  const count = await segments.count();
-  const onIndex = () =>
-    segments.evaluateAll((items) => items.findIndex((item) => item.getAttribute("data-state") === "on"));
-  await expect.poll(onIndex).toBe(count - 1);
-  // the next step is the first card again, on the edge, and the first segment
-  await expect.poll(onIndex, { timeout: 9000 }).toBe(0);
-  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 3000 }).toBeLessThan(2);
-});
-
-test("every use-case headline keeps room for two lines, so the words under it line up across the row", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  // read unrounded: offsetTop rounds, so tops a sixteenth of a pixel apart can land either side of .5
-  const spread = await page
-    .locator("[data-use-cases] .uc-card:not([aria-hidden]) .uc-cap-detail")
-    .evaluateAll((items) => {
-      const tops = items.map((item) => item.getBoundingClientRect().top);
-      return Math.max(...tops) - Math.min(...tops);
-    });
-  expect(spread).toBeLessThan(1);
-});
-
-test("the row steps a card at a time and loops, resting on the title's edge, holds when hovered, and stands still under reduced motion", async ({
+test("the row drifts slowly and evenly without settling, loops without a seam, holds when hovered, and stands still under reduced motion", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -532,36 +532,42 @@ test("the row steps a card at a time and loops, resting on the title's edge, hol
   await row.scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
   await expect(row).toHaveAttribute("data-playing", "true");
-  // at rest a whole card stands on the section title's left edge, and nothing shows left of it
-  const resting = () =>
-    page.evaluate(() => {
-      const element = document.querySelector("[data-use-cases]")!;
-      const edge = document.querySelector("#uses-title")!.getBoundingClientRect().left;
-      const lefts = [...element.querySelectorAll(".uc-card")].map((card) => card.getBoundingClientRect().left);
-      return lefts.some((left) => Math.abs(left - edge) < 2);
-    });
-  expect(await resting()).toBe(true);
+  // nothing pulls it onto a card
+  expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("none");
   expect(
     await row.evaluate((element) => getComputedStyle(element).maskImage.startsWith("linear-gradient(to right, rgba(0, 0, 0, 0)")),
   ).toBe(true);
-  const start = await row.evaluate((element) => element.scrollLeft);
-  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 8000 }).toBeGreaterThan(start + 10);
-  await expect.poll(resting).toBe(true);
+  // a few pixels every few frames, never standing and never jumping: an even drift
+  const samples = await row.evaluate(async (element) => {
+    const out: number[] = [];
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    for (let index = 0; index < 12; index += 1) {
+      out.push(element.scrollLeft);
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    return out;
+  });
+  const steps = samples.slice(1).map((value, index) => value - samples[index]!);
+  for (const step of steps) {
+    expect(step, `the drift stood or jumped: ${samples}`).toBeGreaterThan(1);
+    expect(step, `the drift stood or jumped: ${samples}`).toBeLessThan(20);
+  }
 
-  // at the end of the first set it steps back by one set, so the loop never runs out
+  // past the end of the first set it carries on from the same place in it, so the loop never runs out
   const set = await row.evaluate((element) => {
     const clone = element.querySelector<HTMLElement>("[data-clone]")!;
     const set = clone.offsetLeft - (element.firstElementChild as HTMLElement).offsetLeft;
-    element.scrollTo({ left: set, behavior: "instant" });
+    element.scrollTo({ left: set - 4, behavior: "instant" });
     return set;
   });
-  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 10000 }).toBeLessThan(set / 2);
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 5000 }).toBeLessThan(set / 2);
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
 
   // hovering holds it where it is
   await row.hover();
   await expect(row).toHaveAttribute("data-playing", "false");
   const held = await row.evaluate((element) => element.scrollLeft);
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(1500);
   expect(await row.evaluate((element) => element.scrollLeft)).toBe(held);
 
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -570,6 +576,71 @@ test("the row steps a card at a time and loops, resting on the title's edge, hol
   await expect(row.locator('.uc-card[aria-hidden="true"]')).toHaveCount(await row.locator(".uc-card:not([aria-hidden])").count());
   await expect(row).toHaveAttribute("data-playing", "false");
   expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("x mandatory");
+  await row.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(1500);
+  expect(await row.evaluate((element) => element.scrollLeft)).toBe(0);
+});
+
+test("on a phone the row drifts too, holds under a finger, and moves on again after it lets go", async ({ browser }) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  await row.scrollIntoViewIfNeeded();
+  expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("none");
+  const start = await row.evaluate((element) => element.scrollLeft);
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 4000 }).toBeGreaterThan(start + 10);
+  // a finger on the row holds it
+  await row.dispatchEvent("pointerdown", { pointerType: "touch", isPrimary: true });
+  await expect(row).toHaveAttribute("data-playing", "false");
+  await row.dispatchEvent("pointerup", { pointerType: "touch", isPrimary: true });
+  await expect(row).toHaveAttribute("data-playing", "true", { timeout: 5000 });
+  await context.close();
+});
+
+test("a quiet line under the row marks where it is in its loop, moving with it, and is no control", async ({ page }) => {
+  for (const motion of ["no-preference", "reduce"] as const) {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ reducedMotion: motion });
+    await page.goto("/");
+    const row = page.locator("[data-use-cases]");
+    const line = page.locator(".uc-progress");
+    // a reading, not a control: hidden from assistive technology, with nothing to press, and no segments
+    await expect(line).toHaveAttribute("aria-hidden", "true");
+    await expect(line.locator("button, a")).toHaveCount(0);
+    await expect(line.locator(".uc-progress-mark")).toHaveCount(2);
+    // it sits under the row, on the title's edge
+    const edges = await page.evaluate(() => ({
+      line: document.querySelector(".uc-progress")!.getBoundingClientRect(),
+      row: document.querySelector("[data-use-cases]")!.getBoundingClientRect(),
+      title: document.querySelector("#uses-title")!.getBoundingClientRect().left,
+    }));
+    expect(edges.line.top).toBeGreaterThan(edges.row.bottom - 1);
+    expect(Math.abs(edges.line.left - edges.title)).toBeLessThan(2);
+
+    // held still and moved by hand to the middle of its loop, the mark stands in the middle of the line
+    await row.scrollIntoViewIfNeeded();
+    await row.hover();
+    const mark = () =>
+      page.evaluate(() => {
+        const line = document.querySelector(".uc-progress")!.getBoundingClientRect();
+        const mark = document.querySelector(".uc-progress-mark")!.getBoundingClientRect();
+        return { at: (mark.left - line.left) / line.width, span: mark.width / line.width };
+      });
+    for (const share of [0.25, 0.5]) {
+      await row.evaluate((element, share) => {
+        const clone = element.querySelector<HTMLElement>("[data-clone]")!;
+        const set = clone.offsetLeft - (element.firstElementChild as HTMLElement).offsetLeft;
+        element.scrollTo({ left: set * share, behavior: "instant" });
+      }, share);
+      await expect.poll(async () => Math.abs((await mark()).at - share), { message: `${motion}` }).toBeLessThan(0.08);
+    }
+    // the mark is as long as the share of the loop on screen
+    const { span } = await mark();
+    expect(span).toBeGreaterThan(0.1);
+    expect(span).toBeLessThan(0.4);
+  }
 });
 
 test("every section opens on its title alone on a row, in one style at one edge, with room before its content", async ({

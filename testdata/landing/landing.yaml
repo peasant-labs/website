@@ -59,6 +59,14 @@ removed:
 # one row of every capability, each tagged with its audience and saying in one or two sentences
 # what it is (all twelve in the server's HTML); grouped here by audience; then one card on to the docs
 useCases:
+  # one shape for every card at each screen width: its width in px, and the lines its headline takes
+  # (one on a wide screen, two reserved on a phone); its words take at most three lines, with room for three
+  shape:
+    - { width: 1440, card: [425, 440], headline: 1 }
+    - { width: 1280, card: [425, 440], headline: 1 }
+    - { width: 1024, card: [425, 440], headline: 1 }
+    - { width: 390, card: [325, 340], headline: 2 }
+  detailLines: 3
   more:
     tag: docs
     text: explore more in the docs
@@ -75,7 +83,6 @@ useCases:
         - "Students publish their sessions to your class's collective, so you can see how each worked with an agent."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-balance, uc-book, uc-slate]
-      cta: { label: sign up free, href: "/?login" }
     - id: teams
       label: teams
       capabilities: [review the work behind a diff, onboard from real history, "learn from each other's prompts"]
@@ -85,7 +92,6 @@ useCases:
         - "Read what your teammates typed to their agents in the transcripts they share, and reuse what works."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lens, uc-signpost, uc-candles]
-      cta: { label: sign up free, href: "/?login" }
     - id: developers
       label: developers
       capabilities: [find any past session, explain a change in one comment, publish on every push]
@@ -95,7 +101,6 @@ useCases:
         - "Turn it on once, and each push publishes that project's sessions, secrets hidden, to your chosen collectives."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lantern, uc-door, uc-bell]
-      cta: { label: install now, href: "#install" }
     - id: companies
       label: companies
       capabilities: [keep agent data in-house, see which commits agents wrote, usage across teams]
@@ -105,7 +110,6 @@ useCases:
         - "Your collective's page lists who shared what, with which agent, plus token and pull request totals."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-chest, uc-scroll, uc-sacks]
-      cta: { label: talk to us, href: "mailto:hello@peasantlabs.org" }
 how:
   steps:
     - title: record

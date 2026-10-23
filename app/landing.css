@@ -438,11 +438,12 @@
 
 /*
  * One row of all twelve capabilities, from edge to edge of the screen. It
- * starts at the content's left edge and fades out at both sides, so it reads
- * as going on. About three and a half cards show on a wide screen, two and a
- * bit on a tablet, one and a fifth on a phone, all one width and one height.
- * The row is a scroll area with its bar hidden: it drifts on its own, and a
- * finger, the arrow keys or a mouse drag move it too.
+ * starts at the content's left edge and fades out at its right, so it reads
+ * as going on. Cards are 27rem on a wide screen, wide enough for every
+ * headline on one line, two and a bit across a tablet, and most of a phone's
+ * width, all one width and one height. The row is a scroll area with its bar
+ * hidden: it drifts on its own, and a finger, the arrow keys or a mouse drag
+ * move it too.
  */
 .uc {
   /* the row starts where the content does: the page's own side padding, inside its widest measure */
@@ -450,7 +451,7 @@
   --uc-gap: clamp(1rem, 2.5vw, 2rem);
   --uc-edge: max(var(--uc-pad), calc((100vw - 75rem) / 2 + var(--uc-pad)));
   --uc-fade: clamp(1.5rem, 6vw, 6rem);
-  --uc-card: calc((100vw - var(--uc-edge) - var(--uc-gap)) / 1.2);
+  --uc-card: 85vw;
 
   display: flex;
   gap: var(--uc-gap);
@@ -468,7 +469,6 @@
     #000 calc(100% - var(--uc-fade)),
     transparent
   );
-  scroll-snap-type: x mandatory;
 }
 
 .uc::-webkit-scrollbar {
@@ -489,7 +489,7 @@
 
 @media (min-width: 64rem) {
   .uc {
-    --uc-card: calc((100vw - var(--uc-edge) - 3 * var(--uc-gap)) / 3.5);
+    --uc-card: 27rem;
   }
 }
 
@@ -508,22 +508,37 @@
   }
 }
 
-/* the row settles on a whole card, whether it stepped on its own or was swiped; on a phone the fade is only gutter-wide */
+/*
+ * The drift glides past every card without settling. Under reduced motion the
+ * row only moves by hand, and then it settles on a whole card.
+ */
 .uc-card {
   scroll-snap-align: start;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .uc {
+    scroll-snap-type: x mandatory;
+  }
+}
+
+/* on a phone the fade is only gutter-wide */
 @media (max-width: 47.99rem) {
   .uc {
     --uc-fade: var(--uc-pad);
   }
 }
 
-/* a card: picture, audience tag, headline, words, and the action at its foot, in every card alike */
+/*
+ * A card: picture, audience tag, headline and words, in every card alike and
+ * on the same lines across the row. Only the docs card adds an action, under
+ * its words.
+ */
 .uc-card {
+  position: relative;
   display: grid;
   flex: 0 0 var(--uc-card);
-  grid-template-rows: auto auto auto 1fr auto;
+  align-content: start;
   min-width: 0;
 }
 
@@ -553,50 +568,34 @@
 }
 
 /*
- * Under the row, where it is: one thin segment per card, the current one in
- * ink, filling with the time left before the row steps on. It holds when the
- * row holds; under reduced motion it only marks where the row rests.
+ * Under the row, where it is in its loop: a thin line with a short ink mark
+ * that moves with the row, as long as the share of the loop on screen. When
+ * the mark runs off the line's end, its twin comes in at the start, as the
+ * row comes round to its first card. A reading, not a control.
  */
 .uc-progress {
-  display: flex;
-  gap: var(--sp-1);
-  max-width: 24rem;
-  margin: var(--sp-6) 0 0;
-  padding: 0;
-  list-style: none;
-}
+  --uc-at: 0;
+  --uc-span: 0.2;
 
-.uc-progress-seg {
   position: relative;
-  flex: 1 1 0;
+  max-width: 24rem;
   height: 2px;
+  margin: var(--sp-6) 0 0;
   overflow: hidden;
   background: var(--rule);
 }
 
-.uc-progress[data-static="true"] .uc-progress-seg[data-state="on"] {
-  background: var(--ink-3);
-}
-
-.uc-progress-fill {
+.uc-progress-mark {
   position: absolute;
-  inset: 0;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(var(--uc-span) * 100%);
   background: var(--ink-3);
-  transform: scaleX(0);
-  transform-origin: left center;
-  animation-name: uc-progress;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
+  transform: translateX(calc(var(--uc-at) / var(--uc-span) * 100%));
 }
 
-.uc-progress[data-playing="false"] .uc-progress-fill {
-  animation-play-state: paused;
-}
-
-@keyframes uc-progress {
-  to {
-    transform: scaleX(1);
-  }
+.uc-progress-mark + .uc-progress-mark {
+  transform: translateX(calc((var(--uc-at) - 1) / var(--uc-span) * 100%));
 }
 
 /* the audience: a small tag with its icon, the card's one icon */
@@ -621,45 +620,75 @@
   color: var(--ink-3);
 }
 
-/* room for two lines in every card, so the words under it start on one line across the row */
+/*
+ * One line on a wide screen, where every headline fits; room for two on a
+ * tablet or a phone, top-aligned. Either way the words under it start on one
+ * line across the row.
+ */
 .uc-cap-text {
-  min-block-size: calc(2lh);
+  min-block-size: 2lh;
   margin-block-start: var(--sp-2);
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 1.6vw, 1.5rem);
+  font-size: var(--fs-lg);
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.2;
   text-wrap: balance;
 }
 
-/* what the capability is, in a sentence or two of body type */
+@media (min-width: 64rem) {
+  .uc-cap-text {
+    min-block-size: 1lh;
+  }
+}
+
+/* what the capability is: at most three lines of body type, and room for three in every card */
 .uc-cap-detail {
+  display: -webkit-box;
+  min-block-size: 3lh;
   margin-block-start: var(--sp-2);
+  overflow: hidden;
   color: var(--ink-3);
   font-family: var(--font-body);
   font-size: var(--fs-body);
   line-height: 1.55;
   text-wrap: pretty;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
-/* the audience's one action, small, at the card's foot */
+/*
+ * The docs card's action, small, right under its words, which keep only the
+ * room they take: the whole card is its target, so it needs no tall row of
+ * its own, and the card ends about where the others do.
+ */
+.uc-card:has(.uc-cta) .uc-cap-detail {
+  min-block-size: 0;
+}
+
 .uc-cta {
   display: inline-flex;
   align-items: center;
   justify-self: start;
   gap: var(--sp-2);
-  min-height: var(--target-comfortable);
-  margin-block-start: var(--sp-3);
+  margin-block-start: var(--sp-2);
   color: var(--ink-strong);
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
   font-weight: 700;
   letter-spacing: 0;
+  line-height: 1.55;
   text-decoration: underline;
   text-decoration-color: var(--rule-strong);
   text-underline-offset: 4px;
+}
+
+.uc-cta::after {
+  position: absolute;
+  inset: 0;
+  content: "";
 }
 
 .uc-cta svg {

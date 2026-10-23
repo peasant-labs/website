@@ -4,7 +4,7 @@ import { Art } from "@/components/art";
 import { LandingIcon } from "@/components/landing/icons";
 import { withCommands } from "@/components/landing/inline-code";
 import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
-import { USE_CASES, type Capability, type LandingIconName, type UseCase } from "@/lib/landing";
+import { USE_CASES, type Capability, type LandingIconName } from "@/lib/landing";
 import { ArrowRight } from "@peasant-labs/fairtrade/icons";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 
@@ -15,7 +15,8 @@ type Card = Readonly<{
   text: string;
   detail: string;
   art: Capability["art"];
-  cta: UseCase["cta"];
+  /** only the last card, the one that leads on to the docs, has an action */
+  cta?: Readonly<{ label: string; href: string }>;
 }>;
 
 /* every capability, in order, tagged with the audience it belongs to, then the card that leads on to the docs */
@@ -28,7 +29,6 @@ const CARDS: readonly Card[] = [
       text: capability.text,
       detail: capability.detail,
       art: capability.art,
-      cta: useCase.cta,
     })),
   ),
   { id: "docs", ...USE_CASES.more },
@@ -38,96 +38,106 @@ const CARDS: readonly Card[] = [
 const DRAG_PX = 6;
 /* after a touch lets go, the row waits this long before it moves on its own again */
 const TOUCH_REST_MS = 2400;
-/* how long the row rests on a card before it steps on, so it always rests with a whole card on the title's edge */
-const STEP_MS = 4200;
+/* the drift picks up its speed over this long when it starts or comes back from a hold */
+const EASE_IN_MS = 600;
 
 /**
  * The use cases: the section's heading on its own row, then one row of all
- * twelve capabilities, each a card with its own picture on a tinted panel, a
- * small tag naming its audience, its headline, a sentence or two on what it
- * is, and its audience's one action; a last card in the same shape leads on to
- * the docs. Every card's words are in the page as served. Under the row, a
- * thin line of one segment per card shows where the row is and fills with the
- * time left on the current card; it is a reading, not a control.
+ * twelve capabilities, each a card of one shape (its picture on a tinted
+ * panel, a small tag naming its audience, its headline, a sentence or two on
+ * what it is), and a last card in the same shape that leads on to the docs,
+ * the only one with an action. Every card's words are in the page as served.
  *
- * The row moves on its own and loops: when the current segment fills, it
- * steps one card along and rests with a whole card on the title's left edge,
- * the rest of the row running off to the right. A second set of the cards
- * follows the first, hidden from assistive technology and out of the tab
- * order, and the row steps back by one set when it reaches it. It holds while
- * hovered, keyboard-focused, touched, off screen or in a background tab. It is
- * a real scroll area, so a finger swipes it, the arrow keys move it once it
- * has focus, and a mouse can drag it. Under reduced motion it never moves on
- * its own: it scrolls and snaps to each card, and still goes round, so after
- * the docs card come the first cards again.
+ * The row drifts on its own, slowly and evenly, and never ends: a second set
+ * of the cards follows the first, hidden from assistive technology and out of
+ * the tab order, and the row steps back by one set, without motion, when it
+ * reaches it. It holds while hovered, keyboard-focused, touched, off screen
+ * or in a background tab. It is a real scroll area, so a finger swipes it, the
+ * arrow keys move it once it has focus, and a mouse can drag it; the drift
+ * carries on from wherever it was left. Under a quiet line, a short mark moves
+ * with the row through the whole loop: a reading, not a control.
+ *
+ * Under reduced motion it never moves on its own: it scrolls and snaps to each
+ * card by hand, and still goes round, and the mark still follows it.
  */
 export function UseCases() {
   const rowRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
   const onScreen = useOnScreen(rowRef, 0.1);
+  // once the row has shown, every card's picture loads, not just those in the row's own view
+  const [near, setNear] = useState(false);
+  if (onScreen && !near) setNear(true);
   const reduced = useReducedMotion();
   const [held, setHeld] = useState({ hover: false, focus: false, touch: false, drag: false });
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
   const restTimer = useRef(0);
   const playing = onScreen && !reduced && !held.hover && !held.focus && !held.touch && !held.drag;
 
-  const [current, setCurrent] = useState(0);
-  const currentRef = useRef(0);
-  /* a new take restarts the current segment's fill from empty */
-  const [take, setTake] = useState(0);
-
-  function show(index: number) {
-    if (currentRef.current === index) return;
-    currentRef.current = index;
-    setCurrent(index);
-    setTake((value) => value + 1);
-  }
-
-  // One card along: a smooth step to the next snap point, and back a set at the seam.
-  function step() {
-    const row = rowRef.current;
-    if (!row) return;
-    const cards = [...row.querySelectorAll<HTMLElement>(".uc-card")];
-    const first = cards[0]!.offsetLeft;
+  /* the width of one set of cards: past it, the row stands at the same place in the first set */
+  function setWidth(row: HTMLElement) {
     const clone = row.querySelector<HTMLElement>("[data-clone]");
-    const set = clone ? clone.offsetLeft - first : 0;
-    // the card now resting at the start, then the next one
-    const here = cards.findIndex((card) => card.offsetLeft - first >= row.scrollLeft - 2);
-    const next = cards[here + 1];
-    if (!next) return;
-    const target = next.offsetLeft - first;
-    row.scrollTo({ left: target, behavior: "smooth" });
-    show((here + 1) % CARDS.length);
-    if (set && target >= set) {
-      // the copy of the first card has arrived; once it settles, stand on the real one without motion
-      window.setTimeout(() => {
-        row.scrollTo({ left: target - set, behavior: "instant" });
-      }, 700);
-    }
+    return clone ? clone.offsetLeft - (row.firstElementChild as HTMLElement).offsetLeft : 0;
   }
 
-  // A swipe, a drag or the keys move the row too: the line follows the card that comes to rest, and a
-  // rest in the second set stands on the same card in the first without motion, so the row goes round.
+  // The drift: a few pixels a second, once per frame, back a set at the seam. The row keeps its own
+  // unrounded place, so the drift stays even between whole pixels, and takes up the scroll position
+  // again whenever a hand has moved it.
+  useEffect(() => {
+    const row = rowRef.current;
+    if (!row || !playing) return;
+    let frame = 0;
+    let start = 0;
+    let last = 0;
+    let at = row.scrollLeft;
+    const tick = (time: number) => {
+      if (!start) start = time;
+      if (last) {
+        if (Math.abs(row.scrollLeft - at) > 1) at = row.scrollLeft;
+        const ease = Math.min(1, (time - start) / EASE_IN_MS);
+        at += ((time - last) / 1000) * USE_CASES.speed * ease * ease * (3 - 2 * ease);
+        const set = setWidth(row);
+        if (set && at >= set) at -= set;
+        row.scrollLeft = at;
+      }
+      last = time;
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [playing]);
+
+  // The line follows the row, whoever moves it; a hand scroll that comes to rest in the second set stands
+  // on the same place in the first, so the row goes round by hand too.
   useEffect(() => {
     const row = rowRef.current;
     if (!row) return;
+    let frame = 0;
     let timer = 0;
-    const settle = () => {
+    // the mark stands at the row's place in its loop, as long as the share of the loop on screen
+    const place = () => {
+      frame = 0;
+      const set = setWidth(row);
+      const line = lineRef.current;
+      if (!set || !line) return;
+      const shown = row.clientWidth - parseFloat(getComputedStyle(row).paddingLeft);
+      line.style.setProperty("--uc-at", String((row.scrollLeft % set) / set));
+      line.style.setProperty("--uc-span", String(Math.min(1, shown / set)));
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(place);
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
-        const cards = [...row.querySelectorAll<HTMLElement>(".uc-card")];
-        const first = cards[0]!.offsetLeft;
-        const here = cards.findIndex((card) => card.offsetLeft - first >= row.scrollLeft - 2);
-        if (here < 0) return;
-        if (here >= CARDS.length) {
-          const twin = cards[here - CARDS.length]!;
-          row.scrollTo({ left: twin.offsetLeft - first, behavior: "instant" });
-        }
-        show(here % CARDS.length);
+        const set = setWidth(row);
+        if (set && row.scrollLeft >= set) row.scrollTo({ left: row.scrollLeft - set, behavior: "instant" });
       }, 160);
     };
-    row.addEventListener("scroll", settle, { passive: true });
+    place();
+    row.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
-      row.removeEventListener("scroll", settle);
+      row.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
       window.clearTimeout(timer);
     };
   }, []);
@@ -178,9 +188,6 @@ export function UseCases() {
     );
   }
 
-  /* the second set follows the first under reduced motion too, so the row goes round when moved by hand */
-  const sets = [false, true];
-
   return (
     <>
       <div className="site-wrap">
@@ -220,7 +227,8 @@ export function UseCases() {
           }
         }}
       >
-        {sets.flatMap((clone) =>
+        {/* the second set follows under reduced motion too, so the row goes round when moved by hand */}
+        {[false, true].flatMap((clone) =>
           CARDS.map((card, index) => (
             <article
               key={`${clone ? "clone" : "card"}-${card.text}`}
@@ -233,7 +241,7 @@ export function UseCases() {
               data-use-case={clone ? undefined : card.id}
             >
               <figure className="uc-figure">
-                <Art art={card.art} className="uc-art" />
+                <Art art={card.art} className="uc-art" near={near} />
               </figure>
               <p className="uc-tag">
                 <LandingIcon name={card.icon} className="uc-ic" />
@@ -241,35 +249,22 @@ export function UseCases() {
               </p>
               <h3 className="uc-cap-text">{card.text}</h3>
               <p className="uc-cap-detail">{withCommands(card.detail)}</p>
-              <a className="uc-cta" href={card.cta.href} tabIndex={clone ? -1 : undefined}>
-                {card.cta.label}
-                <ArrowRight aria-hidden="true" focusable="false" />
-              </a>
+              {card.cta ? (
+                <a className="uc-cta" href={card.cta.href} tabIndex={clone ? -1 : undefined}>
+                  {card.cta.label}
+                  <ArrowRight aria-hidden="true" focusable="false" />
+                </a>
+              ) : null}
             </article>
           )),
         )}
       </div>
-      {/* where the row is: a reading, not a control, so it is hidden from assistive technology */}
+      {/* where the row is in its loop: a reading, not a control, so it is hidden from assistive technology */}
       <div className="site-wrap">
-        <ol
-          className="uc-progress"
-          aria-hidden="true"
-          data-playing={playing ? "true" : "false"}
-          data-static={reduced ? "true" : "false"}
-        >
-          {CARDS.map((card, index) => (
-            <li key={card.text} className="uc-progress-seg" data-state={index === current ? "on" : "off"}>
-              {index === current && !reduced ? (
-                <span
-                  key={take}
-                  className="uc-progress-fill"
-                  style={{ animationDuration: `${STEP_MS}ms` }}
-                  onAnimationEnd={step}
-                />
-              ) : null}
-            </li>
-          ))}
-        </ol>
+        <div ref={lineRef} className="uc-progress" aria-hidden="true">
+          <span className="uc-progress-mark" />
+          <span className="uc-progress-mark" />
+        </div>
       </div>
     </>
   );

@@ -23,6 +23,8 @@ export type LandingFixture = {
   sections: Array<{ id: string; heading: string }>;
   removed: string[];
   useCases: {
+    shape: Array<{ width: number; card: [number, number]; headline: number }>;
+    detailLines: number;
     more: { tag: string; text: string; detail: string; picture: string; cta: Link };
     slides: Array<{
       id: string;
@@ -30,7 +32,6 @@ export type LandingFixture = {
       capabilities: string[];
       details: string[];
       pictures: string[];
-      cta: Link;
     }>;
   };
   how: {

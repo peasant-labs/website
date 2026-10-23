@@ -1,4 +1,3 @@
-import { LOGIN_URL } from "@/lib/site";
 
 /**
  * Every word and destination on the landing page, in reading order. The
@@ -78,8 +77,6 @@ export const AGENTS = {
   ],
 } as const;
 
-export type UseCaseCta = Readonly<{ label: string; href: string }>;
-
 /** a drawn icon beside an audience, a capability or a step; components/landing/icons maps each to a lucide mark */
 export type LandingIconName =
   | "check"
@@ -111,10 +108,7 @@ export type UseCase = Readonly<{
   label: string;
   icon: LandingIconName;
   capabilities: readonly [Capability, Capability, Capability];
-  cta: UseCaseCta;
 }>;
-
-const SIGN_UP: UseCaseCta = { label: "sign up free", href: LOGIN_URL };
 
 /* every use-case picture is drawn on the same 704 by 528 grid */
 function capabilityArt(name: string, alt: string): Art {
@@ -123,13 +117,18 @@ function capabilityArt(name: string, alt: string): Art {
 
 /*
  * Each capability is a card of its own in one row, tagged with its audience;
- * the capabilities only claim what the product does today. The audience's one
- * action closes each of its cards.
+ * the capabilities only claim what the product does today. Only the last card,
+ * the one that leads on to the docs, carries an action.
  */
 export const USE_CASES = {
   title: "find your use case",
   /* the row of capabilities, as assistive technology names it */
   label: "use cases",
+  /*
+   * how far the row drifts on its own, in pixels a second: slow enough to read a card as it passes,
+   * and half a pixel a frame at 60 frames a second, so it moves on an even beat on any screen
+   */
+  speed: 30,
   /* after the twelve, one card that leads on to the docs, in the same shape */
   more: {
     tag: "docs",
@@ -167,7 +166,6 @@ export const USE_CASES = {
           art: capabilityArt("uc-slate", "a slate on an easel with an amber apple on its ledge"),
         },
       ],
-      cta: SIGN_UP,
     },
     {
       id: "teams",
@@ -196,7 +194,6 @@ export const USE_CASES = {
           art: capabilityArt("uc-candles", "one candle leaning over to light another, both flames amber"),
         },
       ],
-      cta: SIGN_UP,
     },
     {
       id: "developers",
@@ -225,7 +222,6 @@ export const USE_CASES = {
           art: capabilityArt("uc-bell", "an amber town crier's handbell"),
         },
       ],
-      cta: { label: "install now", href: "#install" },
     },
     {
       id: "companies",
@@ -254,7 +250,6 @@ export const USE_CASES = {
           art: capabilityArt("uc-sacks", "three tied sacks rising in height like a bar chart, the tallest amber"),
         },
       ],
-      cta: { label: "talk to us", href: "mailto:hello@peasantlabs.org" },
     },
   ] satisfies readonly UseCase[],
 } as const;
