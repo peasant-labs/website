@@ -501,10 +501,34 @@ test("scrolling walks the held section through steps 1, 2 and 3, then lets the p
   await page.goto("/");
   const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
   const steps = page.locator(".hw-step");
+  const rail = page.getByRole("progressbar", { name: "how far through how it works" });
+  const marks = rail.locator(".rail-mark");
+  // on the way in, a cue says there is more below
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 2);
+  await expect(page.locator(".hw-scroll")).toHaveAttribute("data-cue", "show");
+  await expect(page.locator(".hw-cue")).toHaveAttribute("aria-label", /scroll/);
+  let last = -1;
   for (const [index, offset] of [0.2, 1.2, 2.2].entries()) {
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * offset);
     await expect(steps.nth(index)).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".hw-window")).toBeInViewport();
+    // the held section shows it is moving: the rail fills, and a mark lights for each step reached
+    await expect
+      .poll(async () => Number(await rail.getAttribute("aria-valuenow")))
+      .toBeGreaterThan(last);
+    last = Number(await rail.getAttribute("aria-valuenow"));
+    for (const [at] of fixture.how.steps.entries()) {
+      await expect(marks.nth(at)).toHaveAttribute("data-reached", at <= index ? "true" : "false");
+    }
+    // and the current step's own bar fills with its third
+    const own = await page
+      .locator(".hw-steps > li")
+      .nth(index)
+      .locator(".hw-step-fill")
+      .evaluate((fill) => new DOMMatrix(getComputedStyle(fill).transform).a);
+    expect(own).toBeGreaterThan(0);
+    // the first scroll put the cue away
+    await expect(page.locator(".hw-scroll")).toHaveAttribute("data-cue", "gone");
   }
   // after the third step the section lets go and the next one arrives
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * 3.2);

@@ -794,17 +794,6 @@
   align-items: start;
 }
 
-.hw-marks {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.hw-mark {
-  height: 100vh;
-  height: 100dvh;
-}
-
 /* the list holds the height of its tallest open state (measured), so opening and closing moves nothing below */
 .hw-steps {
   box-sizing: border-box;
@@ -956,6 +945,121 @@
   margin-inline-end: -10px;
 }
 
+/*
+ * The held section's progress, so it never looks frozen: a slim rail under the
+ * scene fills with the scroll and lights a mark at the start of each step's
+ * third (components/landing/scroll-rail.tsx, for any held section); the
+ * current step's bar, along its bottom rule, fills with its own third.
+ */
+.rail {
+  position: relative;
+  height: 9px;
+}
+
+.rail-track {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 3px;
+  height: 3px;
+  overflow: hidden;
+  background: var(--rule);
+}
+
+.rail-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.rail-mark {
+  position: absolute;
+  inset-block-start: 0;
+  box-sizing: border-box;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--rule-strong);
+  background: var(--canvas);
+}
+
+.rail-mark[data-reached="true"] {
+  border-color: var(--amber);
+  background: var(--amber);
+}
+
+.hw-rail {
+  margin-block-start: var(--sp-3);
+}
+
+.hw-steps > li {
+  position: relative;
+}
+
+.hw-step-fill {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -1px;
+  z-index: 1;
+  height: 2px;
+  background: var(--amber);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.hw-steps > li[data-on="true"] .hw-step-fill {
+  opacity: 1;
+}
+
+/* on the way in, a small cue says there is more below; the first scroll puts it away for good */
+.hw-cue {
+  position: absolute;
+  inset-block-end: var(--sp-4);
+  inset-inline-start: 50%;
+  display: grid;
+  place-items: center;
+  width: var(--target-comfortable);
+  height: var(--target-comfortable);
+  color: var(--ink-3);
+  opacity: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hw-cue svg {
+  width: var(--ic-lg);
+  height: var(--ic-lg);
+}
+
+.hw-scroll[data-cue="show"] .hw-cue {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rail-mark,
+  .hw-step-fill {
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      opacity 200ms ease;
+  }
+
+  .hw-cue {
+    transition: opacity 320ms var(--ease-out);
+  }
+
+  .hw-cue svg {
+    animation: hw-cue 1400ms var(--ease-in-out) infinite alternate;
+  }
+}
+
+@keyframes hw-cue {
+  to {
+    transform: translateY(5px);
+  }
+}
+
 /* replay: the icon alone, named for assistive technology */
 .hw-replay {
   display: inline-grid;
@@ -992,7 +1096,11 @@
 
   .hw-grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
+    gap: 6px;
+  }
+
+  .hw-rail {
+    margin-block-start: 6px;
   }
 
   .hw-side {

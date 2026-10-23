@@ -6,21 +6,27 @@ import { REVIEW_SCENE } from "@/components/landing/scenes/review";
 import { SceneStage, type SceneDefinition } from "@/components/landing/scenes/stage";
 import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
 import { LandingIcon } from "@/components/landing/icons";
+import { ScrollRail, useHeldProgress } from "@/components/landing/scroll-rail";
 import { HOW } from "@/lib/landing";
-import { RotateCcw } from "@peasant-labs/fairtrade/icons";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ChevronDown, RotateCcw } from "@peasant-labs/fairtrade/icons";
+import { useLayoutEffect, useRef, useState } from "react";
 
 const SCENES: readonly SceneDefinition[] = [RECORD_SCENE, REVIEW_SCENE, PUBLISH_SCENE];
 /* replay fades the scene all the way out before the fresh take fades in: the layer's fade is 420ms */
+/* how far into the held section the first scroll puts away the "there is more" cue */
+const CUE_GONE = 0.03;
 const REWIND_MS = 440;
 
 /**
  * How it works, told by scrolling. The section holds still while the page
  * scrolls through it, about one screen per step, and each step's scene plays
  * as it becomes the current one; after the third the page simply carries on.
- * Nothing hijacks the scroll: three markers down the section's height, one a
- * third each, say which step the middle of the screen is on, so momentum, the
- * keyboard and the scroll bar all work as usual. Choosing a step scrolls to it.
+ * Nothing hijacks the scroll: the section's scroll is cut in thirds, one per
+ * step, so momentum, the keyboard and the scroll bar all work as usual.
+ * Choosing a step scrolls to it. So the held section never looks frozen, a
+ * rail under the scene fills with the scroll and lights a mark per step, the
+ * current step's own bar fills with its third, and on the way in a small cue
+ * says there is more below until the first scroll puts it away.
  *
  * The steps show their titles; only the current one opens its description,
  * and the last one closes as it does, both on one height transition. The list
@@ -50,31 +56,33 @@ export function HowItWorks({ title }: { title: string }) {
     setShown(active);
     setTakes((current) => current.map((value, index) => (index === active ? value + 1 : value)));
   }
-  const markRefs = useRef<(HTMLDivElement | null)[]>([]);
   const windowRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const pinRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
   const stepsRef = useRef<HTMLOListElement>(null);
   const onScreen = useOnScreen(windowRef, 0.4);
 
-  // The step whose marker holds the middle of the screen is the current one.
-  useEffect(() => {
-    if (reduced) return;
-    const targets = markRefs.current.filter((element): element is HTMLDivElement => element !== null);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const index = targets.indexOf(entry.target as HTMLDivElement);
-          if (index >= 0) setActive(index);
-        }
-      },
-      { rootMargin: "-50% 0px -50% 0px" },
-    );
-    targets.forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
-  }, [reduced]);
+  // The scroll through the held section is cut in thirds, one per step; the current step's third fills
+  // its own bar, and the page's first scroll into it puts away the cue that says there is more.
+  useHeldProgress(
+    rootRef,
+    (progress, held) => {
+      setActive(Math.min(SCENES.length - 1, Math.floor(progress * SCENES.length)));
+      const root = rootRef.current;
+      if (!root) return;
+      root.querySelectorAll<HTMLElement>(".hw-step-fill").forEach((fill, index) => {
+        const own = Math.min(1, Math.max(0, progress * SCENES.length - index));
+        fill.style.transform = `scaleX(${own})`;
+      });
+      // while the section is held, the header it sits under stays (see app/landing.css)
+      const holding = held || (root.getBoundingClientRect().top <= 0 && progress < 1);
+      if (root.dataset.holding !== String(holding)) root.dataset.holding = String(holding);
+      const near = root.getBoundingClientRect().top <= window.innerHeight * 0.25;
+      if (progress > CUE_GONE) root.dataset.cue = "gone";
+      else if (root.dataset.cue !== "gone") root.dataset.cue = near ? "show" : "wait";
+    },
+    !reduced,
+  );
 
   // The list holds its tallest open state: every title, and the longest description open.
   // The heading's height is kept too, for a phone, where it slides away under the header.
@@ -102,34 +110,13 @@ export function HowItWorks({ title }: { title: string }) {
     return () => observer.disconnect();
   }, [reduced]);
 
-  // While the section is held, the header it sits under stays (see app/landing.css).
-  useEffect(() => {
-    if (reduced) return;
-    let frame = 0;
-    const measure = () => {
-      frame = 0;
-      const pin = pinRef.current;
-      if (!pin || !rootRef.current) return;
-      const top = parseFloat(getComputedStyle(pin).top) || 0;
-      const box = rootRef.current.getBoundingClientRect();
-      const holding = box.top <= top + 1 && box.bottom >= window.innerHeight;
-      rootRef.current.dataset.holding = holding ? "true" : "false";
-    };
-    const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(measure);
-    };
-    measure();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, [reduced]);
-
+  /* choosing a step scrolls to the middle of its third */
   function goTo(index: number) {
-    markRefs.current[index]?.scrollIntoView({ block: "center" });
+    const root = rootRef.current;
+    if (!root) return;
+    const box = root.getBoundingClientRect();
+    const room = Math.max(1, box.height - window.innerHeight);
+    window.scrollTo({ top: window.scrollY + box.top + (room * (index + 0.5)) / SCENES.length });
   }
 
   if (reduced) {
@@ -162,7 +149,7 @@ export function HowItWorks({ title }: { title: string }) {
 
   return (
     <div ref={rootRef} className="hw hw-scroll" data-active={current.id}>
-      <div className="hw-pin" ref={pinRef}>
+      <div className="hw-pin">
         <div className="site-wrap hw-pin-inner">
           <h2 id="how-title" data-fade ref={headRef}>
             {title}
@@ -184,6 +171,7 @@ export function HowItWorks({ title }: { title: string }) {
                       <LandingIcon name={step.icon} className="hw-ic" />
                       <span className="hw-step-title">{step.title}</span>
                     </button>
+                    <span className="hw-step-fill" aria-hidden="true" />
                     <div className="hw-step-more" id={`hw-more-${step.id}`}>
                       <div className="hw-step-clip">
                         <p className="hw-step-body">{step.body}</p>
@@ -213,6 +201,12 @@ export function HowItWorks({ title }: { title: string }) {
                     </div>
                   ))}
                 </div>
+                <ScrollRail
+                  section={rootRef}
+                  marks={SCENES.length}
+                  label="how far through how it works"
+                  className="hw-rail"
+                />
                 <div className="hw-foot">
                   <button
                     type="button"
@@ -234,21 +228,10 @@ export function HowItWorks({ title }: { title: string }) {
             </div>
           </div>
         </div>
+        <span className="hw-cue" role="img" aria-label="scroll for the next steps">
+          <ChevronDown aria-hidden="true" focusable="false" />
+        </span>
       </div>
-
-      {/* one marker per step down the section's height */}
-      <div className="hw-marks" aria-hidden="true">
-        {HOW.steps.map((step, index) => (
-          <div
-            key={step.id}
-            className="hw-mark"
-            ref={(element) => {
-              markRefs.current[index] = element;
-            }}
-          />
-        ))}
-      </div>
-
     </div>
   );
 }
