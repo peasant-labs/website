@@ -7,10 +7,12 @@ import { SceneStage, type SceneDefinition } from "@/components/landing/scenes/st
 import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
 import { LandingIcon } from "@/components/landing/icons";
 import { HOW } from "@/lib/landing";
-import { ChevronLeft, ChevronRight, RotateCcw } from "@peasant-labs/fairtrade/icons";
+import { RotateCcw } from "@peasant-labs/fairtrade/icons";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 const SCENES: readonly SceneDefinition[] = [RECORD_SCENE, REVIEW_SCENE, PUBLISH_SCENE];
+/* replay fades the scene all the way out before the fresh take fades in: the layer's fade is 420ms */
+const REWIND_MS = 440;
 const WIDE = "(min-width: 62.5rem)";
 
 function subscribeToWide(onChange: () => void) {
@@ -25,7 +27,13 @@ function subscribeToWide(onChange: () => void) {
  * as it becomes the current one; after the third the page simply carries on.
  * Nothing hijacks the scroll: three markers in the section's height say which
  * step the middle of the screen is on, so momentum, the keyboard and the
- * scroll bar all work as usual. Choosing a step scrolls to it.
+ * scroll bar all work as usual. Choosing a step scrolls to it. All three
+ * steps stay written out, the current one in full ink, so changing steps moves
+ * nothing in the list.
+ *
+ * The three scenes are stacked in one screen and crossfade: the next one
+ * starts its take from the first frame as it fades in, while the last one
+ * fades out where it was, so a change of step never cuts.
  *
  * On a phone the scene window sticks under the header and the step texts
  * scroll beneath it, each taking over as it crosses the middle.
@@ -37,7 +45,15 @@ export function HowItWorks({ title }: { title: string }) {
   const reduced = useReducedMotion();
   const wide = useSyncExternalStore(subscribeToWide, () => window.matchMedia(WIDE).matches, () => true);
   const [active, setActive] = useState(0);
-  const [take, setTake] = useState(0);
+  /* one take counter per scene: a scene starts a fresh take each time it becomes current, and on replay */
+  const [takes, setTakes] = useState<readonly number[]>(() => SCENES.map(() => 0));
+  /* replay dips the current scene out and back in on a fresh take, rather than cutting to its first frame */
+  const [rewinding, setRewinding] = useState(false);
+  const [shown, setShown] = useState(active);
+  if (shown !== active) {
+    setShown(active);
+    setTakes((current) => current.map((value, index) => (index === active ? value + 1 : value)));
+  }
   const markRefs = useRef<(HTMLDivElement | null)[]>([]);
   const flowRefs = useRef<(HTMLLIElement | null)[]>([]);
   const windowRef = useRef<HTMLDivElement>(null);
@@ -82,7 +98,11 @@ export function HowItWorks({ title }: { title: string }) {
                 <h3 className="hw-step-title">{step.title}</h3>
                 <p className="hw-step-body">{step.body}</p>
               </div>
-              <SceneWindow scene={SCENES[index]!} label={step.scene} playing={false} reduced />
+              <div className="hw-window">
+                <div className="hw-view" role="img" aria-label={step.scene} data-scene={SCENES[index]!.id}>
+                  <SceneStage scene={SCENES[index]!} playing={false} reduced />
+                </div>
+              </div>
             </li>
           ))}
         </ol>
@@ -104,7 +124,7 @@ export function HowItWorks({ title }: { title: string }) {
               {HOW.steps.map((step, index) => {
                 const on = index === active;
                 return (
-                  <li key={step.id}>
+                  <li key={step.id} data-on={on ? "true" : "false"}>
                     <button
                       type="button"
                       className="hw-step"
@@ -115,47 +135,48 @@ export function HowItWorks({ title }: { title: string }) {
                       <LandingIcon name={step.icon} className="hw-ic" />
                       <span className="hw-step-title">{step.title}</span>
                     </button>
-                    <p className="hw-step-body" hidden={!on}>
-                      {step.body}
-                    </p>
+                    <p className="hw-step-body">{step.body}</p>
                   </li>
                 );
               })}
             </ol>
 
             <div className="hw-side" ref={windowRef}>
-              <SceneWindow
-                key={`${active}-${take}`}
-                scene={SCENES[active]!}
-                label={current.scene}
-                playing={onScreen}
-                reduced={false}
-                onReplay={() => setTake((value) => value + 1)}
-              />
-              <div className="hw-below">
-                <div className="hw-arrows">
+              <div className="hw-window" id="hw-window">
+                <div className="hw-view" role="img" aria-label={current.scene} data-scene={current.id}>
+                  {SCENES.map((scene, index) => (
+                    <div
+                      key={scene.id}
+                      className="hw-layer"
+                      data-scene={scene.id}
+                      data-on={index === active && !rewinding ? "true" : "false"}
+                    >
+                      <SceneStage
+                        key={takes[index]}
+                        scene={scene}
+                        playing={index === active && onScreen}
+                        reduced={false}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="hw-foot">
                   <button
                     type="button"
-                    className="site-icon-btn site-icon-btn-boxed"
-                    aria-label="previous step"
-                    disabled={active === 0}
-                    onClick={() => goTo(active - 1)}
+                    className="hw-replay"
+                    aria-label="replay"
+                    disabled={rewinding}
+                    onClick={() => {
+                      setRewinding(true);
+                      window.setTimeout(() => {
+                        setTakes((current) => current.map((value, index) => (index === active ? value + 1 : value)));
+                        setRewinding(false);
+                      }, REWIND_MS);
+                    }}
                   >
-                    <ChevronLeft aria-hidden="true" focusable="false" />
-                  </button>
-                  <button
-                    type="button"
-                    className="site-icon-btn site-icon-btn-boxed"
-                    aria-label="next step"
-                    disabled={active === HOW.steps.length - 1}
-                    onClick={() => goTo(active + 1)}
-                  >
-                    <ChevronRight aria-hidden="true" focusable="false" />
+                    <RotateCcw aria-hidden="true" focusable="false" />
                   </button>
                 </div>
-                <span className="hw-count">
-                  {active + 1} / {HOW.steps.length}
-                </span>
               </div>
             </div>
           </div>
@@ -192,37 +213,6 @@ export function HowItWorks({ title }: { title: string }) {
           </li>
         ))}
       </ol>
-    </div>
-  );
-}
-
-function SceneWindow({
-  scene,
-  label,
-  playing,
-  reduced,
-  onReplay,
-}: {
-  scene: SceneDefinition;
-  label: string;
-  playing: boolean;
-  reduced: boolean;
-  onReplay?: () => void;
-}) {
-  return (
-    <div className="hw-window" id={reduced ? undefined : "hw-window"}>
-      <div className="hw-view" role="img" aria-label={label} data-scene={scene.id}>
-        <SceneStage scene={scene} playing={playing} reduced={reduced} />
-      </div>
-      <div className="hw-foot">
-        <span className="hw-footnote">{HOW.footnote}</span>
-        {onReplay ? (
-          <button type="button" className="hw-replay" onClick={onReplay}>
-            <RotateCcw aria-hidden="true" focusable="false" />
-            replay
-          </button>
-        ) : null}
-      </div>
     </div>
   );
 }

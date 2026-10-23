@@ -15,6 +15,21 @@ export const SCREEN = { width: 1120, height: 700 } as const;
 /* moves across the screen, and the settle into a held framing */
 const EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)";
 const EASE_SETTLE = "cubic-bezier(0.23, 1, 0.32, 1)";
+/* how long a part pushed along by new content takes to glide to its new place */
+const FLIP_MS = 360;
+
+/* where an element sits on the virtual screen by layout alone, whatever transforms are running */
+function layoutOffset(element: HTMLElement, screen: HTMLElement) {
+  let x = 0;
+  let y = 0;
+  let node: HTMLElement | null = element;
+  while (node && node !== screen) {
+    x += node.offsetLeft;
+    y += node.offsetTop;
+    node = node.offsetParent as HTMLElement | null;
+  }
+  return { x, y };
+}
 
 /**
  * A camera move: at `at` ms the camera frames the element marked
@@ -61,19 +76,30 @@ type Box = { x: number; y: number; w: number; h: number };
 /* the closest the camera goes: past this a short line would fill the window */
 const MAX_ZOOM = 2.6;
 
+/* the camera never looks past the screen's edges: a framing near an edge slides back inside it */
+function keepInside(offset: number, view: number, screen: number) {
+  if (screen <= view) return (view - screen) / 2;
+  return Math.min(0, Math.max(view - screen, offset));
+}
+
 function frameFor(box: Box, view: { w: number; h: number }, fill: number) {
   const scale = Math.min((view.w * fill) / box.w, (view.h * fill) / box.h, MAX_ZOOM);
-  const x = view.w / 2 - (box.x + box.w / 2) * scale;
-  const y = view.h / 2 - (box.y + box.h / 2) * scale;
+  const x = keepInside(view.w / 2 - (box.x + box.w / 2) * scale, view.w, SCREEN.width * scale);
+  const y = keepInside(view.h / 2 - (box.y + box.h / 2) * scale, view.h, SCREEN.height * scale);
   return `translate(${x}px, ${y}px) scale(${scale})`;
+}
+
+/* the element a focus names: a name marked with data-focus, or a selector into a component's own markup */
+function targetOf(screen: HTMLElement, focus: string) {
+  if (focus === "all") return null;
+  const selector = /^[.[]/.test(focus) ? focus : `[data-focus="${focus}"]`;
+  return screen.querySelector<HTMLElement>(selector);
 }
 
 /* where an element sits on the virtual screen, whatever the camera is doing right now */
 function boxOf(screen: HTMLElement, focus: string): Box {
   if (focus === "all") return { x: 0, y: 0, w: SCREEN.width, h: SCREEN.height };
-  // a name marked with data-focus, or a selector into a component's own markup
-  const selector = /^[.[]/.test(focus) ? focus : `[data-focus="${focus}"]`;
-  const target = screen.querySelector<HTMLElement>(selector);
+  const target = targetOf(screen, focus);
   if (!target) return { x: 0, y: 0, w: SCREEN.width, h: SCREEN.height };
   const screenBox = screen.getBoundingClientRect();
   const scale = screenBox.width / SCREEN.width || 1;
@@ -108,7 +134,9 @@ export function SceneStage({
 }) {
   const viewRef = useRef<HTMLDivElement>(null);
   const cameraRef = useRef<HTMLDivElement>(null);
+  const screenRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
+  const flipFrom = useRef(new Map<string, { x: number; y: number }>());
   const [phase, setPhase] = useState(reduced ? scene.finalPhase : 0);
   // A take starts the first time the scene can be seen, and is not stopped by scrolling away.
   const [started, setStarted] = useState(false);
@@ -161,6 +189,25 @@ export function SceneStage({
     };
   }, [rest, reduced, started, phase]);
 
+  // A part marked data-flip that a beat pushes along glides from where it was (FLIP), so nothing jumps.
+  useLayoutEffect(() => {
+    const screen = screenRef.current;
+    if (!screen) return;
+    const now = new Map<string, { x: number; y: number }>();
+    for (const element of screen.querySelectorAll<HTMLElement>("[data-flip]")) {
+      const key = element.dataset.flip!;
+      const at = layoutOffset(element, screen);
+      now.set(key, at);
+      const was = flipFrom.current.get(key);
+      if (reduced || !started || !was || (was.x === at.x && was.y === at.y)) continue;
+      element.animate(
+        [{ transform: `translate(${was.x - at.x}px, ${was.y - at.y}px)` }, { transform: "none" }],
+        { duration: FLIP_MS, easing: EASE_MOVE },
+      );
+    }
+    flipFrom.current = now;
+  }, [phase, reduced, started]);
+
   // One take: the scene's beats, the camera moves and the cursor, on one clock.
   useEffect(() => {
     if (reduced || !started) return;
@@ -198,6 +245,10 @@ export function SceneStage({
           const box = boxOf(camera, cue.to);
           const to = `translate(${box.x + box.w / 2}px, ${box.y + box.h / 2}px)`;
           const from = index === 0 ? `translate(${SCREEN.width * 0.9}px, ${SCREEN.height * 0.95}px)` : getComputedStyle(cursor).transform;
+          if (index === 0) {
+            // the cursor fades in as it sets off, rather than appearing
+            cursor.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: EASE_SETTLE });
+          }
           cursor.style.opacity = "1";
           const animation = cursor.animate([{ transform: from }, { transform: to }], {
             duration: cue.move,
@@ -209,15 +260,22 @@ export function SceneStage({
             cursor.style.transform = to;
             animation.cancel();
             running.delete(animation);
-            // a press is the arrow dipping, the way a click feels, with nothing drawn around it
+            // a press is the arrow dipping and the control giving way under it, with nothing drawn around it
             const arrow = cursor.firstElementChild;
-            if (cue.press && arrow) {
-              const press = arrow.animate(
-                [{ transform: "scale(1)" }, { transform: "scale(0.82)" }, { transform: "scale(1)" }],
-                { duration: 240, easing: EASE_SETTLE },
-              );
-              running.add(press);
-              press.onfinish = () => running.delete(press);
+            const target = targetOf(camera, cue.to);
+            if (cue.press) {
+              for (const [element, depth] of [
+                [arrow, 0.82],
+                [target, 0.97],
+              ] as const) {
+                if (!element) continue;
+                const press = element.animate(
+                  [{ transform: "scale(1)" }, { transform: `scale(${depth})` }, { transform: "scale(1)" }],
+                  { duration: 240, easing: EASE_SETTLE },
+                );
+                running.add(press);
+                press.onfinish = () => running.delete(press);
+              }
             }
           };
         });
@@ -235,7 +293,7 @@ export function SceneStage({
   return (
     <div className="scn-view" ref={viewRef}>
       <div className="scn-camera" ref={cameraRef} style={{ width: SCREEN.width, height: SCREEN.height }}>
-        <div className="scn-screen" inert aria-hidden="true">
+        <div className="scn-screen" ref={screenRef} inert aria-hidden="true">
           <Render phase={reduced ? scene.finalPhase : phase} />
         </div>
         {scene.cursor?.length && !reduced ? (

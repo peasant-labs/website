@@ -652,16 +652,6 @@
   }
 }
 
-.hw-count {
-  min-width: 5ch;
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
-  text-align: center;
-}
-
 /* how it works */
 
 .lp-how {
@@ -771,40 +761,33 @@
   cursor: pointer;
 }
 
+/* all three steps stay written out; the current one is in full ink, so a change of step moves nothing */
 .hw-step .hw-ic,
-.hw-step .hw-step-title {
+.hw-step .hw-step-title,
+.hw-step-body {
   transition:
-    color var(--dur-2) ease,
-    border-color var(--dur-2) ease;
+    color 320ms var(--ease-out),
+    border-color 320ms var(--ease-out);
 }
 
-.hw-step[aria-pressed="true"] .hw-ic {
+.hw-steps > li[data-on="true"] .hw-ic {
   border-color: var(--rule-strong);
   color: var(--amber);
 }
 
-.hw-step[aria-pressed="true"] .hw-step-title {
+.hw-steps > li[data-on="true"] .hw-step-title {
   color: var(--ink-strong);
 }
 
 .hw-step-body {
   padding: 0 0 var(--sp-5) calc(2.75rem + var(--sp-4));
-  color: var(--ink-2);
+  color: var(--ink-3);
   font-size: 1.0625rem;
   line-height: 1.55;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .hw-step-body:not([hidden]) {
-    animation: hw-body-in 320ms var(--ease-out) both;
-  }
-}
-
-@keyframes hw-body-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+.hw-steps > li[data-on="true"] .hw-step-body {
+  color: var(--ink-2);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -824,13 +807,13 @@
 
 /* the screen never grows taller than the held section leaves room for */
 .hw-scroll .hw-window {
-  max-width: calc((100dvh - 17rem) * 1.6);
+  max-width: calc((100dvh - 15rem) * 1.6);
 }
 
 /*
  * The scene plays on a Mac's screen: the desktop, its menu bar and its windows
- * are inside the scene, so the frame here is only the screen's edge, with a
- * caption row under it.
+ * are inside the scene, so the frame here is only the screen's edge. The three
+ * scenes are layers of it, and the current one crossfades in over the last.
  */
 .hw-view {
   position: relative;
@@ -840,54 +823,47 @@
   background: var(--surface-2);
 }
 
+/* a crossfade of the whole screen eases in and out, so its first frame changes as little as its last */
+.hw-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 420ms var(--ease-in-out),
+    visibility 0s linear 420ms;
+}
+
+.hw-layer[data-on="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 420ms var(--ease-in-out),
+    visibility 0s;
+}
+
 .hw-foot {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  min-height: var(--target-comfortable);
+  justify-content: flex-end;
   margin-inline-end: -10px;
 }
 
-.hw-footnote {
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  letter-spacing: 0;
-}
-
+/* replay: the icon alone, named for assistive technology */
 .hw-replay {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: var(--target-comfortable);
-  padding: 0 10px;
+  display: inline-grid;
+  place-items: center;
+  width: var(--target-comfortable);
+  height: var(--target-comfortable);
+  padding: 0;
   border: 1px solid transparent;
   background: transparent;
   color: var(--ink-2);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  letter-spacing: 0;
   cursor: pointer;
 }
 
 .hw-replay svg {
-  width: var(--ic-sm);
-  height: var(--ic-sm);
-}
-
-.hw-below {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  margin-block-start: var(--sp-4);
-}
-
-.hw-arrows {
-  display: flex;
-  gap: var(--sp-3);
+  width: var(--ic-md);
+  height: var(--ic-md);
 }
 
 /*
@@ -920,8 +896,7 @@
   }
 
   .hw-steps,
-  .hw-marks,
-  .hw-below {
+  .hw-marks {
     display: none;
   }
 
@@ -1062,6 +1037,7 @@
 }
 
 .scn-screen {
+  position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -1197,8 +1173,10 @@
 }
 
 /* a window: ~10px corners, a 1px hairline, the system shadow; in the dark appearance a light inner rim */
+/* each window is its own stack, so the one in front covers every part of the one behind */
 .mac-win {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1442,112 +1420,123 @@
   padding: 7px 10px;
 }
 
-.cc-hint {
-  padding: 2px 2ch 0;
+/* in the record scene the TUI keeps to one line of welcome, with a line's space between its parts */
+.scn-screen .cc {
+  gap: 17px;
+  padding: 10px 12px;
 }
 
-/* ---------- the scenes' windows ---------- */
+.scn-screen .cc-welcome {
+  width: auto;
+  margin: 0;
+  padding: 7px 14px;
+}
+
+.scn-screen :is(.cc-out, .cc-input) {
+  margin: 0;
+}
+
+/* ---------- the scenes' windows and pages ---------- */
 
 /* record: Claude Code in Terminal, then Safari on the session it opened */
 .scn-rec-term {
   position: absolute;
-  inset-block-start: 48px;
-  inset-inline-start: 52px;
-  width: 660px;
-  height: 440px;
+  inset-block-start: 56px;
+  inset-inline-start: 56px;
+  width: 640px;
+  height: 340px;
 }
 
 .scn-rec-browser {
   position: absolute;
-  inset-block-start: 34px;
-  inset-inline-start: 404px;
-  width: 680px;
-  height: 596px;
+  inset-block-start: 40px;
+  inset-inline-start: 420px;
+  width: 660px;
+  height: 470px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .scn-rec-browser {
-    transform-origin: 20% 10%;
-    animation: scn-open 420ms var(--ease-out) both;
-  }
-}
-
-@keyframes scn-open {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.96);
-  }
-}
-
+/* the local session page, with only what the story needs */
 .scn-page {
   display: grid;
   align-content: start;
-  gap: 18px;
+  gap: 26px;
   height: 100%;
-  padding: 22px 28px;
+  padding: 30px 36px;
 }
 
+/* as wide as what it holds, so the camera can lean in on the title and its state */
 .scn-page-top {
   display: grid;
+  justify-self: start;
   justify-items: start;
-  gap: 12px;
+  gap: 14px;
+  max-width: 100%;
 }
 
-/* the session's own title: user content keeps its case */
+/* the session's own title: one line, and user content keeps its case */
 .scn-page-title {
+  max-width: 100%;
+  overflow: hidden;
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
+  text-overflow: ellipsis;
   text-transform: none;
+  white-space: nowrap;
 }
 
 .scn-page-meta {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 8px 20px;
+  gap: 20px;
   color: var(--ink-3);
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0;
+}
+
+.scn-page-state {
+  margin-block-start: 4px;
+}
+
+.scn-published {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  min-height: var(--target-comfortable);
+}
+
+.scn-turns {
+  display: grid;
+  gap: 10px;
+  padding-block-start: 22px;
+  border-top: var(--bd);
 }
 
 .scn-turn {
-  display: grid;
-  gap: 6px;
-  padding: 14px 16px;
-  border: var(--bd);
-  background: var(--surface-2);
-}
-
-.scn-turn-who {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.scn-turn-who svg {
-  width: 14px;
-  height: 14px;
-}
-
-.scn-turn p {
+  gap: 12px;
   max-inline-size: none;
   margin: 0;
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 16px;
+  letter-spacing: 0;
   line-height: 1.5;
+  word-spacing: normal;
 }
 
-/* review and publish: one browser window across the desktop */
+.scn-turn svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-3);
+}
+
+/* review and publish: one Safari window across the desktop */
 .scn-full-browser {
   position: absolute;
   inset: 14px 24px 16px;
@@ -1555,31 +1544,248 @@
 
 .scn-review {
   height: 100%;
-  padding: 16px 28px;
+  padding: 22px 28px;
   overflow: hidden;
 }
 
 .scn-review .scn-panel {
-  display: grid;
-  gap: var(--sp-3);
   max-width: 760px;
   margin-inline: auto;
 }
 
-.scn-publish {
+/* mid-scan the review has found nothing yet; its "nothing found" line would claim the scan is over */
+.scn-review .rdx-empty {
+  visibility: hidden;
+}
+
+/* publish: the publish window over the page, with a scrim behind it */
+.scn-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: grid;
   place-items: center;
-  height: 100%;
-  background: color-mix(in srgb, var(--ink-strong) 6%, var(--canvas));
+  background: color-mix(in srgb, var(--ink-strong) 14%, transparent);
 }
 
-.scn-publish .scn-dialog {
-  width: 640px;
+.scn-modal[data-open="false"] {
+  opacity: 0;
 }
 
-/* the dialog names the session by its own title, which keeps its case */
-.scn-publish .dlg-head h3 {
+.scn-modal .scn-dialog {
+  width: 600px;
+  /* it opens from the page's publish button, up and to the left of it */
+  transform-origin: 18% 0%;
+}
+
+.scn-modal[data-open="false"] .scn-dialog {
+  transform: scale(0.96);
+}
+
+.scn-dialog .dlg-head h3 {
   text-transform: none;
+}
+
+/* the body holds its tallest state from the start, so the window never changes size */
+.scn-dialog .dlg-body {
+  display: grid;
+  align-content: start;
+  min-height: 236px;
+}
+
+.scn-dialog .pub-section {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.scn-publish-btn {
+  min-width: 128px;
+}
+
+.scn-busy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- the motion: every change in a scene is a transition ---------- */
+
+.scn-swap {
+  display: inline-grid;
+}
+
+.scn-swap-item {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  align-items: center;
+}
+
+.scn-swap-item[data-on="false"] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.scn-reveal[data-on="false"] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.mac-win[data-open="false"] {
+  opacity: 0;
+  transform: translateY(24px) scale(0.96);
+}
+
+/* in a scene, the window a new one opens over dims behind it */
+.scn-screen .mac-win[data-active="false"] .mac-body {
+  opacity: 0.78;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* two states of one spot crossfade, the new one rising a little */
+  .scn-swap-item {
+    transition:
+      opacity 260ms var(--ease-out),
+      transform 260ms var(--ease-out),
+      visibility 0s;
+  }
+
+  .scn-swap-item[data-on="false"] {
+    transform: translateY(5px);
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out),
+      visibility 0s linear 200ms;
+  }
+
+  .scn-reveal {
+    transition:
+      opacity 240ms var(--ease-out),
+      transform 240ms var(--ease-out),
+      visibility 0s;
+  }
+
+  .scn-reveal[data-on="false"] {
+    transform: translateY(-4px);
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out),
+      visibility 0s linear 200ms;
+  }
+
+  /* a part that arrives later rises into place */
+  .scn-in {
+    animation: scn-in 280ms var(--ease-out) both;
+  }
+
+  /* a window opening rises in front; the one it covers dims and greys its buttons */
+  .mac-win[data-open] {
+    transition:
+      opacity 420ms var(--ease-out),
+      transform 460ms var(--ease-out);
+  }
+
+  .mac-win .mac-body,
+  .mac-win .mac-title {
+    transition: opacity 320ms var(--ease-out);
+  }
+
+  .mac-lights i {
+    transition:
+      background-color 320ms var(--ease-out),
+      box-shadow 320ms var(--ease-out);
+  }
+
+  /* the publish window scales and fades from its button, and back; the scrim behind it eases in and out */
+  .scn-modal {
+    transition: opacity 300ms var(--ease-in-out);
+  }
+
+  .scn-modal .scn-dialog {
+    transition: transform 300ms var(--ease-out);
+  }
+
+  .scn-modal[data-open="false"] {
+    transition: opacity 280ms var(--ease-in-out);
+  }
+
+  .scn-modal[data-open="false"] .scn-dialog {
+    transition: transform 280ms var(--ease-in-out);
+  }
+
+  /* a control that comes alive does so gradually */
+  .scn-screen .btn {
+    transition:
+      background var(--dur-1),
+      color var(--dur-1),
+      border-color var(--dur-1),
+      opacity 240ms var(--ease-out);
+  }
+
+  /* the picker's suggestions rise in, one after the other */
+  .scn-screen .pub-picker-row {
+    animation: scn-in 260ms var(--ease-out) both;
+  }
+
+  .scn-screen .pub-picker-row:nth-child(2) {
+    animation-delay: 60ms;
+  }
+
+  /* review: the scan bar fills smoothly, and each match rises in */
+  .scn-review .rdx-scan-fill {
+    transition: transform 140ms linear;
+  }
+
+  .scn-review .rdx-list > li {
+    animation: scn-in 320ms var(--ease-out) both;
+  }
+
+  /* a mark sweeps across the value found, then its placeholder fades in beneath */
+  .scn-review .rdx-strike {
+    position: relative;
+  }
+
+  .scn-review .rdx-strike::after {
+    position: absolute;
+    inset: -1px -3px;
+    background: color-mix(in srgb, var(--del-rail) 34%, transparent);
+    content: "";
+    transform-origin: left center;
+    animation: scn-sweep 720ms var(--ease-in-out) 160ms both;
+  }
+
+  .scn-review .rdx-row-add {
+    animation: scn-fade 260ms var(--ease-out) 620ms both;
+  }
+}
+
+@keyframes scn-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes scn-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes scn-sweep {
+  0% {
+    opacity: 1;
+    transform: scaleX(0);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
 }
 
 .scn-cursor {

@@ -238,8 +238,6 @@ export const USE_CASES = {
 
 export const HOW = {
   title: "how it works",
-  /* the window's footnote: the scenes are the real components, trimmed to what each step needs */
-  footnote: "simplified view",
   steps: [
     {
       id: "record",
@@ -247,7 +245,7 @@ export const HOW = {
       icon: "record",
       body: "Peasant indexes coding agent sessions on your computer. Type /peasant in your harness to open the session in the browser.",
       scene:
-        "in Claude Code in the terminal, /peasant opens the session and peasant answers that it is not published; the browser then comes forward on that session's page, with publish as its one action",
+        "in Claude Code in Terminal, /peasant is typed and peasant answers that it opened the session, not published; Safari then comes forward on the session's page, with publish as its one action",
     },
     {
       id: "review",
@@ -263,7 +261,7 @@ export const HOW = {
       icon: "send",
       body: "Share transcripts for code review, radical openness, or transparent research processes.",
       scene:
-        "in the publish window, the eval-crowd collective is added to who can read it and publish is pressed; the session is published to eval-crowd",
+        "on the session's page, publish opens the publish window; the eval-crowd collective is added to who can read it and publish is pressed; the window closes and the session is published to eval-crowd",
     },
   ],
 } as const;

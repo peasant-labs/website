@@ -1,38 +1,38 @@
 "use client";
 
 import { MacDesktop, SafariWindow } from "@/components/mac";
-import { SAMPLE_ID, SAMPLE_MATCHES } from "@/components/landing/scenes/sample";
+import { SAMPLE_MATCHES } from "@/components/landing/scenes/sample";
 import type { SceneDefinition } from "@/components/landing/scenes/stage";
 import { RedactionReview } from "@peasant-labs/fairtrade/ui";
 
-/* the scan, as it reaches each match: files scanned, and the matches found so far */
-const SCAN = [
-  { scanned: 3, found: 1 },
-  { scanned: 8, found: 2 },
-  { scanned: 12, found: 3 },
-] as const;
 const TOTAL = 12;
+/* the files at which the scan meets each match */
+const FOUND_AT = [3, 8, 12] as const;
+const SCAN_FROM = 500;
+const SCAN_EVERY = 140;
 
 /*
- * Review: fairtrade's redaction review, read-only, in the browser on the share
- * page, the way it shows what leaves the computer. The scan finds a key, an email and a home
- * path; each is shown as found and as it will leave, with the engine's own
- * placeholder and category label, and the count of what is hidden on top.
+ * Review: fairtrade's redaction review, read-only, in Safari, the way it shows
+ * what leaves the computer. The scan counts up file by file and its bar fills;
+ * each match rises into the list as it is found, a mark sweeps across the
+ * value it found, and the engine's placeholder fades in beneath it.
+ *
+ * Phases: the files scanned so far, 0 to 12.
  */
 function Review({ phase }: { phase: number }) {
-  const step = SCAN[Math.min(phase, SCAN.length - 1)]!;
+  const scanned = Math.min(phase, TOTAL);
+  const found = FOUND_AT.filter((at) => scanned >= at).length;
   return (
     <MacDesktop app="Safari">
-      <SafariWindow url={`localhost:8690/share/${SAMPLE_ID}`} className="scn-full-browser">
+      <SafariWindow className="scn-full-browser">
         <div className="scn-review">
           <div className="scn-panel" data-focus="review">
-            <p className="pub-section-title">what leaves your machine</p>
             <RedactionReview
               readOnly
               level="standard"
               availableLevels={["standard"]}
-              matches={SAMPLE_MATCHES.slice(0, step.found)}
-              scanned={step.scanned}
+              matches={SAMPLE_MATCHES.slice(0, found)}
+              scanned={scanned}
               total={TOTAL}
             />
           </div>
@@ -42,20 +42,20 @@ function Review({ phase }: { phase: number }) {
   );
 }
 
+const pairAt = (index: number) => `.rdx-list > li:nth-child(${index}) .rdx-pair`;
+
 export const REVIEW_SCENE: SceneDefinition = {
   id: "review",
-  duration: 6800,
-  finalPhase: 2,
-  cues: [
-    { at: 900, phase: 1 },
-    { at: 1700, phase: 2 },
-  ],
+  duration: 7600,
+  finalPhase: TOTAL,
+  cues: Array.from({ length: TOTAL }, (_, index) => ({ at: SCAN_FROM + index * SCAN_EVERY, phase: index + 1 })),
   shots: [
     { at: 0, focus: "all", move: 1 },
-    { at: 2100, focus: ".rdx-list > li:nth-child(1) .rdx-pair", move: 1000, fill: 0.9, width: 360 },
-    { at: 3400, focus: ".rdx-list > li:nth-child(2) .rdx-pair", move: 800, fill: 0.9, width: 360 },
-    { at: 4500, focus: ".rdx-list > li:nth-child(3) .rdx-pair", move: 800, fill: 0.9, width: 360 },
-    { at: 5600, focus: "review", move: 1200, ease: "settle", fill: 0.96 },
+    { at: 500, focus: "review", move: 1000, fill: 0.96 },
+    { at: 2500, focus: pairAt(1), move: 900, fill: 0.9, width: 360 },
+    { at: 3700, focus: pairAt(2), move: 800, fill: 0.9, width: 360 },
+    { at: 4800, focus: pairAt(3), move: 800, fill: 0.9, width: 360 },
+    { at: 5900, focus: "review", move: 1200, ease: "settle", fill: 0.96 },
   ],
   finalFocus: "review",
   finalFill: 0.96,

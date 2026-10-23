@@ -4,10 +4,10 @@ type RedactionMatch = NonNullable<Parameters<typeof RedactionReview>[0]["matches
 
 /*
  * The sample the three scenes share: one session, as peasant would record,
- * redact and publish it. Illustrative data, not a record of real work.
+ * redact and publish it. Illustrative data, not a record of real work. The
+ * scenes carry only the words their step needs, so the title is short.
  */
-export const SAMPLE_TITLE = "Uploads to staging fail with a 403 since this morning";
-export const SAMPLE_ID = "sess_c41e07";
+export const SAMPLE_TITLE = "fix the staging 403";
 export const SAMPLE_COLLECTIVE = { id: "eval-crowd", name: "eval-crowd", members: 12 };
 
 /* the three things standard redaction replaces in it, with the engine's own placeholders */

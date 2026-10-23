@@ -101,9 +101,9 @@ how:
   publishLabel: publish
   # what each scene shows on its finished frame, read from the real components
   finals:
-    - { scene: record, texts: ["you@macbook shop % claude", "Welcome to Claude Code!", "> /peasant", 'peasant: opened "Uploads to staging fail with a 403 since this morning" · not published', "Uploads to staging fail with a 403 since this morning", "not published"] }
+    - { scene: record, texts: ["Welcome to Claude Code!", "> /peasant", 'peasant: opened "fix the staging 403" · not published', "fix the staging 403", "not published"] }
     - { scene: review, texts: ["3 matches", "<AWS_ACCESS_KEY>", "<EMAIL>", "/Users/<USER>/src/shop/.env"] }
-    - { scene: publish, texts: ["published to eval-crowd", "eval-crowd"] }
+    - { scene: publish, texts: ["fix the staging 403", "published", "eval-crowd"] }
 # the commands as scripts/install.sh and scripts/install.ps1 document themselves, typed at each shell's prompt
 install:
   platforms:

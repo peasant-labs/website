@@ -311,32 +311,48 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
   await expect(steps.locator(".hw-step-title")).toHaveText(fixture.how.steps.map((step) => step.title));
   // each step is illustrated by its icon
   await expect(steps.locator("svg.hw-ic")).toHaveCount(fixture.how.steps.length);
-  // the scene is the screen itself: no window shell around it
+  // the scene is the screen itself: no window shell, caption or step arrows around it
   await expect(page.locator(".hw-titlebar")).toHaveCount(0);
+  await expect(page.locator("#how .hw-count")).toHaveCount(0);
+  await expect(page.locator("#how").getByRole("button", { name: /step$/ })).toHaveCount(0);
+  await expect(page.locator("#how")).not.toContainText("simplified view");
+  // replay is the icon alone, named for assistive technology
+  const replay = page.locator("#how").getByRole("button", { name: "replay" });
+  await expect(replay).toHaveText("");
+  // all three steps stay written out, so changing step moves nothing in the list
+  await expect(page.locator(".hw-step-body")).toHaveText(fixture.how.steps.map((step) => step.body));
 
-  for (const [index, step] of fixture.how.steps.entries()) {
+  for (const [index] of fixture.how.steps.entries()) {
     await steps.nth(index).click();
     await expect(steps.nth(index)).toHaveAttribute("aria-pressed", "true");
-    await expect(page.locator(".hw-step-body:visible")).toHaveText(step.body);
+    await expect(page.locator(".hw-steps > li").nth(index)).toHaveAttribute("data-on", "true");
     // the section is held while it is read: the window stays on screen
     await expect(page.locator(".hw-window")).toBeInViewport();
     const view = page.locator(".hw-scroll .hw-view");
     await expect(view).toHaveAttribute("role", "img");
     expect((await view.getAttribute("aria-label"))?.length ?? 0).toBeGreaterThan(20);
     // the scene is fairtrade's components on a screen nobody can tab into
-    await expect(view.locator(".scn-screen")).toHaveAttribute("inert", "");
+    await expect(view.locator(".scn-screen").first()).toHaveAttribute("inert", "");
     // on a Mac: the menu bar, and windows with their three buttons
-    await expect(view.locator(".mac-menubar")).toHaveCount(1);
-    expect(await view.locator(".mac-win .mac-lights").count()).toBeGreaterThan(0);
+    const layer = view.locator('.hw-layer[data-on="true"]');
+    await expect(layer).toHaveCount(1);
+    await expect(layer.locator(".mac-menubar")).toHaveCount(1);
+    expect(await layer.locator(".mac-win .mac-lights").count()).toBeGreaterThan(0);
     // the camera carries the screen and the cursor, nothing drawn around a click
     await expect(view.locator(".scn-camera > :not(.scn-screen, .scn-cursor)")).toHaveCount(0);
   }
 
-
-  // the publish action in the scene keeps its label on one line
-  const label = page.locator('.hw-view[data-scene="publish"] [data-focus="publish"]');
-  await expect(label).toHaveText(new RegExp(`^(${fixture.how.publishLabel}|done)$`));
+  // the publish action in the scene keeps its label on one line, whatever state it shows
+  const label = page.locator('.hw-layer[data-scene="publish"] [data-focus="publish"]');
+  await expect(label.locator('.scn-swap-item[data-on="true"]')).toHaveText(
+    new RegExp(`^(${fixture.how.publishLabel}|publishing)$`),
+  );
   expect(await label.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+
+  // the scenes keep to the words their step needs: no addresses, no crumb trail, no session ids
+  const scenes = page.locator(".hw-scroll .hw-view");
+  expect(await scenes.locator(".mac-address-text").allTextContents()).toEqual(["", "", ""]);
+  for (const word of ["localhost", "sess_", "sessions"]) await expect(scenes).not.toContainText(word);
 
   // the record scene is the terminal and the browser, not a list of other sessions behind
   await steps.nth(0).click();
