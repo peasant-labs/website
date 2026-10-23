@@ -60,17 +60,21 @@ export function DocPath({ path }: { path: string }) {
   );
 }
 
-/** A procedure: numbered steps, each saying what it does above the commands that do it. */
-export function DocProcedure({ steps }: { steps: readonly DocStep[] }) {
+/**
+ * A procedure: numbered steps, each saying what it does above the commands that
+ * do it. With `ordered={false}` it lists alternatives instead, as bullets.
+ */
+export function DocProcedure({ steps, ordered = true }: { steps: readonly DocStep[]; ordered?: boolean }) {
+  const Tag = ordered ? "ol" : "ul";
   return (
-    <ol className="dx-list">
+    <Tag className={ordered ? "dx-list" : "dx-bullets"}>
       {steps.map((step) => (
         <li key={step.text}>
           <Rich text={step.text} />
           <DocCommands commands={step.commands} />
         </li>
       ))}
-    </ol>
+    </Tag>
   );
 }
 

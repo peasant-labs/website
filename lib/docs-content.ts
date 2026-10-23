@@ -15,6 +15,10 @@ import type { RedactionCategory } from "@peasant-labs/fairtrade/ui";
  * The copy is written to be scanned: one idea per paragraph, procedures as
  * numbered steps, and commands in their own blocks. The hosted app is
  * "peasant online" in prose; "village" stays only in commands and paths.
+ *
+ * Every section id here is a public address: the online and local apps link
+ * to them instead of teaching how-to in the app. Add ids freely; never rename
+ * or remove one (testdata/docs/anchors.yaml guards them).
  */
 
 function art(name: string, alt: string): Art {
@@ -95,7 +99,7 @@ export const DOCS_HOME = {
     intro:
       "Run it once. It finds the sessions your agents recorded on this computer, then walks you through:",
     steps: [
-      "Connecting to peasant online, which signs you in with GitHub. Optional: `peasant village login` works later.",
+      "Connecting to peasant online, which signs you in with GitHub. You can skip it and [sign in](#sign-in) later.",
       "What to track: everything, or narrowed by project, branch or session.",
       "Whether you keep sessions local or publish later, and whether to publish automatically. It only saves your answers.",
       "Standard redaction, shown on examples.",
@@ -107,9 +111,50 @@ export const DOCS_HOME = {
       "Kickstart never publishes, never installs a git hook and never saves an auto-publish rule. It does not install the Claude Code plugin.",
   },
 
+  // peasant docs/cli/peasant_harvest.md; internal/config/config.go (Strike off by default);
+  // internal/defaults/config.go (default folders); cmd/peasant/cmd_harvest.go (selection scope)
+  record: {
+    title: "record sessions",
+    intro: [
+      "`peasant harvest` finds the sessions your agents keep on this computer and indexes them. Kickstart runs it when you save. `peasant ingest` is the same command.",
+    ],
+    command: "peasant harvest",
+    flags: [
+      "`--since 2w`: only sessions from the last two weeks (or `7d`, `3m`).",
+      "`--dry-run`: show what would be processed, without writing.",
+      "`--all`: process every session again.",
+    ],
+    single: "`/peasant` in Claude Code and `peasant open` record one session.",
+    emptyIntro: "If nothing shows up:",
+    empty: [
+      "Strike is off by default. Turn an agent on in the local web's **settings**, under **sources**.",
+      "Peasant reads each agent's default folder: `~/.claude/projects`, `~/.local/share/opencode`, `~/.codex/sessions`, `~/.cursor/projects`, `~/.strike/sessions` and `~/.pi/agent/sessions`. For another folder, pass `--source-harness <agent> --source-path <folder>`.",
+      "A saved selection records only the projects it admits. Run `peasant kickstart` to change it.",
+    ],
+  },
+
+  // peasant cmd_login.go, cmd_logout.go, internal/auth (credentials.json, logout revokes the key);
+  // local web VillageAccountRow (log out is local only); fairtrade SignIn; village settings (connections)
+  signIn: {
+    title: "sign in to peasant online",
+    intro: "Sign in with GitHub:",
+    command: "peasant village login",
+    body: [
+      "Peasant keeps a key in `credentials.json` in your [config folder](#configuration).",
+      "Or sign in from the publish window: choose **continue with GitHub**.",
+    ],
+    logout: "To sign this computer out and revoke its key on peasant online:",
+    logoutCommand: "peasant village logout",
+    note: "**log out** in the local web's settings removes the key from this computer only. To sign out every computer, use **sign out everywhere** in your settings on peasant online, under **connections**.",
+  },
+
   // peasant-plugins README; peasant `open --help`; fairtrade Publish (the publish window)
   publish: {
     title: "publish a session",
+    before: [
+      "Before you publish: [install peasant](#install), run [kickstart](#kickstart) and [sign in](#sign-in).",
+      "Read [peasant online's privacy notice](https://village.peasantlabs.org/privacy).",
+    ],
     claude: {
       title: "from claude code",
       steps: [
@@ -159,6 +204,67 @@ export const DOCS_HOME = {
         "`--yes`: run without the wizard or the public-consent prompt.",
       ],
     },
+  },
+
+  // peasant `village auto --help`, `village hooks --help` and its subcommands; internal/autopublish
+  // (hooks.yaml, paused rules); local web AutoPublishRules; fairtrade Publish; peasant-plugins (/peasant auto)
+  autoPublish: {
+    title: "publish automatically",
+    intro: [
+      "Automatic publishing sends a repository's sessions to your collectives when you push, or on each commit if its rule says so. They go redacted and private, with no license, and skip review.",
+      "A failed upload never fails the push.",
+    ],
+    waysIntro: "Turn it on in one of three ways:",
+    ways: [
+      { text: "In the publish window, tick **publish this repo automatically on git push**.", commands: [] },
+      { text: "In Claude Code, type `/peasant auto`.", commands: [] },
+      {
+        text: "In the repository, run this. It uses the collectives you published to last, saves a rule and installs the git hook in this repository only.",
+        commands: ["peasant village auto"],
+      },
+    ] satisfies readonly DocStep[],
+    rules: [
+      "A rule binds a folder or a git remote to collectives. Rules live in `hooks.yaml` in your [config folder](#configuration).",
+      "Edit or pause rules in the local web's **settings**, under **automatic publishing**. A paused rule publishes nothing.",
+    ],
+    hooksIntro: "Saving a rule there installs no hook. Manage a repository's hooks with:",
+    hooks: [
+      "peasant village hooks install --event pre-push",
+      "peasant village hooks status",
+      "peasant village hooks uninstall",
+    ],
+    hooksNotes: [
+      "`--event pre-push` runs before git contacts the remote; `--event post-commit` runs after each commit.",
+      "A hook installs only into an empty hook slot, and `uninstall` removes only the hooks peasant wrote.",
+      "Without a rule, a hook publishes with your configured `push.visibility`.",
+    ],
+  },
+
+  // local web map page and fairtrade CodeMap legend; peasant web/src/lib/glossary.ts
+  codeMap: {
+    title: "read the code map",
+    intro: "The local web's map shows a project's code as boxes and lines.",
+    legend: [
+      "**Box**: a code area, a folder or a file.",
+      "**Line**: one area uses another.",
+      "**Brightness**: brighter means more of it was built with AI on record. A dim box has no saved conversation behind it.",
+      "**Red**: a tangle. Two areas use each other, or one points against the project's layering.",
+    ],
+    actions: [
+      "Click an area to see what it connects to, its AI-built files, the conversations that built it, what usually changes with it and its effort totals.",
+      "Double-click a folder to open its files.",
+    ],
+  },
+
+  // fairtrade Changes (the local web's changes page)
+  changes: {
+    title: "read changes",
+    intro: "The local web's **changes** page draws a project's git history. Each line of work (a branch) is a lane, and each row is a commit.",
+    legend: [
+      "A star marks a recorded session. Select its commit to open it.",
+      "**sessions not linked to a commit** and **sessions linked outside this visible commit window** list the rest.",
+      "**show older** loads more history.",
+    ],
   },
 
   // peasant internal/ingest/adapter.go (the reader registry) and internal/config defaults
@@ -247,15 +353,59 @@ export const DOCS_HOME = {
     ],
   },
 
+  // peasant docs/cli/peasant_prune.md, cmd_prune.go, internal/store/prune.go; docs/KICKSTART.md
+  // (a selection never deletes); cmd_kickstart.go (--reset)
+  prune: {
+    title: "remove recorded sessions",
+    intro: [
+      "`peasant prune` permanently deletes sessions from this computer: their database rows and their files. It needs at least one filter and asks before it deletes.",
+    ],
+    command: "peasant prune --before 2026-01-01 --dry-run",
+    filters: [
+      "`--session <id>`, `--project <hash>` or `--harness <agent>`.",
+      "`--before` or `--after` a date (YYYY-MM-DD).",
+      "`--unselected`: the sessions your saved selection leaves out.",
+      "`--all`: every session.",
+      "`--dry-run` shows what would go; `--confirm` skips the question, for scripts.",
+    ],
+    notes: [
+      "Prune deletes nothing online: published transcripts stay.",
+      "A saved selection never deletes. It only filters lists and search.",
+      "`peasant kickstart --reset` also deletes the database and recorded files, along with your settings and key.",
+    ],
+  },
+
+  // peasant internal/defaults (config home, XDG_CONFIG_HOME), docs/cli/peasant.md (--config, --config-dir),
+  // cmd_config.go, internal/api/settings_catalog.go (settings the web page leaves read-only)
+  configuration: {
+    title: "settings files",
+    intro: "Peasant keeps its settings in `~/.config/peasant/`, or `$XDG_CONFIG_HOME/peasant/` when that is set:",
+    files: [
+      "`config.yaml`: every setting.",
+      "`hooks.yaml`: the [automatic publishing](#auto-publish) rules.",
+      "`credentials.json`: your peasant online key.",
+    ],
+    flags: [
+      "`--config <file>` reads another `config.yaml`.",
+      "`--config-dir <dir>` moves the whole folder to `<dir>/peasant`. `hooks.yaml` and `credentials.json` follow the folder, not `--config`.",
+    ],
+    editors: [
+      "Edit settings in the local web's **settings**, or in the terminal with `peasant config`.",
+      "Your project selection changes only with `peasant kickstart` or `peasant config`.",
+    ],
+  },
+
   // the Short line of each command in peasant docs/cli/*.md
   cli: {
     title: "cli",
     intro: "These are the commands most people need. For any of them, run `peasant <command> --help`.",
     commands: [
       { command: "peasant kickstart", does: "Run the first-time setup wizard." },
+      { command: "peasant harvest", does: "[Record](#record) the sessions on this computer." },
       { command: "peasant open", does: "Record one session and open its transcript in the web dashboard." },
       { command: "peasant web start", does: "Start the web dashboard server. `peasant web stop` stops it." },
       { command: "peasant village login", does: "Log in to peasant online with GitHub." },
+      { command: "peasant village logout", does: "Log out, and revoke this computer's key online." },
       { command: "peasant village push", does: "Publish your selected sessions to peasant online." },
       {
         command: "peasant village auto",
@@ -267,7 +417,7 @@ export const DOCS_HOME = {
         does: "Pull one transcript, or a collective's transcripts, from peasant online.",
       },
       { command: "peasant redact", does: "Redact local transcripts." },
-      { command: "peasant prune", does: "Remove sessions from the local store and database." },
+      { command: "peasant prune", does: "[Remove sessions](#prune) from the local store and database." },
       { command: "peasant config", does: "Edit peasant's configuration." },
       { command: "peasant upgrade", does: "Upgrade peasant." },
     ],
@@ -278,9 +428,16 @@ export const DOCS_HOME = {
 export const DOCS_HOME_TOC = [
   { id: "install", label: "install" },
   { id: "kickstart", label: "set up with kickstart" },
+  { id: "record", label: "record sessions" },
+  { id: "sign-in", label: "sign in" },
   { id: "publish", label: "publish a session" },
+  { id: "auto-publish", label: "publish automatically" },
+  { id: "code-map", label: "read the code map" },
+  { id: "changes", label: "read changes" },
   { id: "agents", label: "agents" },
   { id: "redaction", label: "redaction" },
   { id: "access", label: "collectives and access" },
+  { id: "prune", label: "remove sessions" },
+  { id: "configuration", label: "settings files" },
   { id: "cli", label: "cli" },
 ] as const;

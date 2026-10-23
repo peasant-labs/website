@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 
-const SPANS = /(`[^`]+`|\*\*[^*]+\*\*)/;
+const SPANS = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\([^)\s]+\))/;
+const LINK = /^\[([^\]]+)\]\(([^)\s]+)\)$/;
 
 /*
  * Inline code stays on one line so a flag is never split. Longer than this, it
@@ -24,10 +25,11 @@ function InlineCode({ code }: { code: string }) {
 }
 
 /**
- * Docs copy is plain strings with `backticks` around code and **stars** around
- * the name of a control on screen, the way the product's own docs are written.
- * This renders those spans as <code> and <strong> and leaves everything else
- * as text, so nothing in the copy is ever parsed as HTML.
+ * Docs copy is plain strings with `backticks` around code, **stars** around
+ * the name of a control on screen, and [label](href) for a link, the way the
+ * product's own docs are written. This renders those spans as <code>, <strong>
+ * and <a> and leaves everything else as text, so nothing in the copy is ever
+ * parsed as HTML.
  */
 export function Rich({ text }: { text: string }) {
   return (
@@ -35,6 +37,14 @@ export function Rich({ text }: { text: string }) {
       {text.split(SPANS).map((part, index) => {
         if (part.startsWith("`") && part.endsWith("`") && part.length > 1) {
           return <InlineCode key={index} code={part.slice(1, -1)} />;
+        }
+        const link = LINK.exec(part);
+        if (link) {
+          return (
+            <a key={index} className="dx-link" href={link[2]}>
+              {link[1]}
+            </a>
+          );
         }
         if (part.startsWith("**") && part.endsWith("**") && part.length > 3) {
           return <strong key={index}>{part.slice(2, -2)}</strong>;

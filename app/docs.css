@@ -356,6 +356,18 @@
   word-spacing: var(--word-spacing-prose);
 }
 
+/* a link in running text: ink with a dotted underline at rest, solid on hover and focus */
+.dx-page a.dx-link {
+  color: var(--ink-strong);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.dx-page a.dx-link:hover,
+.dx-page a.dx-link:focus-visible {
+  text-decoration-style: solid;
+}
+
 :is(.dx-sec, .dx-step-body, .dx-note, .dx-guide-desc) strong {
   color: var(--ink-strong);
   font-weight: 700;
@@ -426,6 +438,7 @@
 
 .dx-cmds {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--sp-2);
 }
 
@@ -436,12 +449,12 @@
 /*
  * A command that does not fit wraps inside its block rather than scrolling: a
  * scrolled line would hide part of the command and need its own tab stop.
- * It breaks at spaces first, and inside a word only when one word is wider
- * than the whole line.
+ * It breaks at spaces, and inside a word only when one word is wider than the
+ * whole line. The grids around it never grow to a long word's width.
  */
 .dx-cmd .cli-cmd-line code {
   white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 /* on a phone the copy button keeps its icon and name but drops the word, so a command keeps its flags whole */
@@ -453,6 +466,10 @@
   /* and a command inside a numbered step takes the column's full width */
   .dx-list li > .dx-cmds {
     margin-inline-start: calc(-2.5em - var(--sp-1));
+  }
+
+  .dx-bullets li > :is(.dx-cmds, .dx-cmd) {
+    margin-inline-start: calc(-1.5em - var(--sp-1));
   }
 }
 

@@ -1,0 +1,11 @@
+# The docs section ids other apps link to. The online and local apps send
+# readers here instead of teaching how-to in the app, so every id below is a
+# public address: add ids freely, never rename or remove one.
+version: 1
+pages:
+  - path: /docs
+    ids: [install, kickstart, record, sign-in, publish, auto-publish, code-map, changes, agents, redaction, access, prune, configuration, cli]
+  - path: /docs/guides/evals
+    ids: [collective, install, invite, publish, approve, pull]
+  - path: /docs/guides/reviews
+    ids: [link, show, publish, attach, review]

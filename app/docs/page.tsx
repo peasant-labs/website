@@ -2,6 +2,7 @@ import { Art } from "@/components/art";
 import {
   DocCaptionedCommand,
   DocCommand,
+  DocCommands,
   DocHead,
   DocJump,
   DocList,
@@ -29,12 +30,24 @@ export const metadata = metadataForRoute({
  * Every command and claim here is checked against the peasant and village
  * sources; see lib/docs-content.ts.
  */
+/** A run of short paragraphs, each one idea. */
+function Paragraphs({ items }: { items: readonly string[] }) {
+  return items.map((item) => (
+    <p key={item}>
+      <Rich text={item} />
+    </p>
+  ));
+}
+
 export default function DocsHome() {
-  const { install, kickstart, publish, agents, redaction, access, cli } = DOCS_HOME;
+  const { install, kickstart, record, signIn, publish, autoPublish, codeMap, changes, agents, redaction, access } =
+    DOCS_HOME;
+  const { prune, configuration, cli } = DOCS_HOME;
 
   return (
     <main id="content" className="dx-page" tabIndex={-1}>
       <DocHead title={DOCS_HOME.title} lede={DOCS_HOME.lede} />
+      <DocJump items={DOCS_HOME_TOC} />
 
       <section className="dx-start" aria-labelledby="guides">
         <h2 id="guides" className="dx-start-title">
@@ -54,8 +67,6 @@ export default function DocsHome() {
           ))}
         </div>
       </section>
-
-      <DocJump items={DOCS_HOME_TOC} />
 
       <div className="dx-columns">
         <div className="dx-article">
@@ -86,8 +97,33 @@ export default function DocsHome() {
             </DocNote>
           </section>
 
+          <section className="dx-sec" id="record" aria-labelledby="record-title">
+            <h2 id="record-title">{record.title}</h2>
+            <Paragraphs items={record.intro} />
+            <DocCommand command={record.command} />
+            <DocList items={record.flags} />
+            <p>
+              <Rich text={record.single} />
+            </p>
+            <p>{record.emptyIntro}</p>
+            <DocList items={record.empty} />
+          </section>
+
+          <section className="dx-sec" id="sign-in" aria-labelledby="sign-in-title">
+            <h2 id="sign-in-title">{signIn.title}</h2>
+            <p>{signIn.intro}</p>
+            <DocCommand command={signIn.command} />
+            <Paragraphs items={signIn.body} />
+            <p>{signIn.logout}</p>
+            <DocCommand command={signIn.logoutCommand} />
+            <DocNote>
+              <Rich text={signIn.note} />
+            </DocNote>
+          </section>
+
           <section className="dx-sec" id="publish" aria-labelledby="publish-title">
             <h2 id="publish-title">{publish.title}</h2>
+            <Paragraphs items={publish.before} />
             <h3>{publish.claude.title}</h3>
             <DocProcedure steps={publish.claude.steps} />
             <p>
@@ -106,6 +142,32 @@ export default function DocsHome() {
             ))}
             <p>{publish.terminal.flagsIntro}</p>
             <DocList items={publish.terminal.flags} />
+          </section>
+
+          <section className="dx-sec" id="auto-publish" aria-labelledby="auto-publish-title">
+            <h2 id="auto-publish-title">{autoPublish.title}</h2>
+            <Paragraphs items={autoPublish.intro} />
+            <p>{autoPublish.waysIntro}</p>
+            <DocProcedure steps={autoPublish.ways} ordered={false} />
+            <Paragraphs items={autoPublish.rules} />
+            <p>{autoPublish.hooksIntro}</p>
+            <DocCommands commands={autoPublish.hooks} />
+            <DocList items={autoPublish.hooksNotes} />
+          </section>
+
+          <section className="dx-sec" id="code-map" aria-labelledby="code-map-title">
+            <h2 id="code-map-title">{codeMap.title}</h2>
+            <p>{codeMap.intro}</p>
+            <DocList items={codeMap.legend} />
+            <Paragraphs items={codeMap.actions} />
+          </section>
+
+          <section className="dx-sec" id="changes" aria-labelledby="changes-title">
+            <h2 id="changes-title">{changes.title}</h2>
+            <p>
+              <Rich text={changes.intro} />
+            </p>
+            <DocList items={changes.legend} />
           </section>
 
           <section className="dx-sec" id="agents" aria-labelledby="agents-title">
@@ -164,6 +226,24 @@ export default function DocsHome() {
                 </div>
               ))}
             </dl>
+          </section>
+
+          <section className="dx-sec" id="prune" aria-labelledby="prune-title">
+            <h2 id="prune-title">{prune.title}</h2>
+            <Paragraphs items={prune.intro} />
+            <DocCommand command={prune.command} />
+            <DocList items={prune.filters} />
+            <Paragraphs items={prune.notes} />
+          </section>
+
+          <section className="dx-sec" id="configuration" aria-labelledby="configuration-title">
+            <h2 id="configuration-title">{configuration.title}</h2>
+            <p>
+              <Rich text={configuration.intro} />
+            </p>
+            <DocList items={configuration.files} />
+            <Paragraphs items={configuration.flags} />
+            <Paragraphs items={configuration.editors} />
           </section>
 
           <section className="dx-sec" id="cli" aria-labelledby="cli-title">

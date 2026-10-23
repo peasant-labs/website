@@ -16,8 +16,8 @@ export const metadata = metadataForRoute({
 /*
  * Sources: village's collective settings (github orgs, pull requests), its
  * account settings, the pull-request page and the GitHub check and comment it
- * writes; fairtrade's publish window; peasant-plugins README and peasant
- * `village auto --help`.
+ * writes, and its waiting pull requests list and matcher; fairtrade's publish
+ * window; peasant-plugins README and peasant `village auto --help`.
  */
 const STEPS = [
   {
@@ -95,7 +95,10 @@ const STEPS = [
           ]}
         />
         <p>
-          <Rich text="To skip this step, turn on **link my transcripts to my pull requests automatically** in your own settings on peasant online, under **pull requests**. It is off by default." />
+          <Rich text="Until one of your transcripts matches, the pull request waits in **pull requests** on peasant online. Publishing a session behind one of its commits links it with no click." />
+        </p>
+        <p>
+          <Rich text="To skip the comment, turn on **link my transcripts to my pull requests automatically** in your own settings on peasant online, under **pull requests**. It is off by default, and covers the repositories your collectives link." />
         </p>
         <DocNote>
           A transcript links only when one of its recorded commits is in the pull request; a matching
