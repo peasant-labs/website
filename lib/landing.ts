@@ -118,7 +118,7 @@ export const USE_CASES = {
         { text: "see which commits agents wrote", icon: "code" },
         { text: "usage across teams", icon: "chart" },
       ],
-      cta: { label: "talk to us", href: "/contact" },
+      cta: { label: "talk to us", href: "mailto:hello@peasantlabs.org" },
     },
   ] satisfies readonly UseCase[],
 } as const;

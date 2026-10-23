@@ -64,7 +64,7 @@ useCases:
       label: companies
       sentence: Access can follow your GitHub organization, with redaction rules for your own names. Village is open source, and we host it for you.
       capabilities: [keep agent data in-house, see which commits agents wrote, usage across teams]
-      cta: { label: talk to us, href: /contact }
+      cta: { label: talk to us, href: "mailto:hello@peasantlabs.org" }
 how:
   steps:
     - title: record
