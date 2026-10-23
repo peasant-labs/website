@@ -27,14 +27,14 @@ export const DOCS_GUIDES = [
     href: "/docs/guides/evals",
     title: "run an agent eval",
     summary: "Collect real sessions from many people into one collective, then pull the approved set.",
-    art: art("uc-evals", "an open book with a quill in an inkwell"),
+    art: art("docs-evals", "a round glass flask half full of amber liquid, on a ring stand"),
   },
   {
     id: "reviews",
     href: "/docs/guides/reviews",
     title: "review pull requests",
     summary: "Show reviewers the agent sessions behind a change, from the pull request.",
-    art: art("uc-review", "two parchment pages with three lines marked in amber"),
+    art: art("docs-reviews", "a pair of round reading spectacles with amber frames"),
   },
 ] as const;
 
@@ -45,7 +45,7 @@ export const DOCS_START = [
     href: "/docs#publish",
     title: "publish your first session",
     summary: "From Claude Code with `/peasant`, or from the terminal.",
-    art: art("uc-push", "a carrier pigeon carrying a small scroll"),
+    art: art("docs-publish", "a pole flying a swallow-tailed amber banner"),
   },
   DOCS_GUIDES[0],
   DOCS_GUIDES[1],
@@ -54,7 +54,7 @@ export const DOCS_START = [
     href: "/docs#access",
     title: "collectives and access",
     summary: "Who can publish to a collective, and who can read it.",
-    art: art("uc-learn", "a long table with one amber mug among the others"),
+    art: art("docs-access", "a crenellated castle wall with an arched gateway and its amber portcullis half raised"),
   },
 ] as const;
 
