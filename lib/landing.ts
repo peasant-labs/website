@@ -359,5 +359,5 @@ export const VISION = {
  * buttons: an open gate, in the same dithered family as the use-case pictures.
  */
 export const CLOSE = {
-  art: art("p-open", "an open wooden gate with an amber latch", 704, 528),
+  art: art("closing", "a cottage with its door swung open on warm amber light", 704, 528),
 } as const;
