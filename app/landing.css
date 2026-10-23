@@ -263,11 +263,32 @@
   .hf {
     width: 666px;
   }
+
+  /*
+   * Between a phone and a wide screen the stage is narrower than the frame,
+   * so the panel closes in on it: the same air at its sides as the stage
+   * keeps above and below the scene, 22 cells of 2px.
+   */
+  .hf-panel {
+    justify-self: center;
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    padding-inline: 44px;
+  }
 }
 
 @media (min-width: 68.75rem) {
   .hf {
     width: 999px;
+  }
+
+  /* a wide screen's stage nearly fills the frame, so the panel spans it, on the page's one left edge */
+  .hf-panel {
+    justify-self: stretch;
+    width: auto;
+    margin-inline: 0;
+    padding-inline: var(--sp-4);
   }
 }
 
