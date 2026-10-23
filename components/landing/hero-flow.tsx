@@ -7,29 +7,30 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /*
  * The hero's picture, told without words and drawn the way the site's
- * pictures are: low-poly shapes in a fine halftone dot screen, warm-grey
- * hairline edges, soft dotted shadows on a ground of scattered dots, and one
- * amber accent.
+ * pictures are: low-poly shapes in three-quarter view, shaded with glyphs on a
+ * fine grid (dots, plusses, checkers, solid squares), every edge a run of solid
+ * squares on the same grid, a sparse dotted ground and patterned contact
+ * shadows, in two inks: near-black (light on the dark page) and amber.
  *
- * A transcript card lifts out of a laptop that runs the agents, glides through
- * a sieve that sweeps its secret line amber, is stamped as it is published,
- * and slides down onto the shared stack, which eases down a notch to make room
- * while one of the people standing at it lights up. Its accessible name tells
- * the same story.
+ * A transcript card lifts out of a laptop that runs the agents, passes through
+ * a sieve standing between the laptop and the commons, which sweeps its secret
+ * line amber, is stamped as it is published, and slides down onto the shared
+ * stack, which eases down a notch to make room while the people at it notice:
+ * one's basket turns amber. Its accessible name tells the same story.
  *
  * Every card makes the same journey, one cycle after the last, so the loop
  * never resets: a card lands on top, sinks one notch a cycle and slips behind
  * the base after four, and comes back out of the laptop on its next turn.
  *
- * Everything is placed on one cell grid, and every drawing uses the cell as its
- * unit, so one set of dot patterns fills them all, pinned to each object: the
- * screen travels with a card instead of shimmering across it. The picture
- * shows at fixed widths where a cell is a whole number of pixels (3px on a
- * phone and a mid-size screen, 4px on a wide one). A card moves on two nested
- * layers, across and down, each with its own curve, which bends its path. Only
- * transform, opacity and clip-path move; z-index steps a card behind the one
- * that lands on it. The resting state is one finished frame, and the loop is
- * laid over it only when motion is allowed.
+ * The unit of every drawing is one grid cell, and the picture shows at widths
+ * where a cell is a whole number of pixels: 3px on a phone and a wide screen,
+ * 2px between. Glyph patterns tile from each drawing's own origin, so the
+ * texture travels with a card instead of shimmering across it, and edges are
+ * worked out here, cell by cell, so they step on the grid like the pictures'.
+ * A card moves on two nested layers, across and down, each with its own curve.
+ * Only transform, opacity and clip-path move; z-index steps a card behind the
+ * one that lands on it. The resting state is one finished frame, and the loop
+ * is laid over it only when motion is allowed.
  */
 
 const FLOW = HERO.flow;
@@ -73,42 +74,66 @@ const CURVES = {
 } as const;
 type Curve = keyof typeof CURVES;
 
-/* ---------- the drawing's grid ---------- */
-
-/* a card, in cells: the same drawing in every layout */
-const CARD = { w: 48, h: 34 } as const;
-/* inside a card: its mark, three lines (the middle one the secret), the amber block over it, the stamp */
-const ON_CARD = {
-  mark: [5, 4, 9] as const,
-  lines: [
-    [5, 17, 33],
-    [5, 22, 25],
-    [5, 27, 29],
-  ] as const,
-  mask: [4, 21, 27, 4] as const,
-  stamp: [35, 3, 10] as const,
-} as const;
-
 type Point = readonly [x: number, y: number];
 type Rect = readonly [x: number, y: number, w: number, h: number];
 /** a person at the stack: centre, height, and what they hold */
 type Person = readonly [x: number, height: number, holds: "rake" | "basket" | null];
 
 /*
- * The scene is drawn in a three-quarter view: depth runs up and to the right,
- * a little over half a cell across and a third of a cell up for each cell of
- * depth, so every box shows a lit top, a front and a shaded side.
+ * The three-quarter view: depth runs up and to the right, a little over half a
+ * cell across and a third of a cell up for each cell of depth, so every box
+ * shows a lit top, a front and a shaded side.
  */
 const DEPTH_X = 0.55;
 const DEPTH_Y = -0.35;
 const back = ([x, y]: Point, depth: number): Point => [x + DEPTH_X * depth, y + DEPTH_Y * depth];
+
+/** a card's drawing, in cells: its size, its mark, three lines (the middle one the secret), the amber block over it, the stamp */
+type CardPlan = Readonly<{
+  w: number;
+  h: number;
+  mark: readonly [x: number, y: number, size: number];
+  lines: readonly (readonly [x: number, y: number, w: number])[];
+  line: number;
+  mask: Rect;
+  stamp: readonly [x: number, y: number, size: number];
+}>;
+
+const WIDE_CARD: CardPlan = {
+  w: 60,
+  h: 42,
+  mark: [7, 5, 11],
+  lines: [
+    [7, 21, 42],
+    [7, 27, 32],
+    [7, 33, 37],
+  ],
+  line: 2,
+  mask: [5, 25, 35, 6],
+  stamp: [44, 4, 11],
+};
+
+const PHONE_CARD: CardPlan = {
+  w: 48,
+  h: 34,
+  mark: [5, 4, 9],
+  lines: [
+    [5, 17, 33],
+    [5, 22, 25],
+    [5, 27, 29],
+  ],
+  line: 1,
+  mask: [4, 21, 27, 4],
+  stamp: [35, 3, 10],
+};
 
 /** One layout, every measure in cells. */
 type Layout = Readonly<{
   name: "phone" | "wide";
   width: number;
   height: number;
-  /** the front edge of the ground everything in the commons stands on */
+  card: CardPlan;
+  /** the front edge of the ground the commons stands on */
   ground: number;
   /** the laptop: the deck's front-left corner on its ground, its width, depth and thickness, and the screen's height and lean */
   laptop: Readonly<{ x: number; ground: number; w: number; depth: number; deck: number; screen: number; lean: number }>;
@@ -119,44 +144,44 @@ type Layout = Readonly<{
   lifted: Point;
   atSieve: Point;
   stamped: Point;
-  /** which way the card crosses the sieve */
-  travel: "across" | "down";
-  /** the sieve's front frame: a short mesh across the card's path */
+  /** the sieve's mesh panel, standing on posts down to its ground */
   sieve: Rect;
+  sieveGround: number;
   /** the stack: its cards' left edge, the base's top, the step between cards and the base's depth */
   stack: readonly [left: number, baseTop: number, notch: number, depth: number];
-  /** the people at the stack, the half width of a robe at its hem, and the one who lights up as a card lands */
+  /** the people at the stack, the half width of a robe at its hem, and the one who notices a card land */
   people: readonly Person[];
   robe: number;
   noticer: number;
 }>;
 
 /*
- * A wide screen, at 16:10: the laptop and the commons on one ground, an even
- * gap between the groups and the same margin outside, the screen's top level
- * with the stack's. The card travels a shallow arc above them, through the
- * sieve standing in the gap, onto a base as wide as the cards.
+ * A wide screen, at 16:10, laid out like the pictures' village: on one ground
+ * seen in three-quarter view, the laptop stands toward the back on the left,
+ * the commons toward the front on the right, and the sieve between them on the
+ * card's way down from one to the other.
  */
 const WIDE: Layout = {
   name: "wide",
-  width: 250,
-  height: 156,
-  ground: 127,
-  laptop: { x: 16, ground: 127, w: 70, depth: 24, deck: 2.5, screen: 40, lean: 3 },
-  marks: [48, 66, 84].map((x) => [x, 96] as const),
-  mark: 14,
-  lifted: [60, 53],
-  atSieve: [115, 47],
-  stamped: [154, 53],
-  travel: "across",
-  sieve: [112, 25, 6, 42],
-  stack: [130, 119, 3, 8],
+  width: 333,
+  height: 208,
+  card: WIDE_CARD,
+  ground: 184,
+  laptop: { x: 22, ground: 106, w: 80, depth: 30, deck: 3, screen: 56, lean: 4 },
+  marks: [48, 72, 96].map((x) => [x, 66] as const),
+  mark: 18,
+  lifted: [70, 68],
+  atSieve: [156, 108],
+  stamped: [228, 96],
+  sieve: [152, 82, 8, 54],
+  sieveGround: 150,
+  stack: [198, 172, 3, 6],
   people: [
-    [200, 42, "rake"],
-    [215, 46, "basket"],
-    [232, 40, null],
+    [279, 66, "rake"],
+    [297, 72, "basket"],
+    [315, 62, null],
   ],
-  robe: 8,
+  robe: 9,
   noticer: 1,
 };
 
@@ -168,6 +193,7 @@ const PHONE: Layout = {
   name: "phone",
   width: 100,
   height: 125,
+  card: PHONE_CARD,
   ground: 118,
   laptop: { x: 3, ground: 40, w: 36, depth: 12, deck: 2, screen: 24, lean: 2 },
   marks: [18, 28.5, 39].map((x) => [x, 22] as const),
@@ -175,13 +201,13 @@ const PHONE: Layout = {
   lifted: [26, 40],
   atSieve: [52, 44],
   stamped: [73, 52],
-  travel: "across",
   sieve: [48, 26, 4, 36],
+  sieveGround: 70,
   stack: [49, 112, 3, 4],
   people: [
-    [11, 30, "rake"],
-    [24, 34, "basket"],
-    [38, 28, null],
+    [11, 32, "rake"],
+    [24, 36, "basket"],
+    [38, 30, null],
   ],
   robe: 6.5,
   noticer: 1,
@@ -210,13 +236,13 @@ function curve(name: Curve) {
 type Track = readonly (readonly [ms: number, value: number, ease?: Curve])[];
 
 /** the top of the stack's top card */
-const stackTop = (layout: Layout) => layout.stack[1] - CARD.h - (DEPTH - 1) * layout.stack[2];
+const stackTop = (layout: Layout) => layout.stack[1] - layout.card.h - (DEPTH - 1) * layout.stack[2];
 
 /** the card's centre across (0) or down (1), in cells, for a card that starts on one of the three marks */
 function track(layout: Layout, slot: number, axis: 0 | 1): Track {
   const from = layout.marks[slot]![axis];
   const [stackLeft, , notch] = layout.stack;
-  const rest = axis === 0 ? stackLeft + CARD.w / 2 : stackTop(layout) + CARD.h / 2;
+  const rest = axis === 0 ? stackLeft + layout.card.w / 2 : stackTop(layout) + layout.card.h / 2;
   const sinks: [number, number, Curve?][] = [];
   if (axis === 1) {
     for (let depth = 1; depth <= DEPTH; depth += 1) {
@@ -277,7 +303,7 @@ function unit(layout: Layout) {
 /* a layer moves its card's top-left corner; the card is drawn at the origin */
 function shiftStops(layout: Layout, stops: Track, axis: 0 | 1): Stop[] {
   const cq = unit(layout);
-  const half = axis === 0 ? CARD.w / 2 : CARD.h / 2;
+  const half = axis === 0 ? layout.card.w / 2 : layout.card.h / 2;
   return stops.map(([ms, value, ease]) => [
     ms,
     `transform: ${axis === 0 ? "translateX" : "translateY"}(${cq(value - half)})`,
@@ -287,23 +313,15 @@ function shiftStops(layout: Layout, stops: Track, axis: 0 | 1): Stop[] {
 
 /*
  * The secret line turns amber where the sieve meets it, sampled from the
- * card's own path so the sweep stays under the mesh: on a wide screen from the
- * line's right end as the card crosses sideways, on a phone from its lower
- * edge as the card crosses downwards.
+ * card's own path so the sweep stays under the mesh: from the line's right end
+ * as the card crosses sideways.
  */
 function sweepStops(layout: Layout): Stop[] {
   const x = track(layout, 1, 0);
-  const y = track(layout, 1, 1);
-  const [sx, sy, sw, sh] = layout.sieve;
-  const [mx, my, mw, mh] = ON_CARD.mask;
-  const shown = (fraction: number) => {
-    const hidden = n((1 - Math.min(1, Math.max(0, fraction))) * 100);
-    return layout.travel === "across" ? `clip-path: inset(0 0 0 ${hidden}%)` : `clip-path: inset(${hidden}% 0 0 0)`;
-  };
-  const fraction = (ms: number) =>
-    layout.travel === "across"
-      ? (valueAt(x, ms) - CARD.w / 2 + mx + mw - (sx + sw / 2)) / mw
-      : (valueAt(y, ms) - CARD.h / 2 + my + mh - (sy + sh / 2)) / mh;
+  const [sx, , sw] = layout.sieve;
+  const [mx, , mw] = layout.card.mask;
+  const shown = (fraction: number) => `clip-path: inset(0 0 0 ${n((1 - Math.min(1, Math.max(0, fraction))) * 100)}%)`;
+  const fraction = (ms: number) => (valueAt(x, ms) - layout.card.w / 2 + mx + mw - (sx + sw / 2)) / mw;
   const samples: Stop[] = [[0, shown(0)]];
   for (let ms = BEAT.leave; ms <= BEAT.stamped; ms += 50) samples.push([ms, shown(fraction(ms)), "linear"]);
   samples.push([LOOP, shown(1)]);
@@ -323,7 +341,8 @@ function layoutRules(layout: Layout) {
   const cq = unit(layout);
   const half = layout.mark / 2;
   const at = finishedAt(layout);
-  const [sx, sy, sw, sh] = layout.sieve;
+  const { w, h } = layout.card;
+  const [sx, sy, sw] = layout.sieve;
   return [
     `.hf { aspect-ratio: ${layout.width} / ${layout.height} }`,
     ...layout.marks.flatMap(([x, y], slot) =>
@@ -331,12 +350,12 @@ function layoutRules(layout: Layout) {
         .filter((index) => index % SHOWN === slot)
         .map((index) => `.hf-m${index} { left: ${cq(x - half)}; top: ${cq(y - half)}; width: ${cq(layout.mark)}; height: ${cq(layout.mark)} }`),
     ),
-    `.hf-card { width: ${cq(CARD.w)}; height: ${cq(CARD.h)} }`,
-    `.hf-mesh-${layout.name} { left: ${cq(sx)}; top: ${cq(sy)}; width: ${cq(sw)}; height: ${cq(sh)} }`,
-    `.hf-base-${layout.name} { left: ${cq(layout.stack[0] - 1)}; top: ${cq(layout.stack[1])}; width: ${cq(CARD.w + 2)}; height: ${cq(layout.ground - layout.stack[1])} }`,
+    `.hf-card { width: ${cq(w)}; height: ${cq(h)} }`,
+    `.hf-mesh-${layout.name} { left: ${cq(sx)}; top: ${cq(sy)}; width: ${cq(sw)}; height: ${cq(layout.sieveGround - sy)} }`,
+    `.hf-base-${layout.name} { left: ${cq(layout.stack[0] - 1)}; top: ${cq(layout.stack[1])}; width: ${cq(w + 2)}; height: ${cq(layout.ground - layout.stack[1])} }`,
     ...AGENTS.map((_, index) => {
       const rest = at(index);
-      return `.hf-x${index} { transform: translateX(${cq(rest.x - CARD.w / 2)}) }\n.hf-y${index} { transform: translateY(${cq(rest.y - CARD.h / 2)}) }`;
+      return `.hf-x${index} { transform: translateX(${cq(rest.x - w / 2)}) }\n.hf-y${index} { transform: translateY(${cq(rest.y - h / 2)}) }`;
     }),
   ].join("\n");
 }
@@ -454,10 +473,9 @@ const RESTING = [
 ].join("\n");
 
 /*
- * Three sizes, each a whole number of pixels per cell: a phone shows the tall
- * layout 300px wide (3px cells), a mid-size screen the wide one 750px wide
- * (3px), a wide screen 1000px wide (4px). The dots in each pattern are drawn in
- * thirds or quarters of a cell, so each set lands on whole pixels.
+ * Three widths, each a whole number of pixels per cell: a phone shows its
+ * layout 300px wide and a wide screen 999px wide, both at 3px a cell; between,
+ * the wide layout shows 666px wide, at 2px.
  */
 const STYLESHEET = [
   RESTING,
@@ -469,73 +487,123 @@ const STYLESHEET = [
   `@media (prefers-reduced-motion: no-preference) {\n${motionRules()}\n}`,
 ].join("\n");
 
-/* ---------- the dot screens ---------- */
+/* ---------- the glyphs ---------- */
 
 /*
- * A fine, regular halftone: one dot per cell, its size the tone. Paper is a
- * dot in every other cell, light a small dot in every cell, mid a larger one,
- * dark the largest; shade is the soft screen of a contact shadow, and amber
- * the mid screen in amber. The ground is a sparse scatter over a large tile.
+ * One glyph per cell, drawn in thirds of a cell so each lands on whole pixels
+ * at 3px. The tones, lightest first: a dot in every other cell, a dot in every
+ * cell, plusses with dots between, a checker in every cell, a solid square in
+ * every cell. Amber is the checker in amber; the ground is a sparse scatter.
  */
-type Grid = 3 | 4;
+const T = 1 / 3;
+
+function glyph(kind: "dot" | "plus" | "checker" | "solid", x: number, y: number, key: string, className = "hf-ink") {
+  switch (kind) {
+    case "dot":
+      return <rect key={key} className={className} x={x + T} y={y + T} width={T} height={T} />;
+    case "solid":
+      return <rect key={key} className={className} x={x} y={y} width={2 * T} height={2 * T} />;
+    case "plus":
+      return <path key={key} className={className} d={`M${x + T} ${y}h${T}v${T}h${T}v${T}h${-T}v${T}h${-T}v${-T}h${-T}v${-T}h${T}z`} />;
+    case "checker":
+      return <path key={key} className={className} d={`M${x} ${y}h${T}v${T}h${-T}zM${x + 2 * T} ${y}h${T}v${T}h${-T}zM${x + T} ${y + T}h${T}v${T}h${-T}zM${x} ${y + 2 * T}h${T}v${T}h${-T}zM${x + 2 * T} ${y + 2 * T}h${T}v${T}h${-T}z`} />;
+  }
+}
 
 const SCATTER = [
-  [1, 2], [7, 1], [13, 4], [19, 2], [26, 3], [31, 1], [4, 8], [10, 10], [17, 7], [23, 9], [29, 11], [2, 14],
-  [8, 16], [15, 13], [21, 17], [27, 15], [33, 18], [5, 21], [12, 22], [18, 20], [25, 23], [31, 22], [9, 26], [22, 27],
+  [3, 2], [17, 5], [29, 1], [41, 7], [8, 13], [23, 16], [36, 12], [47, 18], [2, 24], [14, 28], [31, 25], [44, 31], [9, 37], [26, 40], [39, 36],
 ] as const;
 
-function Patterns({ grid }: { grid: Grid }) {
-  const p = 1 / grid;
-  /* a square dot of `size` pixels, centred in its cell as nearly as whole pixels allow */
-  const dot = (x: number, y: number, size: number, key: string, className = "hf-dot") => {
-    const start = Math.floor((grid - size) / 2) * p;
-    return <rect key={key} className={className} x={x + start} y={y + start} width={size * p} height={size * p} />;
-  };
+function Glyphs() {
   const tile = (id: string, w: number, h: number, children: ReactNode) => (
-    <pattern id={`hf-${id}-${grid}`} patternUnits="userSpaceOnUse" width={w} height={h}>
+    <pattern id={`hf-${id}`} patternUnits="userSpaceOnUse" width={w} height={h}>
       {children}
     </pattern>
   );
-  const large = grid === 4 ? 3 : 2;
-  const medium = 2;
+  const four = (kind: "dot" | "plus" | "checker" | "solid", className?: string) =>
+    [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+    ].map(([x, y]) => glyph(kind, x!, y!, `${x}${y}`, className));
   return (
     <>
-      {tile("paper", 2, 2, [dot(0, 0, 1, "a")])}
-      {tile("light", 1, 1, [dot(0, 0, 1, "a")])}
-      {tile("mid", 1, 1, [dot(0, 0, medium, "a")])}
-      {tile("dark", 1, 1, [dot(0, 0, large, "a")])}
-      {tile("shade", 2, 1, [dot(0, 0, 1, "a")])}
-      {tile("amber", 1, 1, [dot(0, 0, medium, "a", "hf-amber")])}
-      {tile("ground", 36, 30, SCATTER.map(([x, y], index) => dot(x, y, 1, String(index))))}
+      {tile("light", 2, 2, [glyph("dot", 0, 0, "a"), glyph("dot", 1, 1, "b")])}
+      {tile("mid", 2, 2, four("dot"))}
+      {tile("plus", 2, 2, [glyph("plus", 0, 0, "a"), glyph("plus", 1, 1, "b"), glyph("dot", 1, 0, "c"), glyph("dot", 0, 1, "d")])}
+      {tile("checker", 2, 2, four("checker"))}
+      {tile("solid", 2, 2, four("solid"))}
+      {tile("amber", 2, 2, four("checker", "hf-amber"))}
+      {tile("shade", 2, 2, [glyph("dot", 0, 0, "a"), glyph("dot", 1, 1, "b")])}
+      {tile("shade-core", 2, 2, [glyph("plus", 0, 0, "a"), glyph("plus", 1, 1, "b"), glyph("dot", 1, 0, "c"), glyph("dot", 0, 1, "d")])}
+      {tile("ground", 50, 44, SCATTER.map(([x, y], index) => glyph("dot", x, y, String(index), "hf-ink hf-scatter")))}
     </>
   );
 }
 
-/* ---------- the drawings ---------- */
+/* ---------- edges, on the grid ---------- */
 
-type Tone = "paper" | "light" | "mid" | "dark" | "amber" | "none";
+/** the cells a closed polygon's edges pass through, as one path of unit squares */
+function edgeCells(points: readonly Point[]) {
+  const cells = new Set<string>();
+  for (let index = 0; index < points.length; index += 1) {
+    const [x0, y0] = points[index]!;
+    const [x1, y1] = points[(index + 1) % points.length]!;
+    const steps = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) * 3));
+    for (let step = 0; step <= steps; step += 1) {
+      const t = step / steps;
+      const x = Math.min(Math.floor(x0 + (x1 - x0) * t), Math.ceil(Math.max(x0, x1)) - 1);
+      const y = Math.min(Math.floor(y0 + (y1 - y0) * t), Math.ceil(Math.max(y0, y1)) - 1);
+      cells.add(`${x},${y}`);
+    }
+  }
+  return [...cells].map((cell) => {
+    const [x, y] = cell.split(",");
+    return `M${x} ${y}h1v1h-1z`;
+  }).join("");
+}
 
-/** a closed face: filled with the panel to cover what is behind it, screened, then edged with a hairline */
-function Face({ d, tone, edge = true }: { d: string; tone: Tone; edge?: boolean }) {
+const toPath = (points: readonly Point[]) => `M${points.map(([x, y]) => `${n(x)} ${n(y)}`).join("L")}Z`;
+const rectPoints = (x: number, y: number, w: number, h: number): Point[] => [
+  [x, y],
+  [x + w, y],
+  [x + w, y + h],
+  [x, y + h],
+];
+function ellipsePoints(cx: number, cy: number, rx: number, ry: number, sides = 20): Point[] {
+  return Array.from({ length: sides }, (_, index) => {
+    const angle = (index / sides) * Math.PI * 2;
+    return [cx + Math.cos(angle) * rx, cy + Math.sin(angle) * ry] as const;
+  });
+}
+
+type Tone = "light" | "mid" | "plus" | "checker" | "solid" | "amber" | "none";
+
+/** a closed face: filled with the panel to cover what is behind it, shaded with its glyphs, edged with squares */
+function Face({ points, tone, edge = true }: { points: readonly Point[]; tone: Tone; edge?: boolean }) {
+  const d = toPath(points);
   return (
     <>
       <path className="hf-fill" d={d} />
       {tone === "none" ? null : <path className={`hf-tone-${tone}`} d={d} />}
-      {edge ? <path className="hf-out" d={d} /> : null}
+      {edge ? <path className="hf-ink" d={edgeCells(points)} /> : null}
     </>
   );
 }
 
-const rect = (x: number, y: number, w: number, h: number) => `M${x} ${y}H${x + w}V${y + h}H${x}Z`;
-const poly = (points: readonly Point[]) => `M${points.map(([x, y]) => `${x} ${y}`).join("L")}Z`;
-const ellipse = (cx: number, cy: number, rx: number, ry: number) =>
-  `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
+/** a contact shadow: a glyph ellipse, its core darker */
+function Shadow({ cx, cy, rx, ry }: { cx: number; cy: number; rx: number; ry: number }) {
+  return (
+    <>
+      <path className="hf-tone-shade" d={toPath(ellipsePoints(cx, cy, rx, ry))} />
+      <path className="hf-tone-shade-core" d={toPath(ellipsePoints(cx - rx * 0.12, cy, rx * 0.72, ry * 0.6))} />
+    </>
+  );
+}
 
-/* which of the two layouts a drawing belongs to; the stylesheet shows one */
-const sizeClass = (layout: Layout) => `hf-${layout.name}`;
-
-/** A box in three-quarter view: its front, its lit top and its shaded side, from the front face's corner and size. */
-function Box({ x, y, w, h, depth, front = "mid", top = "light", side = "dark" }: {
+/** A box in three-quarter view: its lit top, its shaded side and its front, from the front face's corner and size. */
+function Box({ x, y, w, h, depth, front = "plus", top = "light", side = "checker" }: {
   x: number;
   y: number;
   w: number;
@@ -549,54 +617,73 @@ function Box({ x, y, w, h, depth, front = "mid", top = "light", side = "dark" }:
   const [rx, ry] = back([x + w, y], depth);
   return (
     <>
-      <Face d={poly([[x, y], [x + w, y], [rx, ry], [bx, by]])} tone={top} />
-      <Face d={poly([[x + w, y], [rx, ry], [rx, ry + h], [x + w, y + h]])} tone={side} />
-      <Face d={rect(x, y, w, h)} tone={front} />
+      <Face points={[[x, y], [x + w, y], [rx, ry], [bx, by]]} tone={top} />
+      <Face points={[[x + w, y], [rx, ry], [rx, ry + h], [x + w, y + h]]} tone={side} />
+      <Face points={rectPoints(x, y, w, h)} tone={front} />
     </>
   );
 }
 
+/* which of the two layouts a drawing belongs to; the stylesheet shows one */
+const sizeClass = (layout: Layout) => `hf-${layout.name}`;
+
 /*
  * One of the people, low-poly like the pictures' peasants: a pointed hood on a
  * narrow neck over a robe that widens to the hem, each split into a lit face
- * and a shaded one, and maybe a rake or a basket.
+ * and a shaded one, and maybe a rake, or an arm carrying a basket.
  */
 function Peasant({ person: [x, height, holds], robe, ground, lit }: { person: Person; robe: number; ground: number; lit: boolean }) {
   const top = ground - height;
-  const hood = height * 0.27;
-  const wide = robe * 0.72;
+  const hood = height * 0.26;
+  const wide = robe * 0.74;
   const neck = top + hood;
-  const nape = robe * 0.26;
-  const shoulder = robe * 0.42;
-  const hoodLit = poly([[x, top], [x, neck], [x - nape, neck], [x - wide * 0.86, top + hood * 0.74], [x - wide, top + hood * 0.52]]);
-  const hoodShade = poly([[x, top], [x + wide, top + hood * 0.52], [x + wide * 0.86, top + hood * 0.74], [x + nape, neck], [x, neck]]);
-  const hoodAll = poly([[x, top], [x + wide, top + hood * 0.52], [x + wide * 0.86, top + hood * 0.74], [x + nape, neck], [x - nape, neck], [x - wide * 0.86, top + hood * 0.74], [x - wide, top + hood * 0.52]]);
+  const nape = robe * 0.24;
+  const shoulder = robe * 0.44;
+  const hoodLit: Point[] = [[x, top], [x, neck], [x - nape, neck], [x - wide * 0.86, top + hood * 0.74], [x - wide, top + hood * 0.52]];
+  const hoodShade: Point[] = [[x, top], [x + wide, top + hood * 0.52], [x + wide * 0.86, top + hood * 0.74], [x + nape, neck], [x, neck]];
   const seam = x + robe * 0.18;
-  const bodyLit = poly([[x - shoulder, neck], [seam - robe * 0.1, neck], [seam, ground], [x - robe, ground], [x - robe * 0.86, ground - height * 0.3]]);
-  const bodyShade = poly([[seam - robe * 0.1, neck], [x + shoulder, neck], [x + robe * 0.84, ground - height * 0.24], [x + robe, ground], [seam, ground]]);
-  const bodyAll = poly([[x - shoulder, neck], [x + shoulder, neck], [x + robe * 0.84, ground - height * 0.24], [x + robe, ground], [x - robe, ground], [x - robe * 0.86, ground - height * 0.3]]);
-  const basketX = x + robe * 0.55;
-  const basketY = ground - height * 0.5;
-  const basket = poly([[basketX, basketY], [basketX + robe * 1.1, basketY], [basketX + robe * 0.95, basketY + robe * 0.75], [basketX + robe * 0.15, basketY + robe * 0.75]]);
-  const pole = x - robe - 1;
+  const bodyLit: Point[] = [[x - shoulder, neck], [seam - robe * 0.1, neck], [seam, ground], [x - robe, ground], [x - robe * 0.86, ground - height * 0.3]];
+  const bodyShade: Point[] = [[seam - robe * 0.1, neck], [x + shoulder, neck], [x + robe * 0.84, ground - height * 0.24], [x + robe, ground], [seam, ground]];
+  const pole = x - robe - 1.5;
+  const elbow: Point = [x + robe * 0.95, neck + height * 0.24];
+  const arm: Point[] = [
+    [x + shoulder * 0.7, neck + 1],
+    [x + shoulder + 1.5, neck + 1],
+    [elbow[0] + 1.5, elbow[1] + 1],
+    [elbow[0] - 0.5, elbow[1] + 2],
+  ];
+  const basketTop = elbow[1] + 1.5;
+  const basket: Point[] = [
+    [x + robe * 0.45, basketTop],
+    [x + robe * 1.75, basketTop],
+    [x + robe * 1.55, basketTop + robe * 0.85],
+    [x + robe * 0.65, basketTop + robe * 0.85],
+  ];
   return (
     <g>
-      <path className="hf-tone-shade" d={ellipse(x + 2, ground, robe + 3, 1.6)} />
+      <Shadow cx={x + 2.5} cy={ground + 0.5} rx={robe + 4} ry={2.4} />
       {holds === "rake" ? (
         <>
-          <Face d={poly([[pole, ground], [pole + 0.9, ground], [pole + 3.4, top - 4], [pole + 2.5, top - 4]])} tone="mid" />
-          <Face d={poly([[pole - 0.5, top - 4.6], [pole + 6.5, top - 3.6], [pole + 6.4, top - 2.8], [pole - 0.6, top - 3.8]])} tone="dark" />
+          <Face points={[[pole, ground], [pole + 1.2, ground], [pole + 4.6, top - 6], [pole + 3.4, top - 6]]} tone="plus" />
+          <Face points={[[pole - 1, top - 7], [pole + 9, top - 5.6], [pole + 8.8, top - 4.2], [pole - 1.2, top - 5.6]]} tone="checker" />
         </>
       ) : null}
-      <Face d={bodyLit} tone="mid" edge={false} />
-      <Face d={bodyShade} tone="dark" edge={false} />
-      <path className="hf-out" d={bodyAll} />
-      <Face d={hoodLit} tone="light" edge={false} />
-      <Face d={hoodShade} tone="mid" edge={false} />
-      <path className="hf-out" d={hoodAll} />
-      {holds === "basket" ? <Face d={basket} tone="mid" /> : null}
-      {holds === "basket" && lit ? <path className="hf-notice hf-tone-amber" d={basket} /> : null}
-      {holds !== "basket" && lit ? <path className="hf-notice hf-tone-amber" d={hoodAll} /> : null}
+      <Face points={bodyLit} tone="plus" />
+      <Face points={bodyShade} tone="checker" />
+      <Face points={hoodLit} tone="light" />
+      <Face points={hoodShade} tone="checker" />
+      {holds === "basket" ? (
+        <>
+          <Face points={arm} tone="checker" />
+          <Face points={basket} tone="plus" />
+          {lit ? (
+            <g className="hf-notice">
+              <path className="hf-tone-amber" d={toPath(basket)} />
+              <path className="hf-ink" d={edgeCells(basket)} />
+            </g>
+          ) : null}
+        </>
+      ) : null}
     </g>
   );
 }
@@ -609,88 +696,96 @@ function Scene({ layout }: { layout: Layout }) {
   const [brx, bry] = back([x + w, deckTop], depth);
   const screenTop = bly - screen;
   const face: Point[] = [[blx, bly], [brx, bry], [brx + lean, screenTop], [blx + lean, screenTop]];
-  const inset = layout.name === "wide" ? 3 : 2;
+  const inset = layout.name === "wide" ? 4 : 2;
   const display: Point[] = [
-    [blx + inset * 0.6, bly - inset * 0.6],
-    [brx - inset * 0.6, bry - inset * 0.6],
-    [brx + lean - inset * 0.6, screenTop + inset],
-    [blx + lean + inset * 0.6, screenTop + inset],
+    [blx + inset * 0.8, bly - inset * 0.7],
+    [brx - inset * 0.8, bry - inset * 0.7],
+    [brx + lean - inset * 0.8, screenTop + inset],
+    [blx + lean + inset * 0.8, screenTop + inset],
   ];
-  const edge = 1.5;
-  const [ex, ey] = back([0, 0], edge);
-  const plane = (from: number, to: number, front: number, deep: number) =>
-    poly([[from, front], [to, front], back([to, front], deep), back([from, front], deep)]);
-  const { ground } = layout;
+  const [ex, ey] = back([0, 0], layout.name === "wide" ? 2.5 : 1.5);
+  const keys: Point[] = [
+    back([x + w * 0.1, deckTop], depth * 0.18),
+    back([x + w * 0.9, deckTop], depth * 0.18),
+    back([x + w * 0.9, deckTop], depth * 0.72),
+    back([x + w * 0.1, deckTop], depth * 0.72),
+  ];
   return (
     <svg className={`hf-art ${sizeClass(layout)}`} viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true" focusable="false">
-      <path className="hf-tone-ground" d={rect(0, 0, layout.width, layout.height)} />
-      <path className="hf-tone-paper" d={plane(layout.width * 0.03, layout.width * 0.9, ground + 3, layout.name === "wide" ? 30 : 16)} />
-      <path className="hf-tone-shade" d={ellipse(x + w / 2 + 8, lg + 0.5, w / 2 + 8, 2.4)} />
-      <Face d={poly([[brx, bry], [brx + ex, bry + ey], [brx + lean + ex, screenTop + ey], [brx + lean, screenTop]])} tone="dark" />
-      <Face d={poly([[blx + lean, screenTop], [brx + lean, screenTop], [brx + lean + ex, screenTop + ey], [blx + lean + ex, screenTop + ey]])} tone="light" />
-      <Face d={poly(face)} tone="mid" />
-      <Face d={poly(display)} tone="paper" />
-      <Box x={x} y={deckTop} w={w} h={deck} depth={depth} front="dark" top="light" side="dark" />
-      <path className="hf-tone-mid" d={poly([back([x + w * 0.12, deckTop], depth * 0.2), back([x + w * 0.88, deckTop], depth * 0.2), back([x + w * 0.88, deckTop], depth * 0.75), back([x + w * 0.12, deckTop], depth * 0.75)])} />
-      {layout.people.map((person, index) => (
-        <Peasant key={person[0]} person={person} robe={layout.robe} ground={ground} lit={index === layout.noticer} />
-      ))}
+      <path className="hf-tone-ground" d={toPath(rectPoints(0, 0, layout.width, layout.height))} />
+      <Shadow cx={x + w / 2 + depth * 0.4} cy={lg + 0.5} rx={w / 2 + depth * 0.3} ry={layout.name === "wide" ? 4 : 2.4} />
+      <Face points={[[brx, bry], [brx + ex, bry + ey], [brx + lean + ex, screenTop + ey], [brx + lean, screenTop]]} tone="solid" />
+      <Face points={[[blx + lean, screenTop], [brx + lean, screenTop], [brx + lean + ex, screenTop + ey], [blx + lean + ex, screenTop + ey]]} tone="mid" />
+      <Face points={face} tone="checker" />
+      <Face points={display} tone="light" />
+      <Box x={x} y={deckTop} w={w} h={deck} depth={depth} front="solid" top="mid" side="solid" />
+      <Face points={keys} tone="plus" />
+      {layout.people
+        .map((person, index) => ({ person, index }))
+        .sort((a, b) => Number(a.index === layout.noticer) - Number(b.index === layout.noticer))
+        .map(({ person, index }) => (
+          <Peasant key={person[0]} person={person} robe={layout.robe} ground={layout.ground} lit={index === layout.noticer} />
+        ))}
     </svg>
   );
 }
 
 /** The base the stack stands on: a low box as wide as the cards, drawn over the cards that have sunk into it. */
 function Base({ layout }: { layout: Layout }) {
-  const w = CARD.w + 2;
+  const w = layout.card.w + 2;
   const h = layout.ground - layout.stack[1];
   const depth = layout.stack[3];
   return (
     <svg className={`hf-base hf-base-${layout.name} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
-      <path className="hf-tone-shade" d={ellipse(w / 2 + 4, h + 0.5, w / 2 + 6, 2)} />
-      <Box x={0} y={0} w={w} h={h} depth={depth} />
+      <Shadow cx={w / 2 + 4} cy={h + 0.5} rx={w / 2 + 6} ry={layout.name === "wide" ? 4 : 2.4} />
+      <Box x={0} y={0} w={w} h={h} depth={depth} front="checker" top="light" side="solid" />
     </svg>
   );
 }
 
-/** The sieve: a framed mesh with a little depth, drawn over the card passing through it. */
+/** The sieve: a framed mesh with a little depth on two posts down to the ground, drawn over the card passing through it. */
 function Mesh({ layout }: { layout: Layout }) {
-  const [, , w, h] = layout.sieve;
-  const step = 2;
+  const [, sy, w, h] = layout.sieve;
+  const tall = layout.sieveGround - sy;
+  const post = layout.name === "wide" ? 1.5 : 1;
+  const [dx, dy] = back([0, 0], layout.name === "wide" ? 3 : 2);
   const wires = [];
-  for (let at = step; at < h; at += step) wires.push(<line key={`r${at}`} className="hf-wire" x1={0} y1={at} x2={w} y2={at} />);
-  for (let at = step; at < w; at += step) wires.push(<line key={`c${at}`} className="hf-wire" x1={at} y1={0} x2={at} y2={h} />);
-  const [dx, dy] = back([0, 0], 2);
+  for (let at = 2; at < h; at += 2) wires.push(<rect key={`r${at}`} className="hf-ink" x={0} y={at} width={w} height={T} />);
+  for (let at = 2; at < w; at += 2) wires.push(<rect key={`c${at}`} className="hf-ink" x={at} y={0} width={T} height={h} />);
   return (
-    <svg className={`hf-mesh hf-mesh-${layout.name} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
-      <Face d={poly([[w, 0], [w + dx, dy], [w + dx, h + dy], [w, h]])} tone="dark" />
-      <Face d={poly([[0, 0], [w, 0], [w + dx, dy], [dx, dy]])} tone="light" />
+    <svg className={`hf-mesh hf-mesh-${layout.name} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${tall}`} aria-hidden="true" focusable="false">
+      <Shadow cx={w / 2 + 3} cy={tall + 0.5} rx={w + 3} ry={layout.name === "wide" ? 3 : 2} />
+      <Face points={rectPoints(0, h, post, tall - h)} tone="solid" />
+      <Face points={rectPoints(w - post, h, post, tall - h)} tone="solid" />
+      <Face points={[[w, 0], [w + dx, dy], [w + dx, h + dy], [w, h]]} tone="solid" />
+      <Face points={[[0, 0], [w, 0], [w + dx, dy], [dx, dy]]} tone="mid" />
       {wires}
-      <path className="hf-out" d={rect(0, 0, w, h)} />
+      <path className="hf-ink" d={edgeCells(rectPoints(0, 0, w, h))} />
     </svg>
   );
 }
 
-/** A card: a slab of paper with a lit top edge and a shaded side, its agent's mark, three lines, and the amber block and the stamp (a seal with its check pressed out) laid over it. */
-function Card({ mark, index }: { mark: string; index: number }) {
-  const [markX, markY, markSize] = ON_CARD.mark;
-  const [maskX, maskY, maskW, maskH] = ON_CARD.mask;
-  const [stampX, stampY, stampSize] = ON_CARD.stamp;
+/** A card: a slab of paper with a lit top edge and a shaded side, its agent's mark, three lines, and the amber block and the stamp laid over it. */
+function CardArt({ plan, mark, index, className }: { plan: CardPlan; mark: string; index: number; className: string }) {
+  const [markX, markY, markSize] = plan.mark;
+  const [maskX, maskY, maskW, maskH] = plan.mask;
+  const [stampX, stampY, stampSize] = plan.stamp;
   const box = (x: number, y: number, w: number, h: number) => ({
-    left: `${(x / CARD.w) * 100}%`,
-    top: `${(y / CARD.h) * 100}%`,
-    width: `${(w / CARD.w) * 100}%`,
-    height: `${(h / CARD.h) * 100}%`,
+    left: `${(x / plan.w) * 100}%`,
+    top: `${(y / plan.h) * 100}%`,
+    width: `${(w / plan.w) * 100}%`,
+    height: `${(h / plan.h) * 100}%`,
   });
   const r = stampSize / 2;
-  const [dx, dy] = back([0, 0], 2);
+  const [dx, dy] = back([0, 0], plan.w > 60 ? 3 : 2);
   return (
-    <div className={`hf-card hf-c${index}`}>
-      <svg className="hf-card-art" viewBox={`0 0 ${CARD.w} ${CARD.h}`} aria-hidden="true" focusable="false">
-        <Face d={poly([[0, 0], [CARD.w, 0], [CARD.w + dx, dy], [dx, dy]])} tone="light" />
-        <Face d={poly([[CARD.w, 0], [CARD.w + dx, dy], [CARD.w + dx, CARD.h + dy], [CARD.w, CARD.h]])} tone="dark" />
-        <Face d={rect(0, 0, CARD.w, CARD.h)} tone="paper" />
-        {ON_CARD.lines.map(([x, y, w]) => (
-          <path key={y} className="hf-line" d={rect(x, y, w, 1.5)} />
+    <div className={`hf-card-face ${className}`}>
+      <svg className="hf-card-art" viewBox={`0 0 ${plan.w} ${plan.h}`} aria-hidden="true" focusable="false">
+        <Face points={[[0, 0], [plan.w, 0], [plan.w + dx, dy], [dx, dy]]} tone="mid" />
+        <Face points={[[plan.w, 0], [plan.w + dx, dy], [plan.w + dx, plan.h + dy], [plan.w, plan.h]]} tone="checker" />
+        <Face points={rectPoints(0, 0, plan.w, plan.h)} tone="light" />
+        {plan.lines.map(([x, y, w]) => (
+          <path key={y} className="hf-ink" d={toPath(rectPoints(x, y, w, plan.line))} />
         ))}
       </svg>
       <span className="hf-card-mark" style={box(markX, markY, markSize, markSize)}>
@@ -698,12 +793,12 @@ function Card({ mark, index }: { mark: string; index: number }) {
       </span>
       <span className={`hf-mask hf-k${index}`} style={box(maskX, maskY, maskW, maskH)}>
         <svg viewBox={`0 0 ${maskW} ${maskH}`} aria-hidden="true" focusable="false">
-          <Face d={rect(0, 0, maskW, maskH)} tone="amber" />
+          <Face points={rectPoints(0, 0, maskW, maskH)} tone="amber" />
         </svg>
       </span>
       <span className={`hf-stamp hf-t${index}`} style={box(stampX, stampY, stampSize, stampSize)}>
         <svg viewBox={`0 0 ${stampSize} ${stampSize}`} aria-hidden="true" focusable="false">
-          <Face d={ellipse(r, r, r, r)} tone="dark" />
+          <Face points={ellipsePoints(r, r, r, r, 16)} tone="solid" />
           <path className="hf-knock" d={`M${r * 0.5} ${r}L${r * 0.85} ${r * 1.4}L${r * 1.5} ${r * 0.62}`} />
         </svg>
       </span>
@@ -744,8 +839,7 @@ export function HeroFlow() {
         </style>
         <svg className="hf-defs" aria-hidden="true" focusable="false">
           <defs>
-            <Patterns grid={3} />
-            <Patterns grid={4} />
+            <Glyphs />
           </defs>
         </svg>
         <div className="hf-stage" role="img" aria-label={FLOW.label}>
@@ -761,7 +855,10 @@ export function HeroFlow() {
           {AGENTS.map((agent, index) => (
             <div key={agent.mark} className={`hf-card-x hf-x${index}`}>
               <div className={`hf-card-y hf-y${index}`}>
-                <Card mark={agent.mark} index={index} />
+                <div className={`hf-card hf-c${index}`}>
+                  <CardArt plan={PHONE_CARD} mark={agent.mark} index={index} className="hf-phone" />
+                  <CardArt plan={WIDE_CARD} mark={agent.mark} index={index} className="hf-wide" />
+                </div>
               </div>
             </div>
           ))}

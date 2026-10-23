@@ -205,8 +205,8 @@
 /*
  * The hero's picture (components/landing/hero-flow.tsx). That file owns where
  * everything sits, how it is drawn and when it moves; this owns the inks, the
- * pictures' own: warm-grey dots and hairlines on the panel's surface, and
- * amber. Drawings use the cell as their unit; edges are one pixel at any size.
+ * pictures' own two: near-black, lightened on the dark page, and amber, over
+ * the panel's surface.
  */
 .lp-hero-flow {
   margin-block-start: clamp(2.5rem, 5vw, 4rem);
@@ -218,9 +218,7 @@
  * pause control in its lower corner.
  */
 .hf-panel {
-  --hf-dot: var(--ink-4);
-  --hf-edge: var(--rule-strong);
-  --hf-mark: var(--ink-3);
+  --hf-ink: var(--ink-strong);
   --hf-pad-block: clamp(3.25rem, 5vw, 3.5rem);
 
   position: relative;
@@ -233,9 +231,7 @@
 }
 
 :root:not([data-theme="light"]) .hf-panel {
-  --hf-dot: var(--ink-4);
-  --hf-edge: var(--rule-strong);
-  --hf-mark: var(--ink-2);
+  --hf-ink: var(--ink);
 }
 
 .hf {
@@ -247,13 +243,13 @@
 
 @media (min-width: 53rem) {
   .hf {
-    width: 750px;
+    width: 666px;
   }
 }
 
-@media (min-width: 75rem) {
+@media (min-width: 68.75rem) {
   .hf {
-    width: 1000px;
+    width: 999px;
   }
 }
 
@@ -294,98 +290,65 @@
   fill: var(--surface-2);
 }
 
-.hf-dot {
-  fill: var(--hf-dot);
+.hf-ink {
+  fill: var(--hf-ink);
 }
 
 .hf-amber {
   fill: var(--amber-fill);
 }
 
-.hf-line {
-  fill: var(--hf-edge);
-}
-
-.hf-out,
-.hf-wire {
-  fill: none;
-  stroke: var(--hf-edge);
-  stroke-width: 1px;
-  vector-effect: non-scaling-stroke;
-}
-
-.hf-wire {
-  stroke-opacity: 0.7;
+/* the ground's scatter sits back, lighter than anything standing on it */
+.hf-scatter {
+  opacity: 0.45;
 }
 
 /* the check pressed out of the stamp */
 .hf-knock {
   fill: none;
   stroke: var(--surface-2);
-  stroke-width: 1.6;
+  stroke-width: 1.4;
   stroke-linecap: square;
   shape-rendering: geometricPrecision;
 }
 
-.hf-tone-paper {
-  fill: url(#hf-paper-3);
-}
-
 .hf-tone-light {
-  fill: url(#hf-light-3);
+  fill: url(#hf-light);
 }
 
 .hf-tone-mid {
-  fill: url(#hf-mid-3);
+  fill: url(#hf-mid);
 }
 
-.hf-tone-dark {
-  fill: url(#hf-dark-3);
+.hf-tone-plus {
+  fill: url(#hf-plus);
 }
 
-.hf-tone-shade {
-  fill: url(#hf-shade-3);
+.hf-tone-checker {
+  fill: url(#hf-checker);
+}
+
+.hf-tone-solid {
+  fill: url(#hf-solid);
 }
 
 .hf-tone-amber {
-  fill: url(#hf-amber-3);
+  fill: url(#hf-amber);
+}
+
+.hf-tone-shade {
+  fill: url(#hf-shade);
+}
+
+.hf-tone-shade-core {
+  fill: url(#hf-shade-core);
 }
 
 .hf-tone-ground {
-  fill: url(#hf-ground-3);
+  fill: url(#hf-ground);
 }
 
-@media (min-width: 75rem) {
-  .hf-tone-paper {
-    fill: url(#hf-paper-4);
-  }
-
-  .hf-tone-light {
-    fill: url(#hf-light-4);
-  }
-
-  .hf-tone-mid {
-    fill: url(#hf-mid-4);
-  }
-
-  .hf-tone-dark {
-    fill: url(#hf-dark-4);
-  }
-
-  .hf-tone-shade {
-    fill: url(#hf-shade-4);
-  }
-
-  .hf-tone-amber {
-    fill: url(#hf-amber-4);
-  }
-
-  .hf-tone-ground {
-    fill: url(#hf-ground-4);
-  }
-}
-
-/* the person who lights up as a card lands */
+/* the basket that turns amber as a card lands */
 .hf-notice {
   opacity: 0;
 }
@@ -394,7 +357,7 @@
 .hf-card-mark {
   display: grid;
   place-items: center;
-  color: var(--hf-mark);
+  color: var(--hf-ink);
 }
 
 .hf-mark .brand,
@@ -411,6 +374,11 @@
 
 .hf-card {
   position: relative;
+}
+
+.hf-card-face {
+  position: absolute;
+  inset: 0;
 }
 
 .hf-card-art {
