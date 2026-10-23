@@ -2084,3 +2084,21 @@
     min-width: 0;
   }
 }
+
+/*
+ * On a phone every control on the project, about and contact pages is a full
+ * 44px tap target: buttons, copy, the wizard's step markers (their square
+ * mark keeps its size and place on the rail, the target reaching past it) and the redaction
+ * demo's controls. A term with a definition stays inline with its sentence.
+ * Unlayered, to win over fairtrade's unlayered control sizes.
+ */
+@media (max-width: 47.99rem) {
+  .pj-main :is(.btn, .cli-copy, .rdx-seg-opt, .rdx-toggle) {
+    min-height: var(--target-comfortable);
+  }
+
+  .pj-main .swz-step {
+    min-width: var(--target-comfortable);
+    min-height: var(--target-comfortable);
+  }
+}

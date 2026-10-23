@@ -84,3 +84,20 @@ test("/about says who we are, not that it will later, in sentence-case prose", a
     "/blog/reclaiming-data-autonomy-as-a-peasant",
   );
 });
+
+test("on a phone every control on the project pages is a full tap target", async ({ browser }) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
+  for (const path of ["/projects", "/projects/peasant", "/projects/village"]) {
+    await page.goto(path);
+    const small = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>("main a.btn, main button")]
+        // a term with a definition reads inline with its sentence; quoted transcripts are the viewer's own
+        .filter((control) => control.getClientRects().length && !control.matches(".term") && !control.closest("[data-transcript-demo], [inert]"))
+        .filter((control) => control.getBoundingClientRect().height < 44)
+        .map((control) => control.textContent?.trim() || control.getAttribute("aria-label")),
+    );
+    expect(small, `${path} has controls under 44px`).toEqual([]);
+  }
+  await context.close();
+});
