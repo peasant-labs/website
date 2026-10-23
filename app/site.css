@@ -185,17 +185,16 @@ html {
   transform: translateY(-4px) rotate(-45deg);
 }
 
-/* the phone menu: an opaque sheet under the bar */
+/* the phone menu: an opaque sheet that fills the screen under the bar, so no page shows below it */
 .site-sheet {
   position: absolute;
   inset-inline: 0;
   inset-block-start: 100%;
   display: none;
-  max-height: calc(100dvh - var(--site-bar-h));
+  height: calc(100dvh - var(--site-bar-h));
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-block: var(--sp-3) var(--sp-6);
-  border-bottom: var(--bd-strong);
   background: var(--canvas);
   opacity: 0;
   transform: translateY(-8px);

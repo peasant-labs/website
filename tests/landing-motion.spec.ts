@@ -34,6 +34,13 @@ test("on a phone the header is the mark and one menu button, and the menu behave
   // install lives on the page and in the footer, never in the header
   await expect(sheet.getByText(fixture.footer.cta.primary.label)).toHaveCount(0);
   await expect(sheet.locator("[data-theme-toggle]")).toBeVisible();
+  // the sheet fills the screen under the bar, so none of the page shows below it
+  await expect
+    .poll(async () => {
+      const bottom = await sheet.evaluate((element) => element.getBoundingClientRect().bottom);
+      return Math.abs(bottom - PHONE.viewport.height);
+    })
+    .toBeLessThanOrEqual(1);
   // the page behind does not scroll while the menu is open
   expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe("hidden");
 
@@ -47,10 +54,10 @@ test("on a phone the header is the mark and one menu button, and the menu behave
   await expect(button).toBeFocused();
   expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe("");
 
-  // a tap outside closes it, and so does following a link
+  // its button closes it, and so does following a link
   await button.tap();
   await expect(close).toHaveAttribute("aria-expanded", "true");
-  await page.touchscreen.tap(195, 820);
+  await close.tap();
   await expect(button).toHaveAttribute("aria-expanded", "false");
   await button.tap();
   await menu.getByRole("link", { name: "blog" }).tap();

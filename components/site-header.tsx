@@ -41,9 +41,9 @@ function lockScroll(locked: boolean) {
  * footer do.
  *
  * On a phone it is a compact bar with one menu button. The menu is an opaque
- * sheet under the bar with every destination, the theme and sign-in;
- * it traps focus while open and closes on Escape, an outside tap, a link, or a
- * route change, handing focus back to the button.
+ * sheet that fills the screen under the bar, with every destination, the theme
+ * and sign-in; it traps focus while open and closes on its button, Escape, a
+ * link, or a route change, handing focus back to the button.
  */
 export function SiteHeader() {
   const pathname = usePathname();
