@@ -40,7 +40,7 @@ function damp(dx: number, width: number) {
 /**
  * The use-case carousel: one slide per audience, its picture on its own panel
  * beside a heading, a sentence and one action, and its three capabilities
- * cycling as a caption bar along the panel's foot.
+ * cycling as a caption bar along the panel's foot, each with its own picture.
  *
  * All four audiences stand side by side as labelled tabs, each with its icon
  * and its own track, so the whole set reads at a glance. It plays on its own:
@@ -304,7 +304,18 @@ export function UseCases() {
                 data-active={shown ? "true" : "false"}
               >
                 <figure className="uc-figure">
-                  <Art art={slide.art} className="uc-art" />
+                  {/* each capability's picture, stacked in one place; the caption's own shows */}
+                  <div className="uc-arts">
+                    {slide.capabilities.map((capability, capIndex) => (
+                      <div
+                        key={capability.text}
+                        className="uc-shot"
+                        data-on={capIndex === current ? "true" : "false"}
+                      >
+                        <Art art={capability.art} className="uc-art" />
+                      </div>
+                    ))}
+                  </div>
                   <figcaption className="uc-caption" data-static={reduced ? "true" : "false"}>
                     <ul className="uc-caps">
                       {slide.capabilities.map((capability, capIndex) => {

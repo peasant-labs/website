@@ -25,7 +25,14 @@ export type LandingFixture = {
   useCases: {
     slideMs: number;
     captionMs: number;
-    slides: Array<{ id: string; label: string; sentence: string; capabilities: string[]; cta: Link }>;
+    slides: Array<{
+      id: string;
+      label: string;
+      sentence: string;
+      capabilities: string[];
+      pictures: string[];
+      cta: Link;
+    }>;
   };
   how: {
     steps: Array<{ title: string; body: string }>;
@@ -45,9 +52,17 @@ export function loadLandingFixture(): LandingFixture {
   if (root?.version !== 1) {
     throw new Error("testdata/landing/landing.yaml: expected version 1; update the loader with the fixture.");
   }
+  const pictures = new Set<string>();
   for (const slide of root.useCases.slides) {
     if (slide.capabilities.length !== 3) {
       throw new Error(`useCases.slides.${slide.id}: a slide carries exactly three capabilities.`);
+    }
+    if (slide.pictures?.length !== slide.capabilities.length) {
+      throw new Error(`useCases.slides.${slide.id}: each capability names its own picture.`);
+    }
+    for (const picture of slide.pictures) {
+      if (pictures.has(picture)) throw new Error(`useCases.slides.${slide.id}: ${picture} is used twice.`);
+      pictures.add(picture);
     }
   }
   return root;

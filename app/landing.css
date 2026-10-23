@@ -490,6 +490,36 @@
   background: var(--surface-2);
 }
 
+/*
+ * One picture per capability, stacked in one place. The caption's own fades in
+ * as the caption moves on, and the one it replaces fades out and then leaves
+ * the accessibility tree. Under reduced motion the swap is instant.
+ */
+.uc-arts {
+  display: grid;
+}
+
+.uc-shot {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 400ms var(--ease-out),
+    visibility 0s linear 400ms;
+}
+
+.uc-shot[data-on="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uc-shot {
+    transition: none;
+  }
+}
+
 .uc-art {
   padding: clamp(var(--sp-4), 3vw, var(--sp-7));
 }

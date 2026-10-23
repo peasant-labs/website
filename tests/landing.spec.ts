@@ -154,11 +154,19 @@ test("the use-case carousel: one slide per audience, labelled tabs, captions you
     await expect(panel.locator(".uc-caption a")).toHaveCount(0);
     const segments = panel.locator(".uc-caption").getByRole("button");
     await expect(segments).toHaveCount(slide.capabilities.length);
+    // each capability has its own picture, and the one shown follows the caption
+    const picture = panel.locator("img:visible");
+    const shows = (capIndex: number) => new RegExp(`^/art/${slide.pictures[capIndex]}-(light|dark)\\.png$`);
     await segments.nth(2).click();
     await expect(panel.locator('.uc-cap[data-on="true"] .uc-cap-text')).toHaveText([slide.capabilities[2]!]);
     await expect(segments.nth(2)).toHaveAttribute("aria-current", "true");
+    await expect(picture).toHaveCount(1);
+    await expect(picture).toHaveAttribute("src", shows(2));
     await segments.nth(0).click();
     await expect(panel.locator('.uc-cap[data-on="true"] .uc-cap-text')).toHaveText([slide.capabilities[0]!]);
+    // the two cross-fade, then only the caption's own is left
+    await expect(picture).toHaveCount(1);
+    await expect(picture).toHaveAttribute("src", shows(0));
     // beside the picture: the audience, its sentence, and one action
     await expect(panel.locator(".uc-copy h3")).toHaveText(slide.label);
     await expect(panel.locator(".uc-copy p")).toHaveText(slide.sentence);

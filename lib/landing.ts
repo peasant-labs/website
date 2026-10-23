@@ -85,19 +85,24 @@ export type LandingIconName =
   | "record"
   | "review";
 
-export type Capability = Readonly<{ text: string; icon: LandingIconName }>;
+/** a capability carries its own picture, which shows while its caption does */
+export type Capability = Readonly<{ text: string; icon: LandingIconName; art: Art }>;
 
 export type UseCase = Readonly<{
   id: string;
   label: string;
   icon: LandingIconName;
   sentence: string;
-  art: Art;
   capabilities: readonly [Capability, Capability, Capability];
   cta: UseCaseCta;
 }>;
 
 const SIGN_UP: UseCaseCta = { label: "sign up free", href: LOGIN_URL };
+
+/* every use-case picture is drawn on the same 704 by 528 grid */
+function capabilityArt(name: string, alt: string): Art {
+  return art(name, alt, 704, 528);
+}
 
 /*
  * The sentences only claim what the product does today: collectives can be
@@ -118,11 +123,22 @@ export const USE_CASES = {
       icon: "research",
       sentence:
         "Build evals and studies from real agent work, shared with consent. Start a private collective for your lab or class.",
-      art: art("uc-researchers", "an open book with a quill in an inkwell", 704, 528),
       capabilities: [
-        { text: "build evals from real work", icon: "check" },
-        { text: "study how agents are used", icon: "chart" },
-        { text: "run a class on agents", icon: "class" },
+        {
+          text: "build evals from real work",
+          icon: "check",
+          art: capabilityArt("uc-balance", "a balance scale with an amber weight in its right pan"),
+        },
+        {
+          text: "study how agents are used",
+          icon: "chart",
+          art: capabilityArt("uc-book", "an open book on a stand with an amber ribbon bookmark"),
+        },
+        {
+          text: "run a class on agents",
+          icon: "class",
+          art: capabilityArt("uc-slate", "a slate on an easel with an amber apple on its ledge"),
+        },
       ],
       cta: SIGN_UP,
     },
@@ -131,11 +147,22 @@ export const USE_CASES = {
       label: "teams",
       icon: "team",
       sentence: "Read the sessions behind a pull request, redacted, one click from the diff.",
-      art: art("uc-teams", "a wooden table with three mugs", 704, 528),
       capabilities: [
-        { text: "review the work behind a diff", icon: "pull-request" },
-        { text: "onboard from real history", icon: "history" },
-        { text: "learn from each other's prompts", icon: "conversation" },
+        {
+          text: "review the work behind a diff",
+          icon: "pull-request",
+          art: capabilityArt("uc-lens", "an amber magnifying glass held up to a page"),
+        },
+        {
+          text: "onboard from real history",
+          icon: "history",
+          art: capabilityArt("uc-signpost", "a signpost with three arrows, the top one amber"),
+        },
+        {
+          text: "learn from each other's prompts",
+          icon: "conversation",
+          art: capabilityArt("uc-candles", "one candle leaning over to light another, both flames amber"),
+        },
       ],
       cta: SIGN_UP,
     },
@@ -145,11 +172,22 @@ export const USE_CASES = {
       icon: "terminal",
       sentence:
         "Every session with your coding agent, searchable on your computer. Works with Claude Code, Codex, Cursor, OpenCode, Pi and Strike.",
-      art: art("uc-developers", "an enchanted quill writing on a floating scroll", 704, 528),
       capabilities: [
-        { text: "find any past session", icon: "search" },
-        { text: "explain a change in one comment", icon: "link" },
-        { text: "publish on every push", icon: "send" },
+        {
+          text: "find any past session",
+          icon: "search",
+          art: capabilityArt("uc-lantern", "a lantern with amber glass"),
+        },
+        {
+          text: "explain a change in one comment",
+          icon: "link",
+          art: capabilityArt("uc-door", "an arched door with an amber note pinned to it"),
+        },
+        {
+          text: "publish on every push",
+          icon: "send",
+          art: capabilityArt("uc-bell", "an amber town crier's handbell"),
+        },
       ],
       cta: { label: "install now", href: "#install" },
     },
@@ -159,11 +197,22 @@ export const USE_CASES = {
       icon: "company",
       sentence:
         "Access can follow your GitHub organization, with redaction rules for your own names. Village is open source, and we host it for you.",
-      art: art("uc-companies", "a small two-tower castle with a padlocked gate", 704, 528),
       capabilities: [
-        { text: "keep agent data in-house", icon: "lock" },
-        { text: "see which commits agents wrote", icon: "code" },
-        { text: "usage across teams", icon: "chart" },
+        {
+          text: "keep agent data in-house",
+          icon: "lock",
+          art: capabilityArt("uc-chest", "a closed chest with an amber padlock"),
+        },
+        {
+          text: "see which commits agents wrote",
+          icon: "code",
+          art: capabilityArt("uc-scroll", "a written scroll with an amber wax seal"),
+        },
+        {
+          text: "usage across teams",
+          icon: "chart",
+          art: capabilityArt("uc-sacks", "three tied sacks rising in height like a bar chart, the tallest amber"),
+        },
       ],
       cta: { label: "talk to us", href: "mailto:hello@peasantlabs.org" },
     },
