@@ -416,11 +416,12 @@
 /*
  * A command that does not fit wraps inside its block rather than scrolling: a
  * scrolled line would hide part of the command and need its own tab stop.
- * It breaks at spaces first, and inside a word only when nothing else fits.
+ * It breaks at spaces first, and inside a word only when one word is wider
+ * than the whole line.
  */
 .dx-cmd .cli-cmd-line code {
   white-space: pre-wrap;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 /* on a phone the copy button keeps its icon and name but drops the word, so a command keeps its flags whole */
@@ -437,6 +438,7 @@
 
 .dx-cmd-group {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--sp-2);
 }
 
