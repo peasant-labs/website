@@ -473,10 +473,11 @@
 
 /* blog */
 
+/* auto-fill, so a lone post keeps a column's width instead of stretching across the page */
 .bx-posts {
   display: grid;
   gap: var(--sp-8) var(--sp-6);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 25rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 25rem), 1fr));
 }
 
 .bx-post {
