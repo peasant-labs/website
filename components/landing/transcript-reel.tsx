@@ -127,20 +127,21 @@ export function TranscriptReel({
   if (playing && !started) setStarted(true);
   const commit = viewModel.session.git?.commits?.[0];
 
-  // The camera's resting place for a beat: the track's offset that sets it in the middle of the stage, never past either end.
+  // The camera's resting place for a beat: the track's offset that sets it in the middle of the stage, never above
+  // the first beat. The last one is set in the middle too, with the stage's floor clear, so nothing laid over the
+  // window's lower edge can cover what it is about.
   const aimFor = useCallback((index: number) => {
     const stage = stageRef.current;
     const track = trackRef.current;
     const target = beatRefs.current[index];
     if (!stage || !track || !target) return 0;
-    const room = Math.max(0, track.scrollHeight - stage.clientHeight);
     // a beat taller than the stage is read from its top; any other sits in the middle
     const inset = parseFloat(getComputedStyle(track).paddingTop) || 0;
     const aim =
       target.offsetHeight + 2 * inset > stage.clientHeight
         ? target.offsetTop - inset
         : target.offsetTop + target.offsetHeight / 2 - stage.clientHeight / 2;
-    return Math.min(room, Math.max(0, aim));
+    return Math.max(0, aim);
   }, []);
 
   // The camera: the track slides so the beat at hand sits where aimFor puts it, and again whenever the stage or track resizes.
