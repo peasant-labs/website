@@ -274,6 +274,36 @@ test("the row's cards are one size, about three and a half across a wide screen 
   }
 });
 
+test("on a phone the row steps one card at a time and rests with a whole card at the gutter", async ({ browser }) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  await row.scrollIntoViewIfNeeded();
+  expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("x mandatory");
+  const resting = () =>
+    row.evaluate((element) => {
+      const gutter = element.getBoundingClientRect().left + parseFloat(getComputedStyle(element).paddingLeft);
+      const cards = [...element.querySelectorAll(".uc-card")].map((card) => card.getBoundingClientRect().left);
+      return cards.some((left) => Math.abs(left - gutter) < 2);
+    });
+  await expect.poll(resting).toBe(true);
+  const start = await row.evaluate((element) => element.scrollLeft);
+  // it moves on by itself, then rests again on a whole card
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 8000 }).toBeGreaterThan(start + 10);
+  await expect.poll(resting).toBe(true);
+  await context.close();
+});
+
+test("every use-case headline keeps room for two lines, so the words under it line up across the row", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const tops = await page
+    .locator("[data-use-cases] .uc-card:not([aria-hidden]) .uc-cap-detail")
+    .evaluateAll((items) => new Set(items.map((item) => (item as HTMLElement).offsetTop)).size);
+  expect(tops).toBe(1);
+});
+
 test("the row drifts on its own and loops, holds when hovered, and stands still and snaps under reduced motion", async ({
   page,
 }) => {

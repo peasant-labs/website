@@ -490,13 +490,29 @@
   }
 }
 
-/* under reduced motion nothing drifts: the row scrolls and settles on a card */
+/*
+ * Under reduced motion nothing moves on its own, and on a phone the row steps
+ * card by card: either way it settles on a whole card. On a phone the fade is
+ * only as wide as the gutter, so no words sit under it.
+ */
 .uc[data-static="true"] {
   scroll-snap-type: x mandatory;
 }
 
 .uc[data-static="true"] .uc-card {
   scroll-snap-align: start;
+}
+
+@media (max-width: 47.99rem) {
+  .uc {
+    --uc-fade: var(--uc-pad);
+
+    scroll-snap-type: x mandatory;
+  }
+
+  .uc-card {
+    scroll-snap-align: start;
+  }
 }
 
 /* a card: picture, audience tag, headline, words, and the action at its foot, in every card alike */
@@ -550,7 +566,9 @@
   color: var(--amber);
 }
 
+/* room for two lines in every card, so the words under it start on one line across the row */
 .uc-cap-text {
+  min-block-size: calc(2lh);
   margin-block-start: var(--sp-2);
   color: var(--ink-strong);
   font-family: var(--font-display);
@@ -2036,7 +2054,7 @@
   box-shadow: var(--overlay-shadow);
 }
 
-/* on a phone the check hangs just under the window, starting left of it, clear of the viewer's controls */
+/* on a phone the check hangs just under the window, across the column, clear of the viewer's controls */
 @media (max-width: 47.99rem) {
   .lp-windows {
     --lp-check-room: 0px;
@@ -2045,7 +2063,9 @@
   .lp-check {
     position: relative;
     inset: auto;
-    width: fit-content;
+    width: calc(100% + var(--lp-windows-x));
+    max-width: none;
+    padding-inline: var(--sp-4);
     margin-block-start: var(--sp-3);
     margin-inline-start: calc(-1 * var(--lp-windows-x));
   }
@@ -2072,9 +2092,11 @@
   font-weight: 700;
 }
 
+/* on a narrow card the summary splits in two even lines rather than leaving one word alone */
 .lp-check-summary {
   color: var(--ink-3);
   font-size: var(--fs-sm);
+  text-wrap: balance;
 }
 
 /*

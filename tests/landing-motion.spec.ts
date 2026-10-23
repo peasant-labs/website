@@ -157,6 +157,23 @@ test("the session's windows fan out from one stack once, the transcript wide in 
       expect(layout.check.top).toBeGreaterThanOrEqual(layout.front.bottom - 16);
     } else expect(layout.check.top).toBeGreaterThanOrEqual(layout.front.bottom);
     if (width === 1440) expect(layout.front.width / layout.inner).toBeGreaterThan(0.85);
+    // on a phone the check spans the column, so its summary keeps its last word on its line
+    else {
+      expect(layout.check.width).toBeGreaterThanOrEqual(layout.inner - 1);
+      // its summary never leaves one word alone on a line: the last line is at least a third of the first
+      const widths = await windows.locator(".lp-check-summary").evaluate((summary) => {
+        const range = document.createRange();
+        range.selectNodeContents(summary);
+        const lines = new Map<number, number>();
+        for (const rect of range.getClientRects()) {
+          const top = Math.round(rect.top);
+          lines.set(top, Math.max(lines.get(top) ?? 0, rect.right));
+        }
+        const left = summary.getBoundingClientRect().left;
+        return [...lines.values()].map((right) => right - left);
+      });
+      expect(widths.at(-1)! / widths[0]!, "the check's summary leaves a word alone").toBeGreaterThan(0.33);
+    }
     expect(layout.front.right, `the transcript runs past the content at ${width}`).toBeLessThanOrEqual(layout.right + 1);
     expect(layout.back.left, `the Terminal runs past the content at ${width}`).toBeGreaterThanOrEqual(layout.left - 1);
     expect(layout.overflow, `the page overflows at ${width}`).toBe(false);

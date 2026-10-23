@@ -17,6 +17,9 @@ const CARDS: readonly { capability: Capability; useCase: UseCase }[] = USE_CASES
 const DRAG_PX = 6;
 /* after a touch lets go, the row waits this long before it moves on its own again */
 const TOUCH_REST_MS = 2400;
+/* on a phone the row steps a card at a time instead of drifting, so a card never rests cut by the screen's edge */
+const NARROW = "(max-width: 47.99rem)";
+const STEP_MS = 4200;
 
 /**
  * The use cases: the section's heading on its own row, then one row of all
@@ -24,9 +27,10 @@ const TOUCH_REST_MS = 2400;
  * audience, its headline, a sentence or two on what it is, and its audience's
  * one action. Every card's words are in the page as served.
  *
- * The row drifts on its own, slowly, and loops: a second set of the cards
- * follows the first, hidden from assistive technology and out of the tab
- * order, and the row steps back by one set when it reaches it. It holds while
+ * The row moves on its own and loops: on a wide screen it drifts slowly; on a
+ * phone it steps one card at a time and rests with a whole card in view. A
+ * second set of the cards follows the first, hidden from assistive technology
+ * and out of the tab order, and the row steps back by one set when it reaches it. It holds while
  * hovered, keyboard-focused, touched, off screen or in a background tab. It is
  * a real scroll area, so a finger swipes it, the arrow keys move it once it
  * has focus, and a mouse can drag it. Under reduced motion it never moves on
@@ -41,10 +45,35 @@ export function UseCases() {
   const restTimer = useRef(0);
   const playing = onScreen && !reduced && !held.hover && !held.focus && !held.touch && !held.drag;
 
-  // The drift: a few pixels a second, read and written once per frame, stepping back a set at the seam.
+  // On a phone: one card at a time, a smooth step to the next snap point, and back a set at the seam.
   useEffect(() => {
     const row = rowRef.current;
-    if (!row || !playing) return;
+    if (!row || !playing || !window.matchMedia(NARROW).matches) return;
+    const timer = window.setInterval(() => {
+      const cards = [...row.querySelectorAll<HTMLElement>(".uc-card")];
+      const first = cards[0]!.offsetLeft;
+      const clone = row.querySelector<HTMLElement>("[data-clone]");
+      const set = clone ? clone.offsetLeft - first : 0;
+      // the card now resting at the start, then the next one
+      const here = cards.findIndex((card) => card.offsetLeft - first >= row.scrollLeft - 2);
+      const next = cards[here + 1];
+      if (!next) return;
+      const target = next.offsetLeft - first;
+      row.scrollTo({ left: target, behavior: "smooth" });
+      if (set && target >= set) {
+        // the copy of the first card has arrived; once it settles, stand on the real one without motion
+        window.setTimeout(() => {
+          row.scrollTo({ left: target - set, behavior: "instant" });
+        }, 700);
+      }
+    }, STEP_MS);
+    return () => window.clearInterval(timer);
+  }, [playing]);
+
+  // On a wider screen: the drift, a few pixels a second, read and written once per frame, back a set at the seam.
+  useEffect(() => {
+    const row = rowRef.current;
+    if (!row || !playing || window.matchMedia(NARROW).matches) return;
     let frame = 0;
     let last = 0;
     let carry = 0;
