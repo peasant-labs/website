@@ -230,12 +230,12 @@
    * told to fill it, put the wrapping back under the card's control — `max-width: 100%`
    * alone could not, because the parent it measured against had already grown.
    */
+  /* the axes list is the one frame: the column around it draws none of its own */
   .pj-village-governance-card {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--sp-4);
     min-width: 0;
-    padding: var(--sp-5);
   }
 
   .pj-village-governance-card .cns-summary {
@@ -325,18 +325,25 @@
   .pj-vision {
     display: grid;
     gap: var(--sp-4);
-    max-width: var(--measure-prose);
     margin-block-start: var(--sp-6);
     color: var(--ink-2);
     font-size: var(--fs-md);
     line-height: 1.65;
   }
 
-  .pj-vision-line {
+  .pj-vision > p {
+    max-inline-size: var(--measure-prose);
+  }
+
+  /* the statement shares the titles' face, one step under the page title, in two or three balanced lines */
+  .pj-vision > .pj-vision-line {
+    max-inline-size: 40ch;
     color: var(--ink-strong);
-    font-size: var(--fs-lg);
+    font-family: var(--font-display);
+    font-size: var(--fs-section);
     font-weight: 700;
-    line-height: 1.35;
+    line-height: 1.25;
+    text-wrap: balance;
   }
 
   .pj-product-name,
@@ -522,9 +529,8 @@
    * footer controls. The page only decides how wide it runs and where the
    * copy-all control sits above it.
    */
+  /* the wizard spans the column, so its "copy all" sits on the column's edge, not over an empty band */
   .pj-start-body {
-    max-width: var(--measure-code);
-    /* the measure is in ch, so it has to be read in the face the commands are set in. */
     font-family: var(--font-mono);
   }
 
@@ -1212,9 +1218,10 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
+    /* the same columns and gap as every section heading, so the prose shares one second edge */
     .pj-community {
       grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-      column-gap: var(--sp-6);
+      column-gap: var(--sp-4);
     }
 
     .pj-community > h2 {

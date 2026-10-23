@@ -19,7 +19,7 @@ export function VillageGovernance({ title, body }: VillageGovernanceProps) {
       data-village-governance
       aria-labelledby="village-governance-heading"
     >
-      <div className="pj-village-governance-card card" data-village-governance-card>
+      <div className="pj-village-governance-card" data-village-governance-card>
         <ConsentSummary caption={GOVERNANCE_CAPTION} axes={[...GOVERNANCE_AXES]} />
       </div>
 
