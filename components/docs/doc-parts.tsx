@@ -154,23 +154,29 @@ export function DocNote({ children }: { children: ReactNode }) {
 }
 
 /**
- * A page header: where it sits, its title, and one line saying what it is for.
- * A guide's picture sits beside the title on a wide screen, so the first step
- * starts in the first view.
+ * A page header: where it sits, its title, and one line saying what it is for,
+ * or a post's byline. A guide's picture sits beside the title on a wide
+ * screen, so the first step starts in the first view. An authored title (a
+ * blog post's) keeps its own capitals.
  */
 export function DocHead({
   crumb,
   title,
   lede,
+  meta,
   art,
   columns = false,
+  authored = false,
 }: {
   crumb?: { label: string; href: string; here: string };
   title: string;
-  lede: string;
+  lede?: string;
+  /** a post's byline, in the label style */
+  meta?: ReactNode;
   art?: ArtSource;
   /** the page has "on this page" beside its content: the header keeps the same two columns */
   columns?: boolean;
+  authored?: boolean;
 }) {
   return (
     <header className={columns ? "dx-head dx-head-cols" : "dx-head"}>
@@ -182,10 +188,11 @@ export function DocHead({
             <span>{crumb.here}</span>
           </nav>
         ) : null}
-        <h1 id="page-heading" tabIndex={-1}>
+        <h1 id="page-heading" tabIndex={-1} className={authored ? "dx-authored" : undefined}>
           {title}
         </h1>
-        <p className="dx-lede">{lede}</p>
+        {lede ? <p className="dx-lede">{lede}</p> : null}
+        {meta ? <p className="dx-meta">{meta}</p> : null}
       </div>
       {art ? <Art art={art} className="dx-pic dx-head-art" important /> : null}
     </header>
@@ -206,7 +213,7 @@ export function DocSteps({ steps }: { steps: readonly GuideStep[] }) {
             </span>
             <h2>{step.title}</h2>
           </div>
-          <div className="dx-step-body">{step.body}</div>
+          <div className="dx-step-body dx-prose">{step.body}</div>
         </li>
       ))}
     </ol>

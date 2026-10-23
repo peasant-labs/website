@@ -1,8 +1,9 @@
 import { Art } from "@/components/art";
+import { DocHead } from "@/components/docs/doc-parts";
+import { POST_BODIES, readingMinutes } from "@/content/blog";
 import { formatPostDate, postBySlug, POSTS } from "@/lib/blog";
 import { metadataForRoute } from "@/lib/projects";
 import { LOGIN_URL } from "@/lib/site";
-import { POST_BODIES } from "@/content/blog";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -37,27 +38,27 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
   return (
     <main id="content" className="dx-page" tabIndex={-1}>
-      <article className="bx-essay">
-        <nav className="dx-crumb" aria-label="breadcrumb">
-          <Link href="/blog">blog</Link>
-          <span aria-hidden="true"> / </span>
-          <span>{post.kind}</span>
-        </nav>
-        <h1 className="bx-title">{post.title}</h1>
-        <p className="bx-meta">
-          peasant · <time dateTime={post.published}>{formatPostDate(post.published)}</time>
-        </p>
+      <DocHead
+        crumb={{ label: "blog", href: "/blog", here: post.kind }}
+        title={post.title}
+        authored
+        meta={
+          <>
+            peasant · <time dateTime={post.published}>{formatPostDate(post.published)}</time> ·{" "}
+            {readingMinutes(post.slug)} min read
+          </>
+        }
+      />
+      <article className="dx-prose" aria-labelledby="page-heading">
         <Art art={post.art} className="dx-pic bx-figure" />
-        <div className="bx-body prose">
-          <Body />
-        </div>
-        <nav className="dx-pager" aria-label="after this post">
-          <Link href="/blog">all posts</Link>
-          <a className="btn btn-primary site-btn" href={LOGIN_URL}>
-            sign up free
-          </a>
-        </nav>
+        <Body />
       </article>
+      <nav className="dx-pager" aria-label="after this post">
+        <Link href="/blog">all posts</Link>
+        <a className="btn btn-primary site-btn" href={LOGIN_URL}>
+          sign up free
+        </a>
+      </nav>
     </main>
   );
 }

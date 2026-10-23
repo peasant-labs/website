@@ -51,7 +51,7 @@ export default function DocsHome() {
 
       <div className="dx-columns">
         <div className="dx-article">
-          <section className="dx-sec" id={install.id} aria-labelledby={`${install.id}-title`}>
+          <section className="dx-sec dx-prose" id={install.id} aria-labelledby={`${install.id}-title`}>
             <h2 id={`${install.id}-title`}>{install.title}</h2>
             <p>
               <Rich text={install.intro} />
@@ -68,7 +68,7 @@ export default function DocsHome() {
             ))}
           </section>
 
-          <section className="dx-sec" id={kickstart.id} aria-labelledby={`${kickstart.id}-title`}>
+          <section className="dx-sec dx-prose" id={kickstart.id} aria-labelledby={`${kickstart.id}-title`}>
             <h2 id={`${kickstart.id}-title`}>{kickstart.title}</h2>
             <DocCommand command={kickstart.command} />
             <p>{kickstart.intro}</p>
@@ -78,7 +78,7 @@ export default function DocsHome() {
             </DocNote>
           </section>
 
-          <section className="dx-sec" id={DOCS_NEXT.id} aria-labelledby={`${DOCS_NEXT.id}-title`}>
+          <section className="dx-sec dx-prose" id={DOCS_NEXT.id} aria-labelledby={`${DOCS_NEXT.id}-title`}>
             <h2 id={`${DOCS_NEXT.id}-title`}>{DOCS_NEXT.title}</h2>
             <div className="dx-guides">
               {DOCS_START.map((guide) => (
@@ -95,7 +95,7 @@ export default function DocsHome() {
             </div>
           </section>
 
-          <section className="dx-sec" id={record.id} aria-labelledby={`${record.id}-title`}>
+          <section className="dx-sec dx-prose" id={record.id} aria-labelledby={`${record.id}-title`}>
             <h2 id={`${record.id}-title`}>{record.title}</h2>
             <Paragraphs items={record.intro} />
             <DocCommand command={record.command} />
@@ -107,7 +107,7 @@ export default function DocsHome() {
             <DocList items={record.empty} />
           </section>
 
-          <section className="dx-sec" id={signIn.id} aria-labelledby={`${signIn.id}-title`}>
+          <section className="dx-sec dx-prose" id={signIn.id} aria-labelledby={`${signIn.id}-title`}>
             <h2 id={`${signIn.id}-title`}>{signIn.title}</h2>
             <p>{signIn.intro}</p>
             <DocCommand command={signIn.command} />
@@ -119,7 +119,7 @@ export default function DocsHome() {
             </DocNote>
           </section>
 
-          <section className="dx-sec" id={publish.id} aria-labelledby={`${publish.id}-title`}>
+          <section className="dx-sec dx-prose" id={publish.id} aria-labelledby={`${publish.id}-title`}>
             <h2 id={`${publish.id}-title`}>{publish.title}</h2>
             <Paragraphs items={publish.before} />
             <h3>{publish.claude.title}</h3>
@@ -142,7 +142,7 @@ export default function DocsHome() {
             <DocList items={publish.terminal.flags} />
           </section>
 
-          <section className="dx-sec" id={autoPublish.id} aria-labelledby={`${autoPublish.id}-title`}>
+          <section className="dx-sec dx-prose" id={autoPublish.id} aria-labelledby={`${autoPublish.id}-title`}>
             <h2 id={`${autoPublish.id}-title`}>{autoPublish.title}</h2>
             <Paragraphs items={autoPublish.intro} />
             <p>{autoPublish.waysIntro}</p>
@@ -153,14 +153,14 @@ export default function DocsHome() {
             <DocList items={autoPublish.hooksNotes} />
           </section>
 
-          <section className="dx-sec" id={codeMap.id} aria-labelledby={`${codeMap.id}-title`}>
+          <section className="dx-sec dx-prose" id={codeMap.id} aria-labelledby={`${codeMap.id}-title`}>
             <h2 id={`${codeMap.id}-title`}>{codeMap.title}</h2>
             <p>{codeMap.intro}</p>
             <DocList items={codeMap.legend} />
             <Paragraphs items={codeMap.actions} />
           </section>
 
-          <section className="dx-sec" id={changes.id} aria-labelledby={`${changes.id}-title`}>
+          <section className="dx-sec dx-prose" id={changes.id} aria-labelledby={`${changes.id}-title`}>
             <h2 id={`${changes.id}-title`}>{changes.title}</h2>
             <p>
               <Rich text={changes.intro} />
@@ -168,7 +168,7 @@ export default function DocsHome() {
             <DocList items={changes.legend} />
           </section>
 
-          <section className="dx-sec" id={agents.id} aria-labelledby={`${agents.id}-title`}>
+          <section className="dx-sec dx-prose" id={agents.id} aria-labelledby={`${agents.id}-title`}>
             <h2 id={`${agents.id}-title`}>{agents.title}</h2>
             <p>{agents.intro}</p>
             <ul className="dx-agents">
@@ -183,7 +183,7 @@ export default function DocsHome() {
             <p>{agents.outro}</p>
           </section>
 
-          <section className="dx-sec" id={redaction.id} aria-labelledby={`${redaction.id}-title`}>
+          <section className="dx-sec dx-prose" id={redaction.id} aria-labelledby={`${redaction.id}-title`}>
             <h2 id={`${redaction.id}-title`}>{redaction.title}</h2>
             {redaction.intro.map((paragraph) => (
               <p key={paragraph}>
@@ -211,7 +211,7 @@ export default function DocsHome() {
             <p>{redaction.server}</p>
           </section>
 
-          <section className="dx-sec" id={access.id} aria-labelledby={`${access.id}-title`}>
+          <section className="dx-sec dx-prose" id={access.id} aria-labelledby={`${access.id}-title`}>
             <h2 id={`${access.id}-title`}>{access.title}</h2>
             <p>{access.intro}</p>
             <dl className="dx-defs">
@@ -226,7 +226,7 @@ export default function DocsHome() {
             </dl>
           </section>
 
-          <section className="dx-sec" id={prune.id} aria-labelledby={`${prune.id}-title`}>
+          <section className="dx-sec dx-prose" id={prune.id} aria-labelledby={`${prune.id}-title`}>
             <h2 id={`${prune.id}-title`}>{prune.title}</h2>
             <Paragraphs items={prune.intro} />
             <DocCommand command={prune.command} />
@@ -234,7 +234,7 @@ export default function DocsHome() {
             <Paragraphs items={prune.notes} />
           </section>
 
-          <section className="dx-sec" id={configuration.id} aria-labelledby={`${configuration.id}-title`}>
+          <section className="dx-sec dx-prose" id={configuration.id} aria-labelledby={`${configuration.id}-title`}>
             <h2 id={`${configuration.id}-title`}>{configuration.title}</h2>
             <p>
               <Rich text={configuration.intro} />
@@ -244,7 +244,7 @@ export default function DocsHome() {
             <Paragraphs items={configuration.editors} />
           </section>
 
-          <section className="dx-sec" id={cli.id} aria-labelledby={`${cli.id}-title`}>
+          <section className="dx-sec dx-prose" id={cli.id} aria-labelledby={`${cli.id}-title`}>
             <h2 id={`${cli.id}-title`}>{cli.title}</h2>
             <p>
               <Rich text={cli.intro} />

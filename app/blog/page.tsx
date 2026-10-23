@@ -31,15 +31,17 @@ export default function BlogIndex() {
           }
         />
       ) : (
-        <div className="bx-posts">
+        <div className="dx-guides bx-posts">
           {POSTS.map((post) => (
-            <Link key={post.slug} className="bx-post" href={`/blog/${post.slug}`}>
+            <Link key={post.slug} className="dx-guide bx-post" href={`/blog/${post.slug}`}>
               <Art art={post.art} className="dx-pic bx-post-art" />
-              <span className="bx-meta">
-                {post.kind} · <time dateTime={post.published}>{formatPostDate(post.published)}</time>
+              <span className="dx-guide-text">
+                <span className="dx-meta">
+                  {post.kind} · <time dateTime={post.published}>{formatPostDate(post.published)}</time>
+                </span>
+                <h2 className="dx-guide-title dx-authored">{post.title}</h2>
+                <span className="dx-guide-desc">{post.summary}</span>
               </span>
-              <h2 className="bx-post-title">{post.title}</h2>
-              <p className="bx-post-desc">{post.summary}</p>
             </Link>
           ))}
         </div>

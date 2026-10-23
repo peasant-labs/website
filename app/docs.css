@@ -58,8 +58,7 @@
     color: var(--ink-strong);
   }
 
-  .dx-guide:hover .dx-guide-title,
-  .bx-post:hover .bx-post-title {
+  .dx-guide:hover .dx-guide-title {
     color: var(--amber);
   }
 
@@ -174,13 +173,8 @@
   max-width: var(--dx-col);
 }
 
-/* a page without "on this page" (the blog) centres its header on its one column */
-.dx-head:not(.dx-head-cols) .dx-head-text {
-  margin-inline: auto;
-}
 
-.dx-head h1,
-.bx-title {
+.dx-head h1 {
   text-wrap: balance;
   color: var(--ink-strong);
   font-family: var(--font-display);
@@ -354,12 +348,13 @@
 }
 
 /*
- * One left edge and one right edge: running text keeps its measure, and
- * everything with a frame or a rule (section rules, steps, notes, tables,
- * commands, paths, cards) runs from the same left edge to the wider track's
- * right edge.
+ * .dx-prose is the one reading style the docs sections, the guide steps and a
+ * blog post all share. One left edge and one right edge: running text keeps
+ * its measure, and everything with a frame or a rule (section rules, steps,
+ * notes, tables, commands, paths, cards, pictures) runs from the same left
+ * edge to the wider track's right edge.
  */
-:is(.dx-sec, .dx-step-body),
+.dx-prose,
 .dx-step {
   display: grid;
   grid-template-columns:
@@ -368,17 +363,17 @@
     [wide-end];
 }
 
-:is(.dx-sec, .dx-step-body) > *,
+.dx-prose > *,
 .dx-step > .dx-step-head {
   grid-column: prose;
 }
 
-:is(.dx-sec, .dx-step-body) > :is(h2, .dx-list, .dx-bullets:has(.dx-cmd), .dx-note, .dx-terms, .dx-defs, .dx-ref, .dx-guides, .dx-cmd, .dx-cmds, .dx-cmd-group, .dx-path, .dx-agents),
+.dx-prose > :is(h2, .dx-list, .dx-bullets:has(.dx-cmd), .dx-note, .dx-pic, .essay-tldr, .dx-terms, .dx-defs, .dx-ref, .dx-guides, .dx-cmd, .dx-cmds, .dx-cmd-group, .dx-path, .dx-agents),
 .dx-step > .dx-step-body {
   grid-column: wide;
 }
 
-.dx-sec > h2 {
+.dx-prose > h2 {
   padding-block-end: var(--sp-3);
   border-bottom: var(--bd);
   color: var(--ink-strong);
@@ -389,7 +384,7 @@
   text-wrap: balance;
 }
 
-.dx-sec > h3 {
+.dx-prose > h3 {
   text-wrap: balance;
   color: var(--ink-strong);
   font-family: var(--font-display);
@@ -402,27 +397,27 @@
  * Rhythm: blocks sit one line apart, an intro line sits close to the list or
  * command it introduces, and a heading has more room above than below.
  */
-:is(.dx-sec, .dx-step-body) > * + * {
+.dx-prose > * + * {
   margin-block-start: 1lh;
 }
 
-:is(.dx-sec, .dx-step-body) > p + :is(ol, ul, dl, .dx-cmds, .dx-cmd, .dx-path, .dx-agents) {
+.dx-prose > p + :is(ol, ul, dl, .dx-cmds, .dx-cmd, .dx-path, .dx-agents) {
   margin-block-start: var(--sp-3);
 }
 
-.dx-sec > h2 + * {
+.dx-prose > h2 + * {
   margin-block-start: var(--sp-5);
 }
 
-.dx-sec > * + h3 {
+.dx-prose > * + h3 {
   margin-block-start: var(--sp-7);
 }
 
-.dx-sec > h3 + * {
+.dx-prose > h3 + * {
   margin-block-start: var(--sp-3);
 }
 
-:is(.dx-sec, .dx-step-body, .dx-note) p,
+:is(.dx-prose, .dx-note) p,
 .dx-bullets:not(:has(.dx-cmd)) li,
 .dx-terms dd,
 .dx-defs dd,
@@ -447,7 +442,7 @@
   text-decoration-style: solid;
 }
 
-:is(.dx-sec, .dx-step-body, .dx-note, .dx-guide-desc) strong {
+:is(.dx-prose, .dx-note, .dx-guide-desc) strong {
   color: var(--ink-strong);
   font-weight: 700;
 }
@@ -501,7 +496,7 @@
 
 .dx-list > li {
   position: relative;
-  padding: var(--sp-3) var(--sp-4) var(--sp-3) calc(var(--sp-4) + 1.75rem + var(--sp-3));
+  padding: var(--sp-3) var(--card-pad) var(--sp-3) calc(var(--card-pad) + 1.75rem + var(--sp-3));
   counter-increment: dx-step;
 }
 
@@ -513,7 +508,7 @@
   content: counter(dx-step);
   position: absolute;
   inset-block-start: var(--sp-3);
-  inset-inline-start: var(--sp-4);
+  inset-inline-start: var(--card-pad);
   color: var(--ink-3);
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
@@ -540,28 +535,9 @@
   max-width: 100%;
 }
 
-/*
- * On a wide screen a command stays on one line, as fairtrade draws it, so a
- * flag never splits; the rare one that does not fit scrolls inside its line,
- * which then takes focus (components/docs/doc-command.tsx).
- */
 
-/* commands are code, which reads at the 16px floor like the text around it */
-.dx-cmd .cli-cmd-line {
-  font-size: var(--fs-body);
-}
-
-/*
- * On a phone a command wraps to show all of it, breaking at any character so
- * every line is full and nothing hides off the edge. The copy button keeps
- * its icon and name, drops the word, and is a full tap target.
- */
+/* on a phone the copy button keeps its icon and name, drops the word, and is a full tap target */
 @container dx-page (max-width: 30rem) {
-  .dx-cmd .cli-cmd-line code {
-    white-space: pre-wrap;
-    word-break: break-all;
-  }
-
   .dx-cmd .cli-copy-word {
     display: none;
   }
@@ -629,7 +605,7 @@
   display: flex;
   align-items: flex-start;
   gap: var(--sp-3);
-  padding: var(--sp-4);
+  padding: var(--sp-4) var(--card-pad);
   border: var(--bd-strong);
   background: var(--surface-2);
 }
@@ -663,7 +639,7 @@
 :is(.dx-terms, .dx-defs, .dx-ref) > div {
   display: grid;
   gap: var(--sp-1);
-  padding: var(--sp-3) var(--sp-4);
+  padding: var(--sp-3) var(--card-pad);
 }
 
 :is(.dx-terms, .dx-defs, .dx-ref) > div + div {
@@ -722,7 +698,7 @@
   gap: var(--sp-1);
 }
 
-.dx-sec .dx-label {
+.dx-prose .dx-label {
   padding: 2px 6px;
   border: var(--bd);
   background: var(--surface-2);
@@ -822,7 +798,7 @@
   display: grid;
   gap: var(--sp-1);
   align-content: start;
-  padding: var(--sp-3) var(--sp-4);
+  padding: var(--sp-3) var(--card-pad);
 }
 
 .dx-guide-title {
@@ -866,7 +842,7 @@
   }
 
   .dx-guide-text {
-    padding: var(--sp-4);
+    padding: var(--card-pad);
   }
 }
 
@@ -941,90 +917,29 @@
   text-underline-offset: 3px;
 }
 
-/* blog */
+/* ---------- blog: the docs' reading style, with a post's own pieces ---------- */
 
-/* auto-fill, so a lone post keeps a column's width instead of stretching across the page */
-.dx-page > .bx-posts {
-  width: min(100%, var(--dx-col));
-}
-
-.bx-posts {
-  display: grid;
-  gap: var(--sp-8) var(--sp-6);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 25rem), 1fr));
-}
-
-.bx-post {
-  display: grid;
-  gap: 14px;
-  align-content: start;
-  color: inherit;
-  text-decoration: none;
-}
-
-.bx-meta {
+/* a post's byline, and a card's: the label style */
+.dx-meta {
   color: var(--ink-3);
   font-family: var(--font-mono);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-label);
   letter-spacing: 0;
 }
 
-.bx-post-title {
-  text-wrap: balance;
-  color: var(--ink-strong);
-  font-family: var(--font-display);
-  font-size: var(--fs-lg);
-  font-weight: 700;
-  line-height: 1.25;
-  text-transform: none;
-}
-
-.bx-post-desc {
-  color: var(--ink-3);
-  text-wrap: pretty;
-}
-
-/* a post is one centred column: its title, picture and words share both edges */
-.bx-essay {
-  display: grid;
-  gap: var(--sp-5);
-  width: 100%;
-  max-width: 38rem;
-  margin-inline: auto;
-}
-
 /* an authored title keeps its own capitals; only chrome is lowercase */
-.bx-title {
+.dx-authored {
   text-transform: none;
 }
 
-/* a post's lead picture: a wide panel, so it leads in without pushing the first paragraph a screen down */
-.bx-figure.dx-pic {
-  padding: var(--sp-4);
+/* the blog lists its posts one to a row, each a docs card, so a picture shows at its full size */
+.bx-posts.dx-guides {
+  grid-template-columns: minmax(0, 1fr);
 }
 
-/* an essay reads at 18px on every screen, with paragraphs one line apart */
-.bx-body {
-  display: grid;
-  gap: 1lh;
-  max-inline-size: none;
-  font-size: var(--fs-md);
-  line-height: 1.6;
-}
-
-.bx-body p,
-.bx-body li {
-  color: var(--ink);
-  text-wrap: pretty;
-}
-
-.bx-body li {
-  letter-spacing: var(--tracking-prose);
-  word-spacing: var(--word-spacing-prose);
-}
-
+/* the tldr is a framed block on the wide track; its words keep the prose measure */
 .essay-tldr {
-  border: var(--bd-strong);
+  border: var(--bd);
   background: var(--surface);
 }
 
@@ -1032,10 +947,11 @@
   display: flex;
   align-items: center;
   min-height: var(--target-comfortable);
-  padding: 0 var(--sp-5);
-  color: var(--amber);
+  padding: 0 var(--card-pad);
+  color: var(--ink-strong);
   font-family: var(--font-mono);
-  font-weight: 700;
+  font-size: var(--fs-label);
+  font-weight: 600;
   letter-spacing: 0;
   list-style: none;
   cursor: pointer;
@@ -1046,44 +962,56 @@
 }
 
 .essay-tldr > p {
-  padding: 0 var(--sp-5);
+  padding: 0 var(--card-pad);
 }
 
 .essay-tldr > ol {
   display: grid;
-  gap: var(--sp-2);
-  margin: var(--sp-4) 0 0;
-  padding: 0 var(--sp-5) var(--sp-5) calc(var(--sp-5) + 1.25em);
+  gap: var(--sp-3);
+  max-inline-size: var(--dx-col);
+  margin-block-start: var(--sp-4);
+  padding: 0 var(--card-pad) var(--card-pad) calc(var(--card-pad) + 1.5em);
   list-style: decimal;
 }
 
+.essay-tldr li {
+  letter-spacing: var(--tracking-prose);
+  word-spacing: var(--word-spacing-prose);
+  text-wrap: pretty;
+}
+
+.essay-tldr li::marker {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+}
+
+/* a quote: a hairline on its left, the words in the secondary ink */
 .essay-aside {
   padding-inline-start: var(--sp-4);
   border-inline-start: var(--bd-strong);
 }
 
-.essay-aside p {
+.dx-prose .essay-aside p {
   color: var(--ink-2);
 }
 
-.essay-problems {
-  display: grid;
-  gap: var(--sp-3);
-  margin: 0;
-  padding-inline-start: 1.25em;
-  list-style: disc;
-}
-
+/* the essay's nested points read as docs bullets */
 .essay-problems ul {
   display: grid;
   gap: var(--sp-2);
   margin-block-start: var(--sp-2);
-  padding-inline-start: 1.25em;
+  padding-inline-start: 1.5em;
   list-style: circle;
 }
 
-.essay-problems li::marker {
-  color: var(--amber);
+.essay-problems li {
+  letter-spacing: var(--tracking-prose);
+  word-spacing: var(--word-spacing-prose);
+  text-wrap: pretty;
+}
+
+.essay-problems ul li::marker {
+  color: var(--ink-3);
 }
 
 /* ---------- docs search: fairtrade's command palette, with a snippet under each hit ---------- */

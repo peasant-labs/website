@@ -98,7 +98,7 @@ export default function ReclaimingDataAutonomy() {
 
       <p>{PROBLEMS_INTRO}</p>
 
-      <ul className="essay-problems">
+      <ul className="dx-bullets essay-problems">
         {PROBLEMS.map((problem) => (
           <li key={problem.point}>
             {problem.point}
