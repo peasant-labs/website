@@ -615,6 +615,26 @@
   padding-block: 0;
 }
 
+/*
+ * Held on a wide window, how it works centres itself in a screen whose top
+ * keeps 5rem clear for the header and whose foot keeps --sp-6, so it brings
+ * its own room. The section before it gives up the difference, and the
+ * held screen sits as far from its neighbours as any two sections do. On a
+ * phone it holds at the top with only a few pixels of its own, so it takes
+ * the rhythm itself.
+ */
+@media (min-width: 62.5rem) {
+  .lp-sec:has(+ .lp-how .hw-scroll) {
+    padding-block-end: calc(var(--site-sec-y) - var(--sp-7));
+  }
+}
+
+@media (max-width: 62.49rem) {
+  .lp-how:has(.hw-scroll) {
+    padding-block: calc(var(--site-sec-y) - var(--sp-2)) calc(var(--site-sec-y) - var(--sp-4));
+  }
+}
+
 /* each step's icon, on a small tile; the current step's turns amber */
 .hw-ic {
   flex: none;
