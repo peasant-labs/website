@@ -283,28 +283,26 @@ export const HOW = {
 
 /** The two commands, exactly as the installer scripts document themselves. */
 export const INSTALL = {
-  title: "get started in two commands",
+  title: "get started in three commands",
   guide: { label: "read our docs", href: "/docs" },
-  /* each platform's commands are typed at its shell's short prompt, in a Terminal window titled for that shell */
+  /* the first command, for each system; the other two are the same on both */
   platforms: [
-    {
-      id: "unix",
-      label: "macos and linux",
-      command: "curl -fsSL https://peasantlabs.org/install | bash",
-      title: "you — -zsh — 80×24",
-      prompt: "$",
-    },
-    {
-      id: "windows",
-      label: "windows",
-      command: "irm https://peasantlabs.org/install.ps1 | iex",
-      title: "you — pwsh — 80×24",
-      prompt: "PS>",
-    },
+    { id: "unix", label: "macos and linux", command: "curl -fsSL https://peasantlabs.org/install | bash" },
+    { id: "windows", label: "windows", command: "irm https://peasantlabs.org/install.ps1 | iex" },
   ],
   kickstart: "peasant kickstart",
-  /* what each step does, in two or three words, over its command */
-  steps: ["install peasant", "set it up"],
+  push: "peasant village push",
+  /*
+   * What each command does, in plain words, under it. Kickstart asks what to
+   * record and can connect peasant online; a push from the terminal publishes
+   * the chosen sessions with secrets hidden and private, shared with no one
+   * until you pick who can read them (docs: kickstart, publishing from the terminal).
+   */
+  notes: [
+    "installs peasant on your computer",
+    "finds your sessions, asks what to record, and can sign you in",
+    "publishes your chosen sessions to peasant online, secrets hidden, private to you",
+  ],
 } as const;
 
 /*

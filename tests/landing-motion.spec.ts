@@ -101,41 +101,6 @@ test("the agents drift past under the hero, hold when hovered, and stand still f
   expect(await track.evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
 });
 
-test("the install commands type in once when the terminal comes into view, and show whole without motion", async ({
-  page,
-}) => {
-  await page.goto("/");
-  const terminal = page.locator(".gs-window");
-  const characters = terminal.locator(".gs-line").first().locator(".gs-ch");
-  // below the fold the commands wait, hidden, to be typed
-  await expect(terminal).toHaveAttribute("data-typing", "wait");
-  expect(await characters.first().evaluate((character) => getComputedStyle(character).opacity)).toBe("0");
-
-  await terminal.scrollIntoViewIfNeeded();
-  await expect(terminal).toHaveAttribute("data-typing", "run");
-  // one keystroke after another: each character waits a little longer than the one before
-  const delays = await characters.evaluateAll((items) =>
-    items.slice(0, 3).map((item) => parseFloat(getComputedStyle(item).animationDelay)),
-  );
-  expect(delays[1]!).toBeGreaterThan(delays[0]!);
-  expect(delays[2]!).toBeGreaterThan(delays[1]!);
-  // both commands are whole within about a second and a half, then stay
-  const lastDelay = await terminal
-    .locator(".gs-line")
-    .last()
-    .locator(".gs-ch")
-    .last()
-    .evaluate((character) => parseFloat(getComputedStyle(character).animationDelay));
-  expect(lastDelay).toBeLessThanOrEqual(1.5);
-  await expect(terminal).toHaveAttribute("data-typing", "done", { timeout: 6000 });
-  expect(await characters.last().evaluate((character) => getComputedStyle(character).opacity)).toBe("1");
-
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  expect(await terminal.getAttribute("data-typing")).toBeNull();
-  expect(await characters.first().evaluate((character) => getComputedStyle(character).opacity)).toBe("1");
-});
-
 test("the session's windows fan out from one stack once, the transcript wide in front, all inside the page", async ({
   page,
 }) => {

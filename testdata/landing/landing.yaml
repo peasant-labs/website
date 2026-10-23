@@ -44,7 +44,7 @@ agents:
   names: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
 # the sections after the hero, in reading order: id and heading
 sections:
-  - { id: install, heading: get started in two commands }
+  - { id: install, heading: get started in three commands }
   - { id: uses, heading: find your use case }
   - { id: how, heading: how it works }
   - { id: session, heading: what a reviewer reads }
@@ -116,14 +116,18 @@ how:
     - { scene: record, texts: ["Welcome to Claude Code!", "> /peasant", 'peasant: opened "fix the staging 403" · not published', "fix the staging 403", "not published"] }
     - { scene: review, texts: ["3 matches", "<AWS_ACCESS_KEY>", "<EMAIL>", "/Users/<USER>/src/shop/.env"] }
     - { scene: publish, texts: ["fix the staging 403", "published", "eval-crowd"] }
-# the commands as scripts/install.sh and scripts/install.ps1 document themselves, typed at each shell's prompt
+# the commands as scripts/install.sh and scripts/install.ps1 document themselves, then the two that are
+# the same on every system, each with what it does in plain words (docs: kickstart, publishing from the terminal)
 install:
   platforms:
-    - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash", prompt: "$" }
-    - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex", prompt: "PS>" }
+    - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash" }
+    - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex" }
   kickstart: peasant kickstart
-  # what each step does, over its command
-  steps: [install peasant, set it up]
+  push: peasant village push
+  notes:
+    - installs peasant on your computer
+    - finds your sessions, asks what to record, and can sign you in
+    - publishes your chosen sessions to peasant online, secrets hidden, private to you
   guide: { label: read our docs, href: /docs }
 session:
   label: a sample session

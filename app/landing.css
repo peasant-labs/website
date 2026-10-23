@@ -1848,7 +1848,12 @@
 
 /* get started */
 
-/* under the header: one Terminal window across the whole column, its tabs attached under its title bar */
+/*
+ * One framed panel at the content's width: the systems as tabs along its top,
+ * then three numbered rows split by hairlines. Each row is a large muted
+ * number, the command on its first line with what it does under it in smaller
+ * muted mono, and its copy button at the row's end, centred on the row.
+ */
 .lp-install-guide {
   display: inline-flex;
   align-items: center;
@@ -1860,187 +1865,106 @@
 
 .gs {
   min-width: 0;
+  border: var(--bd-strong);
+  background: var(--surface-2);
 }
 
-.gs-window {
-  min-width: 0;
-}
-
-.gs-term .mac-body {
-  padding: 0;
-}
-
-/*
- * Terminal's tab bar, as it draws one under the title bar: the systems side by
- * side, equal halves, the chosen one raised to the title bar's own ground with
- * an amber line under its name.
- */
 .gs-os {
-  display: grid;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-  border-bottom: 1px solid var(--mac-bar-rule);
-  background: color-mix(in srgb, var(--mac-bar-bg) 72%, var(--mac-bar-rule));
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: var(--bd-strong);
 }
 
 .gs-os-tab {
-  min-height: 2.25rem;
-  padding: 0 var(--sp-3);
+  min-height: var(--target-comfortable);
+  padding: 0 clamp(1rem, 2.5vw, 2rem);
   border: 0;
-  border-inline-start: 1px solid var(--mac-bar-rule);
   background: transparent;
-  color: var(--mac-title);
+  color: var(--ink-3);
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0;
   cursor: pointer;
   box-shadow: inset 0 -2px 0 transparent;
 }
 
-.gs-os-tab:first-child {
-  border-inline-start: 0;
-}
-
 .gs-os-tab[aria-selected="true"] {
-  background: var(--mac-bar-bg);
-  color: var(--mac-field-ink);
-  box-shadow: inset 0 -2px 0 var(--amber);
+  color: var(--ink-strong);
+  box-shadow: inset 0 -2px 0 var(--ink-strong);
 }
 
-/* the two steps: a number and two or three words, then the command at a short prompt with its copy at the line's end */
 .gs-lines {
-  display: grid;
-  gap: clamp(1.25rem, 2.5vw, 1.75rem);
   margin: 0;
-  padding: clamp(18px, 2.5vw, 30px) clamp(14px, 3vw, 32px) clamp(22px, 3vw, 34px);
+  padding: 0;
   list-style: none;
-  font-family: var(--mac-mono);
-  font-size: 13px;
-  letter-spacing: 0;
-  line-height: 1.75rem;
-}
-
-@media (min-width: 48rem) {
-  .gs-lines {
-    font-size: 15px;
-  }
 }
 
 .gs-line {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: var(--sp-1) var(--sp-3);
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-2) clamp(0.75rem, 2vw, 1.5rem);
+  padding: clamp(1rem, 2.2vw, 1.5rem) clamp(1rem, 2.5vw, 2rem);
 }
 
-.gs-step {
-  display: flex;
-  grid-column: 1 / -1;
-  align-items: baseline;
-  gap: var(--sp-2);
-  color: var(--mac-term-dim);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  letter-spacing: 0;
-  line-height: 1.4;
+.gs-line + .gs-line {
+  border-top: var(--bd-strong);
 }
 
+/* the number sits on the command's line, so number and words share one column top */
 .gs-n {
-  color: var(--amber);
+  align-self: start;
+  color: var(--ink-4);
+  font-family: var(--font-mono);
+  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  line-height: 1.5;
 }
 
 .gs-text {
+  display: grid;
+  gap: var(--sp-1);
   min-width: 0;
+}
+
+.gs-cmd {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 1.6vw, 1.375rem);
+  letter-spacing: 0;
+  line-height: 1.5;
   white-space: pre-wrap;
   overflow-wrap: break-word;
 }
 
-.gs-prompt {
-  color: var(--mac-term-dim);
-}
-
-.gs-cmd {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--mac-term-ink);
-  font: inherit;
-}
-
-.gs-caret {
-  display: inline-block;
-  width: 0.6em;
-  height: 1.15em;
-  margin-inline-start: 2px;
-  vertical-align: -0.2em;
-  background: var(--mac-term-cursor);
-}
-
-/* typing: only each character's opacity changes, one keystroke apart, so the line never reflows */
-.gs-window[data-typing="wait"] :is(.gs-ch, .gs-caret),
-.gs-window[data-typing="run"] :is(.gs-ch, .gs-caret) {
-  opacity: 0;
-}
-
-.gs-window[data-typing="run"] :is(.gs-ch, .gs-caret) {
-  animation: gs-key 1ms linear forwards;
-  animation-delay: calc(var(--gs-from) + var(--i) * var(--gs-key));
-}
-
-@keyframes gs-key {
-  to {
-    opacity: 1;
-  }
-}
-
-/* copy is ours, not Terminal's: the site's mono in the terminal's own ink, as tall as the command's line */
-.gs-copy {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--sp-2);
-  height: 1.75rem;
-  padding: 0 var(--sp-2);
-  border: 1px solid color-mix(in srgb, var(--mac-term-ink) 28%, transparent);
-  background: transparent;
-  color: var(--mac-term-ink);
+.gs-note {
+  color: var(--ink-3);
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
-  font-weight: 600;
   letter-spacing: 0;
-  line-height: 1;
+  line-height: 1.45;
+}
+
+.gs-copy {
+  display: inline-grid;
+  place-items: center;
+  min-width: 4.5rem;
+  min-height: var(--target-comfortable);
+  padding: 0 var(--sp-4);
+  border: var(--bd-strong);
+  background: var(--canvas);
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0;
   cursor: pointer;
-}
-
-.gs-copy svg {
-  width: var(--ic-sm);
-  height: var(--ic-sm);
-}
-
-/* on a phone each copy moves up beside its step's words, so the command has the window's whole width to wrap in */
-@media (max-width: 39.99rem) {
-  .gs-line {
-    grid-template-areas:
-      "step copy"
-      "text text";
-    align-items: center;
-  }
-
-  .gs-step {
-    grid-area: step;
-    grid-column: auto;
-  }
-
-  .gs-copy {
-    grid-area: copy;
-  }
-
-  .gs-text {
-    grid-area: text;
-  }
 }
 
 .gs-os-tab:focus-visible,
@@ -2051,11 +1975,11 @@
 
 @media (hover: hover) and (pointer: fine) {
   .gs-copy:hover {
-    border-color: var(--mac-term-ink);
+    border-color: var(--ink-strong);
   }
 
   .gs-os-tab[aria-selected="false"]:hover {
-    color: var(--mac-field-ink);
+    color: var(--ink-strong);
   }
 }
 
@@ -2422,12 +2346,5 @@
   .site-foot-close-words,
   .site-foot-close .site-foot-actions {
     justify-items: stretch;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .gs-window[data-typing] :is(.gs-ch, .gs-caret) {
-    opacity: 1;
-    animation: none;
   }
 }

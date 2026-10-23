@@ -38,9 +38,10 @@ export type LandingFixture = {
     finals: Array<{ scene: string; texts: string[] }>;
   };
   install: {
-    platforms: Array<{ label: string; command: string; prompt: string }>;
+    platforms: Array<{ label: string; command: string }>;
     kickstart: string;
-    steps: string[];
+    push: string;
+    notes: string[];
     guide: Link;
   };
   session: {

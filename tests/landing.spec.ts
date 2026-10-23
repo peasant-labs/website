@@ -94,76 +94,68 @@ test("the hero buttons move to their sections, smoothly unless motion is reduced
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe("auto");
 });
 
-test("the install terminal types each platform's exact command at its prompt, whole, and copies it", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-  const shell = page.locator("[data-install-shell]");
-  // the commands sit in a Terminal window, not in a box of the site's own, with the systems as its tabs
-  await expect(shell.locator(".mac-win-terminal .gs-lines")).toHaveCount(1);
-  await expect(shell.locator(".mac-win-terminal").getByRole("tablist")).toHaveCount(1);
-  // and the Terminal takes the page's own appearance: light on the light theme, dark on the dark one
-  for (const theme of ["light", "dark"] as const) {
-    await page.emulateMedia({ colorScheme: theme });
+test("the install panel shows three numbered commands, each with what it does and its own copy", async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
-    const lightness = await shell.locator(".gs-term .mac-body").evaluate((body) => {
-      const [r, g, b] = getComputedStyle(body).backgroundColor.match(/\d+/g)!.map(Number);
-      return (0.2126 * r! + 0.7152 * g! + 0.0722 * b!) / 255;
-    });
-    if (theme === "light") expect(lightness, "the install terminal is inverted on the light theme").toBeGreaterThan(0.8);
-    else expect(lightness, "the install terminal is bright on the dark theme").toBeLessThan(0.2);
-  }
+    const shell = page.locator("[data-install-shell]");
+    // a plain panel: no window chrome, no prompt, nothing typing
+    await expect(shell.locator(".mac-win, .gs-prompt")).toHaveCount(0);
+    await expect(shell.locator("[data-typing], .gs-ch, .gs-caret")).toHaveCount(0);
 
-  for (const platform of fixture.install.platforms) {
-    const tab = shell.getByRole("tab", { name: platform.label });
-    await tab.click();
-    await expect(tab).toHaveAttribute("aria-selected", "true");
-    const lines = shell.locator(".gs-line");
-    await expect(lines).toHaveCount(2);
-    await expect(lines.nth(0).locator("[data-command]")).toHaveText(platform.command);
-    await expect(lines.nth(1).locator("[data-command]")).toHaveText(fixture.install.kickstart);
-    await expect(lines.locator(".gs-prompt")).toHaveText([platform.prompt, platform.prompt]);
-    // each step says what it does, numbered, over its command
-    for (const [index, step] of fixture.install.steps.entries()) {
-      await expect(lines.nth(index).locator(".gs-step")).toHaveText(`${index + 1}${step}`);
+    for (const platform of fixture.install.platforms) {
+      const tab = shell.getByRole("tab", { name: platform.label });
+      await tab.click();
+      await expect(tab).toHaveAttribute("aria-selected", "true");
+      const lines = shell.locator(".gs-line");
+      await expect(lines).toHaveCount(3);
+      await expect(lines.locator("[data-command]")).toHaveText([
+        platform.command,
+        fixture.install.kickstart,
+        fixture.install.push,
+      ]);
+      await expect(lines.locator(".gs-note")).toHaveText(fixture.install.notes);
+      await expect(lines.locator(".gs-n")).toHaveText(["1", "2", "3"]);
+
+      const rows = await lines.evaluateAll((items) =>
+        items.map((item) => {
+          const row = item.getBoundingClientRect();
+          const number = item.querySelector(".gs-n")!.getBoundingClientRect();
+          const command = item.querySelector("[data-command]")!.getBoundingClientRect();
+          const copy = item.querySelector(".gs-copy")!.getBoundingClientRect();
+          return {
+            // never cut off: the command wraps inside its row rather than overflowing it
+            whole: command.right <= copy.left + 1,
+            // the number starts on the command's line
+            numberOnCommand: Math.abs(number.top - command.top) < 4,
+            // copy is a full-size target, centred on its row, at the row's end
+            target: copy.height >= 44,
+            centred: Math.abs(copy.top + copy.height / 2 - (row.top + row.height / 2)) < 2,
+          };
+        }),
+      );
+      for (const row of rows) {
+        expect(row, `a row is off at ${width} on ${platform.label}`).toEqual({
+          whole: true,
+          numberOnCommand: true,
+          target: true,
+          centred: true,
+        });
+      }
     }
-    // each copy is as tall as a command line and sits at its own step's right edge,
-    // beside the step's words on a phone so the command keeps the whole width
-    const placed = await lines.evaluateAll((items) =>
-      items.map((item) => {
-        const text = item.querySelector(".gs-text")!.getBoundingClientRect();
-        const step = item.querySelector(".gs-step")!.getBoundingClientRect();
-        const copy = item.querySelector(".gs-copy")!.getBoundingClientRect();
-        const line = parseFloat(getComputedStyle(item.querySelector(".gs-text")!).lineHeight);
-        return {
-          height: Math.abs(copy.height - line) < 1,
-          inStep: copy.top < text.top && copy.bottom > step.top,
-          rightEdge: copy.right >= text.right - 1,
-        };
-      }),
-    );
-    expect(placed).toEqual([
-      { height: true, inStep: true, rightEdge: true },
-      { height: true, inStep: true, rightEdge: true },
-    ]);
 
-    // Never cut off: the line wraps inside the window rather than overflowing it.
-    const clipped = await lines
-      .nth(0)
-      .locator(".gs-text")
-      .evaluate((text) => text.scrollWidth > text.clientWidth + 1);
-    expect(clipped, `${platform.label} command is cut off at 390`).toBe(false);
+    // every command copies exactly, and says so
+    const first = shell.locator(".gs-line").first();
+    const command = fixture.install.platforms.at(-1)!.command;
+    await first.getByRole("button", { name: `copy ${command}` }).click();
+    await expect(first.getByRole("button", { name: `copied ${command}` })).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(command);
 
-    await lines.nth(0).getByRole("button", { name: `copy ${platform.command}` }).click();
-    await expect(lines.nth(0).getByRole("button", { name: `copied ${platform.command}` })).toBeVisible();
-    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(platform.command);
+    // the tabs are a real tablist: arrow keys move between systems
+    await shell.getByRole("tab", { name: fixture.install.platforms[0]!.label }).focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(shell.getByRole("tab", { name: fixture.install.platforms[1]!.label })).toBeFocused();
   }
-
-  // The tabs are a real tablist: arrow keys move between platforms.
-  await shell.getByRole("tab", { name: fixture.install.platforms[0]!.label }).focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(shell.getByRole("tab", { name: fixture.install.platforms[1]!.label })).toBeFocused();
 
   const guide = page.locator("#install").getByRole("link", { name: fixture.install.guide.label });
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
