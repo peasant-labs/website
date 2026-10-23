@@ -29,6 +29,7 @@ export type LandingFixture = {
       id: string;
       label: string;
       capabilities: string[];
+      details: string[];
       pictures: string[];
       cta: Link;
     }>;
@@ -66,6 +67,9 @@ export function loadLandingFixture(): LandingFixture {
   for (const slide of root.useCases.slides) {
     if (slide.capabilities.length !== 3) {
       throw new Error(`useCases.slides.${slide.id}: a slide carries exactly three capabilities.`);
+    }
+    if (slide.details?.length !== slide.capabilities.length) {
+      throw new Error(`useCases.slides.${slide.id}: each capability carries its own words.`);
     }
     if (slide.pictures?.length !== slide.capabilities.length) {
       throw new Error(`useCases.slides.${slide.id}: each capability names its own picture.`);

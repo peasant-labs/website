@@ -12,9 +12,10 @@ const CAPS = 3;
 /**
  * The use cases: the section's heading on its own row, then the four audiences, two by two
  * on a wide screen and one under another on a phone. Each card leads with what
- * its audience can do: under its picture, the audience as a small label, then
- * the capability now showing as the card's headline, the three segments that
- * step between capabilities, and its one action. The picture and the headline
+ * its audience can do: under its picture, the audience as a small label with
+ * its icon, then the capability now showing as the card's headline with a
+ * sentence or two on what it is, the three segments that step between
+ * capabilities, and its one action. The picture and the headline
  * change together. Every card keeps the same rhythm, and cards side by side
  * share their rows (CSS subgrid), so their parts line up across the page.
  *
@@ -108,13 +109,25 @@ function UseCaseCard({
         <LandingIcon name={useCase.icon} className="uc-ic" />
         {useCase.label}
       </h3>
+      {/*
+       * Every capability's headline and words are in the page as served; the one
+       * showing is visible and read out, the others wait in the same place.
+       */}
       <ul className="uc-caps" data-static={reduced ? "true" : "false"}>
-        {useCase.capabilities.map((capability, capIndex) => (
-          <li key={capability.text} className="uc-cap" data-on={reduced || capIndex === shown ? "true" : "false"}>
-            <LandingIcon name={capability.icon} className="uc-cap-ic" />
-            <span className="uc-cap-text">{capability.text}</span>
-          </li>
-        ))}
+        {useCase.capabilities.map((capability, capIndex) => {
+          const on = reduced || capIndex === shown;
+          return (
+            <li
+              key={capability.text}
+              className="uc-cap"
+              data-on={on ? "true" : "false"}
+              aria-hidden={on ? undefined : true}
+            >
+              <span className="uc-cap-text">{capability.text}</span>
+              <span className="uc-cap-detail">{capability.detail}</span>
+            </li>
+          );
+        })}
       </ul>
       {reduced ? (
         <span className="uc-segs" aria-hidden="true" />

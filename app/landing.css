@@ -585,16 +585,9 @@
 
 .uc-cap {
   grid-area: 1 / 1;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-3);
-  color: var(--ink-strong);
-  font-family: var(--font-display);
-  font-size: clamp(1.25rem, 1.8vw, 1.625rem);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-  text-wrap: balance;
+  display: grid;
+  align-content: start;
+  gap: var(--sp-2);
   opacity: 0;
   transition: opacity 400ms var(--ease-out);
 }
@@ -603,33 +596,38 @@
   opacity: 1;
 }
 
-/* the icon sits on the headline's first line */
-.uc-cap-ic {
-  flex: none;
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-block-start: 0.12em;
-  color: var(--amber);
+.uc-cap-text {
+  color: var(--ink-strong);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1.8vw, 1.625rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-wrap: balance;
 }
 
-.uc-cap-text {
-  min-width: 0;
+/* what the capability is, in a sentence or two of body type */
+.uc-cap-detail {
+  max-inline-size: 46ch;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  text-wrap: pretty;
 }
 
 /* reduced motion: the three capabilities stand as a short list */
 .uc-caps[data-static="true"] {
-  gap: var(--sp-2);
+  gap: var(--sp-5);
 }
 
 .uc-caps[data-static="true"] .uc-cap {
   grid-area: auto;
-  font-size: var(--fs-lg);
   opacity: 1;
 }
 
-.uc-caps[data-static="true"] .uc-cap-ic {
-  width: var(--ic-lg);
-  height: var(--ic-lg);
+.uc-caps[data-static="true"] .uc-cap-text {
+  font-size: var(--fs-lg);
 }
 
 /* the three segments: each one is a way to its capability, and the current one fills with its time */

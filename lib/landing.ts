@@ -103,8 +103,8 @@ export type LandingIconName =
   | "bot"
   | "layers";
 
-/** a capability carries its own picture, which shows while its caption does */
-export type Capability = Readonly<{ text: string; icon: LandingIconName; art: Art }>;
+/** a capability: its headline, one or two sentences on what it is, and its own picture, which shows while it does */
+export type Capability = Readonly<{ text: string; detail: string; icon: LandingIconName; art: Art }>;
 
 export type UseCase = Readonly<{
   id: string;
@@ -128,8 +128,8 @@ function capabilityArt(name: string, alt: string): Art {
  */
 export const USE_CASES = {
   title: "find your use case",
-  /* how long each capability, and its picture, shows before its audience moves on to the next */
-  captionMs: 3600,
+  /* how long each capability, its words and its picture, shows before its audience moves on to the next */
+  captionMs: 6000,
   slides: [
     {
       id: "researchers",
@@ -138,16 +138,22 @@ export const USE_CASES = {
       capabilities: [
         {
           text: "build evals from real work",
+          detail:
+            "Gather redacted transcripts of real coding work in a private collective, as source material for your evals.",
           icon: "check",
           art: capabilityArt("uc-balance", "a balance scale with an amber weight in its right pan"),
         },
         {
           text: "study how agents are used",
+          detail:
+            "Read how people prompt, steer and correct their agents in the transcripts published to your collective.",
           icon: "chart",
           art: capabilityArt("uc-book", "an open book on a stand with an amber ribbon bookmark"),
         },
         {
           text: "run a class on agents",
+          detail:
+            "Students publish their sessions to your class's collective, so you can see how each worked with an agent.",
           icon: "class",
           art: capabilityArt("uc-slate", "a slate on an easel with an amber apple on its ledge"),
         },
@@ -161,16 +167,22 @@ export const USE_CASES = {
       capabilities: [
         {
           text: "review the work behind a diff",
+          detail:
+            "Link the transcripts behind a pull request's commits, so reviewers in your collective read how it was made.",
           icon: "pull-request",
           art: capabilityArt("uc-lens", "an amber magnifying glass held up to a page"),
         },
         {
           text: "onboard from real history",
+          detail:
+            "New teammates read the transcripts behind past pull requests to learn how and why the code got this way.",
           icon: "history",
           art: capabilityArt("uc-signpost", "a signpost with three arrows, the top one amber"),
         },
         {
           text: "learn from each other's prompts",
+          detail:
+            "See how teammates prompt and steer their agents, and reuse what works.",
           icon: "conversation",
           art: capabilityArt("uc-candles", "one candle leaning over to light another, both flames amber"),
         },
@@ -184,16 +196,22 @@ export const USE_CASES = {
       capabilities: [
         {
           text: "find any past session",
+          detail:
+            "Peasant indexes your agents' sessions on this computer, so you can search them and open one in the browser.",
           icon: "search",
           art: capabilityArt("uc-lantern", "a lantern with amber glass"),
         },
         {
           text: "explain a change in one comment",
+          detail:
+            "Comment /peasant attach on a pull request, then confirm, to link your transcripts that match its commits.",
           icon: "link",
           art: capabilityArt("uc-door", "an arched door with an amber note pinned to it"),
         },
         {
           text: "publish on every push",
+          detail:
+            "Each time you push, a git hook publishes the repository's sessions, redacted, to the collectives you chose.",
           icon: "send",
           art: capabilityArt("uc-bell", "an amber town crier's handbell"),
         },
@@ -207,16 +225,22 @@ export const USE_CASES = {
       capabilities: [
         {
           text: "keep agent data in-house",
+          detail:
+            "Only your collective's members can read its transcripts, and joining can be limited to your GitHub org.",
           icon: "lock",
           art: capabilityArt("uc-chest", "a closed chest with an amber padlock"),
         },
         {
           text: "see which commits agents wrote",
+          detail:
+            "A transcript keeps the commits its session made, so a change traces back to the transcript behind it.",
           icon: "code",
           art: capabilityArt("uc-scroll", "a written scroll with an amber wax seal"),
         },
         {
           text: "usage across teams",
+          detail:
+            "A collective lists each transcript's contributor, agent and turns, with token and pull request totals.",
           icon: "chart",
           art: capabilityArt("uc-sacks", "three tied sacks rising in height like a bar chart, the tallest amber"),
         },

@@ -58,31 +58,48 @@ removed:
   - they see how it is used
   - discord
   - data commons built by commoners
-# every audience shows at once; each cycles its own three capabilities, captionMs apiece
+# every audience shows at once; each cycles its own three capabilities, captionMs apiece,
+# each with one or two sentences on what it is (all twelve in the server's HTML)
 useCases:
-  captionMs: 3600
+  captionMs: 6000
   slides:
     - id: researchers
       label: researchers
       capabilities: [build evals from real work, study how agents are used, run a class on agents]
+      details:
+        - "Gather redacted transcripts of real coding work in a private collective, as source material for your evals."
+        - "Read how people prompt, steer and correct their agents in the transcripts published to your collective."
+        - "Students publish their sessions to your class's collective, so you can see how each worked with an agent."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-balance, uc-book, uc-slate]
       cta: { label: sign up free, href: "/?login" }
     - id: teams
       label: teams
       capabilities: [review the work behind a diff, onboard from real history, "learn from each other's prompts"]
+      details:
+        - "Link the transcripts behind a pull request's commits, so reviewers in your collective read how it was made."
+        - "New teammates read the transcripts behind past pull requests to learn how and why the code got this way."
+        - "See how teammates prompt and steer their agents, and reuse what works."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lens, uc-signpost, uc-candles]
       cta: { label: sign up free, href: "/?login" }
     - id: developers
       label: developers
       capabilities: [find any past session, explain a change in one comment, publish on every push]
+      details:
+        - "Peasant indexes your agents' sessions on this computer, so you can search them and open one in the browser."
+        - "Comment /peasant attach on a pull request, then confirm, to link your transcripts that match its commits."
+        - "Each time you push, a git hook publishes the repository's sessions, redacted, to the collectives you chose."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lantern, uc-door, uc-bell]
       cta: { label: install now, href: "#install" }
     - id: companies
       label: companies
       capabilities: [keep agent data in-house, see which commits agents wrote, usage across teams]
+      details:
+        - "Only your collective's members can read its transcripts, and joining can be limited to your GitHub org."
+        - "A transcript keeps the commits its session made, so a change traces back to the transcript behind it."
+        - "A collective lists each transcript's contributor, agent and turns, with token and pull request totals."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-chest, uc-scroll, uc-sacks]
       cta: { label: talk to us, href: "mailto:hello@peasantlabs.org" }

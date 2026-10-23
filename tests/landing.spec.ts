@@ -163,9 +163,17 @@ test("the use cases show all four audiences at once, each led by the capability 
     // the capability showing is the card's headline, set larger than the audience's label
     const sizes = await card.evaluate((element) => ({
       audience: parseFloat(getComputedStyle(element.querySelector("h3")!).fontSize),
-      capability: parseFloat(getComputedStyle(element.querySelector('.uc-cap[data-on="true"]')!).fontSize),
+      capability: parseFloat(
+        getComputedStyle(element.querySelector('.uc-cap[data-on="true"] .uc-cap-text')!).fontSize,
+      ),
     }));
     expect(sizes.capability, `${slide.label}: the capability does not lead the card`).toBeGreaterThan(sizes.audience);
+    // one icon, the audience's: the capabilities carry none
+    await expect(card.locator("svg.uc-ic")).toHaveCount(1);
+    await expect(card.locator(".uc-caps svg")).toHaveCount(0);
+    // each capability says what it is; only the one showing is read out
+    await expect(card.locator(".uc-cap-detail")).toHaveText(slide.details);
+    await expect(card.locator('.uc-cap[aria-hidden="true"]')).toHaveCount(slide.capabilities.length - 1);
     // one segment per capability; choosing one shows its headline and its own picture
     const segments = card.locator(".uc-segs").getByRole("button");
     await expect(segments).toHaveCount(slide.capabilities.length);
@@ -181,6 +189,17 @@ test("the use cases show all four audiences at once, each led by the capability 
     }
     const cta = card.getByRole("link", { name: slide.cta.label, exact: true });
     await expect(cta).toHaveAttribute("href", slide.cta.href);
+  }
+
+  // every capability's headline and words are in the page as served, for search engines and readers without script
+  const served = (await (await page.request.get("/")).text())
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&amp;", "&");
+  for (const slide of fixture.useCases.slides) {
+    for (const words of [...slide.capabilities, ...slide.details]) {
+      expect(served, `the served page is missing ${JSON.stringify(words)}`).toContain(words);
+    }
   }
 
   // the segments are reachable from the keyboard
