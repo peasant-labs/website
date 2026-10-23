@@ -342,8 +342,10 @@
 }
 
 /*
- * One left edge: prose at its measure, and tables, commands, paths and cards
- * from the same edge out to a wider track on the right.
+ * One left edge and one right edge: running text keeps its measure, and
+ * everything with a frame or a rule (section rules, steps, notes, tables,
+ * commands, paths, cards) runs from the same left edge to the wider track's
+ * right edge.
  */
 :is(.dx-sec, .dx-step-body),
 .dx-step {
@@ -359,7 +361,7 @@
   grid-column: prose;
 }
 
-:is(.dx-sec, .dx-step-body) > :is(.dx-terms, .dx-defs, .dx-ref, .dx-guides, .dx-cmd, .dx-cmds, .dx-cmd-group, .dx-path, .dx-agents),
+:is(.dx-sec, .dx-step-body) > :is(h2, .dx-list, .dx-bullets:has(.dx-cmd), .dx-note, .dx-terms, .dx-defs, .dx-ref, .dx-guides, .dx-cmd, .dx-cmds, .dx-cmd-group, .dx-path, .dx-agents),
 .dx-step > .dx-step-body {
   grid-column: wide;
 }
@@ -409,7 +411,7 @@
 }
 
 :is(.dx-sec, .dx-step-body, .dx-note) p,
-:is(.dx-list, .dx-bullets) li,
+.dx-bullets:not(:has(.dx-cmd)) li,
 .dx-terms dd,
 .dx-defs dd,
 .dx-ref dd,
@@ -527,15 +529,10 @@
 }
 
 /*
- * A command that does not fit wraps inside its block rather than scrolling: a
- * scrolled line would hide part of the command and need its own tab stop.
- * It breaks at spaces, and inside a word only when one word is wider than the
- * whole line. The grids around it never grow to a long word's width.
+ * On a wide screen a command stays on one line, as fairtrade draws it, so a
+ * flag never splits; the rare one that does not fit scrolls inside its line,
+ * which then takes focus (components/docs/doc-command.tsx).
  */
-.dx-cmd .cli-cmd-line code {
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-}
 
 /* commands are code, which reads at the 16px floor like the text around it */
 .dx-cmd .cli-cmd-line {
@@ -543,13 +540,14 @@
 }
 
 /*
- * On a phone a command stays on one line and scrolls sideways inside its block
- * (it takes focus while it scrolls), so nothing breaks mid-word. The copy
- * button keeps its icon and name, drops the word, and is a full tap target.
+ * On a phone a command wraps to show all of it, breaking at any character so
+ * every line is full and nothing hides off the edge. The copy button keeps
+ * its icon and name, drops the word, and is a full tap target.
  */
 @container dx-page (max-width: 30rem) {
   .dx-cmd .cli-cmd-line code {
-    white-space: pre;
+    white-space: pre-wrap;
+    word-break: break-all;
   }
 
   .dx-cmd .cli-copy-word {

@@ -61,7 +61,9 @@ export function DocProcedure({ steps, ordered = true }: { steps: readonly DocSte
     <Tag className={ordered ? "dx-list" : "dx-bullets"}>
       {steps.map((step) => (
         <li key={step.text}>
-          <Rich text={step.text} />
+          <p>
+            <Rich text={step.text} />
+          </p>
           <DocCommands commands={step.commands} />
         </li>
       ))}
@@ -124,11 +126,19 @@ export function DocList({ items, ordered = false }: { items: readonly string[]; 
   const Tag = ordered ? "ol" : "ul";
   return (
     <Tag className={ordered ? "dx-list" : "dx-bullets"}>
-      {items.map((item) => (
-        <li key={item}>
-          <Rich text={item} />
-        </li>
-      ))}
+      {items.map((item) =>
+        ordered ? (
+          <li key={item}>
+            <p>
+              <Rich text={item} />
+            </p>
+          </li>
+        ) : (
+          <li key={item}>
+            <Rich text={item} />
+          </li>
+        ),
+      )}
     </Tag>
   );
 }
