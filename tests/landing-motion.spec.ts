@@ -187,31 +187,27 @@ test("the session's windows fan out from one stack once, the transcript wide in 
   expect(await back.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
 });
 
-test("the transcript reel fits at phone and tablet widths, with its redaction markers read whole", async ({
+test("the transcript browser fits at phone and tablet widths, a long line scrolling inside its own block", async ({
   browser,
 }) => {
   for (const width of [390, 768]) {
     const context = await browser.newContext({ ...PHONE, viewport: { width, height: 900 } });
     const page = await context.newPage();
     await page.goto("/");
-    const reel = page.locator("#session [data-reel]");
-    await reel.scrollIntoViewIfNeeded();
-    // the tool call, whose result carries the redacted key
-    await reel.locator(".reel-segs").getByRole("button").nth(1).tap();
-    const fit = await reel.evaluate((box) => {
-      const edge = box.getBoundingClientRect().right + 1;
-      const beat = box.querySelector('.reel-beat[data-on="true"]')!;
-      const walker = document.createTreeWalker(beat, NodeFilter.SHOW_TEXT);
-      const clipped: string[] = [];
-      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-        const range = document.createRange();
-        range.selectNodeContents(node);
-        for (const rect of range.getClientRects()) if (rect.right > edge) clipped.push(node.textContent ?? "");
-      }
-      return { overflow: box.scrollWidth - box.clientWidth, clipped: clipped.length };
-    });
-    expect(fit, `the reel does not fit at ${width}`).toEqual({ overflow: 0, clipped: 0 });
-    await expect(reel.locator('.reel-beat[data-on="true"]')).toContainText("<AWS_ACCESS_KEY>");
+    const viewer = page.locator("#session [data-session-viewer]");
+    await viewer.scrollIntoViewIfNeeded();
+    // the tool call whose result carries the redacted key, opened in place
+    const env = viewer.locator(".tc-head", { hasText: ".env" }).first();
+    await env.scrollIntoViewIfNeeded();
+    await env.tap();
+    const result = env.locator("xpath=..").locator("pre").first();
+    await expect(result).toContainText("<AWS_ACCESS_KEY>");
+    const fit = await result.evaluate((box) => ({
+      page: document.documentElement.scrollWidth - window.innerWidth,
+      // a line wider than the window scrolls inside the code block, as in the transcript browser itself
+      contained: box.scrollWidth <= box.clientWidth || /auto|scroll/.test(getComputedStyle(box).overflowX),
+    }));
+    expect(fit, `the transcript browser does not fit at ${width}`).toEqual({ page: 0, contained: true });
     await context.close();
   }
 });

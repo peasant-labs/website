@@ -2323,10 +2323,15 @@
   font-size: var(--fs-sm);
 }
 
-/* the reel sits in a browser window that keeps one height, whichever beat it shows; svh, so a phone's toolbars never resize it */
+/*
+ * The transcript browser sits in a browser window that keeps one height
+ * whatever it shows: switching tabs or opening a turn scrolls inside the
+ * viewer's own columns, never moving the page under the reader. svh, so a
+ * phone's toolbars never resize it.
+ */
 .lp-session-win .mac-body {
   flex: none;
-  block-size: clamp(28rem, 72svh, 44rem);
+  block-size: clamp(32rem, 78svh, 48rem);
 }
 
 /* on a phone Safari's chrome scales down in proportion and keeps only what fits: the lights, back, forward and the address */
@@ -2340,184 +2345,33 @@
   }
 }
 
-/*
- * The transcript reel: the session's title and agent, then a stage where the
- * beat at hand sits in the middle at full ink while the others dim, and a slim
- * segment per beat under it. All three keep to one centred column, the width a
- * transcript page reads at, however wide the window.
- */
-.reel {
-  --reel-col: 52rem;
-  --reel-gutter: max(var(--sp-6), (100% - var(--reel-col)) / 2);
+.lp-viewer {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  background: var(--surface);
-}
-
-.reel-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--sp-2) var(--sp-5);
-  padding: var(--sp-5) var(--reel-gutter) var(--sp-4);
-  border-bottom: var(--bd);
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  letter-spacing: 0;
-}
-
-/* the session's own title: user content keeps its case */
-.reel-title {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--ink-strong);
-  font-family: var(--font-display);
-  font-size: var(--fs-xl);
-  font-weight: 700;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  text-transform: none;
-  white-space: nowrap;
-}
-
-.reel-stage {
-  position: relative;
-  flex: 1;
-  min-height: 0;
+  inline-size: 100%;
+  block-size: 100%;
   overflow: hidden;
 }
 
-.reel-track {
-  display: grid;
-  gap: var(--sp-5);
-  margin: 0;
-  padding: var(--sp-6) var(--reel-gutter);
-  list-style: none;
-}
-
-.reel-beat {
-  min-width: 0;
-  opacity: 0.42;
-}
-
-.reel-beat[data-on="true"] {
-  opacity: 1;
-}
-
-.reel-part {
-  display: grid;
-  justify-items: start;
-  gap: var(--sp-3);
-}
-
-.reel-part > :not(.reel-commit, .reel-outcome) {
-  justify-self: stretch;
-}
-
-/*
- * The reel keeps to the words a beat needs: a turn shows who spoke and what
- * was said, without its disclosure, time, link, model or token count, and a
- * tool call shows its result or its lines without repeating its path or
- * counting them.
- */
-.reel :is(.txn-turnnum, .txn-turn-disclosure, .txn-anchor, .txn-turnmodel, .txn-code-head, .txn-diff-head),
-.reel .term-anchor:has(.txn-turntime, .txn-tokbadge) {
+/* the sample is shown without a crumb trail; the viewer's empty trail leaves the page and its landmarks */
+.lp-viewer .txn-crumb:empty {
   display: none;
 }
 
-/*
- * A tool's output wraps rather than running out of the window, so a redaction
- * marker is always read whole; a diff keeps its lines, and its long ones end
- * at the window's edge, so the change still reads as a change on a phone.
- */
-.reel :is(pre, code) {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.reel .diff {
-  overflow: hidden;
-}
-
-/* the run of text the pointer rests on, lit like a selection */
-::highlight(reel-point) {
+/* what the tour's pointer rests on, lit like a selection */
+::highlight(tour-point) {
   background-color: color-mix(in oklab, var(--amber) 32%, transparent);
   color: var(--ink-strong);
 }
 
-.reel-commit {
-  color: var(--ink-2);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-}
-
-/* one slim segment per beat, on the column: the one at hand fills with its time, and any can be chosen */
-.reel-segs {
-  display: flex;
-  gap: var(--sp-2);
-  padding: 0 var(--reel-gutter);
-  border-top: var(--bd);
-}
-
-.reel-seg {
-  display: grid;
-  flex: 1;
-  place-items: center stretch;
-  height: var(--target-comfortable);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.reel-seg-track {
-  position: relative;
-  display: block;
-  height: 3px;
-  overflow: hidden;
-  background: var(--rule);
-}
-
-.reel-seg[data-state="on"] .reel-seg-track {
-  background: var(--rule-strong);
-}
-
-.reel-seg[data-state="done"] .reel-seg-track {
-  background: var(--amber);
-}
-
-.reel-seg-fill {
-  position: absolute;
-  inset: 0;
-  background: var(--amber);
-  transform: scaleX(0);
-  transform-origin: left center;
-}
-
-/* under reduced motion nothing fills: the chosen beat's segment is simply amber */
-.reel-seg[data-state="on"] .reel-seg-track:not(:has(.reel-seg-fill)) {
-  background: var(--amber);
-}
-
-.reel-seg:focus-visible {
-  outline-offset: -6px;
-}
-
 /*
- * The pointer that drives the reel, over everything in it. It shows once the
- * reel first plays, and steps aside while the reader's own pointer or focus
- * holds the reel.
+ * The pointer that tours the viewer, over everything in it. It shows while
+ * the tour runs and is gone the moment the reader takes over.
  */
 .mac-pointer {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
-  z-index: 3;
+  z-index: 30;
   width: 22px;
   height: 22px;
   pointer-events: none;
@@ -2539,60 +2393,7 @@
   stroke-linejoin: round;
 }
 
-.reel-pointer {
-  opacity: 0;
-  transition: opacity 240ms var(--ease-out);
-}
-
-.reel[data-pointer="on"] .reel-pointer {
-  opacity: 1;
-}
-
-.reel[data-held="true"] .reel-pointer {
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .reel-track {
-    transition: transform 720ms var(--ease-in-out);
-  }
-
-  .reel-beat {
-    transition: opacity 420ms var(--ease-in-out);
-  }
-
-  .reel-seg {
-    transition: transform var(--dur-2) var(--ease-out);
-  }
-
-  .reel-seg:active {
-    transform: scale(0.97);
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .reel-seg:hover .reel-seg-track {
-    background: var(--ink-4);
-  }
-}
-
 @media (max-width: 47.99rem) {
-  .reel {
-    --reel-gutter: var(--sp-4);
-  }
-
-  .reel-head {
-    padding-block: var(--sp-4);
-  }
-
-  .reel-title {
-    font-size: var(--fs-lg);
-  }
-
-  .reel-track {
-    padding-block: var(--sp-4);
-  }
-
   .mac-pointer {
     width: 19px;
     height: 19px;

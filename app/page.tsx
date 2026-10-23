@@ -5,7 +5,7 @@ import { HeroFlow } from "@/components/landing/hero-flow";
 import { LandingIcon } from "@/components/landing/icons";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { SessionWindows } from "@/components/landing/session-windows";
-import { TranscriptReel } from "@/components/landing/transcript-reel";
+import { SessionViewer } from "@/components/landing/session-viewer";
 import { UseCases } from "@/components/landing/use-cases";
 import { SafariWindow } from "@/components/mac";
 import { SiteShell } from "@/components/site-shell";
@@ -101,12 +101,7 @@ export default function Home() {
             </div>
             <SessionWindows>
               <SafariWindow secure className="lp-session-win">
-                <TranscriptReel
-                  label={SESSION.label}
-                  session={SAMPLE_SESSION}
-                  title={SESSION.sessionTitle}
-                  beats={SESSION.reel}
-                />
+                <SessionViewer label={SESSION.label} session={SAMPLE_SESSION} title={SESSION.sessionTitle} />
               </SafariWindow>
             </SessionWindows>
           </div>

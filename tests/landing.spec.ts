@@ -624,22 +624,18 @@ test("under reduced motion the steps stack, each scene on its finished frame, wi
   ).toBe(0);
 });
 
-test("a sample session plays as a reel of its beats, driven by a pointer, read by fairtrade's own transcript parts", async ({
+test("a sample session opens in the real transcript browser, in a wide window that keeps its height", async ({
   page,
 }) => {
   await page.goto("/");
   const section = page.locator("#session");
-  const reel = section.locator("[data-reel]");
-  await expect(reel).toHaveAttribute("aria-label", fixture.session.label);
-  await expect(reel).toHaveAttribute("aria-roledescription", "carousel");
-  // the session goes by its short title, with no crumb trail, no ids, and nothing to operate
-  await expect(reel.locator(".reel-title")).toHaveText(fixture.session.title);
-  for (const id of [fixture.session.sessionId, fixture.session.commitId]) {
-    await expect(section, `the section shows the id ${id}`).not.toContainText(id);
-  }
-  await expect(section.getByRole("tab")).toHaveCount(0);
-  await expect(section.locator(".txn-app, .txn-crumb")).toHaveCount(0);
-  // no explainer beside it: the markers in the reel say what was redacted
+  const viewer = section.locator("[data-session-viewer]");
+  await expect(viewer).toHaveAttribute("aria-label", fixture.session.label);
+  // the session goes by its short title, with no crumb trail and no session id
+  await expect(viewer.getByRole("heading", { name: fixture.session.title })).toBeVisible();
+  await expect(section).not.toContainText(fixture.session.sessionId);
+  await expect(section.locator(".txn-crumb a, .txn-crumb li")).toHaveCount(0);
+  // no explainer beside it: the markers in the transcript say what was redacted
   await expect(section.locator(".lp-note")).toHaveCount(0);
   // behind it, Claude Code where the session was recorded, hidden from assistive technology;
   // over its corner, the pull request's check in village's own words
@@ -649,56 +645,30 @@ test("a sample session plays as a reel of its beats, driven by a pointer, read b
   await expect(section.locator(".lp-check-summary")).toHaveText(fixture.session.check.summary);
   // the values peasant redacted show as their markers
   for (const marker of fixture.session.markers) {
-    await expect(reel, `the reel does not show ${marker}`).toContainText(marker);
+    await expect(viewer, `the transcript does not show ${marker}`).toContainText(marker);
   }
-  // the outcome is the last beat's, not the title's
-  await expect(reel.locator(".reel-head .reel-outcome")).toHaveCount(0);
-  await expect(reel.locator(".reel-beat").last().locator(".reel-outcome")).toHaveCount(1);
 
-  // one segment per beat; each can be chosen, and the window keeps its height whichever is shown
+  // the browser's own tabs, each of which works, and the window keeps its height whichever is shown
+  const tabs = viewer.getByRole("tab");
+  expect((await tabs.allInnerTexts()).map((text) => text.split("\n")[0])).toEqual(fixture.session.tabs);
   const browser = section.locator(".mac-win-browser");
-  const segments = reel.locator(".reel-segs").getByRole("button");
-  await expect(segments).toHaveCount(fixture.session.beats.length);
   const height = () => browser.evaluate((window) => window.getBoundingClientRect().height);
   const before = await height();
-  const stage = reel.locator(".reel-stage");
-  const descriptions = new Set<string | null>();
-  for (const [index, beat] of fixture.session.beats.entries()) {
-    await segments.nth(index).click();
-    await expect(segments.nth(index)).toHaveAttribute("aria-label", `show ${beat}`);
-    await expect(segments.nth(index)).toHaveAttribute("aria-current", "true");
-    await expect(reel.locator('.reel-beat[data-on="true"]')).toHaveCount(1);
-    descriptions.add(await stage.getAttribute("aria-label"));
+  for (const [index] of fixture.session.tabs.entries()) {
+    await tabs.nth(index).click();
+    await expect(tabs.nth(index)).toHaveAttribute("aria-selected", "true");
     expect(await height()).toBe(before);
   }
-  // the stage is one picture to assistive technology, described by the beat at hand
-  expect(descriptions.size).toBe(fixture.session.beats.length);
-
-  // a pointer drives it, hidden from assistive technology: it moves on its own, and lights what each beat is about
-  const pointer = reel.locator(".reel-pointer");
-  await expect(pointer).toHaveAttribute("aria-hidden", "true");
-  await segments.nth(0).click();
-  await page.mouse.move(0, 0);
-  await expect(reel).toHaveAttribute("data-playing", "true");
-  const place = () => pointer.evaluate((arrow) => getComputedStyle(arrow).transform);
-  const from = await place();
-  await expect.poll(place).not.toBe(from);
-  const lit = () =>
-    page.evaluate(() => [...(CSS.highlights.get("reel-point") ?? [])].map(String).join("").trim());
-  await expect.poll(lit, { timeout: 5000 }).toBe(fixture.session.points[0]);
-
-  // a beat's time running out is the pointer's press on the next segment, which moves the reel on
-  const fill = reel.locator(".reel-seg-fill");
-  const running = () => fill.evaluate((bar) => bar.getAnimations().map((animation) => animation.playState));
-  await expect.poll(running).toEqual(["running"]);
-  await fill.evaluate((bar) => bar.getAnimations().forEach((animation) => animation.finish()));
-  await expect(segments.nth(1)).toHaveAttribute("aria-current", "true");
-
-  // the reader's pointer holds it: the fill pauses where it is, and the reel's pointer steps aside
-  await stage.hover();
-  await expect(reel).toHaveAttribute("data-playing", "false");
-  await expect.poll(running).toEqual(["paused"]);
-  await expect.poll(() => pointer.evaluate((arrow) => getComputedStyle(arrow).opacity)).toBe("0");
+  // a tool call opens in place, its redacted result read whole
+  await viewer.getByRole("tab", { name: /full trace/ }).click();
+  const env = viewer.locator(".tc-head", { hasText: ".env" }).first();
+  await env.click();
+  await expect(env).toHaveAttribute("aria-expanded", "true");
+  await expect(env.locator("xpath=..")).toContainText("AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY>");
+  expect(await height()).toBe(before);
+  // the transcript scrolls inside the window, never the page under it
+  const stream = viewer.locator(".txn-stream");
+  expect(await stream.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
 
   // it is shown in a browser window whose address field carries the padlock and no address
   await expect(browser.locator(".mac-lights")).toBeVisible();
@@ -711,16 +681,6 @@ test("a sample session plays as a reel of its beats, driven by a pointer, read b
       .locator(".mac-lights i")
       .evaluateAll((lights) => lights.map((light) => getComputedStyle(light).backgroundColor)),
   ).toEqual(["rgb(255, 95, 87)", "rgb(254, 188, 46)", "rgb(40, 200, 64)"]);
-
-  // under reduced motion there is no pointer and nothing plays on its own: each beat is its finished still
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  await expect(page.locator("#session .reel-seg-fill")).toHaveCount(0);
-  await expect(page.locator("#session .reel-pointer")).toHaveCount(0);
-  for (const [index, point] of fixture.session.points.entries()) {
-    await page.locator("#session .reel-segs").getByRole("button").nth(index).click();
-    await expect.poll(lit).toBe(point);
-  }
 });
 
 test("the theme follows the system until the reader chooses one", async ({ page }) => {

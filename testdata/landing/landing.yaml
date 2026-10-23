@@ -125,19 +125,15 @@ install:
   kickstart: peasant kickstart
   guide: { label: read our docs, href: /docs }
 session:
-  label: a sample session, beat by beat
-  # the reel names the sample by this short title; its id is shown nowhere
+  label: a sample session
+  # the viewer names the sample by this short title; its id is shown nowhere
   title: fix the staging 403
-  # the reel's beats, as their segments name them, in order
-  beats: [the prompt, a tool call, the change, the outcome]
-  # what the pointer lights on each beat, in the same order
-  points: [a 403, "<AWS_ACCESS_KEY>", use a per-environment aws profile for build uploads, resolved]
-  # ids the sample carries, shown nowhere on the page: the session's and its commit's
   sessionId: sess_c41e07
-  commitId: 9b20f4e
+  # the transcript browser's own tabs, as online's transcript page shows them
+  tabs: [highlights, full trace, diffs, files, annotations]
   # the pull request's check, in village's own words (backend/internal/digest/render.go) for one transcript and one commit
   check: { name: peasant / prompts, summary: 1 transcript traces 1 of 1 commits }
-  # placeholders the redaction engine writes, visible in the reel's beats
+  # placeholders the redaction engine writes, visible in the transcript
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
 vision:
   line: We are building a sustainable, respectful ecosystem where people have a stake in their data.
