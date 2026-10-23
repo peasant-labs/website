@@ -35,8 +35,8 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
     items: [
       { id: "overview", label: "overview", href: "/docs", icon: "overview" },
       { id: "install", label: "install", href: "/docs#install", icon: "install" },
-      { id: "kickstart", label: "set up with kickstart", href: "/docs#kickstart", icon: "kickstart" },
-      { id: "publish", label: "publish a session", href: "/docs#publish", icon: "publish" },
+      { id: "kickstart", label: "set up", href: "/docs#kickstart", icon: "kickstart" },
+      { id: "publish", label: "publish", href: "/docs#publish", icon: "publish" },
     ],
   },
   {
@@ -44,7 +44,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
     label: "guides",
     items: [
       { id: "evals", label: "agent evals", href: "/docs/guides/evals", icon: "evals" },
-      { id: "reviews", label: "pull request reviews", href: "/docs/guides/reviews", icon: "reviews" },
+      { id: "reviews", label: "pr reviews", href: "/docs/guides/reviews", icon: "reviews" },
     ],
   },
   {
@@ -54,7 +54,7 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
       { id: "cli", label: "cli", href: "/docs#cli", icon: "cli" },
       { id: "agents", label: "agents", href: "/docs#agents", icon: "agents" },
       { id: "redaction", label: "redaction", href: "/docs#redaction", icon: "redaction" },
-      { id: "access", label: "collectives and access", href: "/docs#access", icon: "access" },
+      { id: "access", label: "collectives", href: "/docs#access", icon: "access" },
     ],
   },
   {
