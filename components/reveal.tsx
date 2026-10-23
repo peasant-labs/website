@@ -47,11 +47,30 @@ export function RevealOnView() {
       { threshold: 0.15 },
     );
 
-    const targets = document.querySelectorAll<HTMLElement>(
-      ".art:not([data-revealed]), [data-fade]:not([data-shown])",
-    );
-    targets.forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
+    const watch = () => {
+      document
+        .querySelectorAll<HTMLElement>(".art:not([data-revealed]), [data-fade]:not([data-shown])")
+        .forEach((target) => observer.observe(target));
+    };
+    watch();
+
+    // Something that mounts after this ran (a late client render, a hot reload)
+    // would otherwise wait hidden forever; it is watched as soon as it lands.
+    let frame = 0;
+    const mutations = new MutationObserver(() => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        watch();
+      });
+    });
+    mutations.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      mutations.disconnect();
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, [pathname]);
 
   return null;
