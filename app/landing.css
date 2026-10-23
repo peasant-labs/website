@@ -394,76 +394,68 @@
 /* use cases */
 
 /*
- * The heading and the four audiences as a bento of four shapes on a wide
- * screen: the heading beside researchers, wide; teams and developers side by
- * side, each picture over its copy; companies across the page. On a narrow one
- * they stand one under another, each picture over its copy. Whitespace
- * separates them; no card has a border.
+ * The heading, then the four audiences two by two on a wide screen and one
+ * under another on a phone: equal widths, tops aligned, the same gaps. Each
+ * card is five rows (picture, audience, capability, segments, action), and
+ * cards side by side share those rows through subgrid, so every part sits on
+ * the same line as its neighbour's. Whitespace separates them; no card has a
+ * border.
+ */
+/*
+ * The grid's own row gap stays at zero: a subgrid adds its parent's row gap
+ * inside every card, between its parts. The space between rows of cards is
+ * each later row's top margin instead.
  */
 .uc {
+  --uc-row: clamp(4rem, 8vw, 6.5rem);
+
   position: relative;
   display: grid;
-  gap: clamp(4rem, 8vw, 7rem) clamp(2rem, 4vw, 3.5rem);
+  gap: 0 clamp(2rem, 5vw, 4rem);
   min-width: 0;
+}
+
+.uc-title {
+  grid-column: 1 / -1;
+  margin-block-end: clamp(2.5rem, 5vw, 4rem);
+}
+
+.uc-card:nth-of-type(n + 2) {
+  margin-block-start: var(--uc-row);
+}
+
+@media (min-width: 48rem) {
+  .uc {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .uc-card:nth-of-type(2) {
+    margin-block-start: 0;
+  }
 }
 
 .uc-card {
   display: grid;
-  gap: var(--sp-6);
+  grid-row: span 5;
+  grid-template-rows: subgrid;
+  row-gap: 0;
   align-content: start;
   min-width: 0;
 }
 
-@media (min-width: 64rem) {
-  .uc {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-
-  .uc-title {
-    grid-column: span 4;
-    align-self: start;
-  }
-
-  .uc-card:nth-of-type(1) {
-    grid-column: span 8;
-  }
-
-  .uc-card:nth-of-type(2) {
-    grid-column: span 5;
-  }
-
-  .uc-card:nth-of-type(3) {
-    grid-column: span 7;
-  }
-
-  .uc-card:nth-of-type(4) {
-    grid-column: 1 / -1;
-  }
-
-  /* the wide shapes: the picture beside its copy */
-  .uc-card:is(:nth-of-type(1), :nth-of-type(4)) {
-    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-    align-items: center;
-    gap: clamp(2rem, 4vw, 3.5rem);
-  }
-
-  .uc-card:nth-of-type(4) {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  }
-}
-
-/* the picture on its own page-colour panel, with room on every side, and its caption at the foot */
+/* the picture on its own page-colour panel, centred, with room on every side */
 .uc-figure {
   display: grid;
-  gap: var(--sp-5);
+  place-items: center;
+  aspect-ratio: 4 / 3;
   margin: 0;
-  padding: clamp(2rem, 4.5vw, 3.5rem) clamp(1rem, 2vw, 1.5rem) clamp(0.75rem, 1.5vw, 1.25rem);
+  overflow: hidden;
   background: var(--surface-2);
 }
 
 /*
- * One picture per capability, stacked in one place. The caption's own fades in
- * as the caption moves on, and the one it replaces fades out and then leaves
+ * One picture per capability, stacked in one place. The headline's own fades
+ * in as the card moves on, and the one it replaces fades out and then leaves
  * the accessibility tree. The pictures are drawn on an 8px grid at 704 by 528
  * and show at three eighths or a half of that, so every cell lands on whole
  * pixels.
@@ -507,19 +499,31 @@
   }
 }
 
-.uc-caption {
+/* the audience: a small label with its icon */
+.uc-who {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  min-height: var(--target-comfortable);
-  padding-inline: clamp(0.25rem, 1vw, 1rem);
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-6);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.3;
 }
 
+.uc-ic {
+  flex: none;
+  width: var(--ic-md);
+  height: var(--ic-md);
+  color: var(--amber);
+}
+
+/* the capability now showing is the card's headline; the other two wait in the same place */
 .uc-caps {
   display: grid;
-  flex: 1 1 auto;
-  min-width: 0;
-  margin: 0;
+  margin: var(--sp-3) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -527,13 +531,15 @@
 .uc-cap {
   grid-area: 1 / 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--sp-3);
   color: var(--ink-strong);
-  font-family: var(--font-mono);
-  font-size: var(--fs-body);
-  letter-spacing: 0;
-  line-height: 1.35;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 1.8vw, 1.625rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-wrap: balance;
   opacity: 0;
   transition: opacity 400ms var(--ease-out);
 }
@@ -542,10 +548,12 @@
   opacity: 1;
 }
 
+/* the icon sits on the headline's first line */
 .uc-cap-ic {
   flex: none;
-  width: var(--ic-lg);
-  height: var(--ic-lg);
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-block-start: 0.12em;
   color: var(--amber);
 }
 
@@ -553,17 +561,34 @@
   min-width: 0;
 }
 
+/* reduced motion: the three capabilities stand as a short list */
+.uc-caps[data-static="true"] {
+  gap: var(--sp-2);
+}
+
+.uc-caps[data-static="true"] .uc-cap {
+  grid-area: auto;
+  font-size: var(--fs-lg);
+  opacity: 1;
+}
+
+.uc-caps[data-static="true"] .uc-cap-ic {
+  width: var(--ic-lg);
+  height: var(--ic-lg);
+}
+
 /* the three segments: each one is a way to its capability, and the current one fills with its time */
 .uc-segs {
   display: flex;
-  flex: none;
-  margin-inline-end: calc(-1 * var(--sp-2));
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-3);
+  margin-inline-start: calc(-1 * var(--sp-1));
 }
 
 .uc-seg {
   display: grid;
   place-items: center;
-  width: 2rem;
+  width: 3rem;
   height: var(--target-comfortable);
   padding: 0;
   border: 0;
@@ -574,7 +599,7 @@
 .uc-seg-track {
   position: relative;
   display: block;
-  width: 1.25rem;
+  width: 2.5rem;
   height: 3px;
   overflow: hidden;
   background: var(--rule);
@@ -611,64 +636,25 @@
   outline-offset: -8px;
 }
 
-/* reduced motion: the three capabilities stand as a list under the picture */
-.uc-caption[data-static="true"] .uc-caps {
-  gap: var(--sp-2);
-}
-
-.uc-caption[data-static="true"] .uc-cap {
-  grid-area: auto;
-  opacity: 1;
-}
-
-/* under the panel: the audience, its sentence and its one action */
-.uc-copy {
-  display: grid;
-  gap: var(--sp-3);
-  justify-items: start;
-}
-
-.uc-copy h3 {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  color: var(--ink-strong);
-  font-family: var(--font-display);
-  font-size: var(--fs-xl);
-  font-weight: 700;
-  line-height: 1.15;
-}
-
-.uc-ic {
-  flex: none;
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--amber);
-}
-
-.uc-copy p {
-  max-inline-size: 44ch;
-  color: var(--ink-3);
-  font-size: var(--fs-body);
-  line-height: 1.6;
-}
-
+/* the one action, small */
 .uc-cta {
   display: inline-flex;
   align-items: center;
+  justify-self: start;
   gap: var(--sp-2);
   min-height: var(--target-comfortable);
+  margin-block-start: var(--sp-1);
   color: var(--amber);
   font-family: var(--font-mono);
-  font-size: var(--fs-body);
+  font-size: var(--fs-sm);
   font-weight: 700;
   letter-spacing: 0;
   text-decoration: none;
 }
 
 .uc-cta svg {
-  width: var(--ic-md);
-  height: var(--ic-md);
+  width: var(--ic-sm);
+  height: var(--ic-sm);
   transition: transform var(--dur-2) var(--ease-out);
 }
 
@@ -1850,25 +1836,18 @@
 
 /* get started */
 
-/* the heading and the docs link beside a Terminal window on a wide screen; above it on a narrow one */
+/* the heading and the docs link on top, then the tabs, then the Terminal across the whole column */
 .lp-install {
   display: grid;
   gap: clamp(2.5rem, 5vw, 4rem);
 }
 
-@media (min-width: 64rem) {
-  .lp-install {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    align-items: center;
-    gap: clamp(3rem, 5vw, 5rem);
-  }
-}
-
 .lp-install-head {
-  display: grid;
-  align-content: start;
-  justify-items: start;
-  gap: var(--sp-5);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4) var(--sp-7);
 }
 
 .lp-install-guide {
@@ -1880,13 +1859,10 @@
   letter-spacing: 0;
 }
 
-/* the tabs and the Terminal on a page-colour panel, with room on every side, like the use-case pictures */
 .gs {
   display: grid;
   gap: var(--sp-5);
   min-width: 0;
-  padding: clamp(1rem, 2.5vw, 2.25rem);
-  background: var(--surface-2);
 }
 
 .gs-os {
@@ -1919,13 +1895,13 @@
 }
 
 .gs-term .mac-body {
-  padding: 20px 22px 28px;
+  padding: clamp(16px, 2.5vw, 32px) clamp(14px, 3vw, 36px) clamp(20px, 3vw, 40px);
 }
 
-/* Terminal's default profile: the system monospace at 13px, the prompt dimmed */
+/* Terminal's profile: the system monospace, 13px on a phone and 15px on a wide screen, the prompt dimmed */
 .gs-lines {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--sp-4);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1987,14 +1963,20 @@
   }
 }
 
-/* copy is ours, not Terminal's: an icon in the terminal's own ink, its name for assistive technology */
+@media (min-width: 48rem) {
+  .gs-lines {
+    font-size: 15px;
+  }
+}
+
+/* copy is ours, not Terminal's: drawn in the terminal's own ink; on a phone, an icon whose name is read out */
 .gs-copy {
-  display: inline-grid;
+  display: inline-flex;
   flex: none;
-  place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  padding: 0;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 2.25rem;
+  padding: 0 var(--sp-3);
   border: 1px solid color-mix(in srgb, var(--mac-term-ink) 28%, transparent);
   background: transparent;
   color: var(--mac-term-ink);
@@ -2026,57 +2008,42 @@
   }
 }
 
-.gs-copy span {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/* on a phone the Terminal stands on the page itself, so its lines keep the width they need */
 @media (max-width: 39.99rem) {
-  .gs {
+  .gs-copy {
+    justify-content: center;
+    width: 2.25rem;
     padding: 0;
-    background: transparent;
   }
 
-  .gs-term .mac-body {
-    padding: 16px 14px 20px;
+  .gs-copy span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 
 /* a published session */
 
-/* the heading and its note beside one browser window on a wide screen; above it on a narrow one */
+/* the heading and its note on top, then one browser window across the whole column */
 .lp-session {
   display: grid;
   gap: clamp(2.5rem, 5vw, 4rem);
 }
 
 .lp-session-head {
-  display: grid;
-  align-content: start;
-  gap: var(--sp-5);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4) var(--sp-7);
   min-width: 0;
 }
 
-@media (min-width: 64rem) {
-  .lp-session {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
-    align-items: start;
-    gap: clamp(3rem, 5vw, 5rem);
-  }
-
-  .lp-session-head {
-    position: sticky;
-    inset-block-start: 6rem;
-  }
-}
-
 .lp-note {
-  max-inline-size: 36ch;
+  max-inline-size: 46ch;
   color: var(--ink-3);
 }
 

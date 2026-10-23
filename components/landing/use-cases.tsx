@@ -10,11 +10,13 @@ import { useRef, useState } from "react";
 const CAPS = 3;
 
 /**
- * The use cases: the heading and all four audiences at once, laid out as a
- * bento of four shapes on a wide screen (CSS decides which). A card's
- * picture panel cycles through its three capabilities, one picture and one
- * caption at a time, and its three segments say which is showing and step to
- * any of them. Under the panel: the audience, its sentence and its one action.
+ * The use cases: the heading, then the four audiences side by side, two by two
+ * on a wide screen and one under another on a phone. Each card leads with what
+ * its audience can do: under its picture, the audience as a small label, then
+ * the capability now showing as the card's headline, the three segments that
+ * step between capabilities, and its one action. The picture and the headline
+ * change together. Every card keeps the same rhythm, and cards side by side
+ * share their rows (CSS subgrid), so their parts line up across the page.
  *
  * Each card keeps its own clock, a quarter of a turn apart from its neighbour
  * so the four never change together. A clock is a CSS animation on the current
@@ -88,8 +90,8 @@ function UseCaseCard({
         }
       }}
     >
+      {/* each capability's picture, stacked in one place on its panel; the headline's own shows */}
       <figure className="uc-figure">
-        {/* each capability's picture, stacked in one place; the caption's own shows */}
         <div className="uc-arts">
           {useCase.capabilities.map((capability, capIndex) => (
             <div key={capability.text} className="uc-shot" data-on={capIndex === shown ? "true" : "false"}>
@@ -97,61 +99,54 @@ function UseCaseCard({
             </div>
           ))}
         </div>
-        <figcaption className="uc-caption" data-static={reduced ? "true" : "false"}>
-          <ul className="uc-caps">
-            {useCase.capabilities.map((capability, capIndex) => (
-              <li
-                key={capability.text}
-                className="uc-cap"
-                data-on={reduced || capIndex === shown ? "true" : "false"}
-              >
-                <LandingIcon name={capability.icon} className="uc-cap-ic" />
-                <span className="uc-cap-text">{capability.text}</span>
-              </li>
-            ))}
-          </ul>
-          {reduced ? null : (
-            <div className="uc-segs" role="group" aria-label={`${useCase.label}: capabilities`}>
-              {useCase.capabilities.map((capability, capIndex) => (
-                <button
-                  key={capability.text}
-                  type="button"
-                  className="uc-seg"
-                  aria-label={`show capability ${capIndex + 1} of ${CAPS}: ${capability.text}`}
-                  aria-current={capIndex === current ? "true" : undefined}
-                  data-state={capIndex < current ? "done" : capIndex === current ? "on" : "next"}
-                  onClick={() => pick(capIndex)}
-                >
-                  <span className="uc-seg-track">
-                    {capIndex === current ? (
-                      <span
-                        key={`${take}-${capIndex}`}
-                        className="uc-seg-fill"
-                        style={{
-                          animationDuration: `${USE_CASES.captionMs}ms`,
-                          animationDelay: lead ? `${-lead}ms` : undefined,
-                        }}
-                        onAnimationEnd={() => setCurrent((capIndex + 1) % CAPS)}
-                      />
-                    ) : null}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </figcaption>
       </figure>
-      <div className="uc-copy">
-        <h3 id={`uc-${useCase.id}-title`}>
-          <LandingIcon name={useCase.icon} className="uc-ic" />
-          {useCase.label}
-        </h3>
-        <p>{useCase.sentence}</p>
-        <a className="uc-cta" href={useCase.cta.href} data-use-case-cta={useCase.id}>
-          {useCase.cta.label}
-          <ArrowRight aria-hidden="true" focusable="false" />
-        </a>
-      </div>
+      <h3 id={`uc-${useCase.id}-title`} className="uc-who">
+        <LandingIcon name={useCase.icon} className="uc-ic" />
+        {useCase.label}
+      </h3>
+      <ul className="uc-caps" data-static={reduced ? "true" : "false"}>
+        {useCase.capabilities.map((capability, capIndex) => (
+          <li key={capability.text} className="uc-cap" data-on={reduced || capIndex === shown ? "true" : "false"}>
+            <LandingIcon name={capability.icon} className="uc-cap-ic" />
+            <span className="uc-cap-text">{capability.text}</span>
+          </li>
+        ))}
+      </ul>
+      {reduced ? (
+        <span className="uc-segs" aria-hidden="true" />
+      ) : (
+        <div className="uc-segs" role="group" aria-label={`${useCase.label}: capabilities`}>
+          {useCase.capabilities.map((capability, capIndex) => (
+            <button
+              key={capability.text}
+              type="button"
+              className="uc-seg"
+              aria-label={`show capability ${capIndex + 1} of ${CAPS}: ${capability.text}`}
+              aria-current={capIndex === current ? "true" : undefined}
+              data-state={capIndex < current ? "done" : capIndex === current ? "on" : "next"}
+              onClick={() => pick(capIndex)}
+            >
+              <span className="uc-seg-track">
+                {capIndex === current ? (
+                  <span
+                    key={`${take}-${capIndex}`}
+                    className="uc-seg-fill"
+                    style={{
+                      animationDuration: `${USE_CASES.captionMs}ms`,
+                      animationDelay: lead ? `${-lead}ms` : undefined,
+                    }}
+                    onAnimationEnd={() => setCurrent((capIndex + 1) % CAPS)}
+                  />
+                ) : null}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+      <a className="uc-cta" href={useCase.cta.href} data-use-case-cta={useCase.id}>
+        {useCase.cta.label}
+        <ArrowRight aria-hidden="true" focusable="false" />
+      </a>
     </article>
   );
 }

@@ -149,6 +149,15 @@ test("the transcript's window slides in from the right once, and rests inside th
     return { right: window.right, contentRight: box.right - inset };
   });
   expect(edges.right).toBeLessThanOrEqual(edges.contentRight + 1);
+  // and it takes the whole column: nothing sits beside it
+  const share = await page.evaluate(() => {
+    const window = document.querySelector("#session .mac-win")!.getBoundingClientRect();
+    const column = document.querySelector("#session .lp-session")!;
+    const style = getComputedStyle(column);
+    const inner = column.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    return window.width / inner;
+  });
+  expect(share).toBeGreaterThan(0.98);
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");

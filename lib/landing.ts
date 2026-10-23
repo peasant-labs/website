@@ -110,7 +110,6 @@ export type UseCase = Readonly<{
   id: string;
   label: string;
   icon: LandingIconName;
-  sentence: string;
   capabilities: readonly [Capability, Capability, Capability];
   cta: UseCaseCta;
 }>;
@@ -123,11 +122,9 @@ function capabilityArt(name: string, alt: string): Art {
 }
 
 /*
- * The sentences only claim what the product does today: collectives can be
- * members-only and curated, pull requests link to their transcripts through
- * village's check and comment, peasant reads six agents, a collective can admit
- * by GitHub organization, peasant's redaction takes custom patterns, and
- * village is open source and hosted at village.peasantlabs.org.
+ * Each audience leads with what it can do, one capability at a time; the
+ * capabilities only claim what the product does today. The audience is a
+ * label, and its one action closes the card.
  */
 export const USE_CASES = {
   title: "find your use case",
@@ -138,8 +135,6 @@ export const USE_CASES = {
       id: "researchers",
       label: "researchers",
       icon: "research",
-      sentence:
-        "Build evals and studies from real agent work, shared with consent. Start a private collective for your lab or class.",
       capabilities: [
         {
           text: "build evals from real work",
@@ -163,7 +158,6 @@ export const USE_CASES = {
       id: "teams",
       label: "teams",
       icon: "team",
-      sentence: "Read the sessions behind a pull request, redacted, one click from the diff.",
       capabilities: [
         {
           text: "review the work behind a diff",
@@ -187,8 +181,6 @@ export const USE_CASES = {
       id: "developers",
       label: "developers",
       icon: "terminal",
-      sentence:
-        "Every session with your coding agent, searchable on your computer. Works with Claude Code, Codex, Cursor, OpenCode, Pi and Strike.",
       capabilities: [
         {
           text: "find any past session",
@@ -212,8 +204,6 @@ export const USE_CASES = {
       id: "companies",
       label: "companies",
       icon: "company",
-      sentence:
-        "Access can follow your GitHub organization, with redaction rules for your own names. peasant online is open source, and we host it for you.",
       capabilities: [
         {
           text: "keep agent data in-house",

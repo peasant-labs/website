@@ -145,7 +145,7 @@ test("the install terminal types each platform's exact command at its prompt, wh
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
 });
 
-test("the use cases show all four audiences at once, each with its pictures, captions and one action", async ({
+test("the use cases show all four audiences at once, each led by the capability it shows, with its picture and one action", async ({
   page,
 }) => {
   await page.goto("/");
@@ -160,8 +160,14 @@ test("the use cases show all four audiences at once, each with its pictures, cap
     const card = cardOf(page, slide.id);
     await expect(card).toHaveAttribute("aria-labelledby", `uc-${slide.id}-title`);
     await expect(card.locator(".uc-cap-text")).toHaveText(slide.capabilities);
-    // one segment per capability; choosing one shows its caption and its own picture
-    const segments = card.locator(".uc-caption").getByRole("button");
+    // the capability showing is the card's headline, set larger than the audience's label
+    const sizes = await card.evaluate((element) => ({
+      audience: parseFloat(getComputedStyle(element.querySelector("h3")!).fontSize),
+      capability: parseFloat(getComputedStyle(element.querySelector('.uc-cap[data-on="true"]')!).fontSize),
+    }));
+    expect(sizes.capability, `${slide.label}: the capability does not lead the card`).toBeGreaterThan(sizes.audience);
+    // one segment per capability; choosing one shows its headline and its own picture
+    const segments = card.locator(".uc-segs").getByRole("button");
     await expect(segments).toHaveCount(slide.capabilities.length);
     const picture = card.locator("img:visible");
     const shows = (capIndex: number) => new RegExp(`^/art/${slide.pictures[capIndex]}-(light|dark)\\.png$`);
@@ -173,8 +179,7 @@ test("the use cases show all four audiences at once, each with its pictures, cap
       await expect(picture).toHaveCount(1);
       await expect(picture).toHaveAttribute("src", shows(capIndex));
     }
-    await expect(card.locator(".uc-copy p")).toHaveText(slide.sentence);
-    const cta = card.locator(".uc-copy").getByRole("link", { name: slide.cta.label, exact: true });
+    const cta = card.getByRole("link", { name: slide.cta.label, exact: true });
     await expect(cta).toHaveAttribute("href", slide.cta.href);
   }
 
@@ -184,53 +189,55 @@ test("the use cases show all four audiences at once, each with its pictures, cap
   await expect(cardOf(page, fixture.useCases.slides[0]!.id).getByRole("button").nth(1)).toBeFocused();
 });
 
-test("the use cases form a bento of four shapes with room around each picture, and one column on a phone", async ({
+test("the use cases sit in an aligned grid, two by two with every part on one line, and one column on a phone", async ({
   page,
 }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const geometry = await page.evaluate(() => {
-      const rect = (element: Element) => element.getBoundingClientRect();
-      // layout boxes, not painted ones: a heading still waiting to fade up is drawn a little lower
+      // layout boxes, not painted ones: a part still waiting to fade up is drawn a little lower
       const place = (element: Element) => {
         const box = element as HTMLElement;
-        return { top: box.offsetTop, left: box.offsetLeft, width: box.offsetWidth, right: box.offsetLeft + box.offsetWidth };
+        return { top: box.offsetTop, left: box.offsetLeft, width: box.offsetWidth };
       };
-      const title = place(document.querySelector("#uses-title")!);
-      const cards = [...document.querySelectorAll(".uc-card")].map(place);
-      const grid = { left: 0, width: (document.querySelector("[data-use-cases]") as HTMLElement).clientWidth };
-      const figures = [...document.querySelectorAll(".uc-figure")];
+      const grid = document.querySelector("[data-use-cases]") as HTMLElement;
+      const cards = [...grid.querySelectorAll(".uc-card")];
+      const parts = (card: Element) =>
+        [".uc-figure", "h3", ".uc-caps", ".uc-segs", ".uc-cta"].map((selector) => place(card.querySelector(selector)!));
+      const rows = [
+        [cards[0]!, cards[1]!],
+        [cards[2]!, cards[3]!],
+      ];
+      const figures = [...grid.querySelectorAll(".uc-figure")];
       const room = figures.map((figure) => {
-        const art = rect(figure.querySelector(".uc-shot[data-on='true'] .uc-art")!);
-        const box = rect(figure);
-        return Math.min(art.left - box.left, box.right - art.right);
+        const art = figure.querySelector(".uc-shot[data-on='true'] .uc-art")!.getBoundingClientRect();
+        const box = figure.getBoundingClientRect();
+        return Math.min(art.left - box.left, box.right - art.right, art.top - box.top, box.bottom - art.bottom);
       });
-      const [a, b, c, d] = cards as [typeof title, typeof title, typeof title, typeof title];
       return {
-        // wide: the heading beside the first audience, the next two side by side, the last across the page
-        bento:
-          Math.abs(title.top - a.top) < 2 &&
-          a.left > title.right &&
-          Math.abs(b.top - c.top) < 2 &&
-          b.width < c.width &&
-          Math.abs(d.width - grid.width) < 2,
-        column: cards.every((card) => Math.abs(card.left - grid.left) < 2 && Math.abs(card.width - grid.width) < 2),
+        widths: new Set(cards.map((card) => place(card).width)).size,
+        columns: new Set(cards.map((card) => place(card).left)).size,
+        // side by side, each part of a card starts on the same line as its neighbour's
+        aligned: rows.every(([a, b]) => parts(a).every((part, index) => part.top === parts(b)[index]!.top)),
         // every picture sits on a surface of its own, with no border boxing it in
         panelGround: figures.every(
           (figure) => getComputedStyle(figure).backgroundColor !== getComputedStyle(document.body).backgroundColor,
         ),
         panelBorder: getComputedStyle(figures[0]!).borderTopWidth,
-        roomBeside: Math.min(...room),
+        room: Math.min(...room),
         pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
-    if (width === 1440) expect(geometry.bento, "the use cases are not laid out as the bento").toBe(true);
-    else expect(geometry.column, "the use cases are not one column on a phone").toBe(true);
+    expect(geometry.widths, `the use cases are not one width at ${width}`).toBe(1);
+    expect(geometry.columns, `use cases are not ${width === 1440 ? "two" : "one"} across at ${width}`).toBe(
+      width === 1440 ? 2 : 1,
+    );
+    if (width === 1440) expect(geometry.aligned, "parts of side-by-side cards do not line up").toBe(true);
     expect(geometry.panelGround, `the picture has no panel of its own at ${width}`).toBe(true);
     expect(geometry.panelBorder, `the picture's panel is boxed in at ${width}`).toBe("0px");
-    expect(geometry.roomBeside, `the picture is crowded against its panel at ${width}`).toBeGreaterThanOrEqual(
-      width === 1440 ? 32 : 16,
+    expect(geometry.room, `the picture is crowded against its panel at ${width}`).toBeGreaterThanOrEqual(
+      width === 1440 ? 48 : 24,
     );
     expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
   }
@@ -392,7 +399,7 @@ test("scrolling walks the held section through steps 1, 2 and 3, then lets the p
   }
   // after the third step the section lets go and the next one arrives
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * 3.2);
-  await expect(page.locator("#install h2")).toBeInViewport();
+  await expect(page.locator("#install")).toBeInViewport();
 });
 
 test("on a phone the scene window holds under the header while the steps scroll beneath it", async ({

@@ -28,7 +28,6 @@ export type LandingFixture = {
     slides: Array<{
       id: string;
       label: string;
-      sentence: string;
       capabilities: string[];
       pictures: string[];
       cta: Link;

@@ -64,28 +64,24 @@ useCases:
   slides:
     - id: researchers
       label: researchers
-      sentence: Build evals and studies from real agent work, shared with consent. Start a private collective for your lab or class.
       capabilities: [build evals from real work, study how agents are used, run a class on agents]
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-balance, uc-book, uc-slate]
       cta: { label: sign up free, href: "/?login" }
     - id: teams
       label: teams
-      sentence: Read the sessions behind a pull request, redacted, one click from the diff.
       capabilities: [review the work behind a diff, onboard from real history, "learn from each other's prompts"]
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lens, uc-signpost, uc-candles]
       cta: { label: sign up free, href: "/?login" }
     - id: developers
       label: developers
-      sentence: Every session with your coding agent, searchable on your computer. Works with Claude Code, Codex, Cursor, OpenCode, Pi and Strike.
       capabilities: [find any past session, explain a change in one comment, publish on every push]
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lantern, uc-door, uc-bell]
       cta: { label: install now, href: "#install" }
     - id: companies
       label: companies
-      sentence: Access can follow your GitHub organization, with redaction rules for your own names. peasant online is open source, and we host it for you.
       capabilities: [keep agent data in-house, see which commits agents wrote, usage across teams]
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-chest, uc-scroll, uc-sacks]
