@@ -216,6 +216,16 @@
   letter-spacing: 0;
 }
 
+/* where the four tags no longer fit one line, they sit two and two rather than three and one */
+@media (min-width: 30rem) and (max-width: 54.99rem) {
+  .lp-pillars {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: center;
+    justify-items: start;
+  }
+}
+
 .lp-pillars li {
   display: inline-flex;
   align-items: center;
@@ -236,7 +246,9 @@
  * pictures' own: warm-grey dots and hairlines over the panel's surface, a
  * darker scatter on the ground, and amber.
  */
+/* the frame the picture sits in; the panel sizes its sides to it */
 .lp-hero-flow {
+  container-type: inline-size;
   margin-block-start: clamp(2.5rem, 5vw, 4rem);
 }
 
@@ -264,7 +276,7 @@
   max-width: 100%;
 }
 
-@media (min-width: 53rem) {
+@media (min-width: 48rem) {
   .hf {
     width: 666px;
   }
@@ -272,14 +284,15 @@
   /*
    * Between a phone and a wide screen the stage is narrower than the frame,
    * so the panel closes in on it: the same air at its sides as the stage
-   * keeps above and below the scene, 22 cells of 2px.
+   * keeps above and below the scene, 22 cells of 2px, or what the frame has
+   * room for on a tablet, never less than the phone's.
    */
   .hf-panel {
     justify-self: center;
     width: fit-content;
     max-width: 100%;
     margin-inline: auto;
-    padding-inline: 44px;
+    padding-inline: max(var(--sp-4), min(44px, calc((100cqw - 668px) / 2)));
   }
 }
 

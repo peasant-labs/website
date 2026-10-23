@@ -699,8 +699,8 @@ const STYLESHEET = [
   layoutKeyframes(PHONE),
   sharedKeyframes(PHONE.onScreen, WIDE.onScreen),
   `.hf .hf-wide { display: none }`,
-  `@media (min-width: 53rem) {\n.hf .hf-phone { display: none }\n.hf .hf-wide { display: block }\n${layoutRules(WIDE)}\n${layoutKeyframes(WIDE)}\n}`,
-  `@media (prefers-reduced-motion: no-preference) {\n${motionRules("hf-card-phone")}\n${sharedMotion}\n@media (min-width: 53rem) {\n${motionRules("hf-card-wide")}\n}\n}`,
+  `@media (min-width: 48rem) {\n.hf .hf-phone { display: none }\n.hf .hf-wide { display: block }\n${layoutRules(WIDE)}\n${layoutKeyframes(WIDE)}\n}`,
+  `@media (prefers-reduced-motion: no-preference) {\n${motionRules("hf-card-phone")}\n${sharedMotion}\n@media (min-width: 48rem) {\n${motionRules("hf-card-wide")}\n}\n}`,
 ].join("\n");
 
 /* ---------- the glyphs ---------- */
