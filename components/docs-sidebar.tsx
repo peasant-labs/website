@@ -18,20 +18,13 @@ const ICONS: Record<DocsIcon, ComponentType> = {
   blog: FileText,
 };
 
-/*
- * The switcher lists only a place that does not exist yet. The docs do not
- * switch to the online or local app; a reader signed in to online reaches it
- * from the account row.
- */
-const APPS = [{ id: "community", label: "community", tag: "soon" }];
-
 /**
  * The docs app's sidebar: fairtrade's shared AppSidebar in its one order, the
  * same as the online and local apps: the mark, the docs pages, search, the
- * switcher, then the footer with the theme toggle and the
- * account row, which is "log in", or "dashboard" for a reader signed in there. fairtrade
- * draws the phone top bar and drawer. A page's own sections are in its "on
- * this page" list, not here.
+ * switcher (fairtrade lists no other app, only community as soon), then the
+ * footer with the theme toggle and the account row, which is "log in", or
+ * "dashboard" for a reader signed in there. fairtrade draws the phone top bar
+ * and drawer. A page's own sections are in its "on this page" list, not here.
  */
 export function DocsSidebar() {
   const pathname = usePathname();
@@ -53,7 +46,6 @@ export function DocsSidebar() {
   return (
     <AppSidebar
       app="docs"
-      apps={APPS}
       groups={groups}
       currentId={currentDocsItem(pathname) ?? undefined}
       homeHref="/"
