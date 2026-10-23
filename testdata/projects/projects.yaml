@@ -25,20 +25,20 @@ site:
   routes:
     - id: home
       path: /
-      h1: Reclaiming Data Autonomy as a Peasant
+      h1: data commons built by commoners
       metadata:
-        title: Reclaiming Data Autonomy as a Peasant
-        description: an upcoming editorial on the quiet enclosure of the transcript commons, and why the harvest belongs to the hands that sowed it.
+        title: "peasant labs: data commons built by commoners"
+        description: Record, publish, and share agent sessions with people you trust.
         canonical: https://peasantlabs.org
         openGraph:
-          title: Reclaiming Data Autonomy as a Peasant
-          description: forthcoming — on the quiet enclosure of the transcript commons.
+          title: "peasant labs: data commons built by commoners"
+          description: Record, publish, and share agent sessions with people you trust.
           url: https://peasantlabs.org
-          type: article
+          type: website
         twitter:
           card: summary_large_image
-          title: Reclaiming Data Autonomy as a Peasant
-          description: forthcoming — on the quiet enclosure of the transcript commons.
+          title: "peasant labs: data commons built by commoners"
+          description: Record, publish, and share agent sessions with people you trust.
     - id: projects
       path: /projects
       h1: a commons for AI coding transcripts
@@ -87,11 +87,130 @@ site:
           card: summary_large_image
           title: "village: a governed commons for agent sessions"
           description: village stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
+    - id: docs
+      path: /docs
+      h1: docs
+      metadata:
+        title: docs | peasant labs
+        description: Install peasant, publish a session, then pick a guide.
+        canonical: https://peasantlabs.org/docs
+        openGraph:
+          title: docs | peasant labs
+          description: Install peasant, publish a session, then pick a guide.
+          url: https://peasantlabs.org/docs
+          type: website
+        twitter:
+          card: summary_large_image
+          title: docs | peasant labs
+          description: Install peasant, publish a session, then pick a guide.
+    - id: guide-evals
+      path: /docs/guides/evals
+      h1: run an agent eval
+      metadata:
+        title: run an agent eval | peasant labs docs
+        description: Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.
+        canonical: https://peasantlabs.org/docs/guides/evals
+        openGraph:
+          title: run an agent eval | peasant labs docs
+          description: Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.
+          url: https://peasantlabs.org/docs/guides/evals
+          type: website
+        twitter:
+          card: summary_large_image
+          title: run an agent eval | peasant labs docs
+          description: Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.
+    - id: guide-reviews
+      path: /docs/guides/reviews
+      h1: review pull requests
+      metadata:
+        title: review pull requests | peasant labs docs
+        description: Show reviewers the agent sessions behind a change, right from the pull request.
+        canonical: https://peasantlabs.org/docs/guides/reviews
+        openGraph:
+          title: review pull requests | peasant labs docs
+          description: Show reviewers the agent sessions behind a change, right from the pull request.
+          url: https://peasantlabs.org/docs/guides/reviews
+          type: website
+        twitter:
+          card: summary_large_image
+          title: review pull requests | peasant labs docs
+          description: Show reviewers the agent sessions behind a change, right from the pull request.
+    - id: blog
+      path: /blog
+      h1: blog
+      metadata:
+        title: blog | peasant labs
+        description: Essays on who owns the data that agent work produces.
+        canonical: https://peasantlabs.org/blog
+        openGraph:
+          title: blog | peasant labs
+          description: Essays on who owns the data that agent work produces.
+          url: https://peasantlabs.org/blog
+          type: website
+        twitter:
+          card: summary_large_image
+          title: blog | peasant labs
+          description: Essays on who owns the data that agent work produces.
+    - id: post-reclaiming
+      path: /blog/reclaiming-data-autonomy-as-a-peasant
+      h1: Reclaiming Data Autonomy as a Peasant
+      metadata:
+        title: Reclaiming Data Autonomy as a Peasant | peasant labs
+        description: Why the transcripts our coding agents produce belong to the people who made them, and why we are building tools to share them on their terms.
+        canonical: https://peasantlabs.org/blog/reclaiming-data-autonomy-as-a-peasant
+        openGraph:
+          title: Reclaiming Data Autonomy as a Peasant | peasant labs
+          description: Why the transcripts our coding agents produce belong to the people who made them, and why we are building tools to share them on their terms.
+          url: https://peasantlabs.org/blog/reclaiming-data-autonomy-as-a-peasant
+          type: article
+        twitter:
+          card: summary_large_image
+          title: Reclaiming Data Autonomy as a Peasant | peasant labs
+          description: Why the transcripts our coding agents produce belong to the people who made them, and why we are building tools to share them on their terms.
+    - id: about
+      path: /about
+      h1: about
+      metadata:
+        title: about | peasant labs
+        description: who peasant labs is and what the tools are for.
+        canonical: https://peasantlabs.org/about
+        openGraph:
+          title: about | peasant labs
+          description: who peasant labs is and what the tools are for.
+          url: https://peasantlabs.org/about
+          type: website
+        twitter:
+          card: summary_large_image
+          title: about | peasant labs
+          description: who peasant labs is and what the tools are for.
+    - id: contact
+      path: /contact
+      h1: contact
+      metadata:
+        title: contact | peasant labs
+        description: leave an email — one message when the work is published.
+        canonical: https://peasantlabs.org/contact
+        openGraph:
+          title: contact | peasant labs
+          description: leave an email — one message when the work is published.
+          url: https://peasantlabs.org/contact
+          type: website
+        twitter:
+          card: summary_large_image
+          title: contact | peasant labs
+          description: leave an email — one message when the work is published.
   sitemap:
     - https://peasantlabs.org
     - https://peasantlabs.org/projects
     - https://peasantlabs.org/projects/peasant
     - https://peasantlabs.org/projects/village
+    - https://peasantlabs.org/docs
+    - https://peasantlabs.org/docs/guides/evals
+    - https://peasantlabs.org/docs/guides/reviews
+    - https://peasantlabs.org/blog
+    - https://peasantlabs.org/blog/reclaiming-data-autonomy-as-a-peasant
+    - https://peasantlabs.org/about
+    - https://peasantlabs.org/contact
 catalog:
   cards:
     - id: peasant
@@ -143,9 +262,9 @@ redaction:
   level: standard
   removedLevels: [minimal, maximum]
   matches:
-    - { id: api-key, category: api-key, kept: false, secret: 'const BILLING_KEY = "sk_demo_000000000000000000example"', after: 'const BILLING_KEY = "sk_demo_••••••••••••••••••••••"' }
-    - { id: email, category: email, kept: true, secret: "// reported by alex.rivera@example.com on the 0.4 rollout", after: "// reported by ‹redacted-email› on the 0.4 rollout" }
-    - { id: bearer-token, category: bearer-token, kept: false, secret: 'Authorization: "Bearer demo.example.token.value"', after: 'Authorization: "Bearer ‹redacted-token›"' }
+    - { id: api-key, category: secrets, label: CREDENTIAL, kept: false, secret: 'const BILLING_KEY = "sk_demo_000000000000000000example"', after: 'const BILLING_KEY = "sk_demo_••••••••••••••••••••••"' }
+    - { id: email, category: pii, label: PII, kept: true, secret: "// reported by alex.rivera@example.com on the 0.4 rollout", after: "// reported by ‹redacted-email› on the 0.4 rollout" }
+    - { id: bearer-token, category: secrets, label: CREDENTIAL, kept: false, secret: 'Authorization: "Bearer demo.example.token.value"', after: 'Authorization: "Bearer ‹redacted-token›"' }
 community:
   title: building for community first
   points:

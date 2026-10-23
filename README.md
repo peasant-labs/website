@@ -22,14 +22,16 @@ Other project scripts:
 ```bash
 pnpm lint      # eslint
 pnpm build     # production build
-pnpm validate  # mounted production checks for the project pages
+pnpm validate  # mounted production checks: landing, docs, blog and the project pages
 ```
+
+`pnpm validate` builds and serves the site on port 3100; set `PLAYWRIGHT_PORT` to use another port when 3100 is taken.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Fonts and every visual value come from the fairtrade design system (`@peasant-labs/fairtrade`); Atkinson Hyperlegible is loaded from the root layout.
 
 ## Learn More
 

@@ -1,0 +1,94 @@
+# The landing page, docs shell and blog as a reader meets them. Every value is
+# authored here independently of lib/, so the page has to match the oracle
+# rather than the oracle being read back from the page.
+version: 1
+header:
+  nav:
+    - { label: docs, href: /docs }
+    - { label: blog, href: /blog }
+  login: { label: log in, href: https://village.peasantlabs.org/login }
+footer:
+  - { label: docs, href: /docs }
+  - { label: blog, href: /blog }
+  - { label: projects, href: /projects }
+  - { label: github, href: https://github.com/peasant-labs }
+  - { label: contact, href: /contact }
+hero:
+  title: data commons built by commoners
+  lede: Record, publish, and share agent sessions with people you trust.
+  primary: { label: install now, target: install }
+  secondary: { label: learn more, target: how }
+# the sections after the hero, in reading order: id and heading
+sections:
+  - { id: uses, heading: find your use case }
+  - { id: how, heading: how it works }
+  - { id: install, heading: get started in two commands }
+  - { id: session, heading: what a reviewer reads }
+# copy from earlier designs of the page that must not come back
+removed:
+  - featured collectives
+  - built to be trusted
+  - bring it to your lab
+  - redacted on your computer
+  - six agent harnesses
+  - they see how it is used
+  - discord
+useCases:
+  captionMs: 3500
+  slides:
+    - id: researchers
+      label: researchers
+      capabilities: [build evals from real work, study how agents are used, run a class on agents]
+      cta: { label: sign up free, href: https://village.peasantlabs.org/login }
+    - id: teams
+      label: teams
+      capabilities: [review the work behind a diff, onboard from real history, "learn from each other's prompts"]
+      cta: { label: sign up free, href: https://village.peasantlabs.org/login }
+    - id: developers
+      label: developers
+      capabilities: [find any past session, explain a change in one comment, publish on every push]
+      cta: { label: install now, href: "#install" }
+    - id: companies
+      label: companies
+      capabilities: [keep agent data in-house, see which commits agents wrote, usage across teams]
+      cta: { label: talk to us, href: /contact }
+how:
+  steps:
+    - title: record
+      body: Peasant indexes coding agent sessions on your computer. Type /peasant in your harness to open the session in the browser.
+    - title: review
+      body: Before anything leaves, peasant hides secrets, personal details, file paths and internal names, and shows you exactly what it hid.
+    - title: publish
+      body: Share transcripts for code review, radical openness, or transparent research processes.
+  consent: share it (redacted)
+  publishLabel: publish
+# the commands as scripts/install.sh and scripts/install.ps1 document themselves
+install:
+  platforms:
+    - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash" }
+    - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex" }
+  kickstart: peasant kickstart
+  guide: { label: read the install guide, href: /docs#install }
+session:
+  label: sample session in the transcript viewer
+  sessionId: sess_c41e07
+  note: Sample session, not a real record. Values peasant redacted show as markers like <EMAIL>.
+  # placeholders the redaction engine writes, visible in the opening view or the full trace
+  markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
+vision:
+  line: We are building a sustainable, respectful ecosystem where people have a stake in their data.
+  cta: { label: about us, href: /about }
+docsNav:
+  - { label: overview, href: /docs }
+  - { label: install, href: "/docs#install" }
+  - { label: set up with kickstart, href: "/docs#kickstart" }
+  - { label: publish a session, href: "/docs#publish" }
+  - { label: agent evals, href: /docs/guides/evals }
+  - { label: pull request reviews, href: /docs/guides/reviews }
+  - { label: cli, href: "/docs#cli" }
+  - { label: agents, href: "/docs#agents" }
+  - { label: redaction, href: "/docs#redaction" }
+  - { label: collectives and access, href: "/docs#access" }
+  - { label: blog, href: /blog }
+posts:
+  - { slug: reclaiming-data-autonomy-as-a-peasant, title: Reclaiming Data Autonomy as a Peasant }

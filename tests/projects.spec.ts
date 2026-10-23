@@ -25,6 +25,18 @@ const COMPARISON_MARKS = {
 } as const;
 const THEMES = ["dark", "light"] as const;
 const PROJECT_IDS = ["peasant", "village"] as const;
+const REQUIRED_ROUTE_IDS = [
+  "home",
+  "projects",
+  "peasant",
+  "village",
+  "docs",
+  "guide-evals",
+  "guide-reviews",
+  "blog",
+  "about",
+  "contact",
+] as const;
 
 type ComparisonStatus = (typeof COMPARISON_STATUSES)[number];
 type AdvertisedState = (typeof ADVERTISED_STATES)[number];
@@ -197,6 +209,8 @@ type ProjectFixture = {
     matches: Array<{
       id: string;
       category: string;
+      /** the category's rendered label, from the engine's own mapping */
+      label: string;
       kept: boolean;
       secret: string;
       after: string;
@@ -775,8 +789,11 @@ function loadFixture(): ProjectFixture {
       metadata: parseMetadata(route.metadata, `site.routes[${index}].metadata`),
     };
   });
-  if (routes.length !== 4) {
-    fixtureError("site.routes", `expected four routes, found ${routes.length}`, "restore / and the three project routes");
+  // A manifest of the routes that must stay listed, by name: adding a route never trips it.
+  for (const required of REQUIRED_ROUTE_IDS) {
+    if (!routes.some((route) => route.id === required)) {
+      fixtureError("site.routes", `the ${required} route is missing`, `restore the ${required} route`);
+    }
   }
   uniqueBy(routes, (route) => route.id, "site.routes.id");
   uniqueBy(routes, (route) => route.path, "site.routes.path");
@@ -793,8 +810,8 @@ function loadFixture(): ProjectFixture {
   const sitemap = stringArray(siteObject.sitemap, "site.sitemap").map((url, index) =>
     httpsUrl(url, `site.sitemap[${index}]`).replace(/\/$/, ""),
   );
-  if (sitemap.length !== 4 || JSON.stringify(sitemap) !== JSON.stringify(routes.map((route) => route.metadata.canonical.replace(/\/$/, "")))) {
-    fixtureError("site.sitemap", "sitemap does not exactly match route order", "list the four route canonicals in route order");
+  if (JSON.stringify(sitemap) !== JSON.stringify(routes.map((route) => route.metadata.canonical.replace(/\/$/, "")))) {
+    fixtureError("site.sitemap", "sitemap does not exactly match route order", "list every route canonical in route order");
   }
 
   const catalogObject = exactObject(root.catalog, "catalog", [
@@ -875,7 +892,7 @@ function loadFixture(): ProjectFixture {
   const redactionMatches = nonEmptyArray(redactionObject.matches, "redaction.matches").map(
     (item, index) => {
       const location = `redaction.matches[${index}]`;
-      const match = exactObject(item, location, ["id", "category", "kept", "secret", "after"]);
+      const match = exactObject(item, location, ["id", "category", "label", "kept", "secret", "after"]);
       const kept = match.kept;
       if (typeof kept !== "boolean") {
         fixtureError(
@@ -887,6 +904,7 @@ function loadFixture(): ProjectFixture {
       return {
         id: nonEmptyString(match.id, `${location}.id`),
         category: nonEmptyString(match.category, `${location}.category`),
+        label: nonEmptyString(match.label, `${location}.label`),
         kept: kept as boolean,
         secret: nonEmptyString(match.secret, `${location}.secret`),
         after: nonEmptyString(match.after, `${location}.after`),
@@ -2018,7 +2036,8 @@ test("the redaction review runs the real component over labelled sample matches"
   await expect(matches).toHaveCount(fixture.redaction.matches.length);
   for (const [index, expected] of fixture.redaction.matches.entries()) {
     const match = matches.nth(index);
-    await expect(match).toContainText(expected.category);
+    // The category shows as the engine's label, never as its internal id.
+    await expect(match).toContainText(expected.label);
     // Both halves of the diff are shown: what was found and what replaces it.
     await expect(match).toContainText(expected.secret);
     await expect(match).toContainText(expected.after);
@@ -2218,29 +2237,6 @@ test("the comparison is one balanced native table of marks and nothing else", as
   }
 });
 
-test("homepage compatibility keeps its authored content and project discovery", async ({ page }) => {
-  const home = fixture.site.routes.find((route) => route.id === "home");
-  expect(home).toBeDefined();
-  await page.goto("/");
-  await expect(page.locator('img[alt*="peasants tending and harvesting wheat"]')).toBeVisible();
-  await expect(page.locator("h1")).toHaveText(home!.h1);
-  await expect(page.locator("details")).toHaveAttribute("open", "");
-  await expect(page.locator("article")).toBeVisible();
-  await expect(page.locator("form")).toBeVisible();
-  await expect(page.getByRole("link", { name: /projects/i })).toHaveAttribute("href", "/projects");
-  expect(await page.locator("h1").evaluate((heading) => getComputedStyle(heading).textTransform)).toBe(
-    "none",
-  );
-  const email = page.getByLabel("email *");
-  const submit = page.getByRole("button", { name: "notify me" });
-  await expect(submit).toBeDisabled();
-  await email.fill("not-an-email");
-  await expect(submit).toBeDisabled();
-  await email.fill("reader@example.com");
-  await expect(submit).toBeEnabled();
-  await expectMetadata(page, home!.metadata);
-});
-
 test("skip navigation, route focus, theme persistence, and command copy work by keyboard", async ({ page }) => {
   await page.goto("/projects");
   await page.keyboard.press("Tab");
@@ -2298,9 +2294,8 @@ test("Atkinson fonts and canonical fairtrade component styles mount from real pr
 
   const computed = await page.evaluate(() => {
     const card = document.querySelector<HTMLElement>("[data-project-card]");
-    // The catalog dropped its breadcrumb for the header nav, which wears the
-    // same fairtrade mono chrome — so the nav is what this probe measures now.
-    const chrome = document.querySelector<HTMLElement>(".pj-nav .iu-subnav-item");
+    // The header nav wears the fairtrade mono chrome, so it is what this probe measures.
+    const chrome = document.querySelector<HTMLElement>(".site-nav-link");
     const button = document.querySelector<HTMLElement>(".btn");
     const prose = document.querySelector<HTMLElement>("[data-reading-text]");
     if (!card || !chrome || !button || !prose) {
