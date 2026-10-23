@@ -139,7 +139,8 @@ export function SceneStage({
   }, [frame, reduced, scene]);
 
   useLayoutEffect(() => {
-    rest();
+    // once a take runs, the camera is the take's: a beat of the scene must not snap it back to the opening frame
+    if (reduced || !started) rest();
     // the framing is measured on the real text, so it is taken again once the fonts arrive
     let live = true;
     document.fonts?.ready.then(() => {
