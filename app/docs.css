@@ -82,7 +82,7 @@
 .dx-page {
   /* prose; then tables, commands and cards; then "on this page" beside them */
   --dx-col: 40rem;
-  --dx-wide: 52rem;
+  --dx-wide: 48rem;
   --dx-aside: 15rem;
   --dx-gap: var(--sp-8);
 
@@ -153,13 +153,17 @@
   align-items: center;
 }
 
-/* the title and lede line up with the prose below them */
+/* the title and lede share the prose's left edge */
 .dx-head-text {
   display: grid;
   gap: var(--sp-3);
   align-content: start;
   width: 100%;
   max-width: var(--dx-col);
+}
+
+/* a page without "on this page" (the blog) centres its header on its one column */
+.dx-head:not(.dx-head-cols) .dx-head-text {
   margin-inline: auto;
 }
 
@@ -168,7 +172,7 @@
   text-wrap: balance;
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-size: clamp(2rem, 3.2vw, var(--fs-hero));
   font-weight: 700;
   line-height: 1.12;
   outline: none;
@@ -323,8 +327,11 @@
   padding: 0 var(--sp-4) var(--sp-2);
 }
 
+/* folded "on this page" sits on the content's left edge, at the prose width */
 .dx-page .dx-jump {
+  justify-self: start;
   width: min(100%, var(--dx-col));
+  margin-inline-start: max(0px, calc((100% - var(--dx-wide)) / 2));
 }
 
 /* ---------- sections: headings, paragraphs and the space between them ---------- */
@@ -335,15 +342,14 @@
 }
 
 /*
- * Each section is three tracks on one axis: prose in the middle at its
- * measure, and tables, commands, paths and cards on the wider track around it.
+ * One left edge: prose at its measure, and tables, commands, paths and cards
+ * from the same edge out to a wider track on the right.
  */
 :is(.dx-sec, .dx-step-body),
 .dx-step {
   display: grid;
   grid-template-columns:
-    [wide-start] minmax(0, 1fr)
-    [prose-start] minmax(0, var(--dx-col))
+    [prose-start wide-start] minmax(min(100%, var(--dx-col)), var(--dx-col))
     [prose-end] minmax(0, 1fr)
     [wide-end];
 }
@@ -529,6 +535,11 @@
 .dx-cmd .cli-cmd-line code {
   white-space: pre-wrap;
   overflow-wrap: break-word;
+}
+
+/* commands are code, which reads at the 16px floor like the text around it */
+.dx-cmd .cli-cmd-line {
+  font-size: var(--fs-body);
 }
 
 /*
@@ -963,22 +974,13 @@
   text-wrap: pretty;
 }
 
+/* a post is one centred column: its title, picture and words share both edges */
 .bx-essay {
   display: grid;
-  grid-template-columns:
-    [wide-start] minmax(0, 1fr)
-    [prose-start] minmax(0, 38rem)
-    [prose-end] minmax(0, 1fr)
-    [wide-end];
-  row-gap: var(--sp-5);
-}
-
-.bx-essay > * {
-  grid-column: prose;
-}
-
-.bx-essay > .bx-figure {
-  grid-column: wide;
+  gap: var(--sp-5);
+  width: 100%;
+  max-width: 38rem;
+  margin-inline: auto;
 }
 
 /* an authored title keeps its own capitals; only chrome is lowercase */
