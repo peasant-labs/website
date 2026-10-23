@@ -44,17 +44,17 @@ site:
       h1: a commons for AI coding transcripts
       metadata:
         title: projects | peasant
-        description: peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.
+        description: peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.
         canonical: https://peasantlabs.org/projects
         openGraph:
           title: projects | peasant
-          description: peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.
+          description: peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.
           url: https://peasantlabs.org/projects
           type: website
         twitter:
           card: summary_large_image
           title: projects | peasant
-          description: peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.
+          description: peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.
     - id: peasant
       path: /projects/peasant
       h1: keep your coding-agent transcripts. share the ones you choose.
@@ -75,18 +75,18 @@ site:
       path: /projects/village
       h1: a commons for selected agent work
       metadata:
-        title: "village: a governed commons for agent sessions"
-        description: village stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
+        title: "peasant online: a governed commons for agent sessions"
+        description: peasant online stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
         canonical: https://peasantlabs.org/projects/village
         openGraph:
-          title: "village: a governed commons for agent sessions"
-          description: village stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
+          title: "peasant online: a governed commons for agent sessions"
+          description: peasant online stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
           url: https://peasantlabs.org/projects/village
           type: website
         twitter:
           card: summary_large_image
-          title: "village: a governed commons for agent sessions"
-          description: village stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
+          title: "peasant online: a governed commons for agent sessions"
+          description: peasant online stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
     - id: docs
       path: /docs
       h1: docs
@@ -219,9 +219,9 @@ catalog:
       action: explore peasant
       kind: local
     - id: village
-      label: village
+      label: online
       target: /projects/village
-      action: explore village
+      action: explore online
       kind: open-source
   # "what is peasant?" is the one-paragraph answer and carries no cards;
   # the cards have a section of their own immediately before the comparison.
@@ -286,7 +286,7 @@ faq:
     - { id: uploads, question: "does anything get uploaded on its own?" }
     - { id: search, question: "how good is the search?" }
     - { id: others-work, question: "what about sessions other people publish?" }
-    - { id: village, question: "do i have to use village?" }
+    - { id: village, question: "do i have to use peasant online?" }
 peasant:
   route: /projects/peasant
   hero:
@@ -305,7 +305,7 @@ peasant:
       - { id: set-up, title: set up, comment: "# choose which projects and sessions to keep", command: peasant kickstart }
       - { id: bring-work-in, title: bring your work in, comment: "# reads what your agents already saved", command: peasant ingest }
       - { id: open-it, title: open it, comment: "# browse and search at localhost:8690", command: peasant web start }
-      - { id: share-one, title: share one, comment: "# sends one copy to village, only when you ask", command: peasant village push }
+      - { id: share-one, title: share one, comment: "# sends one copy to peasant online, only when you ask", command: peasant village push }
   uses:
     - { id: remember-why, title: you forgot how something got built }
     - { id: one-list-for-every-tool, title: you use more than one coding agent }
@@ -332,7 +332,7 @@ village:
       - { id: set-up, title: set up, comment: "# choose which projects and sessions to keep", command: peasant kickstart }
       - { id: bring-work-in, title: bring your work in, comment: "# reads what your agents already saved", command: peasant ingest }
       - { id: open-it, title: open it, comment: "# browse and search at localhost:8690", command: peasant web start }
-      - { id: share-one, title: share one, comment: "# sends one copy to village, only when you ask", command: peasant village push }
+      - { id: share-one, title: share one, comment: "# sends one copy to peasant online, only when you ask", command: peasant village push }
   community:
     title: join your community
     joinLabel: join collective
@@ -452,7 +452,7 @@ evidence:
 comparison:
   title: how it compares to similar tools
   intro: here is what peasant does next to the closest public tools in this space, checked against their public docs and our own source.
-  bundleDefinition: peasant here means both tools, peasant on your computer and village online, and the schema they share. the other column covers similar tools and the documentation they publish.
+  bundleDefinition: peasant here means both tools, peasant on your computer and peasant online, and the schema they share. the other column covers similar tools and the documentation they publish.
   meaningNote: a dash means we did not find it in those tools' public docs. it does not mean they cannot do it.
   rows:
     - id: keep-it-local
@@ -509,7 +509,7 @@ comparison:
       capability: share into a group other people can join
       peasantLabs:
         status: "yes"
-        qualification: village groups are either open to contributions or approved by the owner.
+        qualification: peasant online collectives are either open to contributions or approved by the owner.
         sources: [village-collectives]
       entire:
         status: not-documented

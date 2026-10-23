@@ -698,7 +698,8 @@ export type VillageExampleCollective = Readonly<{
  */
 export type VillagePageContent = Readonly<{
   slug: "village";
-  name: "village";
+  /** shown as the project's name; the slug and route keep the repository's. */
+  name: "online";
   route: "/projects/village";
   metadata: RouteMetadata;
   card: ProjectCard;
@@ -719,7 +720,7 @@ export type VillagePageContent = Readonly<{
 
 export type ProjectPageContent = Readonly<{
   slug: ProjectSlug;
-  name: "peasant" | "village";
+  name: "peasant" | "online";
   route: `/projects/${ProjectSlug}`;
   metadata: RouteMetadata;
   card: ProjectCard;
@@ -810,12 +811,12 @@ export const SUITE = {
   metadata: {
     title: "projects | peasant",
     description:
-      "peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.",
+      "peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.",
     canonical: "/projects",
   },
   title: "a commons for AI coding transcripts",
   intro:
-    "peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.",
+    "peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.",
   /*
    * The heading is the question a colleague actually asks, and the paragraph
    * under it is the situation that question arrives in. The transcript browser
@@ -836,12 +837,12 @@ export const SUITE = {
   // The FAQ answers the licensing question in full. This paragraph only defines
   // the two tools and does not carry legal or availability qualifiers.
   whatIntro:
-    "peasant makes your coding agent sessions shareable only with people you trust, private, and searchable. it is made of two tools: peasant on your computer, and village online.",
+    "peasant makes your coding agent sessions shareable only with people you trust, private, and searchable. it is made of two tools: peasant on your computer, and peasant online.",
   /* Two lines: the section is what we make, then what that means. The break is
    * authored rather than left to wrapping — `white-space: pre-line` on the
    * heading keeps it wherever the line lands. */
   cardsTitle: "our projects,\nlocal and open-source",
-  cardsIntro: "peasant runs on your machine. village is where published copies live.",
+  cardsIntro: "peasant runs on your machine. peasant online is where published copies live.",
   story: {
     title: "install, share, and leverage your data",
     situation:
@@ -869,7 +870,7 @@ export const SUITE = {
       {
         id: "contribute-to-the-commons",
         title: "contribute to the commons",
-        body: "sends the one session you approved to village, with your redactions applied. the original stays local and nothing else goes with it.",
+        body: "sends the one session you approved to peasant online, with your redactions applied. the original stays local and nothing else goes with it.",
         command: "peasant village push",
       },
     ] as Four<StoryStep>,
@@ -877,7 +878,7 @@ export const SUITE = {
   community: {
     title: "building for community first",
     body:
-      "the sessions are yours first: they sit on your machine and nothing leaves until you send it. village exists for the ones you do send, so the work behind a fix becomes something other people can learn from instead of something that disappears.",
+      "the sessions are yours first: they sit on your machine and nothing leaves until you send it. peasant online exists for the ones you do send, so the work behind a fix becomes something other people can learn from instead of something that disappears.",
     points: [
       "publishing is always a deliberate act, never a default",
       "every shared session carries the reuse license you picked",
@@ -892,7 +893,7 @@ export const SUITE = {
         id: "open-source",
         question: "is it open source?",
         answer:
-          "yes. peasant, village, and the shared schema are Apache-2.0. session data you publish can carry its own Creative Commons content license.",
+          "yes. peasant, peasant online and the shared schema are Apache-2.0. session data you publish can carry its own Creative Commons content license.",
       },
       {
         id: "agents",
@@ -920,9 +921,9 @@ export const SUITE = {
       },
       {
         id: "village",
-        question: "do i have to use village?",
+        question: "do i have to use peasant online?",
         answer:
-          "no. peasant works on its own as a local record. village only ever holds copies you send it.",
+          "no. peasant works on its own as a local record. peasant online only ever holds copies you send it.",
       },
     ] as readonly [SuiteQuestion, ...SuiteQuestion[]],
   },
@@ -992,7 +993,7 @@ export const PROJECTS = {
         {
           id: "share-one",
           title: "share one",
-          comment: "# sends one copy to village, only when you ask",
+          comment: "# sends one copy to peasant online, only when you ask",
           command: "peasant village push",
         },
       ] as Five<StartStep>,
@@ -1013,7 +1014,7 @@ export const PROJECTS = {
       {
         id: "share-just-one",
         title: "you want to share one session",
-        body: "check it, hide what should stay private, and publish that copy to village.",
+        body: "check it, hide what should stay private, and publish that copy to peasant online.",
       },
     ],
     related: [
@@ -1025,7 +1026,7 @@ export const PROJECTS = {
       },
       {
         id: "village",
-        label: "see village",
+        label: "see peasant online",
         href: "/projects/village",
         kind: "internal",
       },
@@ -1039,12 +1040,12 @@ export const PROJECTS = {
   },
   village: {
     slug: "village",
-    name: "village",
+    name: "online",
     route: "/projects/village",
     metadata: {
-      title: "village: a governed commons for agent sessions",
+      title: "peasant online: a governed commons for agent sessions",
       description:
-        "village stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.",
+        "peasant online stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.",
       canonical: "/projects/village",
     },
     card: {
@@ -1055,13 +1056,13 @@ export const PROJECTS = {
         "open or owner-approved groups",
         "pull other people's work in, one way",
       ],
-      action: "explore village",
+      action: "explore online",
       availability: "private contributor development",
     },
     hero: {
       title: "a commons for selected agent work",
       body:
-        "village receives copies that a peasant user explicitly publishes, then applies discovery, collective access, optional reuse licensing, and governance history around those copies.",
+        "peasant online receives copies that a peasant user explicitly publishes, then applies discovery, collective access, optional reuse licensing, and governance history around those copies.",
     },
     start: {
       title: "get started",
@@ -1101,7 +1102,7 @@ export const PROJECTS = {
         {
           id: "share-one",
           title: "share one",
-          comment: "# sends one copy to village, only when you ask",
+          comment: "# sends one copy to peasant online, only when you ask",
           command: "peasant village push",
         },
       ] as Five<StartStep>,
@@ -1250,7 +1251,7 @@ export const COMPARISON = {
   intro:
     "here is what peasant does next to the closest public tools in this space, checked against their public docs and our own source.",
   bundleDefinition:
-    "peasant here means both tools, peasant on your computer and village online, and the schema they share. the other column covers similar tools and the documentation they publish.",
+    "peasant here means both tools, peasant on your computer and peasant online, and the schema they share. the other column covers similar tools and the documentation they publish.",
   meaningNote:
     "a dash means we did not find it in those tools' public docs. it does not mean they cannot do it.",
   /*
@@ -1342,7 +1343,7 @@ export const COMPARISON = {
       peasantLabs: {
         status: "yes",
         qualification:
-          "village groups are either open to contributions or approved by the owner.",
+          "peasant online collectives are either open to contributions or approved by the owner.",
         evidence: ["village-collectives"],
       },
       entire: {
