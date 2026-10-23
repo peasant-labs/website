@@ -81,7 +81,7 @@ useCases:
       cta: { label: install now, href: "#install" }
     - id: companies
       label: companies
-      sentence: Access can follow your GitHub organization, with redaction rules for your own names. Village is open source, and we host it for you.
+      sentence: Access can follow your GitHub organization, with redaction rules for your own names. peasant online is open source, and we host it for you.
       capabilities: [keep agent data in-house, see which commits agents wrote, usage across teams]
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-chest, uc-scroll, uc-sacks]

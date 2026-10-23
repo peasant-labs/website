@@ -198,7 +198,7 @@ export const USE_CASES = {
       label: "companies",
       icon: "company",
       sentence:
-        "Access can follow your GitHub organization, with redaction rules for your own names. Village is open source, and we host it for you.",
+        "Access can follow your GitHub organization, with redaction rules for your own names. peasant online is open source, and we host it for you.",
       capabilities: [
         {
           text: "keep agent data in-house",
