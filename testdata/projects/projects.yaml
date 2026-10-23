@@ -108,17 +108,17 @@ site:
       h1: run an agent eval
       metadata:
         title: run an agent eval | peasant docs
-        description: Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.
+        description: Collect real coding-agent sessions from many people into one collective, redacted on each computer. Then pull the approved set to yours.
         canonical: https://peasantlabs.org/docs/guides/evals
         openGraph:
           title: run an agent eval | peasant docs
-          description: Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.
+          description: Collect real coding-agent sessions from many people into one collective, redacted on each computer. Then pull the approved set to yours.
           url: https://peasantlabs.org/docs/guides/evals
           type: website
         twitter:
           card: summary_large_image
           title: run an agent eval | peasant docs
-          description: Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.
+          description: Collect real coding-agent sessions from many people into one collective, redacted on each computer. Then pull the approved set to yours.
     - id: guide-reviews
       path: /docs/guides/reviews
       h1: review pull requests
