@@ -122,14 +122,15 @@ function capabilityArt(name: string, alt: string): Art {
 }
 
 /*
- * Each audience leads with what it can do, one capability at a time; the
- * capabilities only claim what the product does today. The audience is a
- * label, and its one action closes the card.
+ * Each capability is a card of its own in one row, tagged with its audience;
+ * the capabilities only claim what the product does today. The audience's one
+ * action closes each of its cards.
  */
 export const USE_CASES = {
   title: "find your use case",
-  /* how long each capability, its words and its picture, shows before its audience moves on to the next */
-  captionMs: 6000,
+  /* the row of capabilities, as assistive technology names it, and how fast it drifts on its own, in pixels a second */
+  label: "use cases",
+  speed: 24,
   slides: [
     {
       id: "researchers",

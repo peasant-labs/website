@@ -58,10 +58,9 @@ removed:
   - they see how it is used
   - discord
   - data commons built by commoners
-# every audience shows at once; each cycles its own three capabilities, captionMs apiece,
-# each with one or two sentences on what it is (all twelve in the server's HTML)
+# one row of every capability, each tagged with its audience and saying in one or two sentences
+# what it is (all twelve in the server's HTML); grouped here by audience
 useCases:
-  captionMs: 6000
   slides:
     - id: researchers
       label: researchers

@@ -3,167 +3,186 @@
 import { Art } from "@/components/art";
 import { LandingIcon } from "@/components/landing/icons";
 import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
-import { USE_CASES, type UseCase } from "@/lib/landing";
+import { USE_CASES, type Capability, type UseCase } from "@/lib/landing";
 import { ArrowRight } from "@peasant-labs/fairtrade/icons";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 
-const CAPS = 3;
+/* every capability, in order, with the audience it belongs to */
+const CARDS: readonly { capability: Capability; useCase: UseCase }[] = USE_CASES.slides.flatMap((useCase) =>
+  useCase.capabilities.map((capability) => ({ capability, useCase })),
+);
+
+/* a drag shorter than this is a click */
+const DRAG_PX = 6;
+/* after a touch lets go, the row waits this long before it moves on its own again */
+const TOUCH_REST_MS = 2400;
 
 /**
- * The use cases: the section's heading on its own row, then the four audiences, two by two
- * on a wide screen and one under another on a phone. Each card leads with what
- * its audience can do: under its picture, the audience as a small label with
- * its icon, then the capability now showing as the card's headline with a
- * sentence or two on what it is, the three segments that step between
- * capabilities, and its one action. The picture and the headline
- * change together. Every card keeps the same rhythm, and cards side by side
- * share their rows (CSS subgrid), so their parts line up across the page.
+ * The use cases: the section's heading on its own row, then one row of all
+ * twelve capabilities, each a card with its own picture, a small tag naming its
+ * audience, its headline, a sentence or two on what it is, and its audience's
+ * one action. Every card's words are in the page as served.
  *
- * Each card keeps its own clock, a quarter of a turn apart from its neighbour
- * so the four never change together. A clock is a CSS animation on the current
- * segment, so it holds exactly where it is while its card is hovered or holds
- * keyboard focus, and every clock holds while the section is off screen or the
- * tab is in the background. Under reduced motion nothing cycles: each card
- * shows its first picture and lists its three capabilities.
+ * The row drifts on its own, slowly, and loops: a second set of the cards
+ * follows the first, hidden from assistive technology and out of the tab
+ * order, and the row steps back by one set when it reaches it. It holds while
+ * hovered, keyboard-focused, touched, off screen or in a background tab. It is
+ * a real scroll area, so a finger swipes it, the arrow keys move it once it
+ * has focus, and a mouse can drag it. Under reduced motion it never moves on
+ * its own: one set of cards in a row that scrolls and snaps to each card.
  */
 export function UseCases() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const onScreen = useOnScreen(rootRef, 0.1);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const onScreen = useOnScreen(rowRef, 0.1);
   const reduced = useReducedMotion();
+  const [held, setHeld] = useState({ hover: false, focus: false, touch: false, drag: false });
+  const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
+  const restTimer = useRef(0);
+  const playing = onScreen && !reduced && !held.hover && !held.focus && !held.touch && !held.drag;
+
+  // The drift: a few pixels a second, read and written once per frame, stepping back a set at the seam.
+  useEffect(() => {
+    const row = rowRef.current;
+    if (!row || !playing) return;
+    let frame = 0;
+    let last = 0;
+    let carry = 0;
+    const tick = (time: number) => {
+      if (last) {
+        carry += ((time - last) / 1000) * USE_CASES.speed;
+        const whole = Math.trunc(carry);
+        if (whole) {
+          carry -= whole;
+          const clone = row.querySelector<HTMLElement>("[data-clone]");
+          const set = clone ? clone.offsetLeft - (row.firstElementChild as HTMLElement).offsetLeft : 0;
+          let next = row.scrollLeft + whole;
+          if (set && next >= set) next -= set;
+          row.scrollLeft = next;
+        }
+      }
+      last = time;
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [playing]);
+
+  useEffect(() => () => window.clearTimeout(restTimer.current), []);
+
+  function onPointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "mouse") {
+      if (event.button !== 0) return;
+      drag.current = { x: event.clientX, left: event.currentTarget.scrollLeft, moved: false };
+      return;
+    }
+    window.clearTimeout(restTimer.current);
+    setHeld((value) => ({ ...value, touch: true }));
+  }
+
+  function onPointerMove(event: PointerEvent<HTMLDivElement>) {
+    const current = drag.current;
+    if (!current) return;
+    const dx = event.clientX - current.x;
+    if (!current.moved && Math.abs(dx) < DRAG_PX) return;
+    if (!current.moved) {
+      current.moved = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+      setHeld((value) => ({ ...value, drag: true }));
+    }
+    event.currentTarget.scrollLeft = current.left - dx;
+  }
+
+  function endPointer(event: PointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "mouse") {
+      const current = drag.current;
+      drag.current = null;
+      if (current?.moved) {
+        // a drag is not a click on the card under the pointer
+        event.currentTarget.addEventListener("click", (click) => click.preventDefault(), {
+          capture: true,
+          once: true,
+        });
+        setHeld((value) => ({ ...value, drag: false }));
+      }
+      return;
+    }
+    window.clearTimeout(restTimer.current);
+    restTimer.current = window.setTimeout(
+      () => setHeld((value) => ({ ...value, touch: false })),
+      TOUCH_REST_MS,
+    );
+  }
+
+  const sets = reduced ? [false] : [false, true];
 
   return (
     <>
-      <div className="lp-head">
-        <h2 id="uses-title" className="lp-title" data-fade>
-          {USE_CASES.title}
-        </h2>
+      <div className="site-wrap">
+        <div className="lp-head">
+          <h2 id="uses-title" className="lp-title" data-fade>
+            {USE_CASES.title}
+          </h2>
+        </div>
       </div>
-      <div ref={rootRef} className="uc" data-use-cases>
-        {USE_CASES.slides.map((useCase, order) => (
-          <UseCaseCard key={useCase.id} useCase={useCase} order={order} running={onScreen} reduced={reduced} />
-        ))}
+      <div
+        ref={rowRef}
+        className="uc"
+        data-use-cases
+        data-playing={playing ? "true" : "false"}
+        data-static={reduced ? "true" : "false"}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label={USE_CASES.label}
+        tabIndex={0}
+        onPointerEnter={(event) => {
+          if (event.pointerType === "mouse") setHeld((value) => ({ ...value, hover: true }));
+        }}
+        onPointerLeave={(event) => {
+          if (event.pointerType === "mouse") setHeld((value) => ({ ...value, hover: false }));
+        }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endPointer}
+        onPointerCancel={endPointer}
+        // Keyboard focus holds the row; a mouse click that leaves focus inside it does not.
+        onFocus={(event) => {
+          if (event.target.matches(":focus-visible")) setHeld((value) => ({ ...value, focus: true }));
+        }}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            setHeld((value) => ({ ...value, focus: false }));
+          }
+        }}
+      >
+        {sets.flatMap((clone) =>
+          CARDS.map(({ capability, useCase }, index) => (
+            <article
+              key={`${clone ? "clone" : "card"}-${capability.text}`}
+              className="uc-card"
+              aria-roledescription={clone ? undefined : "slide"}
+              aria-label={clone ? undefined : `${index + 1} of ${CARDS.length}: ${capability.text}`}
+              aria-hidden={clone ? true : undefined}
+              inert={clone}
+              data-clone={clone && index === 0 ? "" : undefined}
+              data-use-case={clone ? undefined : useCase.id}
+            >
+              <figure className="uc-figure">
+                <Art art={capability.art} className="uc-art" />
+              </figure>
+              <p className="uc-tag">
+                <LandingIcon name={useCase.icon} className="uc-ic" />
+                {useCase.label}
+              </p>
+              <h3 className="uc-cap-text">{capability.text}</h3>
+              <p className="uc-cap-detail">{capability.detail}</p>
+              <a className="uc-cta" href={useCase.cta.href} tabIndex={clone ? -1 : undefined}>
+                {useCase.cta.label}
+                <ArrowRight aria-hidden="true" focusable="false" />
+              </a>
+            </article>
+          )),
+        )}
       </div>
     </>
-  );
-}
-
-function UseCaseCard({
-  useCase,
-  order,
-  running,
-  reduced,
-}: {
-  useCase: UseCase;
-  order: number;
-  running: boolean;
-  reduced: boolean;
-}) {
-  const [current, setCurrent] = useState(0);
-  /* a chosen capability restarts its segment's clock from empty */
-  const [take, setTake] = useState(0);
-  const [held, setHeld] = useState({ hover: false, focus: false });
-  const playing = running && !reduced && !held.hover && !held.focus;
-  const shown = reduced ? 0 : current;
-  /* the first turn starts a quarter of a capability later per card, so neighbours change apart */
-  const lead = take === 0 && current === 0 ? (order * USE_CASES.captionMs) / 4 : 0;
-
-  function pick(capIndex: number) {
-    setCurrent(capIndex);
-    setTake((value) => value + 1);
-  }
-
-  return (
-    <article
-      className="uc-card"
-      id={`uc-${useCase.id}`}
-      aria-labelledby={`uc-${useCase.id}-title`}
-      data-use-case={useCase.id}
-      data-playing={playing ? "true" : "false"}
-      onPointerEnter={(event) => {
-        if (event.pointerType === "mouse") setHeld((value) => ({ ...value, hover: true }));
-      }}
-      onPointerLeave={(event) => {
-        if (event.pointerType === "mouse") setHeld((value) => ({ ...value, hover: false }));
-      }}
-      // Keyboard focus holds the card; a mouse click that leaves focus on a segment does not.
-      onFocus={(event) => {
-        if (event.target.matches(":focus-visible")) setHeld((value) => ({ ...value, focus: true }));
-      }}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-          setHeld((value) => ({ ...value, focus: false }));
-        }
-      }}
-    >
-      {/* each capability's picture, stacked in one place on its panel; the headline's own shows */}
-      <figure className="uc-figure">
-        <div className="uc-arts">
-          {useCase.capabilities.map((capability, capIndex) => (
-            <div key={capability.text} className="uc-shot" data-on={capIndex === shown ? "true" : "false"}>
-              <Art art={capability.art} className="uc-art" />
-            </div>
-          ))}
-        </div>
-      </figure>
-      <h3 id={`uc-${useCase.id}-title`} className="uc-who">
-        <LandingIcon name={useCase.icon} className="uc-ic" />
-        {useCase.label}
-      </h3>
-      {/*
-       * Every capability's headline and words are in the page as served; the one
-       * showing is visible and read out, the others wait in the same place.
-       */}
-      <ul className="uc-caps" data-static={reduced ? "true" : "false"}>
-        {useCase.capabilities.map((capability, capIndex) => {
-          const on = reduced || capIndex === shown;
-          return (
-            <li
-              key={capability.text}
-              className="uc-cap"
-              data-on={on ? "true" : "false"}
-              aria-hidden={on ? undefined : true}
-            >
-              <span className="uc-cap-text">{capability.text}</span>
-              <span className="uc-cap-detail">{capability.detail}</span>
-            </li>
-          );
-        })}
-      </ul>
-      {reduced ? (
-        <span className="uc-segs" aria-hidden="true" />
-      ) : (
-        <div className="uc-segs" role="group" aria-label={`${useCase.label}: capabilities`}>
-          {useCase.capabilities.map((capability, capIndex) => (
-            <button
-              key={capability.text}
-              type="button"
-              className="uc-seg"
-              aria-label={`show capability ${capIndex + 1} of ${CAPS}: ${capability.text}`}
-              aria-current={capIndex === current ? "true" : undefined}
-              data-state={capIndex < current ? "done" : capIndex === current ? "on" : "next"}
-              onClick={() => pick(capIndex)}
-            >
-              <span className="uc-seg-track">
-                {capIndex === current ? (
-                  <span
-                    key={`${take}-${capIndex}`}
-                    className="uc-seg-fill"
-                    style={{
-                      animationDuration: `${USE_CASES.captionMs}ms`,
-                      animationDelay: lead ? `${-lead}ms` : undefined,
-                    }}
-                    onAnimationEnd={() => setCurrent((capIndex + 1) % CAPS)}
-                  />
-                ) : null}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
-      <a className="uc-cta" href={useCase.cta.href} data-use-case-cta={useCase.id}>
-        {useCase.cta.label}
-        <ArrowRight aria-hidden="true" focusable="false" />
-      </a>
-    </article>
   );
 }

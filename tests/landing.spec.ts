@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { loadLandingFixture, PHONE, cardOf } from "./landing-fixture";
+import { loadLandingFixture, PHONE } from "./landing-fixture";
 
 const fixture = loadLandingFixture();
 
@@ -169,177 +169,138 @@ test("the install terminal types each platform's exact command at its prompt, wh
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
 });
 
-test("the use cases show all four audiences at once, each led by the capability it shows, with its picture and one action", async ({
+test("the use cases are one row of all twelve capabilities, each tagged with its audience, all in the served page", async ({
   page,
 }) => {
   await page.goto("/");
-  const uses = page.locator("[data-use-cases]");
-  // no carousel: nothing to page through, every audience is on the page
-  await expect(uses.getByRole("tab")).toHaveCount(0);
-  await expect(uses.locator("[aria-roledescription]")).toHaveCount(0);
-  await expect(uses.locator("h3")).toHaveText(fixture.useCases.slides.map((slide) => slide.label));
-  await expect(uses.locator("h3 svg")).toHaveCount(fixture.useCases.slides.length);
+  const row = page.locator("[data-use-cases]");
+  await expect(row).toHaveAttribute("aria-roledescription", "carousel");
+  await expect(row).toHaveAttribute("role", "region");
+  await expect(row.getByRole("tab")).toHaveCount(0);
+  // no arrows and no counter: the row is the way through
+  await expect(row.getByRole("button")).toHaveCount(0);
 
-  for (const slide of fixture.useCases.slides) {
-    const card = cardOf(page, slide.id);
-    await expect(card).toHaveAttribute("aria-labelledby", `uc-${slide.id}-title`);
-    await expect(card.locator(".uc-cap-text")).toHaveText(slide.capabilities);
-    // the capability showing is the card's headline, set larger than the audience's label
-    const sizes = await card.evaluate((element) => ({
-      audience: parseFloat(getComputedStyle(element.querySelector("h3")!).fontSize),
-      capability: parseFloat(
-        getComputedStyle(element.querySelector('.uc-cap[data-on="true"] .uc-cap-text')!).fontSize,
-      ),
-    }));
-    expect(sizes.capability, `${slide.label}: the capability does not lead the card`).toBeGreaterThan(sizes.audience);
-    // one icon, the audience's: the capabilities carry none
-    await expect(card.locator("svg.uc-ic")).toHaveCount(1);
-    await expect(card.locator(".uc-caps svg")).toHaveCount(0);
-    // each capability says what it is; only the one showing is read out
-    await expect(card.locator(".uc-cap-detail")).toHaveText(slide.details);
-    await expect(card.locator('.uc-cap[aria-hidden="true"]')).toHaveCount(slide.capabilities.length - 1);
-    // one segment per capability; choosing one shows its headline and its own picture
-    const segments = card.locator(".uc-segs").getByRole("button");
-    await expect(segments).toHaveCount(slide.capabilities.length);
-    const picture = card.locator("img:visible");
-    const shows = (capIndex: number) => new RegExp(`^/art/${slide.pictures[capIndex]}-(light|dark)\\.png$`);
-    for (const capIndex of [2, 0]) {
-      await segments.nth(capIndex).click();
-      await expect(card.locator('.uc-cap[data-on="true"] .uc-cap-text')).toHaveText([slide.capabilities[capIndex]!]);
-      await expect(segments.nth(capIndex)).toHaveAttribute("aria-current", "true");
-      // the two cross-fade, then only the caption's own is left
-      await expect(picture).toHaveCount(1);
-      await expect(picture).toHaveAttribute("src", shows(capIndex));
-    }
+  const cards = row.locator(".uc-card:not([aria-hidden])");
+  const all = fixture.useCases.slides.flatMap((slide) =>
+    slide.capabilities.map((capability, index) => ({
+      slide,
+      capability,
+      detail: slide.details[index]!,
+      picture: slide.pictures[index]!,
+    })),
+  );
+  await expect(cards).toHaveCount(all.length);
+  for (const [index, { slide, capability, detail, picture }] of all.entries()) {
+    const card = cards.nth(index);
+    await expect(card.locator("h3")).toHaveText(capability);
+    await expect(card.locator(".uc-cap-detail")).toHaveText(detail);
+    // a small tag names the audience, with its icon, the card's one icon besides the action's arrow
+    await expect(card.locator(".uc-tag")).toHaveText(slide.label);
+    await expect(card.locator(".uc-tag svg")).toHaveCount(1);
+    await expect(card.locator("h3 svg, .uc-cap-detail svg, figure svg")).toHaveCount(0);
+    await expect(card.locator("img").first()).toHaveAttribute(
+      "src",
+      new RegExp(`^/art/${picture}-(light|dark)\\.png$`),
+    );
     const cta = card.getByRole("link", { name: slide.cta.label, exact: true });
     await expect(cta).toHaveAttribute("href", slide.cta.href);
   }
+  // the loop's second set is hidden from assistive technology and out of the tab order
+  const clones = row.locator('.uc-card[aria-hidden="true"]');
+  await expect(clones).toHaveCount(all.length);
+  expect(await clones.evaluateAll((items) => items.every((item) => item.hasAttribute("inert")))).toBe(true);
 
-  // every capability's headline and words are in the page as served, for search engines and readers without script
+  // every headline and every description is in the page as served, for search engines and readers without script
   const served = (await (await page.request.get("/")).text())
     .replaceAll("&#x27;", "'")
     .replaceAll("&quot;", '"')
     .replaceAll("&amp;", "&");
-  for (const slide of fixture.useCases.slides) {
-    for (const words of [...slide.capabilities, ...slide.details]) {
-      expect(served, `the served page is missing ${JSON.stringify(words)}`).toContain(words);
-    }
+  for (const { capability, detail } of all) {
+    expect(served, `the served page is missing ${JSON.stringify(capability)}`).toContain(capability);
+    expect(served, `the served page is missing ${JSON.stringify(detail)}`).toContain(detail);
   }
 
-  // the segments are reachable from the keyboard
-  await cardOf(page, fixture.useCases.slides[0]!.id).getByRole("button").first().focus();
-  await page.keyboard.press("Tab");
-  await expect(cardOf(page, fixture.useCases.slides[0]!.id).getByRole("button").nth(1)).toBeFocused();
+  // with focus the arrow keys move the row, and focus holds its drift
+  await row.focus();
+  const before = await row.evaluate((element) => element.scrollLeft);
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeGreaterThan(before);
 });
 
-test("the use cases sit in an aligned grid, two by two with every part on one line, and one column on a phone", async ({
+test("the row's cards are one size, about three and a half across a wide screen and one and a fifth on a phone", async ({
   page,
 }) => {
-  for (const width of [1440, 390]) {
+  for (const [width, low, high] of [
+    [1440, 3.2, 3.9],
+    [390, 1.1, 1.4],
+  ] as const) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const geometry = await page.evaluate(() => {
-      // layout boxes, not painted ones: a part still waiting to fade up is drawn a little lower
-      const place = (element: Element) => {
-        const box = element as HTMLElement;
-        return { top: box.offsetTop, left: box.offsetLeft, width: box.offsetWidth };
-      };
-      const grid = document.querySelector("[data-use-cases]") as HTMLElement;
-      const cards = [...grid.querySelectorAll(".uc-card")];
-      const parts = (card: Element) =>
-        [".uc-figure", "h3", ".uc-caps", ".uc-segs", ".uc-cta"].map((selector) => place(card.querySelector(selector)!));
-      const rows = [
-        [cards[0]!, cards[1]!],
-        [cards[2]!, cards[3]!],
-      ];
-      const figures = [...grid.querySelectorAll(".uc-figure")];
-      const room = figures.map((figure) => {
-        const art = figure.querySelector(".uc-shot[data-on='true'] .uc-art")!.getBoundingClientRect();
-        const box = figure.getBoundingClientRect();
-        return Math.min(art.left - box.left, box.right - art.right, art.top - box.top, box.bottom - art.bottom);
+      const row = document.querySelector("[data-use-cases]") as HTMLElement;
+      const cards = [...row.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
+      const first = cards[0]!.getBoundingClientRect();
+      const second = cards[1]!.getBoundingClientRect();
+      const title = document.querySelector("#uses-title")!.getBoundingClientRect();
+      const box = row.getBoundingClientRect();
+      const room = cards.map((card) => {
+        const figure = card.querySelector(".uc-figure")!.getBoundingClientRect();
+        const art = card.querySelector(".uc-art")!.getBoundingClientRect();
+        return Math.min(art.left - figure.left, figure.right - art.right, art.top - figure.top, figure.bottom - art.bottom);
       });
       return {
-        widths: new Set(cards.map((card) => place(card).width)).size,
-        columns: new Set(cards.map((card) => place(card).left)).size,
-        // side by side, each part of a card starts on the same line as its neighbour's
-        aligned: rows.every(([a, b]) => parts(a).every((part, index) => part.top === parts(b)[index]!.top)),
-        // every picture sits on a surface of its own, with no border boxing it in
-        panelGround: figures.every(
-          (figure) => getComputedStyle(figure).backgroundColor !== getComputedStyle(document.body).backgroundColor,
-        ),
-        panelBorder: getComputedStyle(figures[0]!).borderTopWidth,
+        sizes: new Set(cards.map((card) => `${card.offsetWidth}x${card.offsetHeight}`)).size,
+        tops: new Set(cards.map((card) => card.offsetTop)).size,
+        across: (box.right - first.left) / (second.left - first.left),
+        startsWithTitle: Math.abs(first.left - title.left) < 2,
+        fades: getComputedStyle(row).maskImage !== "none",
         room: Math.min(...room),
         pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
-    expect(geometry.widths, `the use cases are not one width at ${width}`).toBe(1);
-    expect(geometry.columns, `use cases are not ${width === 1440 ? "two" : "one"} across at ${width}`).toBe(
-      width === 1440 ? 2 : 1,
-    );
-    if (width === 1440) expect(geometry.aligned, "parts of side-by-side cards do not line up").toBe(true);
-    expect(geometry.panelGround, `the picture has no panel of its own at ${width}`).toBe(true);
-    expect(geometry.panelBorder, `the picture's panel is boxed in at ${width}`).toBe("0px");
-    expect(geometry.room, `the picture is crowded against its panel at ${width}`).toBeGreaterThanOrEqual(
-      width === 1440 ? 48 : 24,
-    );
+    expect(geometry.sizes, `the cards are not one size at ${width}`).toBe(1);
+    expect(geometry.tops, `the cards are not one row at ${width}`).toBe(1);
+    expect(geometry.across, `cards across at ${width}`).toBeGreaterThanOrEqual(low);
+    expect(geometry.across, `cards across at ${width}`).toBeLessThanOrEqual(high);
+    expect(geometry.startsWithTitle, `the row does not start under its title at ${width}`).toBe(true);
+    expect(geometry.fades, `the row does not fade at its edges at ${width}`).toBe(true);
+    expect(geometry.room, `a picture is crowded on its panel at ${width}`).toBeGreaterThanOrEqual(16);
     expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
   }
 });
 
-test("each audience cycles on its own clock, a quarter apart, holds on hover, and stands still under reduced motion", async ({
+test("the row drifts on its own and loops, holds when hovered, and stands still and snaps under reduced motion", async ({
   page,
 }) => {
   await page.goto("/");
-  const uses = page.locator("[data-use-cases]");
-  const slides = fixture.useCases.slides;
-  const first = cardOf(page, slides[0]!.id);
-  const fill = first.locator(".uc-seg-fill");
-
-  // off screen every clock holds at its start; each lasts as long as its segment takes to fill,
-  // and the four start a quarter of that apart
-  await expect(first).toHaveAttribute("data-playing", "false");
-  expect(await fill.evaluate((bar) => getComputedStyle(bar).animationDuration)).toBe(
-    `${fixture.useCases.captionMs / 1000}s`,
-  );
-  const delays = await uses
-    .locator(".uc-seg-fill")
-    .evaluateAll((bars) => bars.map((bar) => getComputedStyle(bar).animationDelay));
-  expect(delays).toEqual(slides.map((_, order) => `${(-order * fixture.useCases.captionMs) / 4 / 1000}s`));
-
-  await uses.scrollIntoViewIfNeeded();
+  const row = page.locator("[data-use-cases]");
+  await row.scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
-  await expect(first).toHaveAttribute("data-playing", "true");
+  await expect(row).toHaveAttribute("data-playing", "true");
+  const start = await row.evaluate((element) => element.scrollLeft);
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeGreaterThan(start + 4);
 
-  const on = first.locator('.uc-cap[data-on="true"] .uc-cap-text');
-  await expect(on).toHaveText([slides[0]!.capabilities[0]!]);
-  await fill.dispatchEvent("animationend");
-  await expect(on).toHaveText([slides[0]!.capabilities[1]!]);
-  // after the third it comes back to the first
-  await first.locator(".uc-seg-fill").dispatchEvent("animationend");
-  await first.locator(".uc-seg-fill").dispatchEvent("animationend");
-  await expect(on).toHaveText([slides[0]!.capabilities[0]!]);
+  // at the end of the first set it steps back by one set, so the loop never runs out
+  const set = await row.evaluate((element) => {
+    const clone = element.querySelector<HTMLElement>("[data-clone]")!;
+    const set = clone.offsetLeft - (element.firstElementChild as HTMLElement).offsetLeft;
+    element.scrollLeft = set - 1;
+    return set;
+  });
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeLessThan(set / 2);
 
-  // hovering one card holds its clock where it is; its neighbours carry on
-  await first.locator(".uc-figure").hover();
-  await expect(first).toHaveAttribute("data-playing", "false");
-  expect(await first.locator(".uc-seg-fill").evaluate((bar) => getComputedStyle(bar).animationPlayState)).toBe(
-    "paused",
-  );
-  await expect(cardOf(page, slides[1]!.id)).toHaveAttribute("data-playing", "true");
+  // hovering holds it where it is
+  await row.hover();
+  await expect(row).toHaveAttribute("data-playing", "false");
+  const held = await row.evaluate((element) => element.scrollLeft);
+  await page.waitForTimeout(400);
+  expect(await row.evaluate((element) => element.scrollLeft)).toBe(held);
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  for (const slide of slides) {
-    const caps = cardOf(page, slide.id).locator(".uc-cap");
-    await expect(caps.locator(".uc-cap-text")).toHaveText(slide.capabilities);
-    expect(await caps.evaluateAll((items) => items.map((item) => getComputedStyle(item).opacity))).toEqual([
-      "1",
-      "1",
-      "1",
-    ]);
-  }
-  // with nothing cycling there is nothing to step through
-  await expect(uses.locator(".uc-seg")).toHaveCount(0);
+  await expect(row.locator('.uc-card[aria-hidden="true"]')).toHaveCount(0);
+  await expect(row).toHaveAttribute("data-playing", "false");
+  expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("x mandatory");
 });
 
 test("every section opens on its title alone on a row, in one style at one edge, with room before its content", async ({
@@ -355,7 +316,8 @@ test("every section opens on its title alone on a row, in one style at one edge,
       ["uses", "install", "session"].map((id) => {
         const head = document.querySelector(`#${id} .lp-head`) as HTMLElement;
         const title = head.querySelector("h2")!;
-        const content = head.nextElementSibling as HTMLElement;
+        // the content that follows: the head's next sibling, or, when the head sits alone in its wrap, the wrap's
+        const content = (head.nextElementSibling ?? head.parentElement!.nextElementSibling) as HTMLElement;
         const style = getComputedStyle(title);
         return {
           id,

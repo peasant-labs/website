@@ -1,4 +1,3 @@
-import type { Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parse } from "yaml";
@@ -24,7 +23,6 @@ export type LandingFixture = {
   sections: Array<{ id: string; heading: string }>;
   removed: string[];
   useCases: {
-    captionMs: number;
     slides: Array<{
       id: string;
       label: string;
@@ -83,10 +81,7 @@ export function loadLandingFixture(): LandingFixture {
   return root;
 }
 
-/* one audience's card in the use cases */
-export function cardOf(page: Page, id: string) {
-  return page.locator(`[data-use-cases] [data-use-case="${id}"]`);
-}
+
 
 /** a phone, touch and all */
 export const PHONE = { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } as const;

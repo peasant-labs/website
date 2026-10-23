@@ -83,9 +83,7 @@ export default function Home() {
         </section>
 
         <section id="uses" className="lp-sec" aria-labelledby="uses-title">
-          <div className="site-wrap">
-            <UseCases />
-          </div>
+          <UseCases />
         </section>
 
         <section id="how" className="lp-sec lp-how" aria-labelledby="how-title">

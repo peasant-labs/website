@@ -420,51 +420,92 @@
 /* use cases */
 
 /*
- * The heading, then the four audiences two by two on a wide screen and one
- * under another on a phone: equal widths, tops aligned, the same gaps. Each
- * card is five rows (picture, audience, capability, segments, action), and
- * cards side by side share those rows through subgrid, so every part sits on
- * the same line as its neighbour's. Whitespace separates them; no card has a
- * border.
- */
-/*
- * The grid's own row gap stays at zero: a subgrid adds its parent's row gap
- * inside every card, between its parts. The space between rows of cards is
- * each later row's top margin instead.
+ * One row of all twelve capabilities, from edge to edge of the screen. It
+ * starts at the content's left edge and fades out at both sides, so it reads
+ * as going on. About three and a half cards show on a wide screen, two and a
+ * bit on a tablet, one and a fifth on a phone, all one width and one height.
+ * The row is a scroll area with its bar hidden: it drifts on its own, and a
+ * finger, the arrow keys or a mouse drag move it too.
  */
 .uc {
-  --uc-row: clamp(4rem, 8vw, 6.5rem);
+  /* the row starts where the content does: the page's own side padding, inside its widest measure */
+  --uc-pad: var(--sp-6);
+  --uc-gap: clamp(1rem, 2.5vw, 2rem);
+  --uc-edge: max(var(--uc-pad), calc((100vw - 75rem) / 2 + var(--uc-pad)));
+  --uc-fade: clamp(1.5rem, 6vw, 6rem);
+  --uc-card: calc((100vw - var(--uc-edge) - var(--uc-gap)) / 1.2);
 
-  position: relative;
-  display: grid;
-  gap: 0 clamp(2rem, 5vw, 4rem);
-  min-width: 0;
+  display: flex;
+  gap: var(--uc-gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: var(--sp-2) var(--uc-edge);
+  scroll-padding-inline: var(--uc-edge);
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--uc-fade),
+    #000 calc(100% - var(--uc-fade)),
+    transparent
+  );
 }
 
-.uc-card:nth-of-type(n + 2) {
-  margin-block-start: var(--uc-row);
+.uc::-webkit-scrollbar {
+  display: none;
 }
 
-@media (min-width: 48rem) {
+@media (max-width: 47.99rem) {
   .uc {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .uc-card:nth-of-type(2) {
-    margin-block-start: 0;
+    --uc-pad: var(--sp-4);
   }
 }
 
+@media (min-width: 40rem) {
+  .uc {
+    --uc-card: calc((100vw - var(--uc-edge) - 2 * var(--uc-gap)) / 2.2);
+  }
+}
+
+@media (min-width: 64rem) {
+  .uc {
+    --uc-card: calc((100vw - var(--uc-edge) - 3 * var(--uc-gap)) / 3.5);
+  }
+}
+
+.uc:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .uc {
+    cursor: grab;
+  }
+
+  .uc:active {
+    cursor: grabbing;
+  }
+}
+
+/* under reduced motion nothing drifts: the row scrolls and settles on a card */
+.uc[data-static="true"] {
+  scroll-snap-type: x mandatory;
+}
+
+.uc[data-static="true"] .uc-card {
+  scroll-snap-align: start;
+}
+
+/* a card: picture, audience tag, headline, words, and the action at its foot, in every card alike */
 .uc-card {
   display: grid;
-  grid-row: span 5;
-  grid-template-rows: subgrid;
-  row-gap: 0;
-  align-content: start;
+  flex: 0 0 var(--uc-card);
+  grid-template-rows: auto auto auto 1fr auto;
   min-width: 0;
 }
 
-/* the picture on its own page-colour panel, centred, with room on every side */
+/* the picture on its own page-colour panel, whole, with room on every side */
 .uc-figure {
   display: grid;
   place-items: center;
@@ -474,58 +515,24 @@
   background: var(--surface-2);
 }
 
-/*
- * One picture per capability, stacked in one place. The headline's own fades
- * in as the card moves on, and the one it replaces fades out and then leaves
- * the accessibility tree. The pictures are drawn on an 8px grid at 704 by 528
- * and show at three eighths or a half of that, so every cell lands on whole
- * pixels.
- */
-.uc-arts {
-  display: grid;
-  justify-items: center;
-}
-
-.uc-shot {
-  grid-area: 1 / 1;
-  min-width: 0;
-  max-width: 100%;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 600ms var(--ease-out),
-    visibility 0s linear 600ms;
-}
-
-.uc-shot[data-on="true"] {
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .uc-shot {
-    transition: none;
-  }
-}
-
+/* drawn on an 8px grid at 704 by 528, shown at a quarter or three eighths so every cell lands on whole pixels */
 .uc-art {
-  width: 264px;
+  width: 176px;
   max-width: 100%;
 }
 
-@media (min-width: 72rem) {
+@media (min-width: 64rem) {
   .uc-art {
-    width: 352px;
+    width: 264px;
   }
 }
 
-/* the audience: a small label with its icon */
-.uc-who {
+/* the audience: a small tag with its icon, the card's one icon */
+.uc-tag {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  margin-block-start: var(--sp-6);
+  margin-block-start: var(--sp-5);
   color: var(--ink-3);
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
@@ -541,31 +548,11 @@
   color: var(--amber);
 }
 
-/* the capability now showing is the card's headline; the other two wait in the same place */
-.uc-caps {
-  display: grid;
-  margin: var(--sp-3) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.uc-cap {
-  grid-area: 1 / 1;
-  display: grid;
-  align-content: start;
-  gap: var(--sp-2);
-  opacity: 0;
-  transition: opacity 400ms var(--ease-out);
-}
-
-.uc-cap[data-on="true"] {
-  opacity: 1;
-}
-
 .uc-cap-text {
+  margin-block-start: var(--sp-2);
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 1.8vw, 1.625rem);
+  font-size: clamp(1.25rem, 1.6vw, 1.5rem);
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.2;
@@ -574,7 +561,7 @@
 
 /* what the capability is, in a sentence or two of body type */
 .uc-cap-detail {
-  max-inline-size: 46ch;
+  margin-block-start: var(--sp-2);
   color: var(--ink-3);
   font-family: var(--font-body);
   font-size: var(--fs-body);
@@ -582,87 +569,14 @@
   text-wrap: pretty;
 }
 
-/* reduced motion: the three capabilities stand as a short list */
-.uc-caps[data-static="true"] {
-  gap: var(--sp-5);
-}
-
-.uc-caps[data-static="true"] .uc-cap {
-  grid-area: auto;
-  opacity: 1;
-}
-
-.uc-caps[data-static="true"] .uc-cap-text {
-  font-size: var(--fs-lg);
-}
-
-/* the three segments: each one is a way to its capability, and the current one fills with its time */
-.uc-segs {
-  display: flex;
-  gap: var(--sp-2);
-  margin-block-start: var(--sp-3);
-  margin-inline-start: calc(-1 * var(--sp-1));
-}
-
-.uc-seg {
-  display: grid;
-  place-items: center;
-  width: 3rem;
-  height: var(--target-comfortable);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.uc-seg-track {
-  position: relative;
-  display: block;
-  width: 2.5rem;
-  height: 3px;
-  overflow: hidden;
-  background: var(--rule);
-  transition: background-color var(--dur-2) ease;
-}
-
-.uc-seg[data-state="done"] .uc-seg-track {
-  background: var(--ink-4);
-}
-
-.uc-seg-fill {
-  position: absolute;
-  inset: 0;
-  background: var(--amber);
-  transform: scaleX(0);
-  transform-origin: left center;
-  animation-name: uc-fill;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-
-.uc-card[data-playing="false"] .uc-seg-fill {
-  animation-play-state: paused;
-}
-
-@keyframes uc-fill {
-  to {
-    transform: scaleX(1);
-  }
-}
-
-.uc-seg:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring);
-  outline-offset: -8px;
-}
-
-/* the one action, small */
+/* the audience's one action, small, at the card's foot */
 .uc-cta {
   display: inline-flex;
   align-items: center;
   justify-self: start;
   gap: var(--sp-2);
   min-height: var(--target-comfortable);
-  margin-block-start: var(--sp-1);
+  margin-block-start: var(--sp-3);
   color: var(--amber);
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
@@ -678,10 +592,6 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .uc-seg:hover .uc-seg-track {
-    background: var(--rule-strong);
-  }
-
   .uc-cta:hover {
     text-decoration: underline;
     text-underline-offset: 4px;
