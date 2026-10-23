@@ -51,6 +51,17 @@ test("header and footer carry exactly the fixture destinations", async ({ page }
   ).toEqual(fixture.footer.nav);
 });
 
+test("on a phone the footer's links sit on one line", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const path of ["/", "/about"]) {
+    await page.goto(path);
+    const tops = await page
+      .locator("footer .site-foot-nav a")
+      .evaluateAll((links) => new Set(links.map((link) => Math.round(link.getBoundingClientRect().top))).size);
+    expect(tops, `the footer's links wrap on ${path}`).toBe(1);
+  }
+});
+
 test("every page ends with the footer's call to action", async ({ page }) => {
   const { cta } = fixture.footer;
   for (const [path, installHref] of [

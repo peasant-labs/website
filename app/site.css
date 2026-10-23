@@ -373,6 +373,13 @@ html {
   gap: 0 var(--sp-6);
 }
 
+/* on a phone the five links keep one line: a narrower gap, the same targets */
+@media (max-width: 47.99rem) {
+  .site-foot-nav {
+    gap: 0 var(--sp-4);
+  }
+}
+
 .site-foot-nav a {
   display: inline-flex;
   align-items: center;
