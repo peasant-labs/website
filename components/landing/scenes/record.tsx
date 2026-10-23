@@ -14,11 +14,12 @@ const ANSWERED = TYPED + 2;
 const OPENED = TYPED + 3;
 
 /*
- * Record, on a Mac. In Claude Code, in Terminal, /peasant is typed into the
- * input row and sent; peasant's hook answers with the line `peasant open`
+ * Record, on a Mac. In Claude Code, in Terminal, the pointer clicks into the
+ * input row, /peasant is typed and sent; peasant's hook answers with the line `peasant open`
  * prints (its own wording), and the input row glides down as the lines arrive.
- * Then Safari rises in front on the session it opened, and Terminal dims
- * behind it.
+ * Then Safari rises in front on the session it opened, Terminal dims behind
+ * it, and the pointer crosses to the page and comes to rest on publish, where
+ * the next steps pick it up.
  */
 function Record({ phase }: { phase: number }) {
   const sent = phase >= SENT;
@@ -57,21 +58,28 @@ function Record({ phase }: { phase: number }) {
 
 export const RECORD_SCENE: SceneDefinition = {
   id: "record",
-  duration: 7000,
+  duration: 7200,
   finalPhase: OPENED,
   cues: [
-    ...typing(COMMAND, 500, 1),
-    { at: 1500, phase: SENT },
-    { at: 1950, phase: ANSWERED },
-    { at: 3100, phase: OPENED },
+    ...typing(COMMAND, 1250, 1),
+    { at: 2000, phase: SENT },
+    { at: 2450, phase: ANSWERED },
+    { at: 3500, phase: OPENED },
   ],
   shots: [
     { at: 0, focus: "term", move: 1, fill: 0.94 },
     // a wide screen reads the whole row; a phone leans in on its start
-    { at: 300, focus: "cc-input", move: 800, fill: 0.92, width: 430, cropBelow: 0.8 },
-    { at: 2050, focus: "cc-out", move: 700, fill: 0.92, width: 430, cropBelow: 0.8 },
-    { at: 2900, focus: "all", move: 1200 },
-    { at: 4300, focus: "browser", move: 1300, ease: "settle", fill: 0.97 },
+    { at: 400, focus: "cc-input", move: 800, fill: 0.92, width: 430, cropBelow: 0.8 },
+    { at: 2550, focus: "cc-out", move: 700, fill: 0.92, width: 430, cropBelow: 0.8 },
+    { at: 3300, focus: "all", move: 1200 },
+    { at: 4600, focus: "browser", move: 1300, ease: "settle", fill: 0.97 },
+  ],
+  // the pointer clicks into Claude Code's input, then, once Safari is in front, crosses to it and settles on publish
+  cursorFrom: [560, 330],
+  cursor: [
+    { at: 200, to: "cc-input", move: 700, press: true, hover: 180, shape: "ibeam", aim: [0.25, 0.5] },
+    { at: 3900, to: "browser", move: 800, aim: [0.55, 0.62] },
+    { at: 5100, to: ".scn-page .pub-bar-action", move: 800 },
   ],
   finalFocus: "all",
   Render: Record,

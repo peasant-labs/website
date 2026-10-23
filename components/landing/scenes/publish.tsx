@@ -24,8 +24,9 @@ const PUBLISHED = PUBLISHING + 1;
 
 /*
  * Publish, in Safari. The cursor presses publish on the session page and the
- * publish window opens from it; "eval" is typed into fairtrade's
- * CollectivePicker and its suggestions rise in; the cursor adds eval-crowd,
+ * publish window opens from it; it clicks into the search field, "eval" is
+ * typed into fairtrade's CollectivePicker and its suggestions rise in; the
+ * cursor adds eval-crowd,
  * which arrives in AccessList as the picker fades; the cursor presses publish,
  * which turns busy, and the window closes as the page's state crossfades to
  * published to eval-crowd. Everything is mounted from the start and changes in
@@ -94,27 +95,29 @@ function Publish({ phase }: { phase: number }) {
 
 export const PUBLISH_SCENE: SceneDefinition = {
   id: "publish",
-  duration: 8200,
+  duration: 8400,
   finalPhase: PUBLISHED,
   cues: [
-    { at: 1650, phase: OPEN },
-    ...typing(QUERY, 2350, OPEN + 1, 90),
-    { at: 3600, phase: ADDED },
-    { at: 4600, phase: PUBLISHING },
-    { at: 5500, phase: PUBLISHED },
+    { at: 1550, phase: OPEN },
+    ...typing(QUERY, 2750, OPEN + 1, 90),
+    { at: 4150, phase: ADDED },
+    { at: 5250, phase: PUBLISHING },
+    { at: 6150, phase: PUBLISHED },
   ],
   shots: [
     { at: 0, focus: "all", move: 1 },
     { at: 300, focus: "page-head", move: 900, fill: 0.78 },
-    { at: 1950, focus: "dialog", move: 900, fill: 0.92 },
-    { at: 5650, focus: "page-head", move: 1100, ease: "settle", fill: 0.78 },
+    { at: 1700, focus: "dialog", move: 900, fill: 0.92 },
+    { at: 6250, focus: "page-head", move: 1100, ease: "settle", fill: 0.78 },
   ],
+  // the pointer picks up where review left it: publish, the search field, add, publish, then the new state
+  cursorFrom: [848, 205],
   cursor: [
-    { at: 700, to: ".scn-page .pub-bar-action", move: 800, press: true },
-    { at: 2800, to: ".pub-picker-add", move: 700, press: true },
-    { at: 3900, to: "publish", move: 600, press: true },
-    // and drifts to the page's new state as the window closes
-    { at: 5800, to: "page-state", move: 900 },
+    { at: 400, to: ".scn-page .pub-bar-action", move: 800, press: true, hover: 220 },
+    { at: 1950, to: ".pub-picker input", move: 550, press: true, hover: 150, shape: "ibeam", aim: [0.3, 0.5] },
+    { at: 3250, to: ".pub-picker-add", move: 600, press: true },
+    { at: 4350, to: "publish", move: 600, press: true },
+    { at: 6300, to: "page-state", move: 900, aim: [0.4, 0.5] },
   ],
   finalFocus: "page-head",
   finalFill: 0.78,

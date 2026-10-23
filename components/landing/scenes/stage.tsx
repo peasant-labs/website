@@ -15,6 +15,8 @@ export const SCREEN = { width: 1120, height: 700 } as const;
 /* moves across the screen, and the settle into a held framing */
 const EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)";
 const EASE_SETTLE = "cubic-bezier(0.23, 1, 0.32, 1)";
+/* a hand's move from one control to the next: eases out of rest and into the target */
+const EASE_GLIDE = "cubic-bezier(0.45, 0, 0.2, 1)";
 /* how long a part pushed along by new content takes to glide to its new place */
 const FLIP_MS = 360;
 
@@ -54,8 +56,22 @@ export type Shot = Readonly<{
 /** A beat of the scene's own state: from `at` ms the scene renders `phase`. */
 export type Cue = Readonly<{ at: number; phase: number }>;
 
-/** A cursor move to an element marked `data-focus`, pressing it when it arrives. */
-export type CursorCue = Readonly<{ at: number; to: string; move: number; press?: boolean }>;
+/**
+ * A move of the pointer to an element (a `data-focus` name or a selector), on
+ * a gently curved path. On arrival the target shows its hover state for
+ * `hover` ms; with `press` the pointer then clicks it. `shape` is the pointer
+ * it shows over the target: the I-beam over text it will type into. `aim`
+ * picks the point within the target, as fractions of its box.
+ */
+export type CursorCue = Readonly<{
+  at: number;
+  to: string;
+  move: number;
+  press?: boolean;
+  hover?: number;
+  shape?: "arrow" | "ibeam";
+  aim?: readonly [number, number];
+}>;
 
 export type SceneDefinition = Readonly<{
   id: string;
@@ -65,6 +81,8 @@ export type SceneDefinition = Readonly<{
   cues: readonly Cue[];
   shots: readonly Shot[];
   cursor?: readonly CursorCue[];
+  /** where the pointer rests as the take begins, on the virtual screen: where the last scene left it */
+  cursorFrom?: readonly [number, number];
   /** how the finished frame is framed when nothing moves */
   finalFocus: string;
   finalFill?: number;
@@ -72,6 +90,21 @@ export type SceneDefinition = Readonly<{
 }>;
 
 type Box = { x: number; y: number; w: number; h: number };
+
+/*
+ * The pointer is one hand across the scenes: a take starts its pointer where
+ * the last take's pointer is on screen right now, so a change of step hands it
+ * over in place instead of jumping. The scenes share one view, so a point on
+ * screen is the same point for both.
+ */
+let lastPointer: { cursor: HTMLElement; view: HTMLElement } | null = null;
+
+function onScreenPoint(cursor: HTMLElement, view: HTMLElement) {
+  if (!cursor.isConnected || getComputedStyle(cursor).opacity === "0") return null;
+  const point = cursor.getBoundingClientRect();
+  const box = view.getBoundingClientRect();
+  return { x: point.left - box.left, y: point.top - box.top };
+}
 
 /* the closest the camera goes: past this a short line would fill the window */
 const MAX_ZOOM = 2.6;
@@ -170,8 +203,9 @@ export function SceneStage({
   }, [frame, reduced, scene]);
 
   useLayoutEffect(() => {
-    // once a take runs, the camera is the take's: a beat of the scene must not snap it back to the opening frame
-    if (reduced || !started) rest();
+    // once a take runs, the camera is the take's: a beat of the scene must not snap it back to the opening frame.
+    // A take can start in the same render the stage mounts, so a camera with no framing yet gets its opening one.
+    if (reduced || !started || !cameraRef.current?.style.transform) rest();
     // the framing is measured on the real text, so it is taken again once the fonts arrive
     let live = true;
     document.fonts?.ready.then(() => {
@@ -239,44 +273,84 @@ export function SceneStage({
     }
 
     if (cursor && scene.cursor?.length) {
-      cursor.style.opacity = "0";
-      for (const [index, cue] of scene.cursor.entries()) {
+      // The pointer starts where the last take's pointer is, or where the last scene left it, and fades in there.
+      let here = scene.cursorFrom ?? [SCREEN.width * 0.82, SCREEN.height * 0.88];
+      const view = viewRef.current;
+      const handed = lastPointer && view ? onScreenPoint(lastPointer.cursor, lastPointer.view) : null;
+      if (handed) {
+        const lens = new DOMMatrix(getComputedStyle(camera).transform);
+        const point = lens.inverse().transformPoint(new DOMPoint(handed.x, handed.y));
+        here = [point.x, point.y];
+      }
+      if (view) lastPointer = { cursor, view };
+      let bend = 1;
+      cursor.style.transform = `translate(${here[0]}px, ${here[1]}px)`;
+      cursor.dataset.shape = "arrow";
+      const fadeIn = cursor.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: EASE_SETTLE });
+      running.add(fadeIn);
+      cursor.style.opacity = "1";
+      let hovered: HTMLElement | null = null;
+
+      for (const cue of scene.cursor) {
         at(cue.at, () => {
+          const target = targetOf(camera, cue.to);
           const box = boxOf(camera, cue.to);
-          const to = `translate(${box.x + box.w / 2}px, ${box.y + box.h / 2}px)`;
-          const from = index === 0 ? `translate(${SCREEN.width * 0.9}px, ${SCREEN.height * 0.95}px)` : getComputedStyle(cursor).transform;
-          if (index === 0) {
-            // the cursor fades in as it sets off, rather than appearing
-            cursor.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: EASE_SETTLE });
-          }
-          cursor.style.opacity = "1";
-          const animation = cursor.animate([{ transform: from }, { transform: to }], {
-            duration: cue.move,
-            easing: EASE_MOVE,
-            fill: "forwards",
+          const [ax, ay] = cue.aim ?? [0.5, 0.5];
+          const to: [number, number] = [box.x + box.w * ax, box.y + box.h * ay];
+          const from = here;
+          here = to;
+          // a hand moves in a slight arc, alternating its side, never a ruler-straight line
+          const dx = to[0] - from[0];
+          const dy = to[1] - from[1];
+          const lift = Math.hypot(dx, dy) * 0.12 * bend;
+          bend = -bend;
+          const control: [number, number] = [
+            (from[0] + to[0]) / 2 - (dy / (Math.hypot(dx, dy) || 1)) * lift,
+            (from[1] + to[1]) / 2 + (dx / (Math.hypot(dx, dy) || 1)) * lift,
+          ];
+          const frames = Array.from({ length: 13 }, (_, step) => {
+            const t = step / 12;
+            const x = (1 - t) ** 2 * from[0] + 2 * (1 - t) * t * control[0] + t ** 2 * to[0];
+            const y = (1 - t) ** 2 * from[1] + 2 * (1 - t) * t * control[1] + t ** 2 * to[1];
+            return { transform: `translate(${x}px, ${y}px)` };
           });
-          running.add(animation);
-          animation.onfinish = () => {
-            cursor.style.transform = to;
-            animation.cancel();
-            running.delete(animation);
-            // a press is the arrow dipping and the control giving way under it, with nothing drawn around it
-            const arrow = cursor.firstElementChild;
-            const target = targetOf(camera, cue.to);
-            if (cue.press) {
-              for (const [element, depth] of [
-                [arrow, 0.82],
-                [target, 0.97],
-              ] as const) {
-                if (!element) continue;
-                const press = element.animate(
-                  [{ transform: "scale(1)" }, { transform: `scale(${depth})` }, { transform: "scale(1)" }],
-                  { duration: 240, easing: EASE_SETTLE },
-                );
-                running.add(press);
-                press.onfinish = () => running.delete(press);
-              }
+          if (hovered) {
+            delete hovered.dataset.hover;
+            hovered = null;
+          }
+          // leaving a text field, the I-beam turns back into the arrow a moment after setting off
+          if (cursor.dataset.shape !== "arrow" && cue.shape !== "ibeam") {
+            timers.push(window.setTimeout(() => (cursor.dataset.shape = "arrow"), cue.move * 0.15));
+          }
+          const travel = cursor.animate(frames, { duration: cue.move, easing: EASE_GLIDE, fill: "forwards" });
+          running.add(travel);
+          travel.onfinish = () => {
+            cursor.style.transform = frames.at(-1)!.transform;
+            travel.cancel();
+            running.delete(travel);
+            if (cue.shape === "ibeam") cursor.dataset.shape = "ibeam";
+            if (target) {
+              target.dataset.hover = "true";
+              hovered = target;
             }
+            if (!cue.press) return;
+            // after a short hover, a click: the pointer dips and the control gives way under it
+            timers.push(
+              window.setTimeout(() => {
+                for (const [element, depth] of [
+                  [cursor.querySelector<HTMLElement>(".scn-pointer"), 0.82],
+                  [target, 0.97],
+                ] as const) {
+                  if (!element) continue;
+                  const press = element.animate(
+                    [{ transform: "scale(1)" }, { transform: `scale(${depth})` }, { transform: "scale(1)" }],
+                    { duration: 240, easing: EASE_SETTLE },
+                  );
+                  running.add(press);
+                  press.onfinish = () => running.delete(press);
+                }
+              }, cue.hover ?? 200),
+            );
           };
         });
       }
@@ -285,6 +359,7 @@ export function SceneStage({
     return () => {
       timers.forEach((timer) => window.clearTimeout(timer));
       running.forEach((animation) => animation.cancel());
+      camera.querySelectorAll<HTMLElement>("[data-hover]").forEach((element) => delete element.dataset.hover);
     };
   }, [scene, started, reduced, frame]);
 
@@ -298,8 +373,12 @@ export function SceneStage({
         </div>
         {scene.cursor?.length && !reduced ? (
           <div className="scn-cursor" ref={cursorRef} aria-hidden="true">
-            <svg viewBox="0 0 16 16">
-              <path d="M2 1.5v12l3.3-3.1 2.2 4.6 2-.9-2.2-4.5H12z" />
+            {/* the macOS pointers: the arrow, its tip on the point, and the I-beam, centred on it */}
+            <svg className="scn-pointer scn-arrow" viewBox="0 0 14 22">
+              <path d="M1.5 1.4v16.1l3.9-3.7 2.5 5.9 2.8-1.2-2.5-5.8h5.4z" />
+            </svg>
+            <svg className="scn-pointer scn-ibeam" viewBox="0 0 10 20">
+              <path d="M1.5 1.5h2c.8 0 1.5.5 1.5 1.2 0-.7.7-1.2 1.5-1.2h2M5 2.7v14.6M1.5 18.5h2c.8 0 1.5-.5 1.5-1.2 0 .7.7 1.2 1.5 1.2h2" />
             </svg>
           </div>
         ) : null}

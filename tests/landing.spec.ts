@@ -467,8 +467,11 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
     await expect(layer).toHaveCount(1);
     await expect(layer.locator(".mac-menubar")).toHaveCount(1);
     expect(await layer.locator(".mac-win .mac-lights").count()).toBeGreaterThan(0);
-    // the camera carries the screen and the cursor, nothing drawn around a click
+    // the camera carries the screen and the pointer, nothing drawn around a click
     await expect(view.locator(".scn-camera > :not(.scn-screen, .scn-cursor)")).toHaveCount(0);
+    // every scene has macOS's pointer, the arrow and the I-beam it turns into over text
+    await expect(layer.locator(".scn-cursor .scn-arrow")).toHaveCount(1);
+    await expect(layer.locator(".scn-cursor .scn-ibeam")).toHaveCount(1);
   }
 
   // the publish action in the scene keeps its label on one line, whatever state it shows

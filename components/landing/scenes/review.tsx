@@ -57,6 +57,15 @@ export const REVIEW_SCENE: SceneDefinition = {
     { at: 4800, focus: pairAt(3), move: 800, fill: 0.9, width: 360 },
     { at: 5900, focus: "review", move: 1200, ease: "settle", fill: 0.96 },
   ],
+  // the pointer picks up where publish left it, follows the scan, then reads each match in turn
+  cursorFrom: [650, 265],
+  cursor: [
+    { at: 300, to: ".rdx-scan", move: 900, aim: [0.3, 0.6] },
+    { at: 2500, to: pairAt(1), move: 900, aim: [0.18, 0.3] },
+    { at: 3700, to: pairAt(2), move: 800, aim: [0.18, 0.3] },
+    { at: 4800, to: pairAt(3), move: 800, aim: [0.18, 0.3] },
+    { at: 5900, to: ".rdx-summary-safe", move: 900, aim: [0.4, 0.5] },
+  ],
   finalFocus: "review",
   finalFill: 0.96,
   Render: Review,

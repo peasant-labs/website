@@ -1874,30 +1874,97 @@
   }
 }
 
+/*
+ * The pointer: macOS's arrow and I-beam, black with a white edge as the system
+ * draws them, at the size the system draws them beside this screen's text.
+ * The element sits on the point itself; the arrow's tip and the I-beam's
+ * middle are placed on it.
+ */
 .scn-cursor {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
   z-index: 3;
-  width: 22px;
-  height: 22px;
+  width: 0;
+  height: 0;
   opacity: 0;
   pointer-events: none;
 }
 
-.scn-cursor svg {
+.scn-pointer {
+  position: absolute;
   display: block;
-  width: 100%;
-  height: 100%;
-  /* the arrow's tip, so a press dips toward what it points at */
-  transform-origin: 12% 9%;
+  overflow: visible;
 }
 
-.scn-cursor path {
-  fill: var(--ink-strong);
-  stroke: var(--canvas);
-  stroke-width: 1;
+.scn-pointer path {
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  paint-order: stroke;
 }
+
+.scn-arrow {
+  inset-block-start: -1.6px;
+  inset-inline-start: -1.7px;
+  width: 16px;
+  height: 25px;
+  /* the tip, so a click dips toward what it points at */
+  transform-origin: 10% 6%;
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35));
+}
+
+.scn-arrow path {
+  fill: #000;
+  stroke-width: 1.3;
+}
+
+.scn-ibeam {
+  inset-block-start: -10px;
+  inset-inline-start: -5px;
+  width: 10px;
+  height: 20px;
+  transform-origin: 50% 50%;
+}
+
+.scn-ibeam path {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.2;
+  filter: drop-shadow(0 0 0.8px #fff) drop-shadow(0 0 0.6px #fff);
+}
+
+.scn-cursor:not([data-shape="ibeam"]) .scn-ibeam,
+.scn-cursor[data-shape="ibeam"] .scn-arrow {
+  display: none;
+}
+
+/* what the pointer rests on shows its hover state, as it would under a real pointer */
+.scn-screen .btn-primary[data-hover] {
+  background: var(--amber-fill-hover);
+}
+
+.scn-screen :is(.btn-secondary, .pub-picker-add)[data-hover] {
+  background: var(--surface-hover);
+}
+
+.scn-screen .rdx-pair[data-hover] {
+  outline: 1px solid var(--rule-strong);
+  outline-offset: 2px;
+}
+
+.scn-screen .cc-input[data-hover] {
+  border-color: var(--mac-term-ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scn-screen :is(.rdx-pair, .cc-input) {
+    transition:
+      border-color 160ms ease,
+      outline-color 160ms ease;
+  }
+}
+
 
 /* get started */
 
