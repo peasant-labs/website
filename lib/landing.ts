@@ -181,8 +181,8 @@ export const VISION = {
   line: "We are building a sustainable, respectful ecosystem where people have a stake in their data.",
   cta: { label: "about us", href: "/about" },
   art: art(
-    "vision2",
-    "three thatched cottages with three peasants and bundles of wheat between them",
+    "vision3",
+    "a cottage beside two peasants who carry one basket of grain between them, the basket in amber",
     1200,
     512,
   ),
