@@ -354,7 +354,7 @@ test("every section opens on its title alone on a row, in one style at one edge,
   }
 });
 
-test("the vision stands on its own grounded panel, and the landing ends on a full call to action", async ({
+test("the vision stands on its own grounded panel, and the landing ends on a calm split call to action", async ({
   page,
 }) => {
   await page.goto("/");
@@ -371,24 +371,55 @@ test("the vision stands on its own grounded panel, and the landing ends on a ful
   expect(ground).toEqual({ surface: true, border: "1px", line: "1px" });
   await expect(panel.locator("#vision-line")).toHaveText(fixture.vision.line);
 
-  // the close: the line at display size, install with its first command to copy in place, and the docs
-  const close = page.locator("footer [data-footer-cta]");
-  const sizes = await page.evaluate(() => ({
-    line: parseFloat(getComputedStyle(document.querySelector("footer .site-foot-line")!).fontSize),
-    title: parseFloat(getComputedStyle(document.querySelector("#install h2")!).fontSize),
-  }));
-  expect(sizes.line).toBeGreaterThan(sizes.title);
-  // the reader's own system's line: PowerShell for a Windows visitor, the shell one for everyone else
-  const windows = await page.evaluate(() => /windows/i.test(navigator.userAgent));
-  const command = fixture.install.platforms[windows ? 1 : 0]!.command;
-  await expect(close.locator("[data-install-line] [data-command]")).toHaveText(command);
-  await close.getByRole("button", { name: `copy ${command}` }).click();
-  await expect(close.getByRole("button", { name: `copied ${command}` })).toBeVisible();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(command);
+  // the close: its line at the section titles' size and two buttons of one height, beside a whole picture on a panel
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const close = await page.evaluate(() => {
+      const band = document.querySelector("footer [data-footer-cta]")!;
+      const rect = (element: Element) => element.getBoundingClientRect();
+      const [primary, secondary] = [...band.querySelectorAll(".site-foot-actions .btn")].map(rect);
+      const panel = band.querySelector(".site-foot-close-panel")!;
+      const shown = [...panel.querySelectorAll<HTMLImageElement>(".art-img")].find(
+        (image) => getComputedStyle(image).display !== "none",
+      )!;
+      return {
+        lineSize: getComputedStyle(band.querySelector(".site-foot-line")!).fontSize,
+        titleSize: getComputedStyle(document.querySelector("#install h2")!).fontSize,
+        buttons: band.querySelectorAll(".site-foot-actions .btn").length,
+        sameHeight: Math.abs(primary!.height - secondary!.height) < 1,
+        sameRow: Math.abs(primary!.top - secondary!.top) < 1,
+        stacked: primary!.top < secondary!.top - 1,
+        panelGround: getComputedStyle(panel).backgroundColor !== getComputedStyle(document.body).backgroundColor,
+        panelBorder: getComputedStyle(panel).borderTopWidth,
+        whole: (() => {
+          const box = rect(panel);
+          const art = rect(shown);
+          return art.left >= box.left && art.right <= box.right && art.top >= box.top && art.bottom <= box.bottom;
+        })(),
+        pictureFirst: rect(panel).bottom <= rect(band.querySelector(".site-foot-line")!).top + 1,
+        beside: rect(panel).left >= rect(band.querySelector(".site-foot-line")!).right - 1,
+        extras: band.querySelectorAll("[data-install-line], .site-foot-close-mark").length,
+      };
+    });
+    expect(close.lineSize, `the closing line is not at the section titles' size at ${width}`).toBe(close.titleSize);
+    expect(close.buttons).toBe(2);
+    expect(close.sameHeight, `the closing buttons differ in height at ${width}`).toBe(true);
+    if (width === 1440) {
+      expect(close.sameRow, "the closing buttons do not share a row").toBe(true);
+      expect(close.beside, "the picture is not beside the words").toBe(true);
+    } else {
+      expect(close.stacked, "the closing buttons do not stack on a phone").toBe(true);
+      expect(close.pictureFirst, "the picture does not come first on a phone").toBe(true);
+    }
+    expect(close.panelGround && close.panelBorder === "1px", `the picture has no panel at ${width}`).toBe(true);
+    expect(close.whole, `the closing picture is cropped at ${width}`).toBe(true);
+    expect(close.extras, "the close repeats the install command or floats the mark").toBe(0);
+  }
 
-  // other pages keep the compact row, with no command in it
+  // other pages keep the compact row, with no picture in it
   await page.goto("/about");
-  await expect(page.locator("footer [data-install-line]")).toHaveCount(0);
+  await expect(page.locator("footer .site-foot-close-panel")).toHaveCount(0);
 });
 
 test("whitespace, not rules, separates the sections, with generous room between them", async ({ page }) => {

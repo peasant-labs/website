@@ -376,3 +376,11 @@ export const VISION = {
     512,
   ),
 } as const;
+
+/*
+ * The picture that closes the landing, beside its last line and its two
+ * buttons: an open gate, in the same dithered family as the use-case pictures.
+ */
+export const CLOSE = {
+  art: art("p-open", "an open wooden gate with an amber latch", 704, 528),
+} as const;

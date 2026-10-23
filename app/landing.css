@@ -2711,9 +2711,11 @@
 }
 
 /*
- * The landing ends on a destination: the mark, the line at display size, then
- * install, its first command to copy in place, and the docs. Room above it and
- * below it sets it apart from the footer's links, with no rules.
+ * The landing ends on a calm split inside the content width: its line at the
+ * page's section-title size and its two buttons, of one height, beside a
+ * picture on a page-colour panel with a hairline, like the vision's but
+ * smaller. A phone stacks them, picture first. Room above and below sets it
+ * apart from the footer's links, with no rules.
  */
 .site-shell:has(> .lp) .site-foot,
 .site-shell:has(> .lp) .site-foot-cta-row {
@@ -2722,96 +2724,66 @@
 
 .site-foot-close {
   margin-block-end: clamp(2.5rem, 6vw, 5rem);
-  padding-block: clamp(4rem, 10vw, 9rem);
+  padding-block: clamp(3rem, 7.5vw, 7.5rem);
 }
 
 .site-foot-close .site-foot-cta {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  justify-items: center;
-  gap: clamp(1.5rem, 3vw, 2.5rem);
-  text-align: center;
+  gap: clamp(2rem, 5vw, 4rem);
 }
 
-.site-foot-close-mark {
-  width: 2.25rem;
-  height: 2.75rem;
-  color: var(--amber);
+@media (min-width: 48rem) {
+  .site-foot-close .site-foot-cta {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+  }
+}
+
+.site-foot-close-words {
+  display: grid;
+  justify-items: start;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 .site-foot-close .site-foot-line {
-  max-inline-size: 16ch;
-  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
-  line-height: 1.04;
-  letter-spacing: -0.02em;
+  max-inline-size: 22ch;
+  font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+  line-height: 1.12;
 }
 
 .site-foot-close .site-foot-actions {
-  align-items: center;
-  justify-content: center;
-  justify-self: stretch;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
 }
 
-/* the first command, in the site's mono on a raised ground, with its copy button */
-.close-cmd {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  max-width: 100%;
-  min-height: 52px;
-  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
-  border: var(--bd-strong);
+/* the picture, whole, on its panel */
+.site-foot-close-panel {
+  display: grid;
+  place-items: center;
+  padding: clamp(1.5rem, 3.5vw, 2.5rem);
+  border: var(--bd);
   background: var(--surface-2);
-  text-align: start;
 }
 
-.close-cmd-text {
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--ink-strong);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  letter-spacing: 0;
-  overflow-wrap: break-word;
+.site-foot-close-art {
+  width: 264px;
+  max-width: 100%;
 }
 
-.close-cmd-copy {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--sp-2);
-  min-height: var(--target-comfortable);
-  padding: 0 var(--sp-3);
-  border: 0;
-  background: transparent;
-  color: var(--amber);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  letter-spacing: 0;
-  cursor: pointer;
-}
-
-.close-cmd-copy svg {
-  width: var(--ic-sm);
-  height: var(--ic-sm);
-}
-
-.close-cmd-copy:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring);
-  outline-offset: -3px;
+@media (min-width: 72rem) {
+  .site-foot-close-art {
+    width: 352px;
+  }
 }
 
 @media (max-width: 47.99rem) {
-  .close-cmd {
-    flex: 1 1 100%;
+  .site-foot-close-panel {
+    order: -1;
   }
 
-  .close-cmd-text {
-    font-size: 13px;
+  .site-foot-close-words,
+  .site-foot-close .site-foot-actions {
+    justify-items: stretch;
   }
 }
 
