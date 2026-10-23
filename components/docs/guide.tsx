@@ -20,7 +20,7 @@ export function Guide({ guide, previous, next }: { guide: GuideData; previous: P
 
   return (
     <main id="content" className="dx-page" tabIndex={-1}>
-      <DocHead crumb={{ label: "docs", href: "/docs", here: "guides" }} title={card.title} lede={guide.lede} art={card.art} />
+      <DocHead crumb={{ label: "docs", href: "/docs", here: "guides" }} title={card.title} lede={guide.lede} art={card.art} columns />
       <DocJump items={toc} />
       <div className="dx-columns">
         <article className="dx-article" aria-labelledby="page-heading">

@@ -46,7 +46,7 @@ export default function DocsHome() {
 
   return (
     <main id="content" className="dx-page" tabIndex={-1}>
-      <DocHead title={DOCS_HOME.title} lede={DOCS_HOME.lede} />
+      <DocHead title={DOCS_HOME.title} lede={DOCS_HOME.lede} columns />
       <DocJump items={DOCS_HOME_TOC} />
 
       <div className="dx-columns">

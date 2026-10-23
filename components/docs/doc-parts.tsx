@@ -162,14 +162,17 @@ export function DocHead({
   title,
   lede,
   art,
+  columns = false,
 }: {
   crumb?: { label: string; href: string; here: string };
   title: string;
   lede: string;
   art?: ArtSource;
+  /** the page has "on this page" beside its content: the header keeps the same two columns */
+  columns?: boolean;
 }) {
   return (
-    <header className={art ? "dx-head dx-head-split" : "dx-head"}>
+    <header className={columns ? "dx-head dx-head-cols" : "dx-head"}>
       <div className="dx-head-text">
         {crumb ? (
           <nav className="dx-crumb" aria-label="breadcrumb">
@@ -196,10 +199,12 @@ export function DocSteps({ steps }: { steps: readonly GuideStep[] }) {
     <ol className="dx-steps">
       {steps.map((step, index) => (
         <li key={step.id} id={step.id} className="dx-step">
-          <span className="dx-step-n" aria-hidden="true">
-            {index + 1}
-          </span>
-          <h2>{step.title}</h2>
+          <div className="dx-step-head">
+            <span className="dx-step-n" aria-hidden="true">
+              {index + 1}
+            </span>
+            <h2>{step.title}</h2>
+          </div>
           <div className="dx-step-body">{step.body}</div>
         </li>
       ))}

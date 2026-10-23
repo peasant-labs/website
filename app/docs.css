@@ -37,7 +37,9 @@
   align-items: center;
   gap: 10px;
   min-height: 2.25rem;
-  padding: 0 10px;
+  margin-inline-start: -1px;
+  padding: 0 var(--sp-4);
+  border-inline-start: var(--stroke-emphasis) solid transparent;
   color: var(--ink-2);
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
@@ -46,9 +48,8 @@
 }
 
 .dx-toc-item[aria-current="location"] {
-  background: var(--surface-2);
+  border-inline-start-color: var(--amber);
   color: var(--ink-strong);
-  box-shadow: inset 2px 0 0 var(--amber);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -79,19 +80,36 @@
  * so the columns follow the room beside the sidebar rather than the window.
  */
 .dx-page {
+  /* prose; then tables, commands and cards; then "on this page" beside them */
   --dx-col: 40rem;
+  --dx-wide: 52rem;
   --dx-aside: 15rem;
+  --dx-gap: var(--sp-8);
 
   container: dx-page / inline-size;
   box-sizing: border-box;
   display: grid;
   gap: var(--sp-7);
   align-content: start;
-  max-width: 75rem;
+  justify-items: center;
   padding: var(--sp-8) var(--sp-6);
   outline: none;
   font-size: var(--fs-md);
   line-height: 1.6;
+}
+
+/*
+ * The page uses the room beside the sidebar and centres its content: every
+ * band (header, columns, a post) shares one width, centred in the main area.
+ */
+.dx-page > * {
+  width: min(100%, var(--dx-wide));
+}
+
+@container dx-page (min-width: 58rem) {
+  .dx-page > :is(.dx-head-cols, .dx-columns) {
+    width: min(100%, calc(var(--dx-wide) + var(--dx-gap) + var(--dx-aside)));
+  }
 }
 
 @media (max-width: 47.99rem) {
@@ -135,10 +153,14 @@
   align-items: center;
 }
 
+/* the title and lede line up with the prose below them */
 .dx-head-text {
   display: grid;
   gap: var(--sp-3);
   align-content: start;
+  width: 100%;
+  max-width: var(--dx-col);
+  margin-inline: auto;
 }
 
 .dx-head h1,
@@ -170,22 +192,16 @@
   display: none;
 }
 
-/* a guide's picture sits beside its title once there is room, so step one starts in the first view */
-@container dx-page (min-width: 40rem) {
-  .dx-head-split {
-    grid-template-columns: minmax(0, 1fr) minmax(9rem, 13rem);
-    column-gap: var(--sp-7);
+/* with "on this page" beside the content, the header keeps the same two columns; a guide's picture sits in the second */
+@container dx-page (min-width: 58rem) {
+  .dx-head-cols {
+    grid-template-columns: minmax(0, var(--dx-wide)) var(--dx-aside);
+    justify-content: center;
+    column-gap: var(--dx-gap);
   }
 
   .dx-head-art {
     display: block;
-  }
-}
-
-@container dx-page (min-width: 58rem) {
-  .dx-head-split {
-    grid-template-columns: minmax(0, var(--dx-col)) var(--dx-aside);
-    column-gap: var(--sp-8);
   }
 }
 
@@ -206,7 +222,7 @@
 
 .dx-columns {
   display: grid;
-  gap: var(--sp-8);
+  gap: var(--dx-gap);
   align-items: start;
 }
 
@@ -214,16 +230,17 @@
   display: grid;
   gap: var(--sp-8);
   min-width: 0;
-  max-width: var(--dx-col);
 }
 
 .dx-aside {
   display: none;
 }
 
+/* "on this page" stays in view beside the content, and scrolls on its own when it is long */
 @container dx-page (min-width: 58rem) {
   .dx-columns {
-    grid-template-columns: minmax(0, var(--dx-col)) var(--dx-aside);
+    grid-template-columns: minmax(0, var(--dx-wide)) var(--dx-aside);
+    justify-content: center;
   }
 
   .dx-article {
@@ -234,6 +251,9 @@
     position: sticky;
     inset-block-start: var(--sp-5);
     display: block;
+    max-height: calc(100dvh - 2 * var(--sp-5));
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 }
 
@@ -293,12 +313,18 @@
   }
 }
 
+/* a light list on a hairline; the section being read is marked on the line */
 .dx-toc {
   display: grid;
-  gap: 2px;
-  padding: 6px;
-  border: var(--bd-strong);
-  background: var(--surface);
+  border-inline-start: var(--bd);
+}
+
+.dx-toc .dx-glabel {
+  padding: 0 var(--sp-4) var(--sp-2);
+}
+
+.dx-page .dx-jump {
+  width: min(100%, var(--dx-col));
 }
 
 /* ---------- sections: headings, paragraphs and the space between them ---------- */
@@ -306,6 +332,30 @@
 .dx-sec {
   min-width: 0;
   scroll-margin-top: var(--sp-5);
+}
+
+/*
+ * Each section is three tracks on one axis: prose in the middle at its
+ * measure, and tables, commands, paths and cards on the wider track around it.
+ */
+:is(.dx-sec, .dx-step-body),
+.dx-step {
+  display: grid;
+  grid-template-columns:
+    [wide-start] minmax(0, 1fr)
+    [prose-start] minmax(0, var(--dx-col))
+    [prose-end] minmax(0, 1fr)
+    [wide-end];
+}
+
+:is(.dx-sec, .dx-step-body) > *,
+.dx-step > .dx-step-head {
+  grid-column: prose;
+}
+
+:is(.dx-sec, .dx-step-body) > :is(.dx-terms, .dx-defs, .dx-ref, .dx-guides, .dx-cmd, .dx-cmds, .dx-cmd-group, .dx-path, .dx-agents),
+.dx-step > .dx-step-body {
+  grid-column: wide;
 }
 
 .dx-sec > h2 {
@@ -790,16 +840,20 @@
   list-style: none;
 }
 
-/* the number and the heading share a row; the step's body takes the full column under them */
+/* the number and the heading share a row over the prose; the step's body takes the tracks under them */
 .dx-step {
-  display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr);
-  gap: var(--sp-4);
-  align-items: center;
+  row-gap: var(--sp-4);
   scroll-margin-top: var(--sp-5);
 }
 
+.dx-step-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
 .dx-step-n {
+  flex: none;
   display: grid;
   place-items: center;
   width: 2.25rem;
@@ -813,7 +867,7 @@
   line-height: 1;
 }
 
-.dx-step > h2 {
+.dx-step-head > h2 {
   color: var(--ink-strong);
   font-family: var(--font-display);
   font-size: var(--fs-lg);
@@ -823,7 +877,6 @@
 }
 
 .dx-step-body {
-  grid-column: 1 / -1;
   min-width: 0;
 }
 
@@ -851,6 +904,10 @@
 /* blog */
 
 /* auto-fill, so a lone post keeps a column's width instead of stretching across the page */
+.dx-page > .bx-posts {
+  width: min(100%, var(--dx-col));
+}
+
 .bx-posts {
   display: grid;
   gap: var(--sp-8) var(--sp-6);
@@ -889,10 +946,20 @@
 
 .bx-essay {
   display: grid;
-  gap: var(--sp-5);
-  width: 100%;
-  max-width: 38rem;
-  margin-inline: auto;
+  grid-template-columns:
+    [wide-start] minmax(0, 1fr)
+    [prose-start] minmax(0, 38rem)
+    [prose-end] minmax(0, 1fr)
+    [wide-end];
+  row-gap: var(--sp-5);
+}
+
+.bx-essay > * {
+  grid-column: prose;
+}
+
+.bx-essay > .bx-figure {
+  grid-column: wide;
 }
 
 /* an authored title keeps its own capitals; only chrome is lowercase */
