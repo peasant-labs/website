@@ -1,5 +1,6 @@
 import { Art } from "@/components/art";
 import { GetStarted } from "@/components/landing/get-started";
+import { HeroFlow } from "@/components/landing/hero-flow";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { UseCases } from "@/components/landing/use-cases";
 import { MacWindow } from "@/components/mac";
@@ -54,7 +55,9 @@ export default function Home() {
               ))}
             </ul>
           </div>
-          <Art art={HERO.art} className="lp-hero-art" important />
+          <div className="site-wrap lp-hero-flow" data-fade style={fade(4)}>
+            <HeroFlow />
+          </div>
         </section>
 
         <section id="uses" className="lp-sec" aria-labelledby="uses-title">

@@ -92,17 +92,11 @@
   margin-block-start: var(--sp-2);
 }
 
-.lp-hero-art,
 .lp-vision-art {
   box-sizing: border-box;
   width: min(75rem, 100%);
   margin-inline: auto;
   overflow: hidden;
-}
-
-/* the art carries its own sky, so it sits close under the buttons */
-.lp-hero-art {
-  margin-block-start: var(--sp-5);
 }
 
 /* what the product stands on: four plain tags under the buttons */
@@ -134,11 +128,220 @@
 }
 
 /*
+ * The hero's picture (components/landing/hero-flow.tsx). That file owns where
+ * everything sits and when it moves; this owns how it looks. Sizes inside a
+ * transcript are in hundredths of the transcript, so it reads the same at any
+ * scale.
+ */
+.lp-hero-flow {
+  margin-block-start: clamp(2.5rem, 5vw, 4rem);
+}
+
+.hf {
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  max-width: 26rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 48rem) {
+  .hf {
+    max-width: 51rem;
+  }
+}
+
+.hf-stage {
+  position: absolute;
+  inset: 0;
+}
+
+.hf-stage > * {
+  position: absolute;
+}
+
+.hf-zone {
+  box-sizing: border-box;
+  border: var(--bd-strong);
+}
+
+.hf-computer {
+  border-style: dashed;
+}
+
+.hf-label {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: 1.25;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.hf-label-you {
+  color: var(--ink-strong);
+  font-weight: 700;
+}
+
+.hf-label-plus {
+  color: var(--amber);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+}
+
+/* redaction: a band of fine stripes between two rules, lit while a transcript is inside */
+.hf-filter {
+  box-sizing: border-box;
+  border: var(--bd-strong);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--rule) 0 1px,
+    transparent 1px 6px
+  );
+}
+
+.hf-scan {
+  position: absolute;
+  inset: -1px;
+  border: 2px solid var(--amber);
+  opacity: 0;
+}
+
+.hf-mark {
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+}
+
+.hf-mark .brand {
+  width: 100%;
+  height: 100%;
+}
+
+/* publish sits on the edge of your computer and is pressed as each transcript crosses it */
+.hf-publish {
+  translate: -50% -50%;
+}
+
+.hf-publish-chip {
+  position: relative;
+  display: block;
+  padding: var(--sp-1) var(--sp-3);
+  border: var(--bd-strong);
+  background: var(--canvas);
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.hf-publish-fill {
+  position: absolute;
+  inset: -1px;
+  display: grid;
+  place-items: center;
+  background: var(--amber-fill);
+  color: var(--amber-fill-ink);
+  opacity: 0;
+}
+
+/* a transcript: a header with its agent's mark, three lines, one of them a secret */
+.hf-card {
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  box-sizing: border-box;
+  container-type: inline-size;
+  border: 1px solid var(--rule-strong);
+  background: var(--surface-2);
+  transform-origin: 0 0;
+}
+
+.hf-card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 9cqw;
+  height: 100%;
+  padding-inline: 10cqw;
+}
+
+.hf-card-head {
+  display: flex;
+  align-items: center;
+  gap: 5cqw;
+  color: var(--ink-2);
+}
+
+.hf-card-head .brand {
+  flex: none;
+  width: 14cqw;
+  height: 14cqw;
+}
+
+.hf-bar {
+  display: block;
+  width: var(--w);
+  height: 5cqw;
+  background: var(--ink-4);
+}
+
+.hf-card-head .hf-bar {
+  background: var(--ink-3);
+}
+
+.hf-secret {
+  position: relative;
+  display: block;
+}
+
+.hf-secret .hf-bar {
+  background: var(--ink-2);
+}
+
+/* the secret, once redacted: a taller amber block over the line, so the change is more than a colour */
+.hf-mask {
+  position: absolute;
+  inset-block: -2.5cqw;
+  inset-inline-start: -2cqw;
+  width: calc(62% + 4cqw);
+  background: var(--amber-fill);
+}
+
+.hf-meter {
+  display: flex;
+}
+
+.hf-segment {
+  position: relative;
+  height: 100%;
+  background: var(--rule);
+}
+
+.hf-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--ink-2);
+  transform-origin: left center;
+}
+
+.hf-toggle {
+  position: absolute;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hf-toggle {
+    display: none;
+  }
+}
+
+/*
  * On a phone the wide art would shrink to a strip. It keeps a readable height
  * instead and shows its centre, cropped at the edges of the screen.
  */
 @media (max-width: 47.99rem) {
-  .lp-hero-art .art-img,
   .lp-vision-art .art-img {
     width: auto;
     max-width: none;

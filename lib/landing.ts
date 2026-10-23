@@ -32,7 +32,32 @@ export const HERO = {
   pillars: ["open source", "local first", "consent always", "credited to you"],
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
-  art: art("hero2", "five wheat sheaves in a row, the tallest in the middle in amber", 1200, 512),
+  /*
+   * The picture under the buttons: a transcript leaves each agent, is redacted
+   * and published, and lands in the commons. There is no reputation score, so
+   * the meter counts the transcripts credited to you and the caption says
+   * what that credit is for.
+   */
+  flow: {
+    label:
+      "Transcripts from Claude Code, Codex, Cursor, OpenCode, Pi and Strike pass through redaction while still on your computer, are published, and land in the commons, each one credited to you.",
+    agents: [
+      { mark: "claude", name: "Claude Code" },
+      { mark: "codex", name: "Codex" },
+      { mark: "cursor", name: "Cursor" },
+      { mark: "opencode", name: "OpenCode" },
+      { mark: "pi", name: "Pi" },
+      { mark: "strike", name: "Strike" },
+    ],
+    computer: "your computer",
+    filter: "redaction",
+    publish: "publish",
+    commons: "commons",
+    handle: "@you",
+    caption: "credit builds reputation",
+    pause: "pause the animation",
+    play: "play the animation",
+  },
 } as const;
 
 export type UseCaseCta = Readonly<{ label: string; href: string }>;

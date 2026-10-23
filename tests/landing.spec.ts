@@ -381,8 +381,8 @@ test("the theme follows the system until the reader chooses one", async ({ page 
   // a choice outlives the system setting
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await expect(page.locator(".art-light").first()).toBeVisible();
-  await expect(page.locator(".art-dark").first()).toBeHidden();
+  await expect(page.locator(".lp-vision-art .art-light")).toBeVisible();
+  await expect(page.locator(".lp-vision-art .art-dark")).toBeHidden();
 });
 
 test("the docs sidebar lists only destinations that exist and marks the page you are on", async ({

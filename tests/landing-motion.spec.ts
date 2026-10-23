@@ -158,13 +158,80 @@ test("the transcript viewer reflows at phone and tablet widths and drops keyboar
 test("pictures grow their dots in once, and only when motion is allowed", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveClass(/js-reveal/);
-  await expect(page.locator(".lp-hero-art")).toHaveAttribute("data-revealed", "done", { timeout: 5000 });
   await expect(page.locator("#hero-title")).toHaveAttribute("data-shown", "true");
+  const art = page.locator(".lp-vision-art");
+  await art.scrollIntoViewIfNeeded();
+  await expect(art).toHaveAttribute("data-revealed", "done", { timeout: 5000 });
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(page.locator("html")).not.toHaveClass(/js-reveal/);
   expect(
-    await page.locator(".lp-hero-art .art-img").first().evaluate((image) => getComputedStyle(image).maskImage),
+    await page.locator(".lp-vision-art .art-img").first().evaluate((image) => getComputedStyle(image).maskImage),
   ).toBe("none");
+});
+
+test("a heading that mounts after load is still revealed", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveClass(/js-reveal/);
+  await page.evaluate(() => {
+    const late = document.createElement("p");
+    late.id = "late";
+    late.dataset.fade = "";
+    late.textContent = "late";
+    document.querySelector("#hero-title")!.after(late);
+  });
+  await expect(page.locator("#late")).toHaveAttribute("data-shown", "true");
+});
+
+test("the hero picture loops while on screen, pauses on request, and holds still for reduced motion", async ({
+  page,
+}) => {
+  const flow = page.locator(".hf");
+  const picture = flow.getByRole("img");
+  const card = flow.locator(".hf-card").first();
+  const running = () => card.evaluate((element) => element.getAnimations().map((animation) => animation.playState));
+
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    for (const agent of fixture.hero.flow.agents) {
+      await expect(picture).toHaveAttribute("aria-label", new RegExp(agent));
+    }
+    for (const label of fixture.hero.flow.labels) {
+      await expect(picture.getByText(label, { exact: true })).toBeVisible();
+    }
+    // the picture holds its height from the first paint: nothing below it moves
+    const layout = () =>
+      flow.evaluate((root) => ({
+        height: (root as HTMLElement).offsetHeight,
+        next: document.querySelector<HTMLElement>("#uses")!.offsetTop,
+      }));
+    const before = await layout();
+    expect(before.height).toBeGreaterThan(0);
+    await page.waitForTimeout(1500);
+    expect(await layout()).toEqual(before);
+    // every part stays inside the picture
+    const outside = await flow.evaluate((root) => {
+      const frame = root.getBoundingClientRect();
+      return [...root.querySelectorAll(".hf-stage > :not(.hf-card), .hf-toggle")]
+        .map((element) => element.getBoundingClientRect())
+        .filter((box) => box.left < frame.left - 1 || box.right > frame.right + 1 || box.bottom > frame.bottom + 1)
+        .length;
+    });
+    expect(outside, `parts of the picture overflow at ${width}`).toBe(0);
+  }
+
+  expect(await running()).toEqual(["running"]);
+  await flow.getByRole("button", { name: fixture.hero.flow.pause }).click();
+  await expect(flow).toHaveAttribute("data-paused", "true");
+  expect(await running()).toEqual(["paused"]);
+  await flow.getByRole("button", { name: fixture.hero.flow.play }).click();
+  await expect(flow).toHaveAttribute("data-paused", "false");
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  expect(await running()).toEqual([]);
+  await expect(card).toHaveCSS("opacity", "1");
+  await expect(flow.getByRole("button", { name: fixture.hero.flow.pause })).toBeHidden();
 });
