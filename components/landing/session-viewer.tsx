@@ -5,7 +5,7 @@ import { textIn, Tour } from "@/components/landing/viewer-tour";
 import { MacPointer } from "@/components/mac";
 import { currentTheme, subscribeToTheme, type Theme } from "@/lib/theme";
 import { adaptTranscript, TranscriptViewer, type TranscriptWireInput } from "@peasant-labs/fairtrade/ui";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from "react";
+import { startTransition, useEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 
 /**
  * Every capability is off. This is a read-only demonstration, so the viewer must
@@ -37,7 +37,8 @@ function useNear(ref: RefObject<Element | null>) {
     if (!element || near) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) setNear(true);
+        // a transition, so drawing the whole browser yields to scrolling instead of holding a frame
+        if (entry?.isIntersecting) startTransition(() => setNear(true));
       },
       { rootMargin: DRAW_AHEAD },
     );
@@ -46,6 +47,14 @@ function useNear(ref: RefObject<Element | null>) {
   }, [ref, near]);
   return near;
 }
+
+/* the viewer's tab union and open-tool map, named by the component rather than re-declared */
+type ViewerProps = Parameters<typeof TranscriptViewer>[0];
+type Tab = NonNullable<ViewerProps["activeTab"]>;
+type OpenTools = NonNullable<ViewerProps["openTools"]>;
+
+/* the tab the browser opens on, as online's transcript page does */
+const FIRST_TAB: Tab = "trace";
 
 /* the reader's own input inside the window; any of it ends the tour */
 const TAKE_OVER = ["pointerdown", "wheel", "touchstart", "keydown"] as const;
@@ -93,22 +102,19 @@ async function walk(tour: Tour, root: HTMLElement, script: TourScript) {
   );
   await tour.reveal(head, 0.22);
   if (head.getAttribute("aria-expanded") !== "true") await tour.press(head);
-  await tour.hold(320);
-  const marker = need(textIn(head.parentElement, script.marker));
+  const marker = need(await tour.until(() => textIn(head.parentElement, script.marker)));
   await tour.reveal(marker, 0.4);
   await tour.rest(marker, 2300);
 
   // the change, in the diffs
   await tour.press(need(tab(script.changes)));
-  await tour.hold(420);
-  const change = need(textIn(root.querySelector('[role="tabpanel"]') ?? root, script.change));
+  const change = need(await tour.until(() => textIn(root.querySelector('[role="tabpanel"]') ?? root, script.change)));
   await tour.reveal(change, 0.4);
   await tour.rest(change, 2300);
 
   // back to the trace, down to the answer it ended on
   await tour.press(need(tab(script.trace)));
-  await tour.hold(420);
-  const answer = need(textIn(stream(), script.answer));
+  const answer = need(await tour.until(() => textIn(stream(), script.answer)));
   await tour.reveal(answer, 0.42);
   await tour.rest(answer, 2600);
 
@@ -164,6 +170,10 @@ export function SessionViewer({
   const [take, setTake] = useState(0);
   const [played, setPlayed] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // The browser's heavier changes (a tab, a tool call opening) render as transitions, so they never hold a frame,
+  // whether the reader or the tour asks for them.
+  const [tab, setTab] = useState<Tab>(FIRST_TAB);
+  const [openTools, setOpenTools] = useState<OpenTools>({});
   if (!reduced && near && inView && !played) setPlayed(true);
 
   // The reader's own input in the window is theirs: it ends the tour, and no tour starts again after it.
@@ -218,6 +228,8 @@ export function SessionViewer({
     else if (tour && away.current && !interacted.current && !reduced) {
       away.current = false;
       setFiltersOpen(false);
+      setTab(FIRST_TAB);
+      setOpenTools({});
       setTake((value) => value + 1);
     }
     away.current = false;
@@ -243,6 +255,10 @@ export function SessionViewer({
           showOutcome={false}
           rightRailOpen={filtersOpen}
           onRightRailOpenChange={setFiltersOpen}
+          activeTab={tab}
+          onTabChange={(next) => startTransition(() => setTab(next))}
+          openTools={openTools}
+          onOpenToolsChange={(next) => startTransition(() => setOpenTools(next))}
         />
       ) : null}
       {reduced ? null : <MacPointer ref={pointerRef} className="lp-tour-pointer" />}

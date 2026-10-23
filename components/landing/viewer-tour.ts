@@ -101,6 +101,19 @@ export class Tour {
     return this.track(this.root.animate([], { duration: ms }));
   }
 
+  /** Waits, on the tour's clock, for what a press brought on to be drawn, then a beat more to let it settle. */
+  async until<T>(find: () => T | undefined, most = 3000): Promise<T | undefined> {
+    for (let waited = 0; waited < most; waited += 80) {
+      const found = find();
+      if (found) {
+        await this.hold(240);
+        return found;
+      }
+      await this.hold(80);
+    }
+    return undefined;
+  }
+
   /* the part of a target the reader can see: its box cut by every box around it that clips, up to the window */
   private visible(target: Target, part: "whole" | "end") {
     const rect = boxOf(target, part);
@@ -205,7 +218,8 @@ export class Tour {
       const goal = Math.max(0, Math.min(down.scrollHeight - down.clientHeight, top));
       if (Math.abs(goal - down.scrollTop) > 4) moves.push(this.glide(down, { top: goal }));
     }
-    const across = scrollerOf(node, this.root, "x");
+    // sideways, only a code block moves: a long line scrolls inside it, and no column ever leaves its edge
+    const across = scrollerOf(node, this.root, "x")?.closest<HTMLElement>("pre") ?? null;
     if (across) {
       const frame = across.getBoundingClientRect();
       if (rect.right > frame.right - 12 || rect.left < frame.left) {
