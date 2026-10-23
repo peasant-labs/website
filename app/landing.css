@@ -2132,13 +2132,13 @@
   box-shadow: var(--overlay-shadow);
 }
 
-/* on a phone the check sits under the window, over its lower edge only, clear of the reel's controls */
+/* on a phone the check hangs just under the window, starting left of it, clear of the reel's controls */
 @media (max-width: 47.99rem) {
   .lp-check {
     position: relative;
     inset: auto;
     width: fit-content;
-    margin-block-start: -0.75rem;
+    margin-block-start: var(--sp-3);
     margin-inline-start: calc(-1 * var(--lp-windows-x));
   }
 }

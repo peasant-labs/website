@@ -170,7 +170,9 @@ test("the session's windows fan out from one stack once, the transcript wide in 
     expect(layout.back.top, `at ${width}`).toBeLessThan(layout.front.top);
     expect(layout.check.left, `at ${width}`).toBeLessThan(layout.front.left);
     expect(layout.check.right, `at ${width}`).toBeGreaterThan(layout.front.left);
-    expect(layout.check.top, `at ${width}`).toBeLessThan(layout.front.bottom);
+    // over the front window's left edge on a wide screen; hanging just under it on a phone, clear of the reel's controls
+    if (width === 1440) expect(layout.check.top).toBeLessThan(layout.front.bottom - 44);
+    else expect(layout.check.top).toBeGreaterThanOrEqual(layout.front.bottom);
     if (width === 1440) expect(layout.front.width / layout.inner).toBeGreaterThan(0.85);
     expect(layout.front.right, `the transcript runs past the content at ${width}`).toBeLessThanOrEqual(layout.right + 1);
     expect(layout.back.left, `the Terminal runs past the content at ${width}`).toBeGreaterThanOrEqual(layout.left - 1);
