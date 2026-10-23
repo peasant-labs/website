@@ -50,7 +50,6 @@ export type LandingFixture = {
     sessionId: string;
     note: string;
     markers: string[];
-    check: { name: string; summary: string };
   };
   vision: { line: string; cta: Link };
   docsNav: Link[];

@@ -184,37 +184,53 @@ test("the use cases show all four audiences at once, each with its pictures, cap
   await expect(cardOf(page, fixture.useCases.slides[0]!.id).getByRole("button").nth(1)).toBeFocused();
 });
 
-test("the use cases sit two by two with room around each picture, and one under another on a phone", async ({
+test("the use cases form a bento of four shapes with room around each picture, and one column on a phone", async ({
   page,
 }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const geometry = await page.evaluate(() => {
-      const cards = [...document.querySelectorAll(".uc-card")].map((card) => card.getBoundingClientRect());
-      const figure = document.querySelector(".uc-figure")!;
-      const panel = getComputedStyle(figure);
-      const art = document.querySelector(".uc-shot[data-on='true'] .uc-art")!.getBoundingClientRect();
-      const box = figure.getBoundingClientRect();
+      const rect = (element: Element) => element.getBoundingClientRect();
+      // layout boxes, not painted ones: a heading still waiting to fade up is drawn a little lower
+      const place = (element: Element) => {
+        const box = element as HTMLElement;
+        return { top: box.offsetTop, left: box.offsetLeft, width: box.offsetWidth, right: box.offsetLeft + box.offsetWidth };
+      };
+      const title = place(document.querySelector("#uses-title")!);
+      const cards = [...document.querySelectorAll(".uc-card")].map(place);
+      const grid = { left: 0, width: (document.querySelector("[data-use-cases]") as HTMLElement).clientWidth };
+      const figures = [...document.querySelectorAll(".uc-figure")];
+      const room = figures.map((figure) => {
+        const art = rect(figure.querySelector(".uc-shot[data-on='true'] .uc-art")!);
+        const box = rect(figure);
+        return Math.min(art.left - box.left, box.right - art.right);
+      });
+      const [a, b, c, d] = cards as [typeof title, typeof title, typeof title, typeof title];
       return {
-        columns: new Set(cards.map((card) => Math.round(card.left))).size,
-        // the second column sits lower than the first, so the four read as a rhythm
-        secondLower: cards[1]!.top > cards[0]!.top + 1,
-        // the picture sits on a surface of its own, with no border boxing it in
-        panelGround: panel.backgroundColor !== getComputedStyle(document.body).backgroundColor,
-        panelBorder: panel.borderTopWidth,
-        roomBeside: Math.min(art.left - box.left, box.right - art.right),
+        // wide: the heading beside the first audience, the next two side by side, the last across the page
+        bento:
+          Math.abs(title.top - a.top) < 2 &&
+          a.left > title.right &&
+          Math.abs(b.top - c.top) < 2 &&
+          b.width < c.width &&
+          Math.abs(d.width - grid.width) < 2,
+        column: cards.every((card) => Math.abs(card.left - grid.left) < 2 && Math.abs(card.width - grid.width) < 2),
+        // every picture sits on a surface of its own, with no border boxing it in
+        panelGround: figures.every(
+          (figure) => getComputedStyle(figure).backgroundColor !== getComputedStyle(document.body).backgroundColor,
+        ),
+        panelBorder: getComputedStyle(figures[0]!).borderTopWidth,
+        roomBeside: Math.min(...room),
         pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
-    expect(geometry.columns, `use cases are not ${width === 1440 ? "two" : "one"} across at ${width}`).toBe(
-      width === 1440 ? 2 : 1,
-    );
-    if (width === 1440) expect(geometry.secondLower, "the second column is not set lower").toBe(true);
+    if (width === 1440) expect(geometry.bento, "the use cases are not laid out as the bento").toBe(true);
+    else expect(geometry.column, "the use cases are not one column on a phone").toBe(true);
     expect(geometry.panelGround, `the picture has no panel of its own at ${width}`).toBe(true);
     expect(geometry.panelBorder, `the picture's panel is boxed in at ${width}`).toBe("0px");
     expect(geometry.roomBeside, `the picture is crowded against its panel at ${width}`).toBeGreaterThanOrEqual(
-      width === 1440 ? 48 : 16,
+      width === 1440 ? 32 : 16,
     );
     expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
   }
@@ -434,11 +450,8 @@ test("a sample session opens in fairtrade's viewer, labelled as sample, with red
   await expect(demo.locator(".txn-title")).toHaveText(fixture.session.title);
   await expect(demo).not.toContainText(fixture.session.sessionId);
   await expect(section.locator(".lp-note")).toHaveText(fixture.session.note);
-  // on top, the pull request's check in village's own words; behind, Claude Code, hidden from assistive technology
-  await expect(section.locator(".lp-check-name")).toHaveText(fixture.session.check.name);
-  await expect(section.locator(".lp-check-summary")).toHaveText(fixture.session.check.summary);
-  await expect(section.locator(".lp-windows-term")).toHaveAttribute("aria-hidden", "true");
-  await expect(section.locator(".lp-windows-term .mac-win-terminal")).toBeVisible();
+  // one window, nothing stacked behind or over it
+  await expect(section.locator(".mac-win")).toHaveCount(1);
   // it is shown in a browser window whose address field carries the padlock and no address
   const browser = section.locator(".mac-win-browser");
   await expect(browser.locator(".mac-lights")).toBeVisible();

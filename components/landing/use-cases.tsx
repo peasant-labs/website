@@ -10,7 +10,8 @@ import { useRef, useState } from "react";
 const CAPS = 3;
 
 /**
- * The use cases: all four audiences at once, each on its own card. A card's
+ * The use cases: the heading and all four audiences at once, laid out as a
+ * bento of four shapes on a wide screen (CSS decides which). A card's
  * picture panel cycles through its three capabilities, one picture and one
  * caption at a time, and its three segments say which is showing and step to
  * any of them. Under the panel: the audience, its sentence and its one action.
@@ -29,6 +30,9 @@ export function UseCases() {
 
   return (
     <div ref={rootRef} className="uc" data-use-cases>
+      <h2 id="uses-title" className="uc-title" data-fade>
+        {USE_CASES.title}
+      </h2>
       {USE_CASES.slides.map((useCase, order) => (
         <UseCaseCard key={useCase.id} useCase={useCase} order={order} running={onScreen} reduced={reduced} />
       ))}

@@ -4,12 +4,12 @@ import { GetStarted } from "@/components/landing/get-started";
 import { HeroFlow } from "@/components/landing/hero-flow";
 import { LandingIcon } from "@/components/landing/icons";
 import { HowItWorks } from "@/components/landing/how-it-works";
-import { SessionWindows } from "@/components/landing/session-windows";
+import { SessionStage } from "@/components/landing/session-stage";
 import { UseCases } from "@/components/landing/use-cases";
 import { SafariWindow } from "@/components/mac";
 import { SiteShell } from "@/components/site-shell";
 import { TranscriptDemo } from "@/components/transcript-demo";
-import { HERO, HOW, INSTALL, SESSION, USE_CASES, VISION } from "@/lib/landing";
+import { HERO, HOW, INSTALL, SESSION, VISION } from "@/lib/landing";
 import { SAMPLE_SESSION } from "@/lib/sample-session";
 import { site } from "@/lib/site";
 import "./landing.css";
@@ -69,10 +69,7 @@ export default function Home() {
         <AgentMarquee />
 
         <section id="uses" className="lp-sec" aria-labelledby="uses-title">
-          <div className="site-wrap lp-stack">
-            <h2 id="uses-title" data-fade>
-              {USE_CASES.title}
-            </h2>
+          <div className="site-wrap">
             <UseCases />
           </div>
         </section>
@@ -103,7 +100,7 @@ export default function Home() {
               </h2>
               <p className="lp-note">{SESSION.note}</p>
             </div>
-            <SessionWindows>
+            <SessionStage>
               <SafariWindow secure className="lp-session-win">
                 <TranscriptDemo
                   label={SESSION.label}
@@ -113,24 +110,24 @@ export default function Home() {
                   crossfade
                 />
               </SafariWindow>
-            </SessionWindows>
+            </SessionStage>
           </div>
         </section>
 
         <section className="lp-sec lp-vision" aria-labelledby="vision-line">
           <div className="site-wrap lp-vision-inner">
+            <Art art={VISION.art} className="lp-vision-art" />
             <p id="vision-line" className="lp-vision-line" data-fade>
               {VISION.line}
             </p>
             <Link
-              className="btn btn-primary site-btn site-btn-xl lp-vision-cta"
+              className="btn btn-primary site-btn site-btn-xl"
               href={VISION.cta.href}
               data-fade
               style={fade(1)}
             >
               {VISION.cta.label}
             </Link>
-            <Art art={VISION.art} className="lp-vision-art" />
           </div>
         </section>
       </main>

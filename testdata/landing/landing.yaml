@@ -119,8 +119,6 @@ session:
   note: Sample session, not a real record. Values peasant redacted show as markers like <EMAIL>.
   # placeholders the redaction engine writes, visible in the opening view or the full trace
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
-  # the pull request's check, in village's own words (backend/internal/digest/render.go) for one transcript and one commit
-  check: { name: peasant / prompts, summary: 1 transcript traces 1 of 1 commits }
 vision:
   line: We are building a sustainable, respectful ecosystem where people have a stake in their data.
   cta: { label: about us, href: /about }

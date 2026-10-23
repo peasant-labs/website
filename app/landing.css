@@ -42,6 +42,7 @@
 }
 
 .lp-stack > h2,
+.uc-title,
 .lp-install-head > h2,
 .lp-session-head > h2 {
   color: var(--ink-strong);
@@ -72,17 +73,17 @@
 .lp-agents-row {
   display: flex;
   align-items: center;
-  gap: clamp(2.5rem, 5vw, 4.5rem);
+  gap: clamp(3rem, 6vw, 5rem);
   margin: 0;
-  padding: 0 clamp(2.5rem, 5vw, 4.5rem) 0 0;
+  padding: 0 clamp(3rem, 6vw, 5rem) 0 0;
   list-style: none;
 }
 
 .lp-agent {
   display: inline-flex;
   align-items: center;
-  gap: var(--sp-3);
-  color: var(--ink-3);
+  gap: var(--sp-4);
+  color: var(--ink-strong);
   font-family: var(--font-mono);
   font-size: var(--fs-md);
   letter-spacing: 0;
@@ -90,8 +91,8 @@
 }
 
 .lp-agent .brand {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.875rem;
+  height: 1.875rem;
   color: var(--ink-strong);
 }
 
@@ -393,31 +394,62 @@
 /* use cases */
 
 /*
- * All four audiences at once: two by two on a wide screen, the second column
- * set lower so the four read as a rhythm rather than a table; one under
- * another on a phone. Whitespace separates them; no card has a border.
+ * The heading and the four audiences as a bento of four shapes on a wide
+ * screen: the heading beside researchers, wide; teams and developers side by
+ * side, each picture over its copy; companies across the page. On a narrow one
+ * they stand one under another, each picture over its copy. Whitespace
+ * separates them; no card has a border.
  */
 .uc {
+  position: relative;
   display: grid;
-  gap: clamp(4rem, 8vw, 7rem) clamp(2.5rem, 6vw, 5rem);
+  gap: clamp(4rem, 8vw, 7rem) clamp(2rem, 4vw, 3.5rem);
   min-width: 0;
-}
-
-@media (min-width: 48rem) {
-  .uc {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
-  }
-
-  .uc-card:nth-child(even) {
-    margin-block-start: clamp(4rem, 9vw, 8rem);
-  }
 }
 
 .uc-card {
   display: grid;
   gap: var(--sp-6);
+  align-content: start;
   min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .uc {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .uc-title {
+    grid-column: span 4;
+    align-self: start;
+  }
+
+  .uc-card:nth-of-type(1) {
+    grid-column: span 8;
+  }
+
+  .uc-card:nth-of-type(2) {
+    grid-column: span 5;
+  }
+
+  .uc-card:nth-of-type(3) {
+    grid-column: span 7;
+  }
+
+  .uc-card:nth-of-type(4) {
+    grid-column: 1 / -1;
+  }
+
+  /* the wide shapes: the picture beside its copy */
+  .uc-card:is(:nth-of-type(1), :nth-of-type(4)) {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .uc-card:nth-of-type(4) {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
 }
 
 /* the picture on its own page-colour panel, with room on every side, and its caption at the foot */
@@ -425,7 +457,7 @@
   display: grid;
   gap: var(--sp-5);
   margin: 0;
-  padding: clamp(2rem, 4.5vw, 3.5rem) clamp(1.25rem, 3vw, 2.5rem) clamp(0.75rem, 1.5vw, 1.25rem);
+  padding: clamp(2rem, 4.5vw, 3.5rem) clamp(1rem, 2vw, 1.5rem) clamp(0.75rem, 1.5vw, 1.25rem);
   background: var(--surface-2);
 }
 
@@ -443,6 +475,8 @@
 
 .uc-shot {
   grid-area: 1 / 1;
+  min-width: 0;
+  max-width: 100%;
   opacity: 0;
   visibility: hidden;
   transition:
@@ -478,6 +512,7 @@
   align-items: center;
   gap: var(--sp-3);
   min-height: var(--target-comfortable);
+  padding-inline: clamp(0.25rem, 1vw, 1rem);
 }
 
 .uc-caps {
@@ -1823,9 +1858,9 @@
 
 @media (min-width: 64rem) {
   .lp-install {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 46rem);
-    align-items: start;
-    gap: clamp(3rem, 6vw, 6rem);
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    align-items: center;
+    gap: clamp(3rem, 5vw, 5rem);
   }
 }
 
@@ -1845,10 +1880,13 @@
   letter-spacing: 0;
 }
 
+/* the tabs and the Terminal on a page-colour panel, with room on every side, like the use-case pictures */
 .gs {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--sp-5);
   min-width: 0;
+  padding: clamp(1rem, 2.5vw, 2.25rem);
+  background: var(--surface-2);
 }
 
 .gs-os {
@@ -1884,7 +1922,7 @@
   padding: 20px 22px 28px;
 }
 
-/* Terminal's default profile: the system monospace at 14px, the prompt dimmed */
+/* Terminal's default profile: the system monospace at 13px, the prompt dimmed */
 .gs-lines {
   display: grid;
   gap: var(--sp-3);
@@ -1892,7 +1930,7 @@
   padding: 0;
   list-style: none;
   font-family: var(--mac-mono);
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: 0;
   line-height: 1.6;
 }
@@ -1949,14 +1987,14 @@
   }
 }
 
-/* copy is ours, not Terminal's: the site's mono, drawn in the terminal's own ink */
+/* copy is ours, not Terminal's: an icon in the terminal's own ink, its name for assistive technology */
 .gs-copy {
-  display: inline-flex;
+  display: inline-grid;
   flex: none;
-  align-items: center;
-  gap: var(--sp-2);
-  min-height: 2.25rem;
-  padding: 0 var(--sp-3);
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
   border: 1px solid color-mix(in srgb, var(--mac-term-ink) 28%, transparent);
   background: transparent;
   color: var(--mac-term-ink);
@@ -1988,54 +2026,62 @@
   }
 }
 
+.gs-copy span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* on a phone the Terminal stands on the page itself, so its lines keep the width they need */
 @media (max-width: 39.99rem) {
+  .gs {
+    padding: 0;
+    background: transparent;
+  }
+
   .gs-term .mac-body {
     padding: 16px 14px 20px;
-  }
-
-  .gs-lines {
-    font-size: 13px;
-  }
-
-  /* on a phone copy keeps its icon and its name for assistive technology only */
-  .gs-copy {
-    padding: 0 var(--sp-2);
-  }
-
-  .gs-copy span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 }
 
 /* a published session */
 
+/* the heading and its note beside one browser window on a wide screen; above it on a narrow one */
 .lp-session {
   display: grid;
-  gap: clamp(2.5rem, 5vw, 4.5rem);
+  gap: clamp(2.5rem, 5vw, 4rem);
 }
 
 .lp-session-head {
   display: grid;
-  gap: var(--sp-4);
+  align-content: start;
+  gap: var(--sp-5);
   min-width: 0;
 }
 
 @media (min-width: 64rem) {
+  .lp-session {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+    align-items: start;
+    gap: clamp(3rem, 5vw, 5rem);
+  }
+
   .lp-session-head {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
-    align-items: end;
-    gap: var(--sp-8);
+    position: sticky;
+    inset-block-start: 6rem;
   }
 }
 
 .lp-note {
-  max-inline-size: 46ch;
+  max-inline-size: 36ch;
   color: var(--ink-3);
+}
+
+.lp-session-stage {
+  min-width: 0;
 }
 
 /*
@@ -2089,158 +2135,45 @@
   }
 }
 
-/*
- * Three windows, fanned: Claude Code behind and to the left, the transcript in
- * front, the pull request's check on top at the lower left. A phone keeps the
- * transcript and the check, one under the other.
- */
-.lp-windows {
-  position: relative;
-  min-width: 0;
-}
-
-.lp-windows-term {
-  display: none;
-}
-
-.lp-windows-front {
-  position: relative;
-  z-index: 1;
-}
-
-.lp-check {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-3);
-  width: fit-content;
-  max-width: 100%;
-  margin-block-start: var(--sp-5);
-  padding: var(--sp-4) var(--sp-5);
-  border: var(--bd-strong);
-  background: var(--canvas);
-  box-shadow: var(--overlay-shadow);
-}
-
-.lp-check-ic {
-  flex: none;
-  width: var(--ic-lg);
-  height: var(--ic-lg);
-  margin-block-start: 2px;
-  color: var(--success);
-}
-
-.lp-check-text {
-  display: grid;
-  gap: 2px;
-  font-family: var(--font-mono);
-  letter-spacing: 0;
-}
-
-.lp-check-name {
-  color: var(--ink-strong);
-  font-size: var(--fs-body);
-  font-weight: 700;
-}
-
-.lp-check-summary {
-  color: var(--ink-3);
-  font-size: var(--fs-sm);
-}
-
-@media (min-width: 64rem) {
-  .lp-windows {
-    padding-block-start: clamp(3rem, 5vw, 4.5rem);
-  }
-
-  .lp-windows-term {
-    position: absolute;
-    z-index: 0;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    display: block;
-    width: 46%;
-  }
-
-  .lp-windows-term .mac-win {
-    height: 24rem;
-  }
-
-  .lp-windows-reply {
-    grid-template-columns: 2ch minmax(0, 1fr);
-    padding-inline-start: 0;
-  }
-
-  .lp-windows-front {
-    margin-inline-start: 20%;
-  }
-
-  .lp-check {
-    position: absolute;
-    inset-block-end: clamp(3rem, 6vw, 5rem);
-    inset-inline-start: 3%;
-    margin: 0;
-  }
-}
-
-/* the first time they come into view, the back window and the check fan out from behind the front one */
+/* the first time it comes into view, the window slides in a little from the right */
 @media (prefers-reduced-motion: no-preference) {
-  .lp-windows-term,
-  .lp-check {
+  .lp-session-stage {
     transition:
-      transform 1000ms var(--ease-spring),
+      transform 900ms var(--ease-spring),
       opacity 600ms var(--ease-out);
   }
 
-  .lp-check {
-    transition-delay: 240ms;
-  }
-
-  .js-reveal .lp-windows[data-fanned="false"] .lp-windows-term {
+  .js-reveal .lp-session-stage[data-entered="false"] {
     opacity: 0;
-    transform: translate3d(28%, 2.5rem, 0) scale(0.94);
-  }
-
-  .js-reveal .lp-windows[data-fanned="false"] .lp-check {
-    opacity: 0;
-    transform: translate3d(0, 1.5rem, 0);
+    transform: translate3d(2.5rem, 0, 0);
   }
 }
 
 /* vision */
 
 /*
- * The statement large across the page, then its button, with the picture in
- * the margin beside the button on a wide screen and under it on a narrow one.
+ * The picture, then the statement under it at a moderate size, then its
+ * button, centred, with more air above and below than any other section.
  *
  * The picture is drawn on an 8px cell grid at 1200 by 512. It shows whole, at
  * a half (600px) or a quarter (300px) of that, which on a 2x or 3x screen
  * lands every cell on whole device pixels.
  */
-.lp-vision-inner {
-  display: grid;
-  justify-items: start;
-  gap: var(--sp-6);
+.lp-vision {
+  padding-block: clamp(4rem, 10vw, 10rem);
 }
 
-.lp-vision-line {
-  max-inline-size: 22ch;
-  color: var(--ink-strong);
-  font-family: var(--font-body);
-  font-size: clamp(2rem, 4.4vw, 3.75rem);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.12;
-  word-spacing: normal;
-  text-wrap: balance;
+.lp-vision-inner {
+  display: grid;
+  justify-items: center;
+  gap: clamp(2rem, 4vw, 3rem);
+  text-align: center;
 }
 
 .lp-vision-art {
-  justify-self: center;
   width: 300px;
   max-width: 100%;
-  margin-block-start: var(--sp-6);
+  margin-block-end: var(--sp-4);
 }
 
 @media (min-width: 48rem) {
@@ -2249,28 +2182,22 @@
   }
 }
 
-@media (min-width: 64rem) {
-  .lp-vision-inner {
-    grid-template-columns: minmax(0, 1fr) 600px;
-    align-items: end;
-    gap: var(--sp-7) var(--sp-8);
-  }
+.lp-vision-line {
+  max-inline-size: 30ch;
+  color: var(--ink-strong);
+  font-family: var(--font-body);
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.3;
+  word-spacing: normal;
+  text-wrap: balance;
+}
 
-  .lp-vision-line {
-    grid-column: 1 / -1;
-  }
-
-  .lp-vision-cta {
-    grid-row: 2;
-    grid-column: 1;
-    align-self: start;
-  }
-
-  .lp-vision-art {
-    grid-row: 2;
-    grid-column: 2;
-    margin: 0;
-  }
+/* the footer that closes the landing: whitespace above and between, no rules */
+.site-shell:has(> .lp) .site-foot,
+.site-shell:has(> .lp) .site-foot-cta-row {
+  border: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

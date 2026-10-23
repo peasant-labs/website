@@ -128,31 +128,31 @@ test("the install commands type in once when the terminal comes into view, and s
   expect(await characters.first().evaluate((character) => getComputedStyle(character).opacity)).toBe("1");
 });
 
-test("the session's windows fan out from one stack the first time they come into view", async ({ page }) => {
+test("the transcript's window slides in from the right once, and rests inside the page", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const windows = page.locator(".lp-windows");
-  const back = windows.locator(".lp-windows-term");
-  await expect(windows).toHaveAttribute("data-fanned", "false");
-  expect(await back.evaluate((element) => getComputedStyle(element).opacity)).toBe("0");
+  const stage = page.locator(".lp-session-stage");
+  await expect(stage).toHaveAttribute("data-entered", "false");
+  expect(await stage.evaluate((element) => getComputedStyle(element).opacity)).toBe("0");
 
-  await windows.scrollIntoViewIfNeeded();
-  await expect(windows).toHaveAttribute("data-fanned", "true");
-  // they settle where they rest: the back window to the left of the front one, the check over its corner
+  await stage.scrollIntoViewIfNeeded();
+  await expect(stage).toHaveAttribute("data-entered", "true");
   await expect
-    .poll(() => back.evaluate((element) => getComputedStyle(element).transform))
+    .poll(() => stage.evaluate((element) => getComputedStyle(element).transform))
     .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
-  const layout = await windows.evaluate((group) => {
-    const rect = (selector: string) => group.querySelector(selector)!.getBoundingClientRect();
-    return { back: rect(".lp-windows-term"), front: rect(".lp-windows-front"), check: rect(".lp-check") };
+  // it rests inside the page, with room beside it: no window runs past the content's edge
+  const edges = await page.evaluate(() => {
+    const window = document.querySelector("#session .mac-win")!.getBoundingClientRect();
+    const wrap = document.querySelector("#session .site-wrap")!;
+    const box = wrap.getBoundingClientRect();
+    const inset = parseFloat(getComputedStyle(wrap).paddingRight);
+    return { right: window.right, contentRight: box.right - inset };
   });
-  expect(layout.back.left).toBeLessThan(layout.front.left);
-  expect(layout.check.left).toBeLessThan(layout.front.left);
-  expect(layout.check.right).toBeGreaterThan(layout.front.left);
+  expect(edges.right).toBeLessThanOrEqual(edges.contentRight + 1);
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  expect(await back.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
+  expect(await stage.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
 });
 
 test("the transcript viewer reflows at phone and tablet widths and drops keyboard hints on touch", async ({

@@ -290,24 +290,12 @@ export const INSTALL = {
   kickstart: "peasant kickstart",
 } as const;
 
-/*
- * Three windows, one session: Claude Code where it was recorded, the published
- * transcript in front, and the pull request's check. The check's name and
- * summary are village's own (backend/internal/digest/render.go), for this
- * sample's one transcript and its one commit.
- */
 export const SESSION = {
   title: "what a reviewer reads",
   /* the short title the viewer shows for the sample, the way a curated page names a session */
   sessionTitle: "fix the staging 403",
   label: "sample session in the transcript viewer",
   note: "Sample session, not a real record. Values peasant redacted show as markers like <EMAIL>.",
-  terminal: "shop — claude — 80×24",
-  check: {
-    label: "the pull request's peasant check",
-    name: "peasant / prompts",
-    summary: "1 transcript traces 1 of 1 commits",
-  },
 } as const;
 
 export const VISION = {
