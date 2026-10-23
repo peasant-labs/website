@@ -39,7 +39,7 @@ export default function BlogIndex() {
                 {post.kind} · <time dateTime={post.published}>{formatPostDate(post.published)}</time>
               </span>
               <h2 className="bx-post-title">{post.title}</h2>
-              <p className="bx-post-desc">{post.description}</p>
+              <p className="bx-post-desc">{post.summary}</p>
             </Link>
           ))}
         </div>

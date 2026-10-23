@@ -156,17 +156,17 @@ site:
       h1: Reclaiming Data Autonomy as a Peasant
       metadata:
         title: Reclaiming Data Autonomy as a Peasant | peasant labs
-        description: Why the transcripts our coding agents produce belong to the people who made them, and why we are building tools to share them on their terms.
+        description: We are developing the suite of tools required to safely share and manage access to transcripts produced by coding agent sessions.
         canonical: https://peasantlabs.org/blog/reclaiming-data-autonomy-as-a-peasant
         openGraph:
           title: Reclaiming Data Autonomy as a Peasant | peasant labs
-          description: Why the transcripts our coding agents produce belong to the people who made them, and why we are building tools to share them on their terms.
+          description: We are developing the suite of tools required to safely share and manage access to transcripts produced by coding agent sessions.
           url: https://peasantlabs.org/blog/reclaiming-data-autonomy-as-a-peasant
           type: article
         twitter:
           card: summary_large_image
           title: Reclaiming Data Autonomy as a Peasant | peasant labs
-          description: Why the transcripts our coding agents produce belong to the people who made them, and why we are building tools to share them on their terms.
+          description: We are developing the suite of tools required to safely share and manage access to transcripts produced by coding agent sessions.
     - id: about
       path: /about
       h1: about
