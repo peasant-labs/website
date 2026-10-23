@@ -461,8 +461,11 @@ export const DOCS_HOME_SECTIONS = [
 /** the overview's cards to the guides and the sections most people look for, after install and set up */
 export const DOCS_NEXT = { id: "guides", title: "next steps" } as const;
 
+/** one line of an "on this page" list: a heading's anchor and its label; `sub` marks an h3 under an h2 */
+export type TocItem = Readonly<{ id: string; label: string; sub?: boolean }>;
+
 /** the overview's "on this page" list, in page order: a section's short label where it has one */
-export const DOCS_HOME_TOC = DOCS_HOME_SECTIONS.flatMap((section) => [
+export const DOCS_HOME_TOC: readonly TocItem[] = DOCS_HOME_SECTIONS.flatMap((section) => [
   { id: section.id, label: "toc" in section ? section.toc : section.title },
   ...(section.id === "kickstart" ? [{ id: DOCS_NEXT.id, label: DOCS_NEXT.title }] : []),
 ]);

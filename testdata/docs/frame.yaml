@@ -1,0 +1,9 @@
+# The docs and the blog share one frame, so moving between them shifts nothing:
+# every blog page puts its title, its content column and its running text at
+# the same left edge and the same width as the reference docs page. Each blog
+# post is checked too (testdata/landing/landing.yaml lists them).
+version: 1
+reference: /docs
+pages:
+  - /blog
+widths: [1280, 1440, 1728, 390]

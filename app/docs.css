@@ -47,6 +47,11 @@
   text-decoration: none;
 }
 
+/* an h3 sits under its h2, one step in */
+.dx-toc-item.dx-toc-sub {
+  padding-inline-start: calc(2 * var(--sp-4));
+}
+
 .dx-toc-item[aria-current="location"] {
   border-inline-start-color: var(--amber);
   color: var(--ink-strong);
@@ -317,6 +322,10 @@
   letter-spacing: 0;
 }
 
+.dx-jump .dx-jump-sub a {
+  padding-inline-start: var(--sp-5);
+}
+
 @container dx-page (min-width: 58rem) {
   .dx-jump {
     display: none;
@@ -342,7 +351,8 @@
 
 /* ---------- sections: headings, paragraphs and the space between them ---------- */
 
-.dx-sec {
+.dx-sec,
+.dx-prose > :is(h2, h3)[id] {
   min-width: 0;
   scroll-margin-top: var(--sp-5);
 }

@@ -1,7 +1,7 @@
 import { Art } from "@/components/art";
 import { Rich } from "@/components/docs/rich-text";
 import { DocCommand } from "@/components/docs/doc-command";
-import type { DocStep } from "@/lib/docs-content";
+import type { DocStep, TocItem } from "@/lib/docs-content";
 import type { Art as ArtSource } from "@/lib/landing";
 import { ChevronDown, Info } from "@peasant-labs/fairtrade/icons";
 import { Fragment, type ReactNode } from "react";
@@ -75,7 +75,7 @@ export function DocProcedure({ steps, ordered = true }: { steps: readonly DocSte
  * "On this page" for a narrow screen, where the list beside the article is
  * hidden: folded under the header until the reader opens it.
  */
-export function DocJump({ items }: { items: readonly { id: string; label: string }[] }) {
+export function DocJump({ items }: { items: readonly TocItem[] }) {
   return (
     <details className="dx-jump">
       <summary>
@@ -85,7 +85,7 @@ export function DocJump({ items }: { items: readonly { id: string; label: string
       <nav aria-label="on this page">
         <ul>
           {items.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className={item.sub ? "dx-jump-sub" : undefined}>
               <a href={`#${item.id}`}>{item.label}</a>
             </li>
           ))}

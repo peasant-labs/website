@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parse } from "yaml";
@@ -12,7 +12,10 @@ type SearchFixture = {
   openers: Array<{ key: string }>;
 };
 
+type FrameFixture = { version: 1; reference: string; pages: string[]; widths: number[] };
+
 const anchors = parse(readFileSync(resolve("testdata/docs/anchors.yaml"), "utf8")) as AnchorsFixture;
+const frame = parse(readFileSync(resolve("testdata/docs/frame.yaml"), "utf8")) as FrameFixture;
 const search = parse(readFileSync(resolve("testdata/docs/search.yaml"), "utf8")) as SearchFixture;
 const landing = parse(readFileSync(resolve("testdata/landing/landing.yaml"), "utf8")) as {
   posts: Array<{ slug: string }>;
@@ -39,6 +42,46 @@ test("the search index holds every docs page, every linked section and every pos
   }
   for (const post of landing.posts) expect(hrefs.has(`/blog/${post.slug}`), `${post.slug} is not indexed`).toBe(true);
   for (const doc of index.docs) expect(doc.text.length, `${doc.href} is indexed empty`).toBeGreaterThan(0);
+});
+
+/* where a page puts its title, its content column and its first line of running text */
+async function frameOf(page: Page, path: string) {
+  await page.goto(path);
+  return page.evaluate(() => {
+    const box = (selector: string) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const { left, width } = element.getBoundingClientRect();
+      return { left: Math.round(left), width: Math.round(width) };
+    };
+    return { title: box("#page-heading")?.left, column: box("main .dx-article"), prose: box("main .dx-prose > p") };
+  });
+}
+
+for (const width of frame.widths) {
+  test(`at ${width} the blog sits in the docs' frame, on the same left edge and measure`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    const reference = await frameOf(page, frame.reference);
+    expect(reference.column, "the docs page has no content column").not.toBeNull();
+    expect(reference.prose, "the docs page has no running text").not.toBeNull();
+    const posts = landing.posts.map((post) => `/blog/${post.slug}`);
+    for (const path of [...frame.pages, ...posts]) {
+      const blog = await frameOf(page, path);
+      expect(blog.title, `${path}: the title moved`).toBe(reference.title);
+      expect(blog.column, `${path}: the content column moved`).toEqual(reference.column);
+      if (blog.prose) expect(blog.prose, `${path}: the running text moved`).toEqual(reference.prose);
+      else expect(posts, `${path} is a post with no running text`).not.toContain(path);
+    }
+  });
+}
+
+test("a blog post's \"on this page\" lists exactly its headings", async ({ page }) => {
+  for (const post of landing.posts) {
+    await page.goto(`/blog/${post.slug}`);
+    const headings = await page.locator("main article :is(h2, h3)[id]").evaluateAll((items) => items.map((item) => `#${item.id}`));
+    const listed = await page.locator("main .dx-aside .dx-toc a").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+    expect(listed, `${post.slug}: "on this page" and the headings differ`).toEqual(headings);
+  }
 });
 
 test("on a phone no docs command wraps at a hyphen inside a word", async ({ browser }) => {

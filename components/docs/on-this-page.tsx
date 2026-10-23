@@ -1,12 +1,13 @@
 "use client";
 
+import type { TocItem } from "@/lib/docs-content";
 import { useEffect, useState } from "react";
 
 /**
- * The "on this page" list beside a guide. It marks the step being read: the
- * last one whose heading has passed the top third of the window.
+ * The "on this page" list beside a docs page or a post. It marks the part being
+ * read: the last one whose heading has passed the top third of the window.
  */
-export function OnThisPage({ items }: { items: readonly { id: string; label: string }[] }) {
+export function OnThisPage({ items }: { items: readonly TocItem[] }) {
   const [active, setActive] = useState(items[0]?.id ?? "");
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export function OnThisPage({ items }: { items: readonly { id: string; label: str
         <a
           key={item.id}
           href={`#${item.id}`}
-          className="dx-toc-item"
+          className={item.sub ? "dx-toc-item dx-toc-sub" : "dx-toc-item"}
           aria-current={item.id === active ? "location" : undefined}
         >
           {item.label}
