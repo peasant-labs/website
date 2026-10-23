@@ -893,7 +893,7 @@ export const SUITE = {
         id: "open-source",
         question: "is it open source?",
         answer:
-          "yes. peasant, peasant online and the shared schema are Apache-2.0. session data you publish can carry its own Creative Commons content license.",
+          "yes. peasant, online (the village repo) and the shared schema are Apache-2.0. session data you publish can carry its own Creative Commons content license.",
       },
       {
         id: "agents",
