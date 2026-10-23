@@ -38,7 +38,7 @@ test("on a phone the header is the mark and one menu button, and the menu behave
   expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe("hidden");
 
   // focus stays inside: past the last stop, tab comes back to the button
-  const stops = await sheet.locator("a, button").count();
+  const stops = await sheet.locator("a:visible, button:visible").count();
   for (let index = 0; index < stops; index += 1) await page.keyboard.press("Tab");
   await expect(close).toBeFocused();
 

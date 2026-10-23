@@ -20,6 +20,13 @@ import {
 
 const DESKTOP = "(min-width: 48rem)";
 
+/* The menu's stops: links and buttons that are drawn. One of "log in" and "open online" is always hidden. */
+function menuStops(sheet: HTMLElement | null) {
+  return [...(sheet?.querySelectorAll<HTMLElement>("a, button") ?? [])].filter(
+    (element) => element.getClientRects().length > 0,
+  );
+}
+
 /* The page behind an open menu stays put; the lock is released synchronously so a link can scroll. */
 function lockScroll(locked: boolean) {
   document.documentElement.style.overflow = locked ? "hidden" : "";
@@ -90,7 +97,7 @@ export function SiteHeader() {
   useEffect(() => {
     if (!open) return;
     lockScroll(true);
-    const first = sheetRef.current?.querySelector<HTMLElement>("a, button");
+    const first = menuStops(sheetRef.current)[0];
     first?.focus();
     const onPointer = (event: PointerEvent) => {
       if (!headerRef.current?.contains(event.target as Node)) close({ restoreFocus: false });
@@ -112,7 +119,7 @@ export function SiteHeader() {
     if (!open || event.key !== "Tab") return;
     const stops = [
       buttonRef.current,
-      ...(sheetRef.current?.querySelectorAll<HTMLElement>("a, button") ?? []),
+      ...menuStops(sheetRef.current),
     ].filter((element): element is HTMLElement => element !== null);
     const index = stops.indexOf(document.activeElement as HTMLElement);
     const next = event.shiftKey ? index - 1 : index + 1;
