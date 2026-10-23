@@ -2059,9 +2059,12 @@
   padding: 0;
 }
 
+/* the rows stand apart by space alone: the card and the command blocks are the only frames */
 .gs-lines {
+  display: grid;
+  gap: var(--sp-6);
   margin: 0;
-  padding: 0;
+  padding: var(--sp-5) var(--gs-row-x) var(--sp-6);
   list-style: none;
 }
 
@@ -2069,11 +2072,6 @@
   display: grid;
   grid-template-columns: var(--sp-6) minmax(0, 1fr);
   align-items: start;
-  padding: var(--sp-5) var(--gs-row-x);
-}
-
-.gs-line + .gs-line {
-  border-top: var(--bd);
 }
 
 /* the number sits on the command's line: mono 14, muted, tabular */
@@ -2124,6 +2122,35 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+}
+
+/*
+ * A narrow phone gives the command the card's whole width: the number moves
+ * above it as a small label, and the command block runs from edge to edge of
+ * the card, its sides on the card's own border, while the label and the words
+ * under it keep the card's inset.
+ */
+@media (max-width: 30rem) {
+  .gs-lines {
+    padding-inline: 0;
+  }
+
+  .gs-line {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-1);
+  }
+
+  .gs-n {
+    padding: 0 var(--gs-row-x);
+  }
+
+  .gs .cli-cmd {
+    border-inline: 0;
+  }
+
+  .gs-note {
+    padding-inline: var(--gs-row-x);
   }
 }
 
@@ -2193,6 +2220,9 @@
 @media (max-width: 47.99rem) {
   .lp-windows {
     --lp-check-room: 0px;
+
+    /* room under the check, so the next section starts as far off as between any two */
+    padding-block-end: var(--sp-5);
   }
 
   .lp-check {

@@ -8,9 +8,9 @@ const BREAK_AFTER = /(?<=\/\/)|(?<=[^/]\/)(?=[^/\s])/g;
 
 /**
  * Lets the drawn command wrap after an address's slashes, as well as at its
- * spaces: a <wbr> goes in at each such point. Copy still takes the exact
- * command. The block is keyed by its command, so React never rewrites this
- * text in place.
+ * spaces: a <wbr> goes in at each such point, and a pipe keeps to the word
+ * after it. Copy still takes the exact command. The block is keyed by its
+ * command, so React never rewrites this text in place.
  */
 function markBreaks(code: HTMLElement) {
   const walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT);
@@ -25,6 +25,13 @@ function markBreaks(code: HTMLElement) {
       rest.before(document.createElement("wbr"));
       node = rest;
       consumed = point;
+    }
+  }
+  // a pipe stays with the command it feeds: a word joiner and a no-break space, since a line may break after a "|"
+  for (const pipe of code.querySelectorAll(".cli-tok")) {
+    const space = pipe.nextSibling;
+    if (pipe.textContent === "|" && space?.nodeType === Node.TEXT_NODE && space.nodeValue === " ") {
+      space.nodeValue = "\u2060\u00a0";
     }
   }
 }

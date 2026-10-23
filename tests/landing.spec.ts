@@ -132,8 +132,13 @@ test("the install card is fairtrade's tabs and CommandBlocks, three numbered com
       const panel = shell.locator('[role="tabpanel"]:not([hidden])');
       const lines = panel.locator(".gs-line");
       await expect(lines).toHaveCount(3);
-      // fairtrade draws its muted "$" before each command
-      await expect(lines.locator(".cli-cmd code")).toHaveText(
+      // fairtrade draws its muted "$" before each command; read as plain text, the line is the command
+      const drawn = await lines
+        .locator(".cli-cmd code")
+        .evaluateAll((codes) =>
+          codes.map((code) => (code.textContent ?? "").replaceAll("\u2060", "").replaceAll("\u00a0", " ")),
+        );
+      expect(drawn).toEqual(
         [platform.command, fixture.install.kickstart, fixture.install.push].map((command) => `$ ${command}`),
       );
       await expect(lines.locator(".gs-note")).toHaveText(fixture.install.notes);
@@ -190,7 +195,25 @@ test("the install card is fairtrade's tabs and CommandBlocks, three numbered com
         expect(line, "a command line starts or ends inside a word").toMatch(/^(\$ )?[^\s]*(\s[^\s]+)*$/);
       }
       expect(lines.some((line) => line.endsWith("https://")), `the address does not break after its scheme: ${lines}`).toBe(true);
+      // with the card's whole width the curl line takes three lines, and "peasant village push" one
+      expect(lines.length, `the curl line wraps to ${lines.length} lines: ${lines}`).toBeLessThanOrEqual(3);
+      const push = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').nth(2).locator(".cli-cmd code");
+      expect(
+        await push.evaluate((code) => Math.round(code.getBoundingClientRect().height / parseFloat(getComputedStyle(code).lineHeight))),
+      ).toBe(1);
+      // the number is a small label above its command
+      const label = await shell
+        .locator('[role="tabpanel"]:not([hidden]) .gs-line')
+        .first()
+        .evaluate((row) => row.querySelector(".gs-n")!.getBoundingClientRect().bottom <= row.querySelector(".cli-cmd")!.getBoundingClientRect().top + 1);
+      expect(label, "the step number is not above its command on a phone").toBe(true);
     }
+    // the rows stand apart by space: no rule between them
+    expect(
+      await shell
+        .locator('[role="tabpanel"]:not([hidden]) .gs-line')
+        .evaluateAll((rows) => rows.filter((row) => getComputedStyle(row).borderTopWidth !== "0px").length),
+    ).toBe(0);
 
     // every command copies exactly, and says so
     const command = fixture.install.platforms.at(-1)!.command;
