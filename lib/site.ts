@@ -23,6 +23,15 @@ export const SITE_NAV = [
   { id: "blog", label: "blog", href: "/blog" },
 ] as const;
 
+/** the phone menu: every destination, in the order a reader looks for them. */
+export const MENU_NAV = [
+  { id: "docs", label: "docs", href: "/docs" },
+  { id: "blog", label: "blog", href: "/blog" },
+  { id: "projects", label: "projects", href: "/projects" },
+  { id: "about", label: "about", href: "/about" },
+  { id: "contact", label: "contact", href: "/contact" },
+] as const;
+
 /** the footer's destinations. contact is last: it is the one link a reader goes looking for. */
 export const FOOTER_NAV = [
   { id: "docs", label: "docs", href: "/docs" },

@@ -8,14 +8,21 @@
 export type Theme = "dark" | "light";
 
 export const THEME_KEY = "peasant-labs-theme";
+
+/*
+ * Set by the same head script when the reader allows motion: only then do the
+ * pictures and headings wait to be revealed. Without it (reduced motion, or no
+ * script at all) everything is simply there.
+ */
+export const REVEAL_CLASS = "js-reveal";
 export const THEME_EVENT = "peasant-labs-theme-change";
 
 /*
  * Runs in <head> before the body paints, so the first frame is already in the
- * right theme. Storage can throw (private windows, blocked site data); the
+ * right theme and knows whether reveals may run. Storage can throw (private windows, blocked site data); the
  * system setting is the fallback either way.
  */
-export const THEME_SCRIPT = `(function(){var t=null;try{t=localStorage.getItem("${THEME_KEY}")}catch(_){}if(t!=="dark"&&t!=="light"){t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"}document.documentElement.dataset.theme=t})();`;
+export const THEME_SCRIPT = `(function(){var d=document.documentElement,m=window.matchMedia,t=null;try{t=localStorage.getItem("${THEME_KEY}")}catch(_){}if(t!=="dark"&&t!=="light"){t=m&&m("(prefers-color-scheme: light)").matches?"light":"dark"}d.dataset.theme=t;if(m&&m("(prefers-reduced-motion: no-preference)").matches){d.classList.add("${REVEAL_CLASS}")}})();`;
 
 export function storedTheme(): Theme | null {
   try {

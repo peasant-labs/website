@@ -1,3 +1,5 @@
+import { RevealOnView } from "@/components/reveal";
+import { ThemeSync } from "@/components/theme-toggle";
 import { site } from "@/lib/site";
 import { THEME_SCRIPT } from "@/lib/theme";
 import type { Metadata, Viewport } from "next";
@@ -74,7 +76,9 @@ export default function RootLayout({
         <a href="#content" className="site-skip-link">
           skip to content
         </a>
+        <ThemeSync />
         {children}
+        <RevealOnView />
       </body>
     </html>
   );

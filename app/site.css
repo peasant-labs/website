@@ -44,6 +44,11 @@
   }
 }
 
+/* anchors land below the sticky header */
+html {
+  scroll-padding-top: 4.5rem;
+}
+
 /* ---------- frame ---------- */
 
 .site-wrap {
@@ -71,17 +76,44 @@
   width: 100%;
 }
 
+/*
+ * The header: sticky and opaque. It wears its bottom rule once the page has
+ * moved, and on a wide screen steps up out of view while you read down.
+ */
 .site-bar {
-  border-bottom: var(--bd);
+  --site-bar-h: 4rem;
+
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--z-nav);
+  border-bottom: 1px solid transparent;
   background: var(--canvas);
+  transition:
+    transform var(--dur-3) var(--ease-out),
+    border-color var(--dur-2) ease;
+}
+
+.site-bar[data-scrolled="true"] {
+  border-bottom-color: var(--rule);
+}
+
+@media (min-width: 48rem) {
+  .site-bar[data-hidden="true"] {
+    transform: translateY(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-bar {
+    transition: border-color var(--dur-2) ease;
+  }
 }
 
 .site-bar-inner {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-2) var(--sp-6);
-  min-height: 4rem;
+  min-height: var(--site-bar-h);
   padding-block: var(--sp-2);
 }
 
@@ -135,14 +167,189 @@
   gap: var(--sp-2);
 }
 
-/*
- * Phones: the mark, the theme control and sign-in hold the first row; the two
- * sections drop to a row of their own rather than being hidden behind a menu.
- */
-@media (max-width: 39.99rem) {
-  .site-nav {
-    order: 3;
-    flex-basis: 100%;
+/* the landing's install, offered by the bar once the hero's own has scrolled away */
+.site-bar-install {
+  opacity: 0;
+  transform: translateY(-4px);
+  visibility: hidden;
+  transition:
+    opacity var(--dur-3) var(--ease-out),
+    transform var(--dur-3) var(--ease-out),
+    visibility 0s linear var(--dur-3);
+}
+
+.site-bar-install[data-shown="true"] {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition:
+    opacity var(--dur-3) var(--ease-out),
+    transform var(--dur-3) var(--ease-out),
+    visibility 0s;
+}
+
+.site-bar .site-menu-btn {
+  display: none;
+}
+
+/* the menu icon: two lines that turn into an X */
+.site-menu-icon {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 10px;
+}
+
+.site-menu-icon i {
+  position: absolute;
+  inset-inline: 0;
+  height: 2px;
+  background: currentColor;
+  transition: transform var(--dur-3) var(--ease-out);
+}
+
+.site-menu-icon i:first-child {
+  inset-block-start: 0;
+}
+
+.site-menu-icon i:last-child {
+  inset-block-end: 0;
+}
+
+.site-menu-btn[aria-expanded="true"] .site-menu-icon i:first-child {
+  transform: translateY(4px) rotate(45deg);
+}
+
+.site-menu-btn[aria-expanded="true"] .site-menu-icon i:last-child {
+  transform: translateY(-4px) rotate(-45deg);
+}
+
+/* the phone menu: an opaque sheet under the bar */
+.site-sheet {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 100%;
+  display: none;
+  max-height: calc(100dvh - var(--site-bar-h));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: var(--sp-3) var(--sp-6);
+  border-bottom: var(--bd-strong);
+  background: var(--canvas);
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  transition:
+    opacity 160ms var(--ease-out),
+    transform 160ms var(--ease-out),
+    visibility 0s linear 160ms;
+}
+
+.site-sheet[data-open="true"] {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition:
+    opacity 220ms var(--ease-out),
+    transform 220ms var(--ease-out),
+    visibility 0s;
+}
+
+.site-sheet-nav {
+  display: grid;
+}
+
+.site-sheet-link {
+  display: flex;
+  align-items: center;
+  min-height: 3.25rem;
+  border-bottom: var(--bd);
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+.site-sheet-link[aria-current="page"] {
+  color: var(--amber);
+}
+
+.site-sheet-actions {
+  display: grid;
+  gap: var(--sp-3);
+  padding-block-start: var(--sp-5);
+}
+
+.site-sheet-actions .btn {
+  width: 100%;
+}
+
+.site-sheet-theme {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: var(--target-comfortable);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+.site-sheet-theme svg {
+  width: var(--ic-lg);
+  height: var(--ic-lg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-sheet[data-open="true"] .site-sheet-link,
+  .site-sheet[data-open="true"] .site-sheet-actions {
+    animation: site-sheet-in 220ms var(--ease-out) both;
+    animation-delay: calc(var(--i) * 30ms);
+  }
+}
+
+@keyframes site-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-sheet,
+  .site-sheet[data-open="true"] {
+    transform: none;
+  }
+}
+
+/* phones: the mark and one menu button; everything else lives in the sheet */
+@media (max-width: 47.99rem) {
+  .site-bar {
+    --site-bar-h: 3.5rem;
+  }
+
+  .site-bar-inner {
+    padding-block: var(--sp-1);
+  }
+
+  .site-bar .site-nav,
+  .site-bar .site-bar-wide,
+  .site-bar .site-bar-install {
+    display: none;
+  }
+
+  .site-bar .site-menu-btn {
+    display: inline-grid;
+  }
+
+  .site-sheet {
+    display: block;
   }
 }
 
@@ -285,6 +492,47 @@
   .site-shell .pj-main {
     padding-inline: var(--sp-4);
   }
+}
+
+/* ---------- reveals ---------- */
+
+/*
+ * A dithered picture arrives the way it was made: a grid of dots, one per
+ * dither cell, each growing from nothing until the cells touch. The mask lives
+ * only until the reveal ends. Motion-free readers never get the class.
+ */
+@property --dot-r {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+.js-reveal .art:not([data-revealed="done"]) .art-img {
+  --dot-r: 0px;
+
+  -webkit-mask-image: radial-gradient(circle, #000 var(--dot-r), transparent calc(var(--dot-r) + 0.5px));
+  mask-image: radial-gradient(circle, #000 var(--dot-r), transparent calc(var(--dot-r) + 0.5px));
+  -webkit-mask-size: 8px 8px;
+  mask-size: 8px 8px;
+}
+
+.js-reveal .art[data-revealed="run"] .art-img {
+  --dot-r: 6px;
+
+  transition: --dot-r 700ms var(--ease-out) var(--reveal-delay, 0ms);
+}
+
+/* headings and copy: a short rise into place, once */
+.js-reveal [data-fade]:not([data-shown]) {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.js-reveal [data-fade][data-shown] {
+  transition:
+    opacity 400ms var(--ease-out),
+    transform 400ms var(--ease-out);
+  transition-delay: calc(var(--fade-i, 0) * 60ms);
 }
 
 /* ---------- art: one image per theme, no frame ---------- */
