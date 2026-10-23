@@ -58,7 +58,8 @@ const STEP_MS = 4200;
  * hovered, keyboard-focused, touched, off screen or in a background tab. It is
  * a real scroll area, so a finger swipes it, the arrow keys move it once it
  * has focus, and a mouse can drag it. Under reduced motion it never moves on
- * its own: one set of cards in a row that scrolls and snaps to each card.
+ * its own: it scrolls and snaps to each card, and still goes round, so after
+ * the docs card come the first cards again.
  */
 export function UseCases() {
   const rowRef = useRef<HTMLDivElement>(null);
@@ -104,7 +105,8 @@ export function UseCases() {
     }
   }
 
-  // A swipe, a drag or the keys move the row too: the line follows the card that comes to rest.
+  // A swipe, a drag or the keys move the row too: the line follows the card that comes to rest, and a
+  // rest in the second set stands on the same card in the first without motion, so the row goes round.
   useEffect(() => {
     const row = rowRef.current;
     if (!row) return;
@@ -115,7 +117,12 @@ export function UseCases() {
         const cards = [...row.querySelectorAll<HTMLElement>(".uc-card")];
         const first = cards[0]!.offsetLeft;
         const here = cards.findIndex((card) => card.offsetLeft - first >= row.scrollLeft - 2);
-        if (here >= 0) show(here % CARDS.length);
+        if (here < 0) return;
+        if (here >= CARDS.length) {
+          const twin = cards[here - CARDS.length]!;
+          row.scrollTo({ left: twin.offsetLeft - first, behavior: "instant" });
+        }
+        show(here % CARDS.length);
       }, 160);
     };
     row.addEventListener("scroll", settle, { passive: true });
@@ -171,7 +178,8 @@ export function UseCases() {
     );
   }
 
-  const sets = reduced ? [false] : [false, true];
+  /* the second set follows the first under reduced motion too, so the row goes round when moved by hand */
+  const sets = [false, true];
 
   return (
     <>

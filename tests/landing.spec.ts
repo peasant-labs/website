@@ -453,13 +453,20 @@ test("every card, the last ones too, can rest whole on the title's edge, with no
       const cards = [...element.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
       const first = cards[0]!.offsetLeft;
       const fadeFrom = edge - 12;
-      const out: { index: number; onEdge: boolean; previousHidden: boolean }[] = [];
+      const out: { index: number; onEdge: boolean; previousHidden: boolean; neighbour: boolean }[] = [];
       for (const [index, card] of cards.entries()) {
         element.scrollTo({ left: card.offsetLeft - first, behavior: "instant" });
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         const left = card.getBoundingClientRect().left;
         const previous = cards[index - 1]?.getBoundingClientRect().right ?? -Infinity;
-        out.push({ index, onEdge: Math.abs(left - edge) < 2, previousHidden: previous <= fadeFrom });
+        // the row never runs out at a rest: the next card, real or its twin, stands to the right
+        const next = (cards[index + 1] ?? element.querySelector<HTMLElement>("[data-clone]")!).getBoundingClientRect();
+        out.push({
+          index,
+          onEdge: Math.abs(left - edge) < 2,
+          previousHidden: previous <= fadeFrom,
+          neighbour: next.left < element.getBoundingClientRect().right,
+        });
       }
       return out;
     });
@@ -468,8 +475,15 @@ test("every card, the last ones too, can rest whole on the title's edge, with no
         index: rest.index,
         onEdge: true,
         previousHidden: true,
+        neighbour: true,
       });
     }
+    // moved on by hand from the docs card, the row comes to the first card again, on the edge
+    await row.evaluate((element) => {
+      const clone = element.querySelector<HTMLElement>("[data-clone]")!;
+      element.scrollTo({ left: clone.offsetLeft - (element.firstElementChild as HTMLElement).offsetLeft, behavior: "instant" });
+    });
+    await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 3000 }).toBeLessThan(2);
   }
 });
 
@@ -552,7 +566,8 @@ test("the row steps a card at a time and loops, resting on the title's edge, hol
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await expect(row.locator('.uc-card[aria-hidden="true"]')).toHaveCount(0);
+  // still round: the second set follows, hidden from assistive technology, but nothing moves on its own
+  await expect(row.locator('.uc-card[aria-hidden="true"]')).toHaveCount(await row.locator(".uc-card:not([aria-hidden])").count());
   await expect(row).toHaveAttribute("data-playing", "false");
   expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("x mandatory");
 });
