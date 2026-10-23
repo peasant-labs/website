@@ -2252,8 +2252,17 @@
   overflow: hidden;
 }
 
-/* the sample is shown without a crumb trail; the viewer's empty trail leaves the page and its landmarks */
-.lp-viewer .txn-crumb:empty {
+/*
+ * The sample is shown without a crumb trail or a host's actions, so the
+ * header's top row, which holds only those, leaves the page and its
+ * landmarks instead of standing empty over the title and the tabs.
+ */
+.lp-viewer .txn-header-top:not(:has(.txn-crumb:not(:empty), .txn-actions > *)) {
+  display: none;
+}
+
+/* condensed while the conversation scrolls, the header then holds nothing at all, so it leaves too */
+.lp-viewer .txn-app-condensed > .txn-header:not(:has(.txn-crumb:not(:empty), .txn-actions > *)) {
   display: none;
 }
 
