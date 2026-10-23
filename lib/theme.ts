@@ -33,6 +33,11 @@ export function storedTheme(): Theme | null {
   }
 }
 
+/** The theme the head script picks: the reader's stored choice, else the system's. */
+export function preferredTheme(): Theme {
+  return storedTheme() ?? (window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark");
+}
+
 export function currentTheme(): Theme {
   return document.documentElement.dataset.theme === "light" ? "light" : "dark";
 }
