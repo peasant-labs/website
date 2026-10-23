@@ -1371,8 +1371,20 @@
 
 /* a published session */
 
+/*
+ * The viewer sits in a browser window and keeps one height whatever it shows:
+ * switching tabs or opening a turn scrolls inside the viewer's own columns,
+ * never moving the page under the reader.
+ */
+.lp-session-win .mac-body {
+  flex: none;
+  block-size: clamp(32rem, 82dvh, 48rem);
+}
+
 .lp-session .pj-transcript {
   inline-size: 100%;
+  block-size: 100%;
+  border: 0;
 }
 
 .lp-note {

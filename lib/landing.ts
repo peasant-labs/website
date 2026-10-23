@@ -187,6 +187,8 @@ export const INSTALL = {
 
 export const SESSION = {
   title: "what a reviewer reads",
+  /* the address bar of the browser the viewer is shown in: where a published transcript lives */
+  host: "village.peasantlabs.org",
   label: "sample session in the transcript viewer",
   note: "Sample session, not a real record. Values peasant redacted show as markers like <EMAIL>.",
 } as const;

@@ -347,11 +347,21 @@ test("a sample session opens in fairtrade's viewer, labelled as sample, with red
   await expect(demo.locator("img")).toHaveCount(0);
   await expect(demo).toContainText(fixture.session.sessionId);
   await expect(section.locator(".lp-note")).toHaveText(fixture.session.note);
+  // it is shown in a browser window, at the address a published transcript has
+  const browser = section.locator(".mac-win-browser");
+  await expect(browser.locator(".mac-lights")).toBeVisible();
+  await expect(browser.locator(".mac-url-text")).toHaveText(
+    new RegExp(`/transcripts/${fixture.session.sessionId}$`),
+  );
 
+  const height = () => browser.evaluate((window) => window.getBoundingClientRect().height);
+  const before = await height();
   await demo.getByRole("tab", { name: /^full trace/ }).click();
   for (const marker of fixture.session.markers) {
     await expect(demo, `the viewer does not show ${marker}`).toContainText(marker);
   }
+  // switching what it shows never changes its height
+  expect(await height()).toBe(before);
 });
 
 test("the theme follows the system until the reader chooses one", async ({ page }) => {
