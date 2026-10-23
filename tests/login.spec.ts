@@ -27,7 +27,9 @@ for (const colorScheme of ["dark", "light"] as const) {
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveAttribute("aria-modal", "true");
     await expect(dialog.getByRole("button", { name: fixture.dialog.github })).toBeVisible();
-    await expect(dialog.locator(".site-login-cli")).toHaveText(fixture.dialog.terminal);
+    // the title, the github button and the privacy notice: no terminal command, no footer band
+    await expect(dialog).not.toContainText("peasant village login");
+    await expect(dialog.locator(".dlg-foot")).toHaveCount(0);
     await expect(dialog.getByRole("link", { name: fixture.dialog.privacy.label })).toHaveAttribute(
       "href",
       fixture.dialog.privacy.href,

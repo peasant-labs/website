@@ -89,8 +89,8 @@ export function useLoginDialog() {
 }
 
 /**
- * The log-in dialog: what the online app's log-in page offers, over the page
- * the reader is on. GitHub sign-in starts on the online app, which returns the
+ * The log-in dialog, over the page the reader is on: the github button and the
+ * privacy notice. GitHub sign-in starts on the online app, which returns the
  * person to `next` (a path on the online app) or to its home.
  *
  * fairtrade's Dialog traps focus, closes on Escape and on the scrim, locks the
@@ -117,20 +117,16 @@ export function LoginDialog({
       labelId="login-dialog-title"
       className="site-login-dialog"
       returnFocusRef={returnFocusRef}
-      footer={
-        <a className="site-link site-login-privacy" href={PRIVACY_URL}>
-          privacy notice
-        </a>
-      }
+      footer={null}
     >
       <SignInProviders
         className="site-login-github"
         providers={PROVIDERS}
         onSignIn={() => window.location.assign(githubSignInUrl(next))}
       />
-      <p className="site-login-cli">
-        in the terminal: <code>peasant village login</code>
-      </p>
+      <a className="site-link site-login-privacy" href={PRIVACY_URL}>
+        privacy notice
+      </a>
     </Dialog>,
     document.body,
   );

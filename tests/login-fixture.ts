@@ -4,7 +4,7 @@ import { parse } from "yaml";
 
 export type LoginFixture = {
   version: 1;
-  dialog: { title: string; github: string; terminal: string; privacy: { label: string; href: string } };
+  dialog: { title: string; github: string; privacy: { label: string; href: string } };
   online: string;
   next: Array<{ name: string; address: string; start: string }>;
   signedIn: { cookie: string; label: string; href: string };

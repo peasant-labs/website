@@ -560,16 +560,12 @@ html {
   min-height: var(--target-comfortable);
 }
 
-.site-login-cli {
-  color: var(--ink-2);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-}
-
-/* the command wraps as a whole, never mid-word on a phone */
-.site-login-cli code {
-  color: var(--ink-strong);
-  white-space: nowrap;
+/* one body under the title: the github button, then the privacy notice; no
+   footer band and no rule that would separate nothing */
+.site-login-dialog .dlg-body {
+  display: grid;
+  gap: var(--sp-3);
+  justify-items: start;
 }
 
 .site-login-privacy {

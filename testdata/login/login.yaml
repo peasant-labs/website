@@ -5,7 +5,6 @@ version: 1
 dialog:
   title: log in to peasant
   github: continue with github
-  terminal: "in the terminal: peasant village login"
   privacy: { label: privacy notice, href: https://village.peasantlabs.org/privacy }
 # the online app's sign-in start; every case below is fulfilled locally, never fetched
 online: https://village.peasantlabs.org
