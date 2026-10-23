@@ -119,7 +119,7 @@ export const DOCS_HOME = {
     id: "record",
     title: "record sessions",
     intro: [
-      "`peasant harvest` finds the sessions your agents keep on this computer and indexes them. Kickstart runs it when you save. `peasant ingest` is the same command.",
+      "`peasant harvest` finds the sessions your agents keep on this computer and adds them to peasant, ready to browse and search. Kickstart runs it when you save. `peasant ingest` is the same command.",
     ],
     command: "peasant harvest",
     flags: [
@@ -218,7 +218,7 @@ export const DOCS_HOME = {
     id: "auto-publish",
     title: "publish automatically",
     intro: [
-      "Automatic publishing sends a repository's sessions to your collectives when you push, or on each commit if its rule says so. They go redacted and private, with no license, and skip review.",
+      "Automatic publishing sends a repository's sessions to your collectives when you push, or on each commit if its rule says so. Each one goes up private and with no license, with secrets and personal details hidden, and skips review.",
       "A failed upload never fails the push.",
     ],
     waysIntro: "Turn it on in one of three ways:",
@@ -297,7 +297,7 @@ export const DOCS_HOME = {
     id: "redaction",
     title: "redaction",
     intro: [
-      "Peasant redacts on your computer, before anything is uploaded.",
+      "Peasant hides secrets and personal details on your computer, before anything is uploaded.",
       "Each match is replaced with a placeholder such as `<EMAIL>`. The publish window names each category as shown here.",
     ],
     categories: [

@@ -33,7 +33,7 @@ export type GuideData = Readonly<{
  */
 export const EVALS_GUIDE: GuideData = {
   id: "evals",
-  lede: "Collect real coding-agent sessions from many people into one collective, redacted on each computer. Then pull the approved set to yours.",
+  lede: "Collect real coding-agent sessions from many people into one collective, with secrets and personal details hidden on each computer. Then pull the approved set to yours.",
   steps: [
     {
       id: "collective",
