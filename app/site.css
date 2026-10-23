@@ -506,8 +506,10 @@ html {
 }
 
 /* the product pages share the frame's width, so their content lines up with the header */
+/* the page title sits well under the header: 56px on a phone to 80px */
 .site-shell .pj-main {
   max-width: 75rem;
+  padding-block-start: clamp(var(--sp-8), 6vw, calc(var(--sp-7) * 2));
 }
 
 @media (max-width: 47.99rem) {

@@ -305,7 +305,7 @@
   }
 
   .pj-main h2 {
-    font-size: var(--fs-xl);
+    font-size: var(--fs-section);
     text-transform: none;
   }
 
@@ -354,10 +354,9 @@
     font-size: var(--fs-label);
   }
 
+  /* sections are set apart by whitespace alone, on the site's subpage rhythm: 56px on a phone to 112px */
   .pj-section {
-    margin-block-start: var(--group-y);
-    padding-block-start: var(--sp-5);
-    border-block-start: var(--bd);
+    margin-block-start: var(--pj-sec-gap);
   }
 
   .pj-section-heading {
@@ -1144,9 +1143,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--sp-2);
-    margin-block-start: var(--group-y);
-    padding-block-start: var(--sp-5);
-    border-top: var(--bd-strong);
+    margin-block-start: var(--pj-sec-gap);
   }
 
   [data-reading-text] {
@@ -1258,16 +1255,8 @@
       padding-inline: var(--sp-4);
     }
 
-    .pj-main {
-      padding-block-start: var(--sp-6);
-    }
-
     .pj-main h1 {
       font-size: var(--fs-xl);
-    }
-
-    .pj-main h2 {
-      font-size: var(--fs-lg);
     }
 
     .pj-proof,
@@ -1430,6 +1419,8 @@
  * offset holds the whole run in line.
  */
 .pj-main {
+  /* the gap between two sections of a subpage, whitespace only */
+  --pj-sec-gap: clamp(var(--sp-8), 6vw, calc(var(--sp-8) * 2));
   --pj-rail-x: 12px;
   --pj-rail-w: 1px;
   --pj-rail-ink: var(--amber-fill);
@@ -1438,8 +1429,8 @@
   /* past the top of the spacing scale: the run out of the question is the longer
    * of the two, so the panel arrives as a landing rather than as the next thing. */
   --pj-viewer-tail: calc(var(--sp-8) * 2.2);
-  /* how far the question hangs left of the column it sits in. */
-  --pj-title-pull: var(--gutter);
+  /* how far the question hangs left of the column it sits in: not at all, so every heading shares one left edge */
+  --pj-title-pull: 0px;
   /*
    * How far each run stops short of the question, on both sides. It is taken off
    * the title end of each run only — the other ends still meet the last step and
@@ -1483,7 +1474,7 @@
 /*
  * From the last step down to the question. The negative offset is the gap
  * between the two sections — `.pj-section` sets it as `margin-block-start` and
- * carries no bottom margin, so `--group-y` above this section's own box is
+ * carries no bottom margin, so `--pj-sec-gap` above this section's own box is
  * exactly where the steps ended. This depends on the viewer following the story
  * directly; the section order is asserted in tests/projects.spec.ts.
  */
@@ -1491,10 +1482,10 @@
   content: "";
   position: absolute;
   left: var(--pj-rail-x);
-  top: calc(-1 * var(--group-y));
+  top: calc(-1 * var(--pj-sec-gap));
   /* short of the question by the clearance; the start is untouched, so it still
    * meets the last step's own run exactly. */
-  height: calc(var(--group-y) + var(--pj-viewer-lead) - var(--pj-title-clear));
+  height: calc(var(--pj-sec-gap) + var(--pj-viewer-lead) - var(--pj-title-clear));
   width: var(--pj-rail-w);
   background: var(--pj-rail-ink);
 }
@@ -2038,9 +2029,11 @@
     min-width: 0;
   }
 
+  /* at 14px the longest word of a command, the install address, fits a phone's wizard whole */
   .pj-start-step .cli-cmd-line {
     flex: 1 1 100%;
     overflow: visible;
+    font-size: var(--fs-sm);
   }
 
   .pj-start-step .cli-cmd-line code {
