@@ -6,7 +6,7 @@
 export const site = {
   name: "peasant",
   url: "https://peasantlabs.org",
-  title: "peasant: an open commons for agent transcripts",
+  title: "peasant: the open-source commons for agent transcripts",
   description: "Record, publish, and share agent sessions with people you trust.",
   /* the short line used on social cards */
   tagline: "Record, publish, and share agent sessions with people you trust.",

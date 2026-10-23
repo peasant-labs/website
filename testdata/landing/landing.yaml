@@ -28,9 +28,9 @@ footer:
     - { label: github, href: https://github.com/peasant-labs }
     - { label: contact, href: /contact }
 hero:
-  title: an open commons for agent transcripts
+  title: the open-source commons for agent transcripts
   lede: Peasant keeps your coding agent sessions on your computer. When you publish one, it is redacted there first and shared under your handle, only with the collectives you pick.
-  pillars: [secure, open source, agent-agnostic, performant]
+  pillars: [secure, apache-2.0, agent-agnostic, performant]
   # the picture under the buttons: the agents peasant reads, then the words it shows
   flow:
     agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
