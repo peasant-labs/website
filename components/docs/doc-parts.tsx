@@ -1,16 +1,114 @@
+import { Art } from "@/components/art";
+import { Rich } from "@/components/docs/rich-text";
 import { CommandBlock } from "@/components/fairtrade-client";
-import { Info } from "@peasant-labs/fairtrade/icons";
-import type { ReactNode } from "react";
+import type { DocStep } from "@/lib/docs-content";
+import type { Art as ArtSource } from "@/lib/landing";
+import { ChevronDown, Info } from "@peasant-labs/fairtrade/icons";
+import { Fragment, type ReactNode } from "react";
 
 /**
- * A copyable command. A long one scrolls inside its own box rather than
- * pushing the page sideways on a phone.
+ * A copyable command. A long one wraps inside its own line, so the copy button
+ * stays put and nothing scrolls out of sight on a phone.
  */
 export function DocCommand({ command, label }: { command: string; label?: string }) {
   return (
     <div className="dx-cmd" data-contained-overflow>
       <CommandBlock command={command} label={label ?? command} />
     </div>
+  );
+}
+
+/** A command under a short lowercase caption that says what it is for. */
+export function DocCaptionedCommand({ caption, command }: { caption: string; command: string }) {
+  return (
+    <div className="dx-cmd-group">
+      <p className="dx-cmd-label">{caption}</p>
+      <DocCommand command={command} label={`${caption}: ${command}`} />
+    </div>
+  );
+}
+
+/** A run of commands, stacked close so they read as one group. */
+export function DocCommands({ commands }: { commands: readonly string[] }) {
+  if (commands.length === 0) return null;
+  return (
+    <div className="dx-cmds">
+      {commands.map((command) => (
+        <DocCommand key={command} command={command} />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * A folder or file path the reader looks up rather than runs: no prompt and no
+ * copy button. It wraps only after a slash, so a folder name never splits.
+ */
+export function DocPath({ path }: { path: string }) {
+  const segments = path.split(/(?<=\/)/);
+  return (
+    <div className="dx-path">
+      <code>
+        {segments.map((segment, index) => (
+          <Fragment key={index}>
+            {index > 0 ? <wbr /> : null}
+            <span className="dx-path-seg">{segment}</span>
+          </Fragment>
+        ))}
+      </code>
+    </div>
+  );
+}
+
+/** A procedure: numbered steps, each saying what it does above the commands that do it. */
+export function DocProcedure({ steps }: { steps: readonly DocStep[] }) {
+  return (
+    <ol className="dx-list">
+      {steps.map((step) => (
+        <li key={step.text}>
+          <Rich text={step.text} />
+          <DocCommands commands={step.commands} />
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/**
+ * "On this page" for a narrow screen, where the list beside the article is
+ * hidden: folded under the header until the reader opens it.
+ */
+export function DocJump({ items }: { items: readonly { id: string; label: string }[] }) {
+  return (
+    <details className="dx-jump">
+      <summary>
+        on this page
+        <ChevronDown className="dx-jump-ic" aria-hidden="true" focusable="false" />
+      </summary>
+      <nav aria-label="on this page">
+        <ul>
+          {items.map((item) => (
+            <li key={item.id}>
+              <a href={`#${item.id}`}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </details>
+  );
+}
+
+/** A list of short lines: numbered when the order is the point, bulleted otherwise. */
+export function DocList({ items, ordered = false }: { items: readonly string[]; ordered?: boolean }) {
+  const Tag = ordered ? "ol" : "ul";
+  return (
+    <Tag className={ordered ? "dx-list" : "dx-bullets"}>
+      {items.map((item) => (
+        <li key={item}>
+          <Rich text={item} />
+        </li>
+      ))}
+    </Tag>
   );
 }
 
@@ -24,29 +122,38 @@ export function DocNote({ children }: { children: ReactNode }) {
   );
 }
 
-/** A page header: where it sits, its title, and one line saying what it is for. */
+/**
+ * A page header: where it sits, its title, and one line saying what it is for.
+ * A guide's picture sits beside the title on a wide screen, so the first step
+ * starts in the first view.
+ */
 export function DocHead({
   crumb,
   title,
   lede,
+  art,
 }: {
   crumb?: { label: string; href: string; here: string };
   title: string;
   lede: string;
+  art?: ArtSource;
 }) {
   return (
-    <header className="dx-head">
-      {crumb ? (
-        <nav className="dx-crumb" aria-label="breadcrumb">
-          <a href={crumb.href}>{crumb.label}</a>
-          <span aria-hidden="true"> / </span>
-          <span>{crumb.here}</span>
-        </nav>
-      ) : null}
-      <h1 id="page-heading" tabIndex={-1}>
-        {title}
-      </h1>
-      <p className="dx-lede">{lede}</p>
+    <header className={art ? "dx-head dx-head-split" : "dx-head"}>
+      <div className="dx-head-text">
+        {crumb ? (
+          <nav className="dx-crumb" aria-label="breadcrumb">
+            <a href={crumb.href}>{crumb.label}</a>
+            <span aria-hidden="true"> / </span>
+            <span>{crumb.here}</span>
+          </nav>
+        ) : null}
+        <h1 id="page-heading" tabIndex={-1}>
+          {title}
+        </h1>
+        <p className="dx-lede">{lede}</p>
+      </div>
+      {art ? <Art art={art} className="dx-head-art" important /> : null}
     </header>
   );
 }
@@ -62,10 +169,8 @@ export function DocSteps({ steps }: { steps: readonly GuideStep[] }) {
           <span className="dx-step-n" aria-hidden="true">
             {index + 1}
           </span>
-          <div className="dx-step-body">
-            <h2>{step.title}</h2>
-            {step.body}
-          </div>
+          <h2>{step.title}</h2>
+          <div className="dx-step-body">{step.body}</div>
         </li>
       ))}
     </ol>

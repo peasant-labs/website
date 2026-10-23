@@ -1,4 +1,4 @@
-import { DocCommand, DocNote } from "@/components/docs/doc-parts";
+import { DocCommand, DocList, DocNote } from "@/components/docs/doc-parts";
 import { Guide } from "@/components/docs/guide";
 import { Rich } from "@/components/docs/rich-text";
 import { DOCS_GUIDES } from "@/lib/docs-content";
@@ -24,18 +24,33 @@ const STEPS = [
     id: "link",
     title: "link your repositories",
     body: (
-      <p>
-        <Rich text="As the collective's owner, open its settings and choose **connect github** to install the GitHub app. Back on village, under **github orgs**, choose **manage**, pick the repositories and save. A collective links one GitHub org today." />
-      </p>
+      <>
+        <p>As the collective&apos;s owner:</p>
+        <DocList
+          ordered
+          items={[
+            "Open the collective's settings and choose **connect github** to install the GitHub app.",
+            "Back on peasant online, under **github orgs**, choose **manage**.",
+            "Pick the repositories and save.",
+          ]}
+        />
+        <p>A collective links one GitHub org today.</p>
+      </>
     ),
   },
   {
     id: "show",
     title: "show transcripts on pull requests",
     body: (
-      <p>
-        <Rich text="In the same settings, under **pull requests**, turn on **show transcripts on pull requests**. Village adds one `peasant / prompts` check and one comment to pull requests in the linked repositories, listing which commits have transcripts. The comment is updated in place, and the check never blocks merging." />
-      </p>
+      <>
+        <p>
+          <Rich text="In the same settings, under **pull requests**, turn on **show transcripts on pull requests**." />
+        </p>
+        <p>
+          <Rich text="Peasant online then adds one `peasant / prompts` check and one comment to pull requests in the linked repositories. The comment lists which commits have transcripts." />
+        </p>
+        <p>The comment is updated in place, and the check never blocks merging.</p>
+      </>
     ),
   },
   {
@@ -44,11 +59,24 @@ const STEPS = [
     body: (
       <>
         <p>
-          <Rich text="The author types `/peasant` in Claude Code and publishes the session to the collective. To publish on every git push instead, tick **publish this repo automatically on git push** in the publish window, type `/peasant auto` in Claude Code, or run this in the repository:" />
+          <Rich text="The author types `/peasant` in Claude Code and publishes the session to the collective." />
         </p>
-        <DocCommand command="peasant village auto" />
+        <p>To publish on every git push instead, do one of these:</p>
+        <ul className="dx-bullets">
+          <li>
+            <Rich text="In the publish window, tick **publish this repo automatically on git push**." />
+          </li>
+          <li>
+            <Rich text="In Claude Code, type `/peasant auto`." />
+          </li>
+          <li>
+            In the repository, run:
+            <DocCommand command="peasant village auto" />
+          </li>
+        </ul>
         <p>
-          <Rich text="Automatic publishing sends to the collectives you published to last. It is private with no license, skips review, and never blocks a push." />
+          Automatic publishing sends to the collectives you published to last. It is private with no license,
+          skips review, and never blocks a push.
         </p>
       </>
     ),
@@ -58,8 +86,16 @@ const STEPS = [
     title: "link it to the pull request",
     body: (
       <>
+        <DocList
+          ordered
+          items={[
+            "Comment `/peasant attach` on the pull request.",
+            "Peasant online replies with how many of your transcripts match, and a link.",
+            "Open the link and choose **attach**.",
+          ]}
+        />
         <p>
-          <Rich text="Comment `/peasant attach` on the pull request. Village replies with how many of your transcripts match and a link; open it and choose **attach**. To skip this step, turn on **link my transcripts to my pull requests automatically** in your own village settings, under **pull requests**. It is off by default." />
+          <Rich text="To skip this step, turn on **link my transcripts to my pull requests automatically** in your own settings on peasant online, under **pull requests**. It is off by default." />
         </p>
         <DocNote>
           A transcript links only when one of its recorded commits is in the pull request; a matching
@@ -72,9 +108,16 @@ const STEPS = [
     id: "review",
     title: "review",
     body: (
-      <p>
-        <Rich text="The comment counts the transcripts and the commits they trace, and links to the pull request's page on village. That page shows how many commits are traced, the transcripts on the left and their prompts on the right; `j` and `k` move between them. Each reviewer sees only the transcripts they can read, so reviewers should be members of the collective." />
-      </p>
+      <>
+        <p>
+          The comment counts the transcripts and the commits they trace. It links to the pull request&apos;s page on
+          peasant online.
+        </p>
+        <p>
+          <Rich text="That page shows how many commits are traced, with the transcripts on the left and their prompts on the right. `j` and `k` move between them." />
+        </p>
+        <p>Each reviewer sees only the transcripts they can read, so reviewers should be members of the collective.</p>
+      </>
     ),
   },
 ] as const;

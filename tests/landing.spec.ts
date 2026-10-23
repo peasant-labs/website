@@ -465,7 +465,7 @@ test("on a phone the docs sidebar folds into fairtrade's top bar and drawer", as
   await context.close();
 });
 
-test("the docs starting points sit two by two on a wide screen, with no card left alone", async ({ page }) => {
+test("the docs starting points sit in full rows on a wide screen, with no card left alone", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/docs");
   const rows = await page.locator(".dx-guide").evaluateAll((cards) => {

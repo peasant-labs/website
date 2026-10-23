@@ -72,26 +72,48 @@
   min-width: 0;
 }
 
+/*
+ * The reading page. Prose is the proportional face at 18px with 1.6 leading on
+ * a wide screen and 16px on a phone, in one column of about 70 characters;
+ * mono carries only code, headings and chrome. The page is a size container,
+ * so the columns follow the room beside the sidebar rather than the window.
+ */
 .dx-page {
+  --dx-col: 40rem;
+  --dx-aside: 15rem;
+
+  container: dx-page / inline-size;
   box-sizing: border-box;
   display: grid;
-  gap: var(--sp-8);
+  gap: var(--sp-7);
   align-content: start;
   max-width: 75rem;
-  padding: var(--sp-8) var(--sp-6) var(--sp-8);
+  padding: var(--sp-8) var(--sp-6);
   outline: none;
+  font-size: var(--fs-md);
+  line-height: 1.6;
 }
 
 @media (max-width: 47.99rem) {
   .dx-page {
-    gap: var(--sp-7);
+    gap: var(--sp-6);
     padding: var(--sp-6) var(--sp-4) var(--sp-8);
+    font-size: var(--fs-body);
   }
 }
 
+/* ---------- header ---------- */
+
 .dx-head {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--sp-5);
+  align-items: center;
+}
+
+.dx-head-text {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: start;
 }
 
 .dx-head h1,
@@ -105,9 +127,39 @@
 }
 
 .dx-lede {
-  max-inline-size: 52ch;
+  max-inline-size: var(--dx-col);
   color: var(--ink-2);
   font-size: var(--fs-md);
+  line-height: 1.5;
+}
+
+@media (min-width: 48rem) {
+  .dx-lede {
+    font-size: var(--fs-lg);
+  }
+}
+
+.dx-head-art {
+  display: none;
+}
+
+/* a guide's picture sits beside its title once there is room, so step one starts in the first view */
+@container dx-page (min-width: 40rem) {
+  .dx-head-split {
+    grid-template-columns: minmax(0, 1fr) minmax(9rem, 13rem);
+    column-gap: var(--sp-7);
+  }
+
+  .dx-head-art {
+    display: block;
+  }
+}
+
+@container dx-page (min-width: 58rem) {
+  .dx-head-split {
+    grid-template-columns: minmax(0, var(--dx-col)) var(--dx-aside);
+    column-gap: var(--sp-8);
+  }
 }
 
 .dx-crumb {
@@ -123,128 +175,206 @@
   text-underline-offset: 3px;
 }
 
-.dx-sec {
+/* ---------- the reading column and "on this page" beside it ---------- */
+
+.dx-columns {
   display: grid;
-  gap: var(--sp-4);
-  max-width: 46rem;
+  gap: var(--sp-8);
+  align-items: start;
+}
+
+.dx-article {
+  display: grid;
+  gap: var(--sp-8);
+  min-width: 0;
+  max-width: var(--dx-col);
+}
+
+.dx-aside {
+  display: none;
+}
+
+@container dx-page (min-width: 58rem) {
+  .dx-columns {
+    grid-template-columns: minmax(0, var(--dx-col)) var(--dx-aside);
+  }
+
+  .dx-article {
+    gap: calc(var(--sp-8) + var(--sp-4));
+  }
+
+  .dx-aside {
+    position: sticky;
+    inset-block-start: var(--sp-5);
+    display: block;
+  }
+}
+
+/* on a narrow screen, "on this page" folds under the header */
+.dx-jump {
+  border: var(--bd-strong);
+  background: var(--surface);
+}
+
+.dx-jump summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--target-comfortable);
+  padding: 0 var(--sp-4);
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+.dx-jump summary::-webkit-details-marker {
+  display: none;
+}
+
+.dx-jump-ic {
+  width: var(--ic-md);
+  height: var(--ic-md);
+}
+
+.dx-jump[open] .dx-jump-ic {
+  rotate: 180deg;
+}
+
+.dx-jump ul {
+  display: grid;
+  padding: 0 var(--sp-2) var(--sp-2);
+  list-style: none;
+}
+
+.dx-jump a {
+  display: flex;
+  align-items: center;
+  min-height: var(--target-comfortable);
+  padding: 0 var(--sp-2);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0;
+}
+
+@container dx-page (min-width: 58rem) {
+  .dx-jump {
+    display: none;
+  }
+}
+
+.dx-toc {
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border: var(--bd-strong);
+  background: var(--surface);
+}
+
+/* ---------- sections: headings, paragraphs and the space between them ---------- */
+
+.dx-sec {
+  min-width: 0;
   scroll-margin-top: var(--sp-5);
 }
 
-.dx-sec h2,
-.dx-step-body h2 {
+.dx-sec > h2,
+.dx-start-title {
+  padding-block-end: var(--sp-3);
+  border-bottom: var(--bd);
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.dx-sec h2 {
   font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.4;
+  text-wrap: balance;
 }
 
-.dx-sec h3 {
-  margin-block-start: var(--sp-2);
+.dx-sec > h3 {
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-size: var(--fs-md);
+  font-size: var(--fs-lg);
   font-weight: 700;
+  line-height: 1.4;
 }
 
-.dx-sec p,
-.dx-step-body p,
-.dx-list li,
-.dx-defs dd {
-  color: var(--ink);
+/*
+ * Rhythm: blocks sit one line apart, an intro line sits close to the list or
+ * command it introduces, and a heading has more room above than below.
+ */
+:is(.dx-sec, .dx-step-body) > * + * {
+  margin-block-start: 1lh;
 }
 
-/* list text reads with the same prose spacing fairtrade gives a paragraph */
-.dx-list li,
+:is(.dx-sec, .dx-step-body) > p + :is(ol, ul, dl, .dx-cmds, .dx-cmd, .dx-path, .dx-agents) {
+  margin-block-start: var(--sp-3);
+}
+
+.dx-sec > h2 + * {
+  margin-block-start: var(--sp-5);
+}
+
+.dx-sec > * + h3 {
+  margin-block-start: var(--sp-7);
+}
+
+.dx-sec > h3 + * {
+  margin-block-start: var(--sp-3);
+}
+
+:is(.dx-sec, .dx-step-body, .dx-note) p,
+:is(.dx-list, .dx-bullets) li,
 .dx-defs dd,
-.dx-agent-name,
-.bx-body li {
+.dx-ref dd,
+.dx-guide-desc {
+  max-inline-size: var(--dx-col);
+  color: var(--ink);
   letter-spacing: var(--tracking-prose);
   word-spacing: var(--word-spacing-prose);
 }
 
-.dx-sec code,
-.dx-step-body code,
-.dx-note code {
-  padding: 0 4px;
+:is(.dx-sec, .dx-step-body, .dx-note, .dx-guide-desc) strong {
+  color: var(--ink-strong);
+  font-weight: 700;
+}
+
+/* inline code: never below the 16px floor, and a short token never splits across lines */
+.dx-page :is(p, li, dd, .dx-guide-desc) > code {
+  padding: 0 0.25em;
   background: var(--surface-2);
   font-family: var(--font-mono);
-  font-size: 0.9375em;
-  overflow-wrap: anywhere;
+  font-size: max(var(--fs-min), 0.9em);
+  white-space: nowrap;
 }
 
-.dx-sec strong,
-.dx-step-body strong {
-  color: var(--ink-strong);
-  font-weight: 700;
+.dx-page code.dx-code-wrap {
+  white-space: normal;
 }
 
-.dx-sec:has(.dx-guides) {
-  max-width: none;
+.dx-code-wrap > span {
+  white-space: pre;
 }
 
-/* the four starting points: one column on a phone, two by two from a tablet up, never an orphan */
-.dx-guides {
-  display: grid;
-  gap: var(--sp-7) var(--sp-6);
-  grid-template-columns: minmax(0, 1fr);
-}
+/* ---------- lists ---------- */
 
-@media (min-width: 40rem) {
-  .dx-guides {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.dx-guide-art {
-  max-width: 30rem;
-}
-
-.dx-guide {
+.dx-list,
+.dx-bullets {
   display: grid;
   gap: var(--sp-3);
-  align-content: start;
-  color: inherit;
-  text-decoration: none;
-}
-
-.dx-guide-title {
-  color: var(--ink-strong);
-  font-family: var(--font-mono);
-  font-size: var(--fs-md);
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.dx-guide-desc {
-  color: var(--ink-3);
-}
-
-.dx-cmd-group {
-  display: grid;
-  gap: var(--sp-2);
-}
-
-.dx-cmd {
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-/* a long command wraps inside its block, so the copy button never scrolls away */
-.dx-cmd .cli-cmd code {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.dx-list {
-  display: grid;
-  gap: var(--sp-2);
-  margin: 0;
   padding-inline-start: 1.5em;
+}
+
+/* room for a two-digit mono number, so the markers stay inside the column */
+.dx-list {
+  padding-inline-start: 2.5em;
   list-style: decimal;
+}
+
+.dx-bullets {
+  list-style: disc;
 }
 
 .dx-list li::marker {
@@ -253,14 +383,102 @@
   font-variant-numeric: tabular-nums;
 }
 
+.dx-bullets li::marker {
+  color: var(--ink-3);
+}
+
+.dx-list li,
+.dx-bullets li {
+  padding-inline-start: var(--sp-1);
+}
+
+/* a numbered step that carries commands: the steps need more room between them */
+.dx-list:has(.dx-cmds),
+.dx-bullets:has(.dx-cmd) {
+  gap: var(--sp-5);
+}
+
+:is(.dx-list, .dx-bullets) li > :is(.dx-cmds, .dx-cmd) {
+  margin-block-start: var(--sp-3);
+}
+
+/* ---------- commands and paths ---------- */
+
+.dx-cmds {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.dx-cmd {
+  max-width: 100%;
+}
+
+/*
+ * A command that does not fit wraps inside its block rather than scrolling: a
+ * scrolled line would hide part of the command and need its own tab stop.
+ * It breaks at spaces first, and inside a word only when nothing else fits.
+ */
+.dx-cmd .cli-cmd-line code {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* on a phone the copy button keeps its icon and name but drops the word, so a command keeps its flags whole */
+@container dx-page (max-width: 30rem) {
+  .dx-cmd .cli-copy-word {
+    display: none;
+  }
+
+  /* and a command inside a numbered step takes the column's full width */
+  .dx-list li > .dx-cmds {
+    margin-inline-start: calc(-2.5em - var(--sp-1));
+  }
+}
+
+.dx-cmd-group {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.dx-cmd-group + .dx-cmd-group {
+  margin-block-start: var(--sp-5);
+}
+
+.dx-page .dx-cmd-label {
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0;
+  word-spacing: normal;
+}
+
+.dx-path {
+  padding: var(--sp-3) var(--sp-4);
+  border: var(--bd);
+  background: var(--surface-2);
+}
+
+.dx-path code {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
+  line-height: var(--lh-mono);
+}
+
+/* a long path wraps only between folders; a folder name never splits */
+.dx-path-seg {
+  white-space: pre;
+}
+
+/* ---------- notes ---------- */
+
 .dx-note {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-3);
-  padding: 14px var(--sp-4);
+  padding: var(--sp-4);
   border: var(--bd-strong);
   background: var(--surface-2);
-  color: var(--ink-2);
 }
 
 .dx-note p {
@@ -271,19 +489,20 @@
   flex: none;
   width: var(--ic-lg);
   height: var(--ic-lg);
-  margin-block-start: 3px;
+  margin-block-start: 0.3lh;
   color: var(--ink-strong);
 }
 
+/* ---------- definitions and the command reference ---------- */
+
 .dx-defs {
   display: grid;
-  gap: var(--sp-5);
-  margin: 0;
+  gap: var(--sp-6);
 }
 
 .dx-defs > div {
   display: grid;
-  gap: var(--sp-1);
+  gap: var(--sp-2);
 }
 
 .dx-defs dt {
@@ -293,6 +512,7 @@
   gap: var(--sp-2);
   color: var(--ink-strong);
   font-family: var(--font-mono);
+  font-size: var(--fs-md);
   font-weight: 700;
   letter-spacing: 0;
 }
@@ -301,12 +521,8 @@
   margin: 0;
 }
 
-.dx-defs dd ul {
-  display: grid;
+.dx-defs dd > .dx-bullets {
   gap: var(--sp-1);
-  margin: 0;
-  padding-inline-start: 1.25em;
-  list-style: disc;
 }
 
 .dx-sec .dx-label {
@@ -318,11 +534,49 @@
   font-weight: 600;
 }
 
+/* every command on its own row; the two columns line up once there is room for them */
+.dx-ref {
+  display: grid;
+  border-top: var(--bd);
+}
+
+.dx-ref > div {
+  display: grid;
+  gap: var(--sp-1);
+  padding-block: var(--sp-3);
+  border-bottom: var(--bd);
+}
+
+.dx-ref dt code {
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
+}
+
+.dx-ref dd {
+  margin: 0;
+  font-size: var(--fs-body);
+}
+
+@container dx-page (min-width: 36rem) {
+  .dx-ref {
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  }
+
+  .dx-ref > div {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    gap: var(--sp-1) var(--sp-6);
+    align-items: baseline;
+  }
+}
+
+/* ---------- agents ---------- */
+
 .dx-agents {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
   gap: 0 var(--sp-6);
-  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -338,102 +592,104 @@
 .dx-agent-name {
   color: var(--ink-strong);
   font-weight: 700;
+  letter-spacing: var(--tracking-prose);
 }
 
 .dx-agent-note {
   color: var(--ink-3);
+  white-space: nowrap;
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
   letter-spacing: 0;
 }
 
-.dx-table {
-  overflow-x: auto;
-  border: var(--bd);
+/* ---------- the overview's starting points ---------- */
+
+/*
+ * A row with a small picture on a phone; two by two, then four across, with
+ * the picture on top once there is room. Never three and one.
+ */
+.dx-start {
+  display: grid;
+  gap: var(--sp-5);
+  max-width: calc(var(--dx-col) + var(--sp-8) + var(--dx-aside));
 }
 
-.dx-table table {
-  width: 100%;
-  min-width: 36rem;
-  border-collapse: collapse;
+.dx-guides {
+  display: grid;
+  gap: var(--sp-5);
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.dx-table th {
-  padding: 10px 12px;
-  border-bottom: var(--bd-strong);
+.dx-guide {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: var(--sp-4);
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.dx-guide-text {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.dx-guide-title {
   color: var(--ink-strong);
   font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  font-weight: 600;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  line-height: 1.4;
   letter-spacing: 0;
-  text-align: start;
 }
 
-.dx-table td {
-  padding: 12px;
-  border-bottom: var(--bd);
-  vertical-align: top;
+.dx-guide-desc {
+  color: var(--ink-2);
+  font-size: var(--fs-body);
+  line-height: 1.5;
 }
 
-.dx-table tr:last-child td {
-  border-bottom: 0;
-}
+@container dx-page (min-width: 34rem) {
+  .dx-guides {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-6) var(--sp-5);
+  }
 
-.dx-table td code {
-  white-space: nowrap;
-  overflow-wrap: normal;
-}
+  .dx-guide {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    align-content: start;
+    gap: var(--sp-3);
+  }
 
-/* a guide: the article, and "on this page" beside it on a wide screen */
-
-.dx-guide-page {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: var(--sp-7) var(--sp-8);
-}
-
-.dx-article {
-  flex: 999 1 36rem;
-  display: grid;
-  gap: var(--sp-7);
-  min-width: 0;
-  max-width: 45rem;
-}
-
-.dx-aside {
-  position: sticky;
-  inset-block-start: var(--sp-5);
-  flex: 1 1 14rem;
-  max-width: 17.5rem;
-}
-
-@media (max-width: 63.99rem) {
-  .dx-aside {
-    display: none;
+  .dx-guide-art {
+    max-width: 13rem;
   }
 }
 
-.dx-toc {
-  display: grid;
-  gap: 2px;
-  padding: 6px;
-  border: var(--bd-strong);
-  background: var(--surface);
+@container dx-page (min-width: 56rem) {
+  .dx-guides {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
+
+/* ---------- guide steps ---------- */
 
 .dx-steps {
   display: grid;
-  gap: var(--sp-7);
+  gap: calc(var(--sp-8) + var(--sp-2));
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* the number and the heading share a row; the step's body takes the full column under them */
 .dx-step {
   display: grid;
-  grid-template-columns: 2.75rem minmax(0, 1fr);
+  grid-template-columns: 2.25rem minmax(0, 1fr);
   gap: var(--sp-4);
+  align-items: center;
   scroll-margin-top: var(--sp-5);
 }
 
@@ -448,17 +704,21 @@
   font-size: var(--fs-md);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.dx-step > h2 {
+  color: var(--ink-strong);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  line-height: 1.4;
+  text-wrap: balance;
 }
 
 .dx-step-body {
-  display: grid;
-  gap: var(--sp-3);
+  grid-column: 1 / -1;
   min-width: 0;
-}
-
-.dx-step-body h2 {
-  font-size: var(--fs-lg);
-  line-height: 2.25rem;
 }
 
 .dx-pager {
@@ -523,7 +783,7 @@
   display: grid;
   gap: var(--sp-5);
   width: 100%;
-  max-width: 42.5rem;
+  max-width: 38rem;
   margin-inline: auto;
 }
 
@@ -532,20 +792,29 @@
   text-transform: none;
 }
 
+/* the picture leads in without pushing the first paragraph a screen down */
 .bx-figure {
-  margin-block: var(--sp-2);
+  width: min(100%, 28rem);
+  margin-inline: auto;
 }
 
+/* an essay reads at 18px on every screen, with paragraphs one line apart */
 .bx-body {
   display: grid;
-  gap: var(--sp-5);
+  gap: 1lh;
+  max-inline-size: none;
+  font-size: var(--fs-md);
+  line-height: 1.6;
 }
 
 .bx-body p,
 .bx-body li {
   color: var(--ink);
-  font-size: var(--fs-md);
-  line-height: 1.6;
+}
+
+.bx-body li {
+  letter-spacing: var(--tracking-prose);
+  word-spacing: var(--word-spacing-prose);
 }
 
 .essay-tldr {
