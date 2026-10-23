@@ -191,9 +191,9 @@ test("the hero picture loops while on screen, pauses on request, and holds still
     for (const agent of fixture.hero.flow.agents) {
       await expect(picture).toHaveAttribute("aria-label", new RegExp(agent));
     }
-    for (const label of fixture.hero.flow.labels) {
-      await expect(picture.getByText(label, { exact: true })).toBeVisible();
-    }
+    // the picture tells its story in shapes; the words are only in its accessible name
+    await expect(picture.locator(".hf-card").first()).toBeVisible();
+    expect((await picture.innerText()).trim()).toBe("");
     // the picture holds its height from the first paint: nothing below it moves
     const layout = () =>
       flow.evaluate((root) => ({
@@ -209,6 +209,7 @@ test("the hero picture loops while on screen, pauses on request, and holds still
       const frame = root.getBoundingClientRect();
       return [...root.querySelectorAll(".hf-stage > :not(.hf-card), .hf-toggle")]
         .map((element) => element.getBoundingClientRect())
+        .filter((box) => box.width > 0 && box.height > 0)
         .filter((box) => box.left < frame.left - 1 || box.right > frame.right + 1 || box.bottom > frame.bottom + 1)
         .length;
     });

@@ -122,9 +122,9 @@
 
 /*
  * The hero's picture (components/landing/hero-flow.tsx). That file owns where
- * everything sits and when it moves; this owns how it looks. Sizes inside a
- * transcript are in hundredths of the transcript, so it reads the same at any
- * scale.
+ * everything sits and when it moves; this owns how it looks: ink strokes, one
+ * amber accent for what redaction hides, no words. Sizes inside a card are in
+ * hundredths of the card, so it reads the same at any scale.
  */
 .lp-hero-flow {
   margin-block-start: clamp(2.5rem, 5vw, 4rem);
@@ -134,13 +134,13 @@
   position: relative;
   container-type: inline-size;
   width: 100%;
-  max-width: 26rem;
+  max-width: 24rem;
   margin-inline: auto;
 }
 
 @media (min-width: 48rem) {
   .hf {
-    max-width: 51rem;
+    max-width: 64rem;
   }
 }
 
@@ -153,51 +153,43 @@
   position: absolute;
 }
 
-.hf-zone {
-  box-sizing: border-box;
-  border: var(--bd-strong);
+.hf-art {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.hf-computer {
-  border-style: dashed;
+.hf-line,
+.hf-sieve,
+.hf-beam,
+.hf-ground {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
 }
 
-.hf-label {
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  line-height: 1.25;
-  letter-spacing: 0;
-  white-space: nowrap;
+.hf-line {
+  stroke: var(--ink-2);
+  stroke-width: 2;
 }
 
-.hf-label-you {
-  color: var(--ink-strong);
-  font-weight: 700;
+.hf-ground {
+  stroke: var(--rule-strong);
+  stroke-width: 1;
 }
 
-.hf-label-plus {
-  color: var(--amber);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  opacity: 0;
+/* the scanner: a dashed line, lit amber while a card passes through it */
+.hf-sieve {
+  stroke: var(--ink-3);
+  stroke-width: 2;
+  stroke-dasharray: 4 6;
 }
 
-/* redaction: a band of fine stripes between two rules, lit while a transcript is inside */
-.hf-filter {
-  box-sizing: border-box;
-  border: var(--bd-strong);
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--rule) 0 1px,
-    transparent 1px 6px
-  );
-}
-
-.hf-scan {
-  position: absolute;
-  inset: -1px;
-  border: 2px solid var(--amber);
+.hf-beam {
+  stroke: var(--amber);
+  stroke-width: 3;
   opacity: 0;
 }
 
@@ -212,43 +204,14 @@
   height: 100%;
 }
 
-/* publish sits on the edge of your computer and is pressed as each transcript crosses it */
-.hf-publish {
-  translate: -50% -50%;
-}
-
-.hf-publish-chip {
-  position: relative;
-  display: block;
-  padding: var(--sp-1) var(--sp-3);
-  border: var(--bd-strong);
-  background: var(--canvas);
-  color: var(--ink-strong);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  line-height: 1.5;
-  letter-spacing: 0;
-  white-space: nowrap;
-}
-
-.hf-publish-fill {
-  position: absolute;
-  inset: -1px;
-  display: grid;
-  place-items: center;
-  background: var(--amber-fill);
-  color: var(--amber-fill-ink);
-  opacity: 0;
-}
-
-/* a transcript: a header with its agent's mark, three lines, one of them a secret */
+/* a card: its agent's mark and three thick lines, the middle one a secret */
 .hf-card {
   inset-block-start: 0;
   inset-inline-start: 0;
   box-sizing: border-box;
   container-type: inline-size;
-  border: 1px solid var(--rule-strong);
-  background: var(--surface-2);
+  border: 2px solid var(--ink-2);
+  background: var(--canvas);
   transform-origin: 0 0;
 }
 
@@ -256,33 +219,23 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 9cqw;
+  gap: 7cqw;
   height: 100%;
   padding-inline: 10cqw;
-}
-
-.hf-card-head {
-  display: flex;
-  align-items: center;
-  gap: 5cqw;
   color: var(--ink-2);
 }
 
-.hf-card-head .brand {
+.hf-card-body > .brand {
   flex: none;
-  width: 14cqw;
-  height: 14cqw;
+  width: 18cqw;
+  height: 18cqw;
 }
 
 .hf-bar {
   display: block;
   width: var(--w);
-  height: 5cqw;
+  height: 6.5cqw;
   background: var(--ink-4);
-}
-
-.hf-card-head .hf-bar {
-  background: var(--ink-3);
 }
 
 .hf-secret {
@@ -294,34 +247,31 @@
   background: var(--ink-2);
 }
 
-/* the secret, once redacted: a taller amber block over the line, so the change is more than a colour */
+/* the secret, once the scanner has passed it: an amber block over the line */
 .hf-mask {
   position: absolute;
-  inset-block: -2.5cqw;
+  inset-block: -1.5cqw;
   inset-inline-start: -2cqw;
-  width: calc(62% + 4cqw);
+  width: calc(58% + 4cqw);
   background: var(--amber-fill);
+  transform-origin: right center;
 }
 
-.hf-meter {
-  display: flex;
-}
-
-.hf-segment {
-  position: relative;
-  height: 100%;
-  background: var(--rule);
-}
-
-.hf-fill {
+/* the stamp: a check pressed onto the card as it is published */
+.hf-stamp {
   position: absolute;
-  inset: 0;
-  background: var(--ink-2);
-  transform-origin: left center;
+  inset-block-start: 8cqw;
+  inset-inline-end: 9cqw;
+  width: 18cqw;
+  height: 18cqw;
+  color: var(--ink-strong);
+  stroke-width: 2.25;
 }
 
 .hf-toggle {
   position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

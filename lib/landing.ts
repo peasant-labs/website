@@ -40,14 +40,15 @@ export const HERO = {
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
   /*
-   * The picture under the buttons: a transcript leaves each agent, is redacted
-   * and published, and lands in the commons. There is no reputation score, so
-   * the meter counts the transcripts credited to you and the caption says
-   * what that credit is for.
+   * The picture under the buttons tells its story without words, so its
+   * accessible name says it: a transcript leaves the laptop, a scanner turns
+   * its secret amber, a stamp marks it published, and it joins the stack
+   * beside a person. There is no reputation score: the stack is the
+   * transcripts credited to them.
    */
   flow: {
     label:
-      "Transcripts from Claude Code, Codex, Cursor, OpenCode, Pi and Strike pass through redaction while still on your computer, are published, and land in the commons, each one credited to you.",
+      "A transcript card rises out of a laptop that runs Claude Code, Codex, Cursor, OpenCode, Pi and Strike. It passes a scanner that turns its secret line amber, gets a check stamp as you publish it, and lands on a growing stack of transcripts beside a person: the commons, each one credited to you.",
     agents: [
       { mark: "claude", name: "Claude Code" },
       { mark: "codex", name: "Codex" },
@@ -56,12 +57,6 @@ export const HERO = {
       { mark: "pi", name: "Pi" },
       { mark: "strike", name: "Strike" },
     ],
-    computer: "your computer",
-    filter: "redaction",
-    publish: "publish",
-    commons: "commons",
-    handle: "@you",
-    caption: "credit builds reputation",
     pause: "pause the animation",
     play: "play the animation",
   },

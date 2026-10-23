@@ -2,13 +2,14 @@
 
 import { BrandMark } from "@/components/fairtrade-client";
 import { HERO } from "@/lib/landing";
-import { Pause, Play } from "@peasant-labs/fairtrade/icons";
+import { BadgeCheck, Pause, Play } from "@peasant-labs/fairtrade/icons";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 /*
- * The hero's picture, drawn with the page's own type and tokens: a transcript
- * leaves each agent, passes through redaction, is published across the edge of
- * your computer, and lands in the commons, where the meter under @you counts it.
+ * The hero's picture, told without words: a transcript card rises out of a
+ * laptop that runs the agents, a scanner turns its secret line amber as it
+ * passes, a stamp marks it published, and it lands on the stack beside a
+ * person, which grows with each one. Its accessible name tells the same story.
  *
  * Its geometry and its timeline live here, together, and become one stylesheet.
  * Every place is in hundredths of the picture's width (cqw), so the picture
@@ -16,117 +17,98 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
  * top to bottom; a wide screen reads it left to right.
  *
  * Only transform and opacity move. The stylesheet's resting state is the
- * finished frame, every transcript in the commons, and the loop is laid over it
- * only when motion is allowed, so reduced motion sees that one frame.
+ * finished frame, every card on the stack, and the loop is laid over it only
+ * when motion is allowed, so reduced motion sees that one frame.
  */
 
 const FLOW = HERO.flow;
 const AGENTS = FLOW.agents;
+/* the laptop shows three marks at a time: the first three agents, then the other three */
+const SHOWN = 3;
 
-/* one loop, a departure every GAP ms from START, and the fade out at the end */
-const LOOP = 18400;
+/* one loop, a card every GAP ms from START, and the fade out at the end */
+const LOOP = 19400;
 const START = 400;
-const GAP = 2400;
-const FADE_FROM = LOOP - 900;
-const FADE_TO = LOOP - 500;
+const GAP = 2600;
+const FADE_FROM = LOOP - 950;
+const FADE_TO = LOOP - 550;
+const SWAP = START + SHOWN * GAP - 700;
 
-/* a trip, from its departure: appear beside the agent, reach redaction, wait, reach the edge, wait while publish is pressed, land */
-const TRIP = { shown: 300, atFilter: 1000, leaveFilter: 1550, atEdge: 2050, leaveEdge: 2350, landed: 3050 } as const;
+/* a card's trip, from its start: out of the laptop, to the scanner, through it at an even pace, stamped, onto the stack */
+const TRIP = { out: 450, atScanner: 1150, pastScanner: 1950, stamped: 2550, landed: 3250 } as const;
+const CROSS = TRIP.pastScanner - TRIP.atScanner;
 
-type Rect = readonly [x: number, y: number, w: number, h: number];
-type Text = Readonly<{ x: number; y: number; align: "start" | "center" | "end"; middle?: boolean }>;
 type Point = readonly [x: number, y: number];
+type Rect = readonly [x: number, y: number, w: number, h: number];
 
 type Layout = Readonly<{
   /** the picture's height, in hundredths of its width */
   height: number;
-  computer: Rect;
-  commons: Rect;
-  filter: Rect;
-  labels: Readonly<{ computer: Text; commons: Text; filter: Text; you: Text; plus: Text; caption: Text }>;
-  /** the agents' marks: their centres and one size */
+  /** the laptop's screen, and how far its base reaches past the screen on each side */
+  screen: Rect;
+  base: readonly [depth: number, overhang: number];
+  /** the three marks on the screen: centres and one size */
   marks: readonly Point[];
   mark: number;
-  /** where a transcript first shows beside its agent, from that agent's centre, and how small */
+  /** a card's width; its height is seven tenths of it */
+  card: number;
+  /** centres: just out of the laptop (a card starts on its agent's mark), at the scanner, past it */
   out: Point;
-  outScale: number;
-  card: readonly [w: number, h: number];
-  /** the centres a transcript stops at: in redaction, then at the edge of your computer */
-  atFilter: Point;
-  atEdge: Point;
-  /** the centre of publish, on the edge */
-  publish: Point;
-  /** where each transcript lands, top-left, and how small it rests there */
-  slots: readonly Point[];
-  slotScale: number;
-  meter: Rect;
-  segmentGap: number;
+  atScanner: Point;
+  pastScanner: Point;
+  /** the scanner: a line across the card's path */
+  scanner: readonly [from: Point, to: Point];
+  /** where the secret line meets the scanner, as a share of the crossing; null when it wipes across */
+  flip: number | null;
+  /** the stack: its left edge, the ground it stands on, each card's step up and its scale */
+  stack: readonly [left: number, ground: number, step: number, scale: number];
+  ground: readonly [from: number, to: number];
+  /** the person beside the stack: head centre and radius, shoulders' line and half width */
+  person: readonly [x: number, headY: number, radius: number, shouldersY: number, halfWidth: number];
 }>;
 
 const PHONE: Layout = {
-  height: 110,
-  computer: [0.5, 0.5, 99, 57.5],
-  commons: [0.5, 64, 99, 45.5],
-  filter: [4.5, 31.5, 91, 6],
-  labels: {
-    computer: { x: 4.5, y: 3.5, align: "start" },
-    commons: { x: 4.5, y: 67, align: "start" },
-    filter: { x: 95.5, y: 39, align: "end" },
-    you: { x: 4.5, y: 90, align: "start", middle: true },
-    plus: { x: 95.5, y: 90, align: "end", middle: true },
-    caption: { x: 4.5, y: 95.5, align: "start" },
-  },
-  marks: [14, 28.4, 42.8, 57.2, 71.6, 86].map((x) => [x, 17] as const),
-  mark: 7,
-  out: [0, 8],
-  outScale: 0.45,
-  card: [20, 14],
-  atFilter: [50, 34.5],
-  atEdge: [50, 49.5],
-  publish: [78, 58],
-  slots: [4.5, 20.22, 35.94, 51.66, 67.38, 83.1].map((x) => [x, 74] as const),
-  slotScale: 0.62,
-  meter: [17.5, 89.4, 66, 1.2],
-  segmentGap: 1.2,
-};
-
-/* the commons fills its far side first, so a transcript on its way never crosses one that has landed */
-const WIDE: Layout = {
-  height: 43,
-  computer: [0.5, 0.5, 57.5, 42],
-  commons: [64, 0.5, 35.5, 42],
-  filter: [31, 11, 6, 24],
-  labels: {
-    computer: { x: 2.75, y: 2.2, align: "start" },
-    commons: { x: 67.75, y: 2.2, align: "start" },
-    filter: { x: 34, y: 7.6, align: "center" },
-    you: { x: 67.75, y: 27.2, align: "start", middle: true },
-    plus: { x: 95.75, y: 27.2, align: "end", middle: true },
-    caption: { x: 67.75, y: 31.6, align: "start" },
-  },
-  marks: [9.5, 14.8, 20.1, 25.4, 30.7, 36].map((y) => [4.15, y] as const),
-  mark: 2.8,
-  out: [4.5, 0],
-  outScale: 0.5,
-  card: [10, 7],
-  atFilter: [34, 23],
-  atEdge: [51.5, 23],
-  publish: [58, 31.5],
-  slots: [
-    [87.75, 8],
-    [77.75, 8],
-    [67.75, 8],
-    [87.75, 15.6],
-    [77.75, 15.6],
-    [67.75, 15.6],
+  height: 150,
+  screen: [24, 3, 52, 30],
+  base: [3.5, 4],
+  marks: [36, 50, 64].map((x) => [x, 18] as const),
+  mark: 10,
+  card: 48,
+  out: [50, 46],
+  atScanner: [50, 59.2],
+  pastScanner: [50, 92.8],
+  scanner: [
+    [6, 76],
+    [94, 76],
   ],
-  slotScale: 0.8,
-  meter: [73.5, 26.8, 18.5, 0.8],
-  segmentGap: 0.7,
+  flip: 0.4,
+  stack: [18, 147, 3.6, 0.5],
+  ground: [10, 90],
+  person: [67, 122, 4.5, 129, 8],
 };
 
-const departs = (index: number) => START + index * GAP;
-const lands = (index: number) => departs(index) + TRIP.landed;
+const WIDE: Layout = {
+  height: 34,
+  screen: [3, 7, 22, 16],
+  base: [2.5, 2.5],
+  marks: [8.5, 14, 19.5].map((x) => [x, 15] as const),
+  mark: 4,
+  card: 24,
+  out: [22, 15],
+  atScanner: [38, 15],
+  pastScanner: [62, 15],
+  scanner: [
+    [50, 4],
+    [50, 27],
+  ],
+  flip: null,
+  stack: [76, 32, 2.4, 0.62],
+  ground: [72, 99.5],
+  person: [95.5, 21.5, 1.8, 25, 3.25],
+};
+
+const starts = (index: number) => START + index * GAP;
+const cardHeight = (layout: Layout) => layout.card * 0.7;
 
 /* ---------- the stylesheet ---------- */
 
@@ -134,152 +116,160 @@ const n = (value: number) => Number(value.toFixed(3));
 const cq = (value: number) => `${n(value)}cqw`;
 const at = (ms: number) => `${n((ms / LOOP) * 100)}%`;
 
-type Stop = readonly [ms: number, declarations: string, ease?: "out" | "in-out"];
+type Ease = "out" | "in-out" | "linear";
+type Stop = readonly [ms: number, declarations: string, ease?: Ease];
 
 function keyframes(name: string, stops: readonly Stop[]) {
   const body = stops
     .map(([ms, declarations, ease]) => {
-      const timing = ease ? ` animation-timing-function: var(--ease-${ease});` : "";
+      const timing = !ease ? "" : ease === "linear" ? " animation-timing-function: linear;" : ` animation-timing-function: var(--ease-${ease});`;
       return `${at(ms)} { ${declarations};${timing} }`;
     })
     .join(" ");
   return `@keyframes ${name} { ${body} }`;
 }
 
-function box([x, y, w, h]: Rect) {
-  return `left: ${cq(x)}; top: ${cq(y)}; width: ${cq(w)}; height: ${cq(h)}`;
-}
-
-function text({ x, y, align, middle }: Text) {
-  const left = align === "end" ? `left: auto; right: ${cq(100 - x)}` : `left: ${cq(x)}; right: auto`;
-  const shift = `${align === "center" ? "-50%" : "0"} ${middle ? "-50%" : "0"}`;
-  return `${left}; top: ${cq(y)}; translate: ${shift}`;
-}
-
-/* a transcript centred on a point, at a scale; it scales from its top-left corner */
+/* a card centred on a point, at a scale; it scales from its top-left corner */
 function pose(layout: Layout, [x, y]: Point, scale: number, opacity: number) {
-  const [w, h] = layout.card;
+  const w = layout.card;
+  const h = cardHeight(layout);
   return `transform: translate(${cq(x - (w * scale) / 2)}, ${cq(y - (h * scale) / 2)}) scale(${n(scale)}); opacity: ${opacity}`;
 }
 
-function landed(layout: Layout, index: number, opacity = 1) {
-  const [x, y] = layout.slots[index]!;
-  return `transform: translate(${cq(x)}, ${cq(y)}) scale(${n(layout.slotScale)}); opacity: ${opacity}`;
+function stacked(layout: Layout, index: number, opacity = 1) {
+  const [left, ground, step, scale] = layout.stack;
+  const top = ground - cardHeight(layout) * scale - index * step;
+  return `transform: translate(${cq(left)}, ${cq(top)}) scale(${n(scale)}); opacity: ${opacity}`;
 }
 
 function cardStops(layout: Layout, index: number): Stop[] {
-  const t = departs(index);
-  const [mx, my] = layout.marks[index]!;
-  const out: Point = [mx + layout.out[0], my + layout.out[1]];
+  const t = starts(index);
+  const from = layout.marks[index % SHOWN]!;
+  const startScale = (layout.mark * 1.2) / layout.card;
   return [
-    [0, pose(layout, out, layout.outScale, 0)],
-    [t, pose(layout, out, layout.outScale, 0), "out"],
-    [t + TRIP.shown, pose(layout, out, layout.outScale, 1), "in-out"],
-    [t + TRIP.atFilter, pose(layout, layout.atFilter, 1, 1)],
-    [t + TRIP.leaveFilter, pose(layout, layout.atFilter, 1, 1), "in-out"],
-    [t + TRIP.atEdge, pose(layout, layout.atEdge, 1, 1)],
-    [t + TRIP.leaveEdge, pose(layout, layout.atEdge, 1, 1), "in-out"],
-    [t + TRIP.landed, landed(layout, index)],
-    [FADE_FROM, landed(layout, index), "out"],
-    [FADE_TO, landed(layout, index, 0)],
-    [LOOP, landed(layout, index, 0)],
+    [0, pose(layout, from, startScale, 0)],
+    [t, pose(layout, from, startScale, 0), "out"],
+    [t + TRIP.out, pose(layout, layout.out, 0.62, 1), "in-out"],
+    [t + TRIP.atScanner, pose(layout, layout.atScanner, 1, 1), "linear"],
+    [t + TRIP.pastScanner, pose(layout, layout.pastScanner, 1, 1)],
+    [t + TRIP.stamped, pose(layout, layout.pastScanner, 1, 1), "in-out"],
+    [t + TRIP.landed, stacked(layout, index)],
+    [FADE_FROM, stacked(layout, index), "out"],
+    [FADE_TO, stacked(layout, index, 0)],
+    [LOOP, stacked(layout, index, 0)],
   ];
 }
 
-/* the places, and each transcript's finished frame, for one layout */
+/*
+ * The secret line turns amber where the scanner meets it: on a wide screen the
+ * card crosses sideways and the amber follows the scanner along the line; on a
+ * phone the card crosses downwards and the whole line turns at once.
+ */
+function maskStops(layout: Layout, index: number): Stop[] {
+  const crossing = starts(index) + TRIP.atScanner;
+  if (layout.flip !== null) {
+    const when = crossing + layout.flip * CROSS;
+    return [
+      [0, "opacity: 0; transform: none"],
+      [when - 60, "opacity: 0; transform: none", "out"],
+      [when + 60, "opacity: 1; transform: none"],
+      [LOOP, "opacity: 1; transform: none"],
+    ];
+  }
+  /* the line runs from a tenth of the card to 0.564 of it; the scanner sweeps the card from its right edge */
+  const from = crossing + 0.436 * CROSS;
+  const to = crossing + 0.9 * CROSS;
+  return [
+    [0, "opacity: 1; transform: scaleX(0)"],
+    [from, "opacity: 1; transform: scaleX(0)", "linear"],
+    [to, "opacity: 1; transform: scaleX(1)"],
+    [LOOP, "opacity: 1; transform: scaleX(1)"],
+  ];
+}
+
 function layoutRules(layout: Layout) {
-  const mw = layout.mark;
-  const [, , meterWidth] = layout.meter;
-  const segment = (meterWidth - layout.segmentGap * (AGENTS.length - 1)) / AGENTS.length;
+  const half = layout.mark / 2;
   return [
     `.hf { aspect-ratio: 100 / ${layout.height} }`,
-    `.hf-computer { ${box(layout.computer)} }`,
-    `.hf-commons { ${box(layout.commons)} }`,
-    `.hf-filter { ${box(layout.filter)} }`,
-    ...(["computer", "commons", "filter", "you", "plus", "caption"] as const).map(
-      (name) => `.hf-label-${name} { ${text(layout.labels[name])} }`,
+    ...layout.marks.flatMap(([x, y], slot) =>
+      AGENTS.map((_, index) => index)
+        .filter((index) => index % SHOWN === slot)
+        .map(
+          (index) =>
+            `.hf-m${index} { left: ${cq(x - half)}; top: ${cq(y - half)}; width: ${cq(layout.mark)}; height: ${cq(layout.mark)} }`,
+        ),
     ),
-    ...layout.marks.map(([x, y], index) => `.hf-m${index} { ${box([x - mw / 2, y - mw / 2, mw, mw])} }`),
-    `.hf-card { width: ${cq(layout.card[0])}; height: ${cq(layout.card[1])} }`,
-    ...AGENTS.map((_, index) => `.hf-c${index} { ${landed(layout, index)} }`),
-    `.hf-publish { left: ${cq(layout.publish[0])}; top: ${cq(layout.publish[1])} }`,
-    `.hf-meter { ${box(layout.meter)}; gap: ${cq(layout.segmentGap)} }`,
-    `.hf-segment { width: ${cq(segment)} }`,
-    `.hf-toggle { left: calc(${cq(layout.commons[0] + layout.commons[2])} - 44px); top: calc(${cq(layout.commons[1] + layout.commons[3])} - 44px) }`,
+    `.hf-card { width: ${cq(layout.card)}; height: ${cq(cardHeight(layout))} }`,
+    ...AGENTS.map((_, index) => `.hf-c${index} { ${stacked(layout, index)} }`),
   ].join("\n");
 }
 
 function layoutKeyframes(layout: Layout) {
-  return AGENTS.map((_, index) => keyframes(`hf-card-${index}`, cardStops(layout, index))).join("\n");
+  return AGENTS.flatMap((_, index) => [
+    keyframes(`hf-card-${index}`, cardStops(layout, index)),
+    keyframes(`hf-mask-${index}`, maskStops(layout, index)),
+  ]).join("\n");
 }
 
 /* everything that moves the same way whatever the layout */
 function sharedKeyframes() {
-  const hidden = "opacity: 0";
-  const shown = "opacity: 1";
-  const masks = AGENTS.map((_, index) => {
-    const t = departs(index);
-    return keyframes(`hf-mask-${index}`, [
-      [0, hidden],
-      [t + TRIP.atFilter + 100, hidden, "out"],
-      [t + TRIP.atFilter + 400, shown],
-      [LOOP, shown],
+  const marks = AGENTS.map((_, index) => {
+    const first = index < SHOWN;
+    const t = starts(index);
+    const idle = "opacity: 0.4";
+    const lit = "opacity: 1";
+    const gone = "opacity: 0";
+    /* the first three show from the start and come back at the end; the other three take the middle */
+    const shown: Stop[] = first
+      ? [
+          [0, idle],
+          [t - 250, idle, "out"],
+          [t, lit],
+          [t + TRIP.out + 200, lit, "out"],
+          [t + TRIP.out + 500, idle],
+          [SWAP - 300, idle, "out"],
+          [SWAP, gone],
+          [FADE_TO, gone, "out"],
+          [FADE_TO + 300, idle],
+          [LOOP, idle],
+        ]
+      : [
+          [0, gone],
+          [SWAP, gone, "out"],
+          [SWAP + 300, idle],
+          [t - 250, idle, "out"],
+          [t, lit],
+          [t + TRIP.out + 200, lit, "out"],
+          [t + TRIP.out + 500, idle],
+          [FADE_FROM, idle, "out"],
+          [FADE_TO, gone],
+          [LOOP, gone],
+        ];
+    return keyframes(`hf-mark-${index}`, shown);
+  });
+  const stamps = AGENTS.map((_, index) => {
+    const t = starts(index) + TRIP.pastScanner + 100;
+    return keyframes(`hf-stamp-${index}`, [
+      [0, "opacity: 0; transform: scale(1.5)"],
+      [t, "opacity: 0; transform: scale(1.5)", "out"],
+      [t + 260, "opacity: 1; transform: scale(1)"],
+      [LOOP, "opacity: 1; transform: scale(1)"],
     ]);
   });
-  const segments = AGENTS.map((_, index) =>
-    keyframes(`hf-seg-${index}`, [
-      [0, "transform: scaleX(0); opacity: 1"],
-      [lands(index), "transform: scaleX(0); opacity: 1", "out"],
-      [lands(index) + 400, "transform: scaleX(1); opacity: 1"],
-      [FADE_FROM, "transform: scaleX(1); opacity: 1", "out"],
-      [FADE_TO, "transform: scaleX(1); opacity: 0"],
-      [LOOP, "transform: scaleX(1); opacity: 0"],
-    ]),
-  );
-  const pulses = (name: string, from: number, to: number, on: string, off: string) =>
-    keyframes(name, [
-      [0, off],
-      ...AGENTS.flatMap((_, index): Stop[] => {
-        const t = departs(index);
-        return [
-          [t + from - 50, off, "out"],
-          [t + from + 100, on],
-          [t + to, on, "out"],
-          [t + to + 200, off],
-        ];
-      }),
-      [LOOP, off],
-    ]);
-  const plus = keyframes("hf-plus", [
-    [0, "opacity: 0; transform: translateY(40%)"],
-    ...AGENTS.flatMap((_, index): Stop[] => [
-      [lands(index), "opacity: 0; transform: translateY(40%)", "out"],
-      [lands(index) + 250, "opacity: 1; transform: translateY(0)"],
-      [lands(index) + 900, "opacity: 1; transform: translateY(0)", "out"],
-      [lands(index) + 1200, "opacity: 0; transform: translateY(0)"],
-    ]),
-    [LOOP, "opacity: 0; transform: translateY(0)"],
-  ]);
-  const press = keyframes("hf-press", [
-    [0, "transform: scale(1)"],
+  const beam = keyframes("hf-beam", [
+    [0, "opacity: 0"],
     ...AGENTS.flatMap((_, index): Stop[] => {
-      const t = departs(index) + TRIP.atEdge;
+      const t = starts(index);
       return [
-        [t, "transform: scale(1)", "out"],
-        [t + 120, "transform: scale(0.97)", "out"],
-        [t + 320, "transform: scale(1)"],
+        [t + TRIP.atScanner - 80, "opacity: 0", "out"],
+        [t + TRIP.atScanner + 80, "opacity: 1"],
+        [t + TRIP.pastScanner - 80, "opacity: 1", "out"],
+        [t + TRIP.pastScanner + 120, "opacity: 0"],
       ];
     }),
-    [LOOP, "transform: scale(1)"],
+    [LOOP, "opacity: 0"],
   ]);
-  return [
-    ...masks,
-    ...segments,
-    pulses("hf-scan", TRIP.atFilter, TRIP.leaveFilter, shown, hidden),
-    pulses("hf-press-fill", TRIP.atEdge, TRIP.leaveEdge, shown, hidden),
-    plus,
-    press,
-  ].join("\n");
+  return [...marks, ...stamps, beam].join("\n");
 }
 
 function motionRules() {
@@ -288,25 +278,58 @@ function motionRules() {
     ...AGENTS.flatMap((_, index) => [
       `.hf-c${index} { ${run(`hf-card-${index}`)} }`,
       `.hf-k${index} { ${run(`hf-mask-${index}`)} }`,
-      `.hf-s${index} { ${run(`hf-seg-${index}`)} }`,
+      `.hf-t${index} { ${run(`hf-stamp-${index}`)} }`,
+      `.hf-m${index} { ${run(`hf-mark-${index}`)} }`,
     ]),
-    `.hf-scan { ${run("hf-scan")} }`,
-    `.hf-publish-chip { ${run("hf-press")} }`,
-    `.hf-publish-fill { ${run("hf-press-fill")} }`,
-    `.hf-label-plus { ${run("hf-plus")} }`,
+    `.hf-beam { ${run("hf-beam")} }`,
     `.hf[data-paused=true] * { animation-play-state: paused }`,
   ].join("\n");
 }
 
+/* at rest, the finished frame: the first three marks on the laptop, every card on the stack */
+const RESTING = AGENTS.map((_, index) => `.hf-m${index} { opacity: ${index < SHOWN ? 1 : 0} }`).join("\n");
+
 const STYLESHEET = [
+  RESTING,
   layoutRules(PHONE),
   layoutKeyframes(PHONE),
   sharedKeyframes(),
-  `@media (min-width: 48rem) {\n${layoutRules(WIDE)}\n${layoutKeyframes(WIDE)}\n}`,
+  `.hf-art-wide { display: none }`,
+  `@media (min-width: 48rem) {\n.hf-art-phone { display: none }\n.hf-art-wide { display: block }\n${layoutRules(WIDE)}\n${layoutKeyframes(WIDE)}\n}`,
   `@media (prefers-reduced-motion: no-preference) {\n${motionRules()}\n}`,
 ].join("\n");
 
-/* ---------- the picture ---------- */
+/* ---------- the drawing ---------- */
+
+/** The still parts, drawn in the picture's own units: the laptop, the scanner, the ground and the person. */
+function Scene({ layout, className }: { layout: Layout; className: string }) {
+  const [sx, sy, sw, sh] = layout.screen;
+  const [depth, overhang] = layout.base;
+  const [[x1, y1], [x2, y2]] = layout.scanner;
+  const [px, headY, radius, shouldersY, halfWidth] = layout.person;
+  const [, groundY] = layout.stack;
+  const [groundFrom, groundTo] = layout.ground;
+  const corner = halfWidth * 0.5;
+  const left = px - halfWidth;
+  const right = px + halfWidth;
+  return (
+    <svg className={`hf-art ${className}`} viewBox={`0 0 100 ${layout.height}`} aria-hidden="true" focusable="false">
+      <rect className="hf-line" x={sx} y={sy} width={sw} height={sh} />
+      <path
+        className="hf-line"
+        d={`M${sx} ${sy + sh} L${sx + sw} ${sy + sh} L${sx + sw + overhang} ${sy + sh + depth} L${sx - overhang} ${sy + sh + depth} Z`}
+      />
+      <line className="hf-sieve" x1={x1} y1={y1} x2={x2} y2={y2} />
+      <line className="hf-beam" x1={x1} y1={y1} x2={x2} y2={y2} />
+      <line className="hf-ground" x1={groundFrom} y1={groundY} x2={groundTo} y2={groundY} />
+      <circle className="hf-line" cx={px} cy={headY} r={radius} />
+      <path
+        className="hf-line"
+        d={`M${left} ${groundY} V${shouldersY + corner} Q${left} ${shouldersY} ${left + corner} ${shouldersY} H${right - corner} Q${right} ${shouldersY} ${right} ${shouldersY + corner} V${groundY}`}
+      />
+    </svg>
+  );
+}
 
 /**
  * The loop holds while the picture is off screen or the tab is behind another,
@@ -339,15 +362,8 @@ export function HeroFlow() {
         {STYLESHEET}
       </style>
       <div className="hf-stage" role="img" aria-label={FLOW.label}>
-        <div className="hf-zone hf-computer" />
-        <div className="hf-zone hf-commons" />
-        <span className="hf-label hf-label-computer">{FLOW.computer}</span>
-        <span className="hf-label hf-label-commons">{FLOW.commons}</span>
-
-        <div className="hf-filter">
-          <i className="hf-scan" />
-        </div>
-        <span className="hf-label hf-label-filter">{FLOW.filter}</span>
+        <Scene layout={PHONE} className="hf-art-phone" />
+        <Scene layout={WIDE} className="hf-art-wide" />
 
         {AGENTS.map((agent, index) => (
           <span key={agent.mark} className={`hf-mark hf-m${index}`}>
@@ -355,40 +371,20 @@ export function HeroFlow() {
           </span>
         ))}
 
-        <span className="hf-publish">
-          <span className="hf-publish-chip">
-            {FLOW.publish}
-            <span className="hf-publish-fill">{FLOW.publish}</span>
-          </span>
-        </span>
-
         {AGENTS.map((agent, index) => (
           <div key={agent.mark} className={`hf-card hf-c${index}`}>
             <div className="hf-card-body">
-              <span className="hf-card-head">
-                <BrandMark name={agent.mark} />
-                <i className="hf-bar" style={{ "--w": "58%" } as CSSProperties} />
-              </span>
-              <i className="hf-bar" style={{ "--w": "88%" } as CSSProperties} />
+              <BrandMark name={agent.mark} />
+              <i className="hf-bar" style={{ "--w": "80%" } as CSSProperties} />
               <span className="hf-secret">
-                <i className="hf-bar" style={{ "--w": "62%" } as CSSProperties} />
+                <i className="hf-bar" style={{ "--w": "58%" } as CSSProperties} />
                 <i className={`hf-mask hf-k${index}`} />
               </span>
-              <i className="hf-bar" style={{ "--w": "74%" } as CSSProperties} />
+              <i className="hf-bar" style={{ "--w": "70%" } as CSSProperties} />
             </div>
+            <BadgeCheck className={`hf-stamp hf-t${index}`} aria-hidden="true" focusable="false" />
           </div>
         ))}
-
-        <span className="hf-label hf-label-you">{FLOW.handle}</span>
-        <span className="hf-meter">
-          {AGENTS.map((agent, index) => (
-            <span key={agent.mark} className="hf-segment">
-              <i className={`hf-fill hf-s${index}`} />
-            </span>
-          ))}
-        </span>
-        <span className="hf-label hf-label-plus">+1</span>
-        <span className="hf-label hf-label-caption">{FLOW.caption}</span>
       </div>
       <button
         type="button"
