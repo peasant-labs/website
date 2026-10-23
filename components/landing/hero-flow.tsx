@@ -338,22 +338,23 @@ const WIDE: Layout = {
 };
 
 /*
- * A phone, at 4:5, in two tiers with the same air above and below: the
- * laptop and the stack side by side on top, the three peasants centred under
- * them; the wheat is left out, too small here to read as wheat.
+ * A phone, in two tiers with the same air above and below, held to the scene
+ * so no band of empty ground is left: the laptop and the stack side by side
+ * on top, the three peasants centred under them; the wheat is left out, too
+ * small here to read as wheat.
  */
 const PHONE: Layout = {
   name: "phone",
   width: 100,
-  height: 125,
+  height: 114,
   card: PHONE_CARD,
-  laptop: { x: 5, ground: 55, w: 40, depth: 4, deck: 2, screen: 26, bezel: 2 },
+  laptop: { x: 5, ground: 49, w: 40, depth: 4, deck: 2, screen: 26, bezel: 2 },
   marks: [11, 7],
   onScreen: 0.85,
-  crest: 22,
-  stack: { left: 62, ground: 55, base: 3, depth: 1, notch: 2 },
+  crest: 16,
+  stack: { left: 62, ground: 49, base: 3, depth: 1, notch: 2 },
   commons: {
-    ground: 99,
+    ground: 93,
     from: 23,
     gap: 4,
     members: [{ figure: PHONE_FIGURES.rake }, { figure: PHONE_FIGURES.basket, noticed: true }, { figure: PHONE_FIGURES.wave }],

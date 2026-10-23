@@ -162,8 +162,13 @@
 .lp-hero h1 {
   color: var(--ink-strong);
   font-family: var(--font-display);
-  /* the largest type on the page at every width: on a phone it still outranks the section titles */
-  font-size: clamp(2.125rem, 4vw, 3.625rem);
+  /*
+   * The largest type on the page at every width. On a narrow phone it eases
+   * just below 34px so "commons for agent" (10.6em) still fits one line and
+   * the heading reads in three even lines; it never drops under the section
+   * titles.
+   */
+  font-size: clamp(1.875rem, max(4vw, min(2.125rem, calc((100vw - 2rem) / 10.7))), 3.625rem);
   font-weight: 700;
   line-height: 1.08;
   letter-spacing: -0.01em;
