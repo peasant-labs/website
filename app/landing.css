@@ -164,6 +164,38 @@
   box-shadow: inset 0 -3px 0 var(--amber);
 }
 
+/* while the carousel plays, the chosen tab's underline fills with the time left on the slide */
+.uc-tab {
+  position: relative;
+}
+
+.uc[data-playing] .uc-tab[aria-selected="true"]:has(.uc-progress) {
+  box-shadow: inset 0 -3px 0 var(--rule-strong);
+}
+
+.uc-progress {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 3px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation-name: uc-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.uc[data-playing="false"] .uc-progress {
+  animation-play-state: paused;
+}
+
+@keyframes uc-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
 @media (max-width: 47.99rem) {
   .uc-tabs {
     gap: 0 var(--sp-5);
@@ -191,50 +223,31 @@
   text-align: center;
 }
 
+/* the stage: a window onto a track of slides, moved by transform alone */
 .uc-stage {
   min-width: 0;
+  overflow: hidden;
   touch-action: pan-y;
 }
 
-/* the stage: the picture on the left, the audience's sentence and action on the right */
+.uc-track {
+  display: flex;
+  width: 100%;
+}
+
+/* a slide: the picture on the left, the audience's sentence and action on the right */
 .uc-panel {
   display: grid;
+  flex: 0 0 100%;
   gap: var(--sp-6);
   align-items: center;
+  min-width: 0;
 }
 
 @media (min-width: 60rem) {
   .uc-panel {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: var(--sp-8);
-  }
-}
-
-.uc-panel[hidden] {
-  display: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .uc-panel {
-    animation: uc-in 520ms var(--ease-out) both;
-  }
-
-  .uc-panel[data-direction="-1"] {
-    animation-name: uc-in-back;
-  }
-}
-
-@keyframes uc-in {
-  from {
-    opacity: 0;
-    transform: translateX(1.5rem);
-  }
-}
-
-@keyframes uc-in-back {
-  from {
-    opacity: 0;
-    transform: translateX(-1.5rem);
   }
 }
 
@@ -369,16 +382,84 @@
 
 /* how it works */
 
-.hw {
-  display: grid;
-  gap: var(--sp-7) var(--sp-8);
+.lp-how {
+  padding-block: 0;
 }
 
-@media (min-width: 62.5rem) {
-  .hw {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    align-items: start;
-  }
+.hw-n {
+  flex: none;
+  width: 2.5rem;
+  color: var(--ink-4);
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.hw-step-title {
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.hw h2 {
+  color: var(--ink-strong);
+  font-family: var(--font-display);
+  font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+/*
+ * Wide screens: the section is three screens tall; its first child holds still
+ * (sticky) while the page scrolls through it, and three markers, one screen
+ * each, decide which step is current.
+ */
+.hw-scroll {
+  position: relative;
+  height: 300vh;
+  height: 300dvh;
+}
+
+.hw-pin {
+  position: sticky;
+  inset-block-start: 0;
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  height: 100dvh;
+  padding-block: 5rem var(--sp-6);
+}
+
+.hw-pin-inner {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.hw-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: var(--sp-7) var(--sp-8);
+  align-items: start;
+}
+
+.hw-marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hw-mark {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.hw-flow {
+  display: none;
 }
 
 .hw-steps {
@@ -407,23 +488,9 @@
   cursor: pointer;
 }
 
-.hw-n {
-  flex: none;
-  width: 2.5rem;
-  color: var(--ink-4);
-  font-family: var(--font-mono);
-  font-size: 2rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.hw-step-title {
-  color: var(--ink-2);
-  font-family: var(--font-mono);
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0;
+.hw-step .hw-n,
+.hw-step .hw-step-title {
+  transition: color var(--dur-2) ease;
 }
 
 .hw-step[aria-pressed="true"] .hw-n {
@@ -441,6 +508,19 @@
   line-height: 1.55;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .hw-step-body:not([hidden]) {
+    animation: hw-body-in 320ms var(--ease-out) both;
+  }
+}
+
+@keyframes hw-body-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .hw-step:hover .hw-step-title {
     color: var(--ink-strong);
@@ -454,6 +534,11 @@
 
 .hw-side {
   min-width: 0;
+}
+
+/* the window never grows taller than the held screen leaves room for */
+.hw-scroll .hw-window {
+  max-width: calc((100dvh - 19rem) * 1.6);
 }
 
 .hw-window {
@@ -472,10 +557,13 @@
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
   letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .hw-titlebar i {
   display: block;
+  flex: none;
   width: 10px;
   height: 10px;
   border: var(--bd-strong);
@@ -483,6 +571,8 @@
 
 .hw-titlebar span {
   margin-inline-start: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hw-view {
@@ -490,13 +580,6 @@
   overflow: hidden;
   aspect-ratio: 16 / 10;
   background: var(--canvas);
-  container-type: inline-size;
-}
-
-@media (max-width: 39.99rem) {
-  .hw-view {
-    aspect-ratio: 4 / 3;
-  }
 }
 
 .hw-foot {
@@ -504,6 +587,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-3);
+  min-height: var(--target-comfortable);
   padding: 2px 6px 2px 14px;
   border-top: var(--bd-strong);
   background: var(--surface-2);
@@ -537,18 +621,12 @@
   height: var(--ic-sm);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hw-replay {
-    display: none;
-  }
-}
-
 .hw-below {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-4);
-  margin-block-start: var(--sp-5);
+  margin-block-start: var(--sp-4);
 }
 
 .hw-arrows {
@@ -557,679 +635,337 @@
 }
 
 /*
- * The scenes. Resting styles are the final frame; each animation only says where
- * it starts, and runs only while the scene is playing. Everything moves with
- * transform or opacity: typing is a cover that shrinks away, the scan and the
- * cursor ride full-size tracks so their percentages are the window's own.
+ * Phones and narrow windows: the heading, then the scene window held under the
+ * header, then the three step texts scrolling beneath it. The wide layout's
+ * wrappers step aside (display: contents) so the window's sticky range is the
+ * whole section.
  */
+@media (max-width: 62.49rem) {
+  .hw-scroll {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    padding-block: clamp(4rem, 9vw, 6rem) 0;
+  }
 
-.hw-scene {
-  position: absolute;
-  inset: 0;
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: 3.2cqw;
-  font-weight: 500;
-  letter-spacing: 0;
-  line-height: 1.45;
-}
+  .hw-pin,
+  .hw-pin-inner,
+  .hw-grid {
+    display: contents;
+  }
 
+  .hw-scroll h2 {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 75rem;
+    margin-inline: auto;
+    padding-inline: var(--sp-4);
+    margin-block-end: var(--sp-5);
+  }
 
-.hw-cam {
-  position: absolute;
-  inset: 0;
-}
+  .hw-steps,
+  .hw-marks,
+  .hw-below {
+    display: none;
+  }
 
-.hw-rail {
-  display: inline-block;
-  flex: none;
-  width: 4px;
-  height: 1.2em;
-  margin-inline-end: 0.6em;
-  vertical-align: middle;
-}
+  /* held flush under the header, its own ground covering the text that scrolls beneath */
+  .hw-side {
+    position: sticky;
+    inset-block-start: 3.5rem;
+    z-index: 1;
+    box-sizing: border-box;
+    width: 100%;
+    padding: var(--sp-2) var(--sp-4) var(--sp-3);
+    background: var(--canvas);
+  }
 
-.hw-r-you {
-  background: var(--teal);
-}
+  .hw-scroll .hw-window {
+    max-width: none;
+  }
 
-.hw-r-agent {
-  background: var(--clay);
-}
+  .hw-scroll .hw-view {
+    aspect-ratio: auto;
+    height: calc(46dvh - 6rem);
+    min-height: 13rem;
+  }
 
-.hw-r-tool {
-  background: var(--mauve);
-}
+  .hw-flow {
+    display: grid;
+    margin: 0;
+    padding-block: var(--sp-5) 30vh;
+    list-style: none;
+  }
 
-@media (prefers-reduced-motion: no-preference) {
-  .hw-scene[data-playing="pending"] *,
-  .hw-scene[data-playing="pending"] *::before,
-  .hw-scene[data-playing="pending"] *::after {
-    animation-play-state: paused !important;
+  .hw-flow-step {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    align-content: center;
+    gap: var(--sp-2) var(--sp-3);
+    min-height: 55vh;
+    opacity: 0.4;
+    transition: opacity 320ms var(--ease-out);
+  }
+
+  .hw-flow-step[data-on="true"] {
+    opacity: 1;
+  }
+
+  .hw-flow-step .hw-n {
+    grid-row: span 2;
+  }
+
+  .hw-flow-step[data-on="true"] .hw-n {
+    color: var(--amber);
+  }
+
+  .hw-flow-step[data-on="true"] .hw-step-title {
+    color: var(--ink-strong);
+  }
+
+  .hw-flow-body {
+    color: var(--ink-2);
+    font-size: 1.0625rem;
+    line-height: 1.55;
   }
 }
 
-/* record */
+/* reduced motion: the steps stack, each beside its finished scene */
+.hw-stacked {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 75rem;
+  margin-inline: auto;
+  padding: clamp(5rem, 9vw, 8rem) var(--sp-6);
+}
 
-.hw-s-record {
+@media (max-width: 47.99rem) {
+  .hw-stacked {
+    padding-inline: var(--sp-4);
+  }
+}
+
+.hw-stack {
+  display: grid;
+  gap: var(--sp-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hw-stack-step {
+  display: grid;
+  gap: var(--sp-5);
+  align-items: center;
+}
+
+@media (min-width: 62.5rem) {
+  .hw-stack-step {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: var(--sp-8);
+  }
+}
+
+.hw-stack-copy {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: var(--sp-2) var(--sp-3);
+}
+
+.hw-stack-copy .hw-n {
+  grid-row: span 2;
+  color: var(--amber);
+}
+
+.hw-stack-copy .hw-step-title {
+  color: var(--ink-strong);
+}
+
+.hw-stack-copy .hw-step-body {
+  padding: 0;
+}
+
+/* ---------- the scenes: real components on a virtual screen ---------- */
+
+.scn-view {
+  position: absolute;
+  inset: 0;
+}
+
+.scn-camera {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  transform-origin: 0 0;
+}
+
+.scn-screen {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--canvas);
+  pointer-events: none;
+  user-select: none;
+}
+
+.scn-app {
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 28px 32px;
+}
+
+.scn-page-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-4);
+  margin-block-end: var(--sp-4);
+}
+
+.scn-h {
+  color: var(--ink-strong);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+}
+
+.scn-chrome {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
+}
+
+.scn-session {
+  display: grid;
+  gap: 2px;
+}
+
+.scn-session-title {
+  color: var(--ink-strong);
+  font-family: var(--font-body);
+}
+
+/* the session /peasant just recorded, marked where the scene puts it */
+.scn-table[data-fresh="true"] [data-focus="new-row"] {
+  box-shadow:
+    -12px 0 0 0 var(--surface),
+    -14px 0 0 0 var(--amber);
+}
+
+/* Claude Code, where /peasant is typed: a terminal over the browser */
+.scn-term {
+  position: absolute;
+  inset-inline-end: 32px;
+  inset-block-end: 28px;
+  width: 560px;
+  border: 1px solid var(--term-rule);
   background: var(--term-bg);
   color: var(--term-ink);
-  font-size: 3.4cqw;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0;
+  line-height: 1.5;
 }
 
-
-.hw-s-record .hw-cam {
-  transform: scale(1.1);
-  transform-origin: 0% 20%;
+.scn-term-bar {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--term-rule);
+  color: var(--term-dim);
+  font-size: 13px;
 }
 
-.hw-term {
-  position: absolute;
-  inset-inline-start: 7%;
-  inset-block-start: 12%;
+.scn-term-body {
   display: grid;
-  gap: 0.45em;
+  gap: 6px;
+  min-height: 7.5rem;
+  padding: 14px;
 }
 
-.hw-prompt {
+.scn-term-body p {
+  max-inline-size: none;
+  margin: 0;
+  letter-spacing: 0;
+  word-spacing: normal;
+  overflow-wrap: anywhere;
+}
+
+.scn-term-dim {
   color: var(--term-dim);
 }
 
-.hw-ok {
-  color: var(--term-ink);
-}
-
-.hw-typed {
-  position: relative;
+.scn-caret {
   display: inline-block;
-  white-space: nowrap;
-  vertical-align: bottom;
+  width: 0.6em;
+  height: 1.1em;
+  vertical-align: text-bottom;
+  background: var(--term-ink);
 }
 
-.hw-typed::after {
-  content: "";
-  position: absolute;
-  inset: 0 -0.1em 0 0;
-  background: var(--term-bg);
-  transform: scaleX(0);
-  transform-origin: right center;
+.scn-review .scn-panel {
+  display: grid;
+  gap: var(--sp-3);
+  max-width: 760px;
+  margin-inline: auto;
 }
 
-/* review */
-
-.hw-s-review .hw-cam {
-  transform: scale(1.08);
-  transform-origin: 35% 50%;
-}
-
-.hw-badge {
-  position: absolute;
-  inset-inline-end: 6%;
-  inset-block-start: 7%;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35em;
-  padding: 0.15em 0.55em;
-  border: 2px solid var(--ink-strong);
-  color: var(--ink-strong);
-  font-size: 0.9em;
-  font-weight: 700;
-}
-
-.hw-cnt {
-  display: inline-block;
-  height: 1.45em;
-  overflow: hidden;
-  vertical-align: bottom;
-}
-
-.hw-strip {
-  display: block;
-  transform: translateY(-4.35em);
-}
-
-.hw-strip span {
-  display: block;
-  height: 1.45em;
-  font-variant-numeric: tabular-nums;
-}
-
-.hw-row {
-  position: absolute;
-  inset-inline-start: 7%;
-  display: flex;
-  align-items: center;
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-
-.hw-red {
-  display: inline-grid;
-  margin-inline-start: 0.45em;
-}
-
-.hw-red > * {
-  grid-area: 1 / 1;
-}
-
-.hw-raw {
-  position: relative;
-  isolation: isolate;
-  padding: 0 0.15em;
-  color: var(--ink-strong);
-  opacity: 0;
-}
-
-.hw-raw::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--surface-hover);
-  opacity: 0;
-}
-
-.hw-lbl {
+.scn-publish {
   display: grid;
   place-items: center;
-  background: var(--amber);
-  color: var(--on-amber);
-  font-weight: 700;
-  transform-origin: left center;
 }
 
-.hw-scan {
+.scn-publish .scn-dialog {
+  width: 640px;
+}
+
+.scn-cursor {
   position: absolute;
-  inset-inline-start: 4%;
-  inset-block: 0;
-  width: 92%;
-  opacity: 0;
-  transform: translateY(78%);
-}
-
-.hw-scan::before {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 14%;
-  height: 2px;
-  background: var(--ink-strong);
-}
-
-/* publish */
-
-.hw-s-publish .hw-cam {
-  transform: scale(1.06);
-  transform-origin: 45% 55%;
-}
-
-.hw-dlg {
-  position: absolute;
-  inset-inline-start: 4%;
-  inset-block-start: 5%;
-  width: 92%;
-  height: 90%;
-  border: 2px solid var(--rule-strong);
-  background: var(--surface);
-}
-
-.hw-abs {
-  position: absolute;
-}
-
-.hw-ttl {
-  inset-inline-start: 10%;
-  inset-block-start: 10%;
-  color: var(--ink-strong);
-  font-size: 1.1em;
-  font-weight: 700;
-}
-
-.hw-lab {
-  inset-inline-start: 10%;
-  inset-block-start: 25%;
-  color: var(--ink-3);
-  font-size: 0.92em;
-}
-
-.hw-chip {
-  inset-inline-start: 10%;
-  inset-block-start: 34%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4em;
-  width: 32%;
-  height: 13%;
-  border: 2px solid var(--ink-strong);
-  background: var(--surface-2);
-  color: var(--ink-strong);
-  font-weight: 700;
-}
-
-.hw-chip::after,
-.hw-box::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border: 2px solid var(--rule-strong);
-  background: var(--surface);
-  opacity: 0;
-}
-
-.hw-chip::after {
-  content: "eval-crowd";
-  display: grid;
-  place-items: center;
-  color: var(--ink-3);
-}
-
-.hw-chip svg,
-.hw-box svg,
-.hw-done svg {
-  flex: none;
-  width: 1em;
-  height: 1em;
-}
-
-.hw-box {
-  inset-inline-start: 10%;
-  inset-block-start: 55%;
-  display: grid;
-  place-items: center;
-  width: 4.4%;
-  aspect-ratio: 1;
-  border: 2px solid var(--ink-strong);
-  background: var(--ink-strong);
-  color: var(--canvas);
-  font-size: 0.9em;
-}
-
-.hw-cons {
-  inset-inline-start: 17%;
-  inset-block-start: 55.5%;
-  color: var(--ink-2);
-  font-size: 0.92em;
-  white-space: nowrap;
-}
-
-.hw-done {
-  inset-inline-start: 10%;
-  inset-block-start: 77%;
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  width: 50%;
-  height: 12%;
-  padding: 0 0.6em;
-  border: 2px solid var(--rule-strong);
-  background: var(--surface-2);
-  color: var(--ink-strong);
-  font-size: 0.86em;
-  white-space: nowrap;
-}
-
-.hw-pub {
-  inset-inline-start: 64%;
-  inset-block-start: 76%;
-  display: grid;
-  place-items: center;
-  width: 26%;
-  height: 14%;
-  padding-inline: 0.5em;
-  background: var(--ink-strong);
-  color: var(--canvas);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.hw-ring {
-  position: absolute;
-  z-index: 2;
-  width: 2.6em;
-  height: 2.6em;
-  border: 3px solid var(--amber);
-  opacity: 0;
-  transform: translate(-50%, -50%);
-}
-
-.hw-g1 {
-  inset-inline-start: 26%;
-  inset-block-start: 40.5%;
-}
-
-.hw-g2 {
-  inset-inline-start: 12.2%;
-  inset-block-start: 58.5%;
-}
-
-.hw-g3 {
-  inset-inline-start: 77%;
-  inset-block-start: 83%;
-}
-
-.hw-cur-track {
-  position: absolute;
-  inset: 0;
+  inset-block-start: 0;
+  inset-inline-start: 0;
   z-index: 3;
-  transform: translate(82%, 92%);
+  width: 22px;
+  height: 22px;
+  opacity: 0;
   pointer-events: none;
 }
 
-.hw-cur {
-  position: absolute;
-  inset-inline-start: 0;
-  inset-block-start: 0;
-  width: 1.6em;
-  height: 1.6em;
+.scn-cursor svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.hw-cur path {
+.scn-cursor path {
   fill: var(--ink-strong);
   stroke: var(--canvas);
   stroke-width: 1;
 }
 
-/* a narrow window: larger type, and the publish row and button share the bottom line */
-@container (max-width: 36rem) {
-  .hw-scene {
-    font-size: 4cqw;
-  }
-
-  .hw-s-record {
-    font-size: 4.4cqw;
-  }
-
-  .hw-done {
-    width: 53%;
-    padding-inline: 0.45em;
-    font-size: 0.7em;
-  }
-
-  .hw-pub {
-    inset-inline-start: 66%;
-    width: 24%;
-  }
+.scn-press {
+  position: absolute;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border: 3px solid var(--amber);
+  opacity: 0;
+  pointer-events: none;
+  animation: scn-press 600ms var(--ease-out) both;
 }
 
-/*
- * The takes. They only exist with motion: under reduced motion no animation is
- * attached at all, so every scene rests on its final frame (all lines typed,
- * the three blocks hiding their values, the collective picked, the box ticked,
- * the confirmation shown), and the cursor, which only means something moving,
- * is left out.
- */
-@media (prefers-reduced-motion: no-preference) {
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-cam {
-    animation: hw-push 6.5s cubic-bezier(0.2, 0, 0.1, 1) both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-t1::after {
-    animation: hw-type 1.1s steps(15, end) 0.4s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-t2::after {
-    animation: hw-type 0.5s steps(8, end) 3.1s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-l2 {
-    animation: hw-rise 0.35s var(--ease-out) 1.8s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-l3 {
-    animation: hw-rise 0.35s var(--ease-out) 2.2s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-l4 {
-    animation: hw-fade 0.1s linear 2.9s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-l5 {
-    animation: hw-rise 0.35s var(--ease-out) 3.9s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-strip {
-    animation: hw-count 2.23s linear both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-raw {
-    animation: hw-raw-out 0.45s linear both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-raw::before {
-    animation: hw-raw-flash 0.45s linear both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-lbl {
-    animation: hw-block 0.25s var(--ease-out) both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-k1 .hw-raw,
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-k1 .hw-raw::before {
-    animation-delay: 0.92s;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-k1 .hw-lbl {
-    animation-delay: 1.22s;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-k2 .hw-raw,
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-k2 .hw-raw::before {
-    animation-delay: 1.42s;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-k2 .hw-lbl {
-    animation-delay: 1.72s;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-k3 .hw-raw,
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-k3 .hw-raw::before {
-    animation-delay: 1.93s;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-k3 .hw-lbl {
-    animation-delay: 2.23s;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-scan {
-    animation: hw-scan 1.8s linear 0.6s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-chip::after {
-    animation: hw-unskin 0.15s linear 1.45s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-chip svg {
-    animation: hw-pop 0.2s var(--ease-out) 1.45s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-box::after {
-    animation: hw-unskin 0.15s linear 2.65s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-done {
-    animation: hw-rise 0.4s var(--ease-out) 4.3s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-pub {
-    animation: hw-press 0.16s var(--ease-out) 3.85s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-cur-track {
-    animation: hw-cursor 4.6s cubic-bezier(0.77, 0, 0.175, 1) both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-g1 {
-    animation: hw-ring 0.6s var(--ease-out) 1.4s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-g2 {
-    animation: hw-ring 0.6s var(--ease-out) 2.6s both;
-  }
-
-  .hw-scene[data-playing]:not([data-playing="final"]) .hw-g3 {
-    animation: hw-ring 0.6s var(--ease-out) 3.85s both;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hw-cur-track,
-  .hw-ring {
-    display: none;
-  }
-}
-
-@keyframes hw-push {
-  from {
-    transform: scale(1);
-  }
-}
-
-@keyframes hw-rise {
-  from {
-    opacity: 0;
-    transform: translateY(0.4em);
-  }
-}
-
-@keyframes hw-fade {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes hw-type {
-  from {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes hw-count {
-  0%,
-  54.6% {
-    transform: translateY(0);
-  }
-  54.7%,
-  77% {
-    transform: translateY(-1.45em);
-  }
-  77.1%,
-  99.9% {
-    transform: translateY(-2.9em);
-  }
-  100% {
-    transform: translateY(-4.35em);
-  }
-}
-
-@keyframes hw-raw-out {
-  0%,
-  99% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes hw-raw-flash {
+@keyframes scn-press {
   0% {
     opacity: 0;
-  }
-  30% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  75% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes hw-block {
-  from {
-    opacity: 0;
-    transform: scaleX(0.15);
-  }
-}
-
-@keyframes hw-scan {
-  from {
-    opacity: 0.7;
-    transform: translateY(0);
-  }
-  95% {
-    opacity: 0.7;
-  }
-  to {
-    opacity: 0;
-    transform: translateY(78%);
-  }
-}
-
-@keyframes hw-unskin {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes hw-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-}
-
-@keyframes hw-press {
-  50% {
-    transform: scale(0.93);
-  }
-}
-
-@keyframes hw-ring {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.2);
+    transform: scale(0.4);
   }
   25% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.6);
-  }
-}
-
-@keyframes hw-cursor {
-  0% {
-    opacity: 0;
-    transform: translate(92%, 96%);
-  }
-  6% {
-    opacity: 1;
-  }
-  28%,
-  33% {
-    transform: translate(26%, 40.5%);
-  }
-  55%,
-  60% {
-    transform: translate(12.2%, 58.5%);
-  }
-  82%,
-  88% {
-    transform: translate(77%, 83%);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(82%, 92%);
+    transform: scale(1.6);
   }
 }
 

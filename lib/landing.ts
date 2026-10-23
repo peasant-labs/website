@@ -65,8 +65,9 @@ const SIGN_UP: UseCaseCta = { label: "sign up free", href: LOGIN_URL };
  */
 export const USE_CASES = {
   title: "find your use case",
-  /* how long each capability holds the caption before the next one fades in */
-  captionMs: 3500,
+  /* how long a slide stays before the carousel moves on, and each capability within it */
+  slideMs: 6000,
+  captionMs: 2000,
   slides: [
     {
       id: "researchers",
@@ -124,32 +125,29 @@ export const USE_CASES = {
 
 export const HOW = {
   title: "how it works",
-  /* the window's footnote: the scenes are drawings of the product, not captures of it */
+  /* the window's footnote: the scenes are the real components, trimmed to what each step needs */
   footnote: "simplified view",
   steps: [
     {
       id: "record",
       title: "record",
       body: "Peasant indexes coding agent sessions on your computer. Type /peasant in your harness to open the session in the browser.",
-      window: "terminal",
       scene:
-        "a terminal runs peasant harvest and indexes 3 sessions on this computer with nothing uploaded, then /peasant opens the session in the browser",
+        "in Claude Code, /peasant opens the session and peasant answers that it is not published; the sessions list on this computer then shows it at the top",
     },
     {
       id: "review",
       title: "review",
       body: "Before anything leaves, peasant hides secrets, personal details, file paths and internal names, and shows you exactly what it hid.",
-      window: "peasant on this computer",
       scene:
-        "a scan passes over three lines; an api key, an email address and a file path become blocks labelled secrets, pii and paths, and a badge counts 3 hidden",
+        "the redaction review finds an AWS key, an email address and a home folder path, and shows each as it will leave, replaced by its placeholder: 3 matches",
     },
     {
       id: "publish",
       title: "publish",
       body: "Share transcripts for code review, radical openness, or transparent research processes.",
-      window: "peasant on this computer",
       scene:
-        "in the publish dialog the cursor picks the eval-crowd collective, ticks share it (redacted) and presses publish; a row confirms published to eval-crowd",
+        "in the publish window, the eval-crowd collective is added to who can read it and publish is pressed; the session is published to eval-crowd",
     },
   ],
 } as const;

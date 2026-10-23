@@ -10,6 +10,12 @@ import { site } from "@/lib/site";
 import "./landing.css";
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { CSSProperties } from "react";
+
+/* the place of a revealed element among its siblings: each starts a beat after the last */
+function fade(order: number) {
+  return { "--fade-i": order } as CSSProperties;
+}
 
 export const metadata: Metadata = {
   title: { absolute: site.title },
@@ -27,10 +33,14 @@ export default function Home() {
       <main id="content" className="lp" tabIndex={-1}>
         <section className="lp-sec lp-hero" aria-labelledby="hero-title">
           <div className="site-wrap lp-hero-inner">
-            <h1 id="hero-title">{HERO.title}</h1>
-            <p className="lp-lede">{HERO.lede}</p>
-            <div className="lp-ctas">
-              <a className="btn btn-primary site-btn site-btn-xl" href={HERO.primary.href}>
+            <h1 id="hero-title" data-fade>
+              {HERO.title}
+            </h1>
+            <p className="lp-lede" data-fade style={fade(1)}>
+              {HERO.lede}
+            </p>
+            <div className="lp-ctas" data-fade style={fade(2)}>
+              <a className="btn btn-primary site-btn site-btn-xl" href={HERO.primary.href} data-hero-install>
                 {HERO.primary.label}
               </a>
               <a className="btn btn-secondary site-btn site-btn-xl" href={HERO.secondary.href}>
@@ -43,21 +53,22 @@ export default function Home() {
 
         <section id="uses" className="lp-sec" aria-labelledby="uses-title">
           <div className="site-wrap lp-stack">
-            <h2 id="uses-title">{USE_CASES.title}</h2>
+            <h2 id="uses-title" data-fade>
+              {USE_CASES.title}
+            </h2>
             <UseCases />
           </div>
         </section>
 
-        <section id="how" className="lp-sec" aria-labelledby="how-title">
-          <div className="site-wrap lp-stack">
-            <h2 id="how-title">{HOW.title}</h2>
-            <HowItWorks />
-          </div>
+        <section id="how" className="lp-sec lp-how" aria-labelledby="how-title">
+          <HowItWorks title={HOW.title} />
         </section>
 
         <section id="install" className="lp-sec" aria-labelledby="install-title">
           <div className="site-wrap lp-stack lp-install">
-            <h2 id="install-title">{INSTALL.title}</h2>
+            <h2 id="install-title" data-fade>
+              {INSTALL.title}
+            </h2>
             <div className="lp-install-body">
               <GetStarted />
               <Link className="site-link lp-install-guide" href={INSTALL.guide.href}>
@@ -69,7 +80,9 @@ export default function Home() {
 
         <section id="session" className="lp-sec" aria-labelledby="session-title">
           <div className="site-wrap lp-stack lp-session">
-            <h2 id="session-title">{SESSION.title}</h2>
+            <h2 id="session-title" data-fade>
+              {SESSION.title}
+            </h2>
             <TranscriptDemo label={SESSION.label} session={SAMPLE_SESSION} />
             <p className="lp-note">{SESSION.note}</p>
           </div>
@@ -78,10 +91,15 @@ export default function Home() {
         <section className="lp-sec lp-vision" aria-labelledby="vision-line">
           <Art art={VISION.art} className="lp-vision-art" />
           <div className="site-wrap lp-vision-inner">
-            <p id="vision-line" className="lp-vision-line">
+            <p id="vision-line" className="lp-vision-line" data-fade>
               {VISION.line}
             </p>
-            <Link className="btn btn-primary site-btn site-btn-xl" href={VISION.cta.href}>
+            <Link
+              className="btn btn-primary site-btn site-btn-xl"
+              href={VISION.cta.href}
+              data-fade
+              style={fade(1)}
+            >
               {VISION.cta.label}
             </Link>
           </div>
