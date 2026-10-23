@@ -2,6 +2,7 @@
 
 import { Art } from "@/components/art";
 import { LandingIcon } from "@/components/landing/icons";
+import { withCommands } from "@/components/landing/inline-code";
 import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
 import { USE_CASES, type Capability, type UseCase } from "@/lib/landing";
 import { ArrowRight } from "@peasant-labs/fairtrade/icons";
@@ -174,7 +175,7 @@ export function UseCases() {
                 {useCase.label}
               </p>
               <h3 className="uc-cap-text">{capability.text}</h3>
-              <p className="uc-cap-detail">{capability.detail}</p>
+              <p className="uc-cap-detail">{withCommands(capability.detail)}</p>
               <a className="uc-cta" href={useCase.cta.href} tabIndex={clone ? -1 : undefined}>
                 {useCase.cta.label}
                 <ArrowRight aria-hidden="true" focusable="false" />

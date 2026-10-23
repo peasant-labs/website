@@ -5,6 +5,17 @@
 
 /* ---------- landing ---------- */
 
+/* a command named in the copy is set as code and never breaks across lines */
+.lp-nowrap {
+  white-space: nowrap;
+}
+
+.lp-cmd {
+  font-family: var(--font-mono);
+  font-size: 0.94em;
+  letter-spacing: 0;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .gs-copy,
   .gs-os-tab,
@@ -642,10 +653,14 @@
  * (sticky) while the page scrolls through it, and three markers, one screen
  * each, decide which step is current.
  */
+/*
+ * The section is held for 1.2 screens of scroll, 0.4 of a screen per step:
+ * enough for each step to read, short enough that a flick carries past it.
+ */
 .hw-scroll {
   position: relative;
-  height: 300vh;
-  height: 300dvh;
+  height: 220vh;
+  height: 220dvh;
 }
 
 .hw-pin {

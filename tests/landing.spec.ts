@@ -211,7 +211,9 @@ test("the use cases are one row of all twelve capabilities, each tagged with its
   expect(await clones.evaluateAll((items) => items.every((item) => item.hasAttribute("inert")))).toBe(true);
 
   // every headline and every description is in the page as served, for search engines and readers without script
+  // (read as text: a command in the words is set in its own code element)
   const served = (await (await page.request.get("/")).text())
+    .replace(/<[^>]*>/g, "")
     .replaceAll("&#x27;", "'")
     .replaceAll("&quot;", '"')
     .replaceAll("&amp;", "&");
@@ -453,6 +455,10 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
   // (the buttons drawn inside a scene are part of its picture, which nobody can tab into)
   await expect(page.locator("#how .hw-window button:not(.scn-screen *)")).toHaveCount(0);
   await expect(page.locator(".hw-step-body")).toHaveText(fixture.how.steps.map((step) => step.body));
+  // a command named in the copy is code that never breaks across lines
+  const command = page.locator(".hw-step-body .lp-nowrap").first();
+  await expect(command.locator("code")).toHaveText("/peasant");
+  expect(await command.evaluate((element) => getComputedStyle(element).whiteSpace)).toBe("nowrap");
   const list = page.locator(".hw-steps");
   let listHeight: number | null = null;
 
@@ -524,7 +530,8 @@ test("scrolling walks the held section through steps 1, 2 and 3, then lets the p
   await expect(page.locator("#how :is([role=progressbar], .rail, .hw-cue):not(.scn-screen *)")).toHaveCount(0);
   const fills = page.locator(".hw-step-fill");
   await expect(fills).toHaveCount(fixture.how.steps.length);
-  for (const [index, offset] of [0.2, 1.2, 2.2].entries()) {
+  // the section is held for 1.2 screens, 0.4 of a screen per step: the middle of each step's third, then past it
+  for (const [index, offset] of [0.2, 0.6, 1.0].entries()) {
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * offset);
     await expect(steps.nth(index)).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".hw-window")).toBeInViewport();
@@ -536,7 +543,7 @@ test("scrolling walks the held section through steps 1, 2 and 3, then lets the p
       .toEqual(fixture.how.steps.map((_, at) => at === index));
   }
   // after the third step the section lets go and the next one arrives
-  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * 3.2);
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * 2.2);
   await expect(page.locator("#session")).toBeInViewport();
 });
 
@@ -584,7 +591,7 @@ test("on a phone the scene holds under the header with the steps right under it,
   await expect(items).toHaveCount(fixture.how.steps.length);
   const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
   const height = page.viewportSize()!.height;
-  for (const [index, offset] of [0.2, 1.2, 1.9].entries()) {
+  for (const [index, offset] of [0.2, 0.6, 1.0].entries()) {
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + height * offset);
     await expect(items.nth(index)).toHaveAttribute("data-on", "true");
     await expect

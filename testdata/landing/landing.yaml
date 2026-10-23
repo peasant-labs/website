@@ -105,11 +105,11 @@ useCases:
 how:
   steps:
     - title: record
-      body: Peasant indexes coding agent sessions on your computer. Type /peasant in your harness to open the session in the browser.
+      body: Peasant saves every coding agent session on your computer. Type /peasant in Claude Code to open it in your browser.
     - title: review
-      body: Before anything leaves, peasant hides secrets, personal details, file paths and internal names, and shows you exactly what it hid.
+      body: Before anything leaves your computer, peasant hides keys, personal details, file paths and project names, and shows you what it hid.
     - title: publish
-      body: Share transcripts for code review, radical openness, or transparent research processes.
+      body: Pick who can read it, like your team or a research group, and publish. Nothing leaves until you do.
   publishLabel: publish
   # what each scene shows on its finished frame, read from the real components
   finals:

@@ -205,7 +205,7 @@ export const USE_CASES = {
         {
           text: "explain a change in one comment",
           detail:
-            "Comment /peasant attach on a pull request, then confirm, to link your transcripts that match its commits.",
+            "Comment `/peasant attach` on a pull request, then confirm, to link your transcripts that match its commits.",
           icon: "link",
           art: capabilityArt("uc-door", "an arched door with an amber note pinned to it"),
         },
@@ -258,7 +258,7 @@ export const HOW = {
       id: "record",
       title: "record",
       icon: "record",
-      body: "Peasant indexes coding agent sessions on your computer. Type /peasant in your harness to open the session in the browser.",
+      body: "Peasant saves every coding agent session on your computer. Type `/peasant` in Claude Code to open it in your browser.",
       scene:
         "in Claude Code in Terminal, /peasant is typed and peasant answers that it opened the session, not published; Safari then comes forward on the session's page, with publish as its one action",
     },
@@ -266,7 +266,7 @@ export const HOW = {
       id: "review",
       title: "review",
       icon: "review",
-      body: "Before anything leaves, peasant hides secrets, personal details, file paths and internal names, and shows you exactly what it hid.",
+      body: "Before anything leaves your computer, peasant hides keys, personal details, file paths and project names, and shows you what it hid.",
       scene:
         "the redaction review finds an AWS key, an email address and a home folder path, and shows each as it will leave, replaced by its placeholder: 3 matches",
     },
@@ -274,7 +274,7 @@ export const HOW = {
       id: "publish",
       title: "publish",
       icon: "send",
-      body: "Share transcripts for code review, radical openness, or transparent research processes.",
+      body: "Pick who can read it, like your team or a research group, and publish. Nothing leaves until you do.",
       scene:
         "on the session's page, publish opens the publish window; the eval-crowd collective is added to who can read it and publish is pressed; the window closes and the session is published to eval-crowd",
     },

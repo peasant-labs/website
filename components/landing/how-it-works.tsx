@@ -6,6 +6,7 @@ import { REVIEW_SCENE } from "@/components/landing/scenes/review";
 import { SceneStage, type SceneDefinition } from "@/components/landing/scenes/stage";
 import { useHeldProgress, useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
 import { LandingIcon } from "@/components/landing/icons";
+import { withCommands } from "@/components/landing/inline-code";
 import { HOW } from "@/lib/landing";
 import { useLayoutEffect, useRef, useState } from "react";
 
@@ -124,7 +125,7 @@ export function HowItWorks({ title }: { title: string }) {
               <div className="hw-stack-copy">
                 <LandingIcon name={step.icon} className="hw-ic" />
                 <h3 className="hw-step-title">{step.title}</h3>
-                <p className="hw-step-body">{step.body}</p>
+                <p className="hw-step-body">{withCommands(step.body)}</p>
               </div>
               <div className="hw-window">
                 <div className="hw-view" role="img" aria-label={step.scene} data-scene={SCENES[index]!.id}>
@@ -167,7 +168,7 @@ export function HowItWorks({ title }: { title: string }) {
                     <span className="hw-step-fill" aria-hidden="true" />
                     <div className="hw-step-more" id={`hw-more-${step.id}`}>
                       <div className="hw-step-clip">
-                        <p className="hw-step-body">{step.body}</p>
+                        <p className="hw-step-body">{withCommands(step.body)}</p>
                       </div>
                     </div>
                   </li>
