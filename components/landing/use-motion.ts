@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore, type RefObject } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 
 const REDUCE = "(prefers-reduced-motion: reduce)";
 
@@ -46,4 +46,46 @@ export function useOnScreen(ref: RefObject<Element | null>, threshold = 0.25) {
   }, []);
 
   return inView && pageVisible;
+}
+
+/**
+ * How far the page has scrolled through a held section: 0 as it takes hold,
+ * 1 as it lets go. The section is the tall element whose child sticks; while
+ * the child is held, the page scrolls through the section's extra height.
+ * Calls `onProgress` once per frame while the page moves, never in between.
+ */
+export function useHeldProgress(
+  section: RefObject<HTMLElement | null>,
+  onProgress: (progress: number, held: boolean) => void,
+  enabled = true,
+) {
+  const listener = useRef(onProgress);
+  useEffect(() => {
+    listener.current = onProgress;
+  });
+
+  useEffect(() => {
+    if (!enabled) return;
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      const element = section.current;
+      if (!element) return;
+      const box = element.getBoundingClientRect();
+      const room = Math.max(1, box.height - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, -box.top / room));
+      listener.current(progress, box.top <= 1 && box.bottom >= window.innerHeight - 1);
+    };
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [section, enabled]);
 }

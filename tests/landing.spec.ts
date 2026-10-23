@@ -486,9 +486,10 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
   await expect(page.locator("#how .hw-count")).toHaveCount(0);
   await expect(page.locator("#how").getByRole("button", { name: /step$/ })).toHaveCount(0);
   await expect(page.locator("#how")).not.toContainText("simplified view");
-  // replay is the icon alone, named for assistive technology
-  const replay = page.locator("#how").getByRole("button", { name: "replay" });
-  await expect(replay).toHaveText("");
+  // the scenes have no controls of their own: no replay, pause or resume
+  await expect(page.locator("#how").getByRole("button", { name: /replay|pause|resume|play/ })).toHaveCount(0);
+  // (the buttons drawn inside a scene are part of its picture, which nobody can tab into)
+  await expect(page.locator("#how .hw-window button:not(.scn-screen *)")).toHaveCount(0);
   await expect(page.locator(".hw-step-body")).toHaveText(fixture.how.steps.map((step) => step.body));
   const list = page.locator(".hw-steps");
   let listHeight: number | null = null;
@@ -556,38 +557,59 @@ test("scrolling walks the held section through steps 1, 2 and 3, then lets the p
   await page.goto("/");
   const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
   const steps = page.locator(".hw-step");
-  const rail = page.getByRole("progressbar", { name: "how far through how it works" });
-  const marks = rail.locator(".rail-mark");
-  // on the way in, a cue says there is more below
-  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 2);
-  await expect(page.locator(".hw-scroll")).toHaveAttribute("data-cue", "show");
-  await expect(page.locator(".hw-cue")).toHaveAttribute("aria-label", /scroll/);
-  let last = -1;
+  // one sign of the scroll: the current step's bar along its rule, and no other progress or cue
+  // (the scan bar drawn inside the review scene is part of its picture)
+  await expect(page.locator("#how :is([role=progressbar], .rail, .hw-cue):not(.scn-screen *)")).toHaveCount(0);
+  const fills = page.locator(".hw-step-fill");
+  await expect(fills).toHaveCount(fixture.how.steps.length);
   for (const [index, offset] of [0.2, 1.2, 2.2].entries()) {
     await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * offset);
     await expect(steps.nth(index)).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".hw-window")).toBeInViewport();
-    // the held section shows it is moving: the rail fills, and a mark lights for each step reached
-    await expect
-      .poll(async () => Number(await rail.getAttribute("aria-valuenow")))
-      .toBeGreaterThan(last);
-    last = Number(await rail.getAttribute("aria-valuenow"));
-    for (const [at] of fixture.how.steps.entries()) {
-      await expect(marks.nth(at)).toHaveAttribute("data-reached", at <= index ? "true" : "false");
-    }
-    // and the current step's own bar fills with its third
-    const own = await page
-      .locator(".hw-steps > li")
-      .nth(index)
-      .locator(".hw-step-fill")
-      .evaluate((fill) => new DOMMatrix(getComputedStyle(fill).transform).a);
+    // the current step's bar shows how far into its third the scroll is, and only its bar shows
+    const own = await fills.nth(index).evaluate((fill) => new DOMMatrix(getComputedStyle(fill).transform).a);
     expect(own).toBeGreaterThan(0);
-    // the first scroll put the cue away
-    await expect(page.locator(".hw-scroll")).toHaveAttribute("data-cue", "gone");
+    await expect
+      .poll(() => fills.evaluateAll((all) => all.map((fill) => getComputedStyle(fill).opacity !== "0")))
+      .toEqual(fixture.how.steps.map((_, at) => at === index));
   }
   // after the third step the section lets go and the next one arrives
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * 3.2);
   await expect(page.locator("#session")).toBeInViewport();
+});
+
+test("a scene plays only while it can be seen, and holds where it is under the reader's pointer or focus", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * 0.2);
+  const view = page.locator(".hw-scroll .hw-view");
+  const take = page.locator('.hw-layer[data-on="true"] .scn-view');
+  await expect(take).toHaveAttribute("data-paused", "false");
+  // the screen is one described image, and it takes focus so a keyboard can hold it
+  await expect(view).toHaveAttribute("role", "img");
+  await expect(view).toHaveAttribute("tabindex", "0");
+  const pointer = page.locator('.hw-layer[data-on="true"] .scn-cursor');
+  const where = () => pointer.evaluate((cursor) => cursor.style.transform + getComputedStyle(cursor).transform);
+
+  await view.hover();
+  await expect(take).toHaveAttribute("data-paused", "true");
+  const held = await where();
+  await page.waitForTimeout(900);
+  expect(await where(), "the take moved while the pointer held it").toBe(held);
+  await page.mouse.move(0, 0);
+  await expect(take).toHaveAttribute("data-paused", "false");
+
+  await view.focus();
+  await expect(take).toHaveAttribute("data-paused", "true");
+  await view.blur();
+  await expect(take).toHaveAttribute("data-paused", "false");
+
+  // scrolled away, it holds too
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await expect(page.locator('.hw-layer[data-on="true"] .scn-view')).toHaveAttribute("data-paused", "true");
 });
 
 test("on a phone the scene holds under the header with the steps right under it, one open at a time", async ({

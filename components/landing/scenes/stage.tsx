@@ -161,7 +161,11 @@ export function SceneStage({
   reduced,
 }: {
   scene: SceneDefinition;
-  /** false holds the scene on its first frame until it can be seen; once started, a take runs to its end */
+  /**
+   * The take plays while this is true: it starts the first time the scene can
+   * be seen, and holds exactly where it is whenever it is false (off screen,
+   * or the reader's pointer or focus on it), then carries on.
+   */
   playing: boolean;
   reduced: boolean;
 }) {
@@ -170,8 +174,10 @@ export function SceneStage({
   const screenRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const flipFrom = useRef(new Map<string, { x: number; y: number }>());
+  const holdTake = useRef<((held: boolean) => void) | null>(null);
+  const playingNow = useRef(playing);
   const [phase, setPhase] = useState(reduced ? scene.finalPhase : 0);
-  // A take starts the first time the scene can be seen, and is not stopped by scrolling away.
+  // A take starts the first time the scene can be seen; after that, it holds while it cannot be.
   const [started, setStarted] = useState(false);
   if (playing && !started && !reduced) setStarted(true);
 
@@ -242,15 +248,47 @@ export function SceneStage({
     flipFrom.current = now;
   }, [phase, reduced, started]);
 
+  // Hold the take, and the scene's own short animations, whenever it is not playing.
+  useEffect(() => {
+    playingNow.current = playing;
+    holdTake.current?.(!playing);
+    const view = viewRef.current;
+    if (view) view.dataset.paused = String(!playing);
+  }, [playing]);
+
   // One take: the scene's beats, the camera moves and the cursor, on one clock.
   useEffect(() => {
     if (reduced || !started) return;
     const camera = cameraRef.current;
     const cursor = cursorRef.current;
     if (!camera) return;
-    const timers: number[] = [];
     const running = new Set<Animation>();
-    const at = (ms: number, run: () => void) => timers.push(window.setTimeout(run, ms));
+    /*
+     * The take's clock runs on animation frames and stands still while the take
+     * is held, so every beat, camera move and pointer move resumes exactly where
+     * it stopped; the moves already under way pause with it.
+     */
+    const pending: { at: number; run: () => void }[] = [];
+    let elapsed = 0;
+    let last = performance.now();
+    let held = !playingNow.current;
+    let tick = 0;
+    const advance = (now: number) => {
+      if (!held) elapsed += now - last;
+      last = now;
+      pending.sort((a, b) => a.at - b.at);
+      while (pending.length && pending[0]!.at <= elapsed) pending.shift()!.run();
+      tick = pending.length ? window.requestAnimationFrame(advance) : 0;
+    };
+    const at = (ms: number, run: () => void) => {
+      pending.push({ at: ms, run });
+      if (!tick) tick = window.requestAnimationFrame(advance);
+    };
+    const later = (ms: number, run: () => void) => at(elapsed + ms, run);
+    holdTake.current = (hold) => {
+      held = hold;
+      running.forEach((animation) => (hold ? animation.pause() : animation.play()));
+    };
 
     for (const cue of scene.cues) at(cue.at, () => setPhase(cue.phase));
 
@@ -320,7 +358,7 @@ export function SceneStage({
           }
           // leaving a text field, the I-beam turns back into the arrow a moment after setting off
           if (cursor.dataset.shape !== "arrow" && cue.shape !== "ibeam") {
-            timers.push(window.setTimeout(() => (cursor.dataset.shape = "arrow"), cue.move * 0.15));
+            later(cue.move * 0.15, () => (cursor.dataset.shape = "arrow"));
           }
           const travel = cursor.animate(frames, { duration: cue.move, easing: EASE_GLIDE, fill: "forwards" });
           running.add(travel);
@@ -335,29 +373,28 @@ export function SceneStage({
             }
             if (!cue.press) return;
             // after a short hover, a click: the pointer dips and the control gives way under it
-            timers.push(
-              window.setTimeout(() => {
-                for (const [element, depth] of [
-                  [cursor.querySelector<HTMLElement>(".scn-pointer"), 0.82],
-                  [target, 0.97],
-                ] as const) {
-                  if (!element) continue;
-                  const press = element.animate(
-                    [{ transform: "scale(1)" }, { transform: `scale(${depth})` }, { transform: "scale(1)" }],
-                    { duration: 240, easing: EASE_SETTLE },
-                  );
-                  running.add(press);
-                  press.onfinish = () => running.delete(press);
-                }
-              }, cue.hover ?? 200),
-            );
+            later(cue.hover ?? 200, () => {
+              for (const [element, depth] of [
+                [cursor.querySelector<HTMLElement>(".scn-pointer"), 0.82],
+                [target, 0.97],
+              ] as const) {
+                if (!element) continue;
+                const press = element.animate(
+                  [{ transform: "scale(1)" }, { transform: `scale(${depth})` }, { transform: "scale(1)" }],
+                  { duration: 240, easing: EASE_SETTLE },
+                );
+                running.add(press);
+                press.onfinish = () => running.delete(press);
+              }
+            });
           };
         });
       }
     }
 
     return () => {
-      timers.forEach((timer) => window.clearTimeout(timer));
+      window.cancelAnimationFrame(tick);
+      holdTake.current = null;
       running.forEach((animation) => animation.cancel());
       camera.querySelectorAll<HTMLElement>("[data-hover]").forEach((element) => delete element.dataset.hover);
     };
@@ -378,6 +415,10 @@ export function SceneStage({
               <path d="M1.5 1.4v16.1l3.9-3.7 2.5 5.9 2.8-1.2-2.5-5.8h5.4z" />
             </svg>
             <svg className="scn-pointer scn-ibeam" viewBox="0 0 10 20">
+              <path
+                className="scn-ibeam-edge"
+                d="M1.5 1.5h2c.8 0 1.5.5 1.5 1.2 0-.7.7-1.2 1.5-1.2h2M5 2.7v14.6M1.5 18.5h2c.8 0 1.5-.5 1.5-1.2 0 .7.7 1.2 1.5 1.2h2"
+              />
               <path d="M1.5 1.5h2c.8 0 1.5.5 1.5 1.2 0-.7.7-1.2 1.5-1.2h2M5 2.7v14.6M1.5 18.5h2c.8 0 1.5-.5 1.5-1.2 0 .7.7 1.2 1.5 1.2h2" />
             </svg>
           </div>

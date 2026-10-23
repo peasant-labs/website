@@ -8,8 +8,7 @@
 @media (prefers-reduced-motion: no-preference) {
   .gs-copy,
   .gs-os-tab,
-  .hw-step,
-  .hw-replay {
+  .hw-step {
     transition:
       transform var(--dur-2) var(--ease-out),
       background-color var(--dur-2) ease,
@@ -23,8 +22,7 @@
   }
 
   .uc-seg:active,
-  .gs-copy:active,
-  .hw-replay:active {
+  .gs-copy:active {
     transform: scale(0.97);
   }
 }
@@ -859,11 +857,6 @@
   .hw-step:hover .hw-step-title {
     color: var(--ink-strong);
   }
-
-  .hw-replay:hover {
-    border-color: var(--rule-strong);
-    color: var(--ink-strong);
-  }
 }
 
 .hw-side {
@@ -907,59 +900,7 @@
     visibility 0s;
 }
 
-.hw-foot {
-  display: flex;
-  justify-content: flex-end;
-  margin-inline-end: -10px;
-}
-
-/*
- * The held section's progress, so it never looks frozen: a slim rail under the
- * scene fills with the scroll and lights a mark at the start of each step's
- * third (components/landing/scroll-rail.tsx, for any held section); the
- * current step's bar, along its bottom rule, fills with its own third.
- */
-.rail {
-  position: relative;
-  height: 9px;
-}
-
-.rail-track {
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 3px;
-  height: 3px;
-  overflow: hidden;
-  background: var(--rule);
-}
-
-.rail-fill {
-  position: absolute;
-  inset: 0;
-  background: var(--amber);
-  transform: scaleX(0);
-  transform-origin: left center;
-}
-
-.rail-mark {
-  position: absolute;
-  inset-block-start: 0;
-  box-sizing: border-box;
-  width: 9px;
-  height: 9px;
-  border: 2px solid var(--rule-strong);
-  background: var(--canvas);
-}
-
-.rail-mark[data-reached="true"] {
-  border-color: var(--amber);
-  background: var(--amber);
-}
-
-.hw-rail {
-  margin-block-start: var(--sp-3);
-}
-
+/* the one sign the held section is moving: the current step's bar, along its bottom rule, fills with its third */
 .hw-steps > li {
   position: relative;
 }
@@ -980,71 +921,23 @@
   opacity: 1;
 }
 
-/* on the way in, a small cue says there is more below; the first scroll puts it away for good */
-.hw-cue {
-  position: absolute;
-  inset-block-end: var(--sp-4);
-  inset-inline-start: 50%;
-  display: grid;
-  place-items: center;
-  width: var(--target-comfortable);
-  height: var(--target-comfortable);
-  color: var(--ink-3);
-  opacity: 0;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.hw-cue svg {
-  width: var(--ic-lg);
-  height: var(--ic-lg);
-}
-
-.hw-scroll[data-cue="show"] .hw-cue {
-  opacity: 1;
-}
-
 @media (prefers-reduced-motion: no-preference) {
-  .rail-mark,
   .hw-step-fill {
-    transition:
-      background-color 200ms ease,
-      border-color 200ms ease,
-      opacity 200ms ease;
-  }
-
-  .hw-cue {
-    transition: opacity 320ms var(--ease-out);
-  }
-
-  .hw-cue svg {
-    animation: hw-cue 1400ms var(--ease-in-out) infinite alternate;
+    transition: opacity 200ms ease;
   }
 }
 
-@keyframes hw-cue {
-  to {
-    transform: translateY(5px);
-  }
+/* the screen takes focus, so a keyboard can hold its take; the ring sits just inside its edge */
+.hw-scroll .hw-view:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
-/* replay: the icon alone, named for assistive technology */
-.hw-replay {
-  display: inline-grid;
-  place-items: center;
-  width: var(--target-comfortable);
-  height: var(--target-comfortable);
-  padding: 0;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--ink-2);
-  cursor: pointer;
+/* a held take holds the scene's own short animations too, whatever their rule sets */
+.scn-view[data-paused="true"] :is(*, *::before, *::after) {
+  animation-play-state: paused !important;
 }
 
-.hw-replay svg {
-  width: var(--ic-md);
-  height: var(--ic-md);
-}
 
 /*
  * Phones and narrow windows hold the same way: the scene on top and the steps
@@ -1064,11 +957,7 @@
 
   .hw-grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
-  }
-
-  .hw-rail {
-    margin-block-start: 6px;
+    gap: 12px;
   }
 
   .hw-side {
@@ -1107,21 +996,6 @@
     :root:has(.hw-scroll[data-holding="true"]) .site-bar[data-hidden="true"] {
       transform: none;
     }
-  }
-
-  /* replay sits on the scene's corner, so nothing stands between the scene and the steps under it */
-  .hw-scroll .hw-foot {
-    position: absolute;
-    inset-block-end: 6px;
-    inset-inline-end: 6px;
-    margin: 0;
-  }
-
-  .hw-scroll .hw-replay {
-    width: 2.25rem;
-    height: 2.25rem;
-    border-color: var(--rule);
-    background: color-mix(in srgb, var(--canvas) 88%, transparent);
   }
 }
 
@@ -2007,7 +1881,12 @@
   fill: none;
   stroke: #000;
   stroke-width: 1.2;
-  filter: drop-shadow(0 0 0.8px #fff) drop-shadow(0 0 0.6px #fff);
+}
+
+/* the white edge under the black I-beam, so it reads on a dark terminal as on a light page */
+.scn-ibeam .scn-ibeam-edge {
+  stroke: #fff;
+  stroke-width: 3;
 }
 
 .scn-cursor:not([data-shape="ibeam"]) .scn-ibeam,

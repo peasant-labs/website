@@ -4,18 +4,12 @@ import { PUBLISH_SCENE } from "@/components/landing/scenes/publish";
 import { RECORD_SCENE } from "@/components/landing/scenes/record";
 import { REVIEW_SCENE } from "@/components/landing/scenes/review";
 import { SceneStage, type SceneDefinition } from "@/components/landing/scenes/stage";
-import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
+import { useHeldProgress, useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
 import { LandingIcon } from "@/components/landing/icons";
-import { ScrollRail, useHeldProgress } from "@/components/landing/scroll-rail";
 import { HOW } from "@/lib/landing";
-import { ChevronDown, RotateCcw } from "@peasant-labs/fairtrade/icons";
 import { useLayoutEffect, useRef, useState } from "react";
 
 const SCENES: readonly SceneDefinition[] = [RECORD_SCENE, REVIEW_SCENE, PUBLISH_SCENE];
-/* replay fades the scene all the way out before the fresh take fades in: the layer's fade is 420ms */
-/* how far into the held section the first scroll puts away the "there is more" cue */
-const CUE_GONE = 0.03;
-const REWIND_MS = 440;
 
 /**
  * How it works, told by scrolling. The section holds still while the page
@@ -23,10 +17,13 @@ const REWIND_MS = 440;
  * as it becomes the current one; after the third the page simply carries on.
  * Nothing hijacks the scroll: the section's scroll is cut in thirds, one per
  * step, so momentum, the keyboard and the scroll bar all work as usual.
- * Choosing a step scrolls to it. So the held section never looks frozen, a
- * rail under the scene fills with the scroll and lights a mark per step, the
- * current step's own bar fills with its third, and on the way in a small cue
- * says there is more below until the first scroll puts it away.
+ * Choosing a step scrolls to it. So the held section never looks frozen, the
+ * current step's bar, along its bottom rule, fills with its third.
+ *
+ * The scenes have no controls: a take plays only while its screen can be
+ * seen, and holds where it is while the reader's pointer or keyboard focus is
+ * on it. The screen is one image to assistive technology, described by the
+ * step at hand, and it takes focus so a keyboard can hold it too.
  *
  * The steps show their titles; only the current one opens its description,
  * and the last one closes as it does, both on one height transition. The list
@@ -49,8 +46,8 @@ export function HowItWorks({ title }: { title: string }) {
   const [active, setActive] = useState(0);
   /* one take counter per scene: a scene starts a fresh take each time it becomes current, and on replay */
   const [takes, setTakes] = useState<readonly number[]>(() => SCENES.map(() => 0));
-  /* replay dips the current scene out and back in on a fresh take, rather than cutting to its first frame */
-  const [rewinding, setRewinding] = useState(false);
+  /* the reader's pointer or keyboard focus on the screen holds the take where it is */
+  const [held, setHeld] = useState({ hover: false, focus: false });
   const [shown, setShown] = useState(active);
   if (shown !== active) {
     setShown(active);
@@ -62,11 +59,10 @@ export function HowItWorks({ title }: { title: string }) {
   const stepsRef = useRef<HTMLOListElement>(null);
   const onScreen = useOnScreen(windowRef, 0.4);
 
-  // The scroll through the held section is cut in thirds, one per step; the current step's third fills
-  // its own bar, and the page's first scroll into it puts away the cue that says there is more.
+  // The scroll through the held section is cut in thirds, one per step; the current step's third fills its own bar.
   useHeldProgress(
     rootRef,
-    (progress, held) => {
+    (progress, sectionHeld) => {
       setActive(Math.min(SCENES.length - 1, Math.floor(progress * SCENES.length)));
       const root = rootRef.current;
       if (!root) return;
@@ -75,11 +71,8 @@ export function HowItWorks({ title }: { title: string }) {
         fill.style.transform = `scaleX(${own})`;
       });
       // while the section is held, the header it sits under stays (see app/landing.css)
-      const holding = held || (root.getBoundingClientRect().top <= 0 && progress < 1);
+      const holding = sectionHeld || (root.getBoundingClientRect().top <= 0 && progress < 1);
       if (root.dataset.holding !== String(holding)) root.dataset.holding = String(holding);
-      const near = root.getBoundingClientRect().top <= window.innerHeight * 0.25;
-      if (progress > CUE_GONE) root.dataset.cue = "gone";
-      else if (root.dataset.cue !== "gone") root.dataset.cue = near ? "show" : "wait";
     },
     !reduced,
   );
@@ -184,53 +177,41 @@ export function HowItWorks({ title }: { title: string }) {
 
             <div className="hw-side" ref={windowRef}>
               <div className="hw-window" id="hw-window">
-                <div className="hw-view" role="img" aria-label={current.scene} data-scene={current.id}>
+                <div
+                  className="hw-view"
+                  role="img"
+                  aria-label={current.scene}
+                  data-scene={current.id}
+                  tabIndex={0}
+                  onPointerEnter={(event) => {
+                    if (event.pointerType === "mouse") setHeld((value) => ({ ...value, hover: true }));
+                  }}
+                  onPointerLeave={(event) => {
+                    if (event.pointerType === "mouse") setHeld((value) => ({ ...value, hover: false }));
+                  }}
+                  onFocus={() => setHeld((value) => ({ ...value, focus: true }))}
+                  onBlur={() => setHeld((value) => ({ ...value, focus: false }))}
+                >
                   {SCENES.map((scene, index) => (
                     <div
                       key={scene.id}
                       className="hw-layer"
                       data-scene={scene.id}
-                      data-on={index === active && !rewinding ? "true" : "false"}
+                      data-on={index === active ? "true" : "false"}
                     >
                       <SceneStage
                         key={takes[index]}
                         scene={scene}
-                        playing={index === active && onScreen}
+                        playing={index === active && onScreen && !held.hover && !held.focus}
                         reduced={false}
                       />
                     </div>
                   ))}
                 </div>
-                <ScrollRail
-                  section={rootRef}
-                  marks={SCENES.length}
-                  label="how far through how it works"
-                  className="hw-rail"
-                />
-                <div className="hw-foot">
-                  <button
-                    type="button"
-                    className="hw-replay"
-                    aria-label="replay"
-                    disabled={rewinding}
-                    onClick={() => {
-                      setRewinding(true);
-                      window.setTimeout(() => {
-                        setTakes((current) => current.map((value, index) => (index === active ? value + 1 : value)));
-                        setRewinding(false);
-                      }, REWIND_MS);
-                    }}
-                  >
-                    <RotateCcw aria-hidden="true" focusable="false" />
-                  </button>
-                </div>
               </div>
             </div>
           </div>
         </div>
-        <span className="hw-cue" role="img" aria-label="scroll for the next steps">
-          <ChevronDown aria-hidden="true" focusable="false" />
-        </span>
       </div>
     </div>
   );
