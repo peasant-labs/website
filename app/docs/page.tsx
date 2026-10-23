@@ -3,7 +3,7 @@ import { DocCommand, DocHead, DocNote } from "@/components/docs/doc-parts";
 import { RedactionLabel } from "@/components/docs/redaction-label";
 import { Rich } from "@/components/docs/rich-text";
 import { BrandMark } from "@/components/fairtrade-client";
-import { DOCS_GUIDES, DOCS_HOME } from "@/lib/docs-content";
+import { DOCS_HOME, DOCS_START } from "@/lib/docs-content";
 import { metadataForRoute } from "@/lib/projects";
 import Link from "next/link";
 
@@ -27,13 +27,15 @@ export default function DocsHome() {
       <DocHead title={DOCS_HOME.title} lede={DOCS_HOME.lede} />
 
       <section className="dx-sec" aria-labelledby="guides">
-        <h2 id="guides">guides</h2>
+        <h2 id="guides">start here</h2>
         <div className="dx-guides">
-          {DOCS_GUIDES.map((guide) => (
+          {DOCS_START.map((guide) => (
             <Link key={guide.id} className="dx-guide" href={guide.href}>
               <Art art={guide.art} className="dx-guide-art" />
               <span className="dx-guide-title">{guide.title}</span>
-              <span className="dx-guide-desc">{guide.summary}</span>
+              <span className="dx-guide-desc">
+                <Rich text={guide.summary} />
+              </span>
             </Link>
           ))}
         </div>
