@@ -1,6 +1,6 @@
 "use client";
 
-import { MacDesktop, MacWindow } from "@/components/mac";
+import { MacDesktop, SafariWindow } from "@/components/mac";
 import { SAMPLE_ID, SAMPLE_MATCHES } from "@/components/landing/scenes/sample";
 import type { SceneDefinition } from "@/components/landing/scenes/stage";
 import { RedactionReview } from "@peasant-labs/fairtrade/ui";
@@ -22,8 +22,8 @@ const TOTAL = 12;
 function Review({ phase }: { phase: number }) {
   const step = SCAN[Math.min(phase, SCAN.length - 1)]!;
   return (
-    <MacDesktop app="browser">
-      <MacWindow kind="browser" url={`localhost:8690/share/${SAMPLE_ID}`} className="scn-full-browser">
+    <MacDesktop app="Safari">
+      <SafariWindow url={`localhost:8690/share/${SAMPLE_ID}`} className="scn-full-browser">
         <div className="scn-review">
           <div className="scn-panel" data-focus="review">
             <p className="pub-section-title">what leaves your machine</p>
@@ -37,7 +37,7 @@ function Review({ phase }: { phase: number }) {
             />
           </div>
         </div>
-      </MacWindow>
+      </SafariWindow>
     </MacDesktop>
   );
 }

@@ -3,7 +3,7 @@ import { GetStarted } from "@/components/landing/get-started";
 import { HeroFlow } from "@/components/landing/hero-flow";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { UseCases } from "@/components/landing/use-cases";
-import { MacWindow } from "@/components/mac";
+import { SafariWindow } from "@/components/mac";
 import { SiteShell } from "@/components/site-shell";
 import { TranscriptDemo } from "@/components/transcript-demo";
 import { HERO, HOW, INSTALL, SESSION, USE_CASES, VISION } from "@/lib/landing";
@@ -92,9 +92,13 @@ export default function Home() {
             <h2 id="session-title" data-fade>
               {SESSION.title}
             </h2>
-            <MacWindow kind="browser" url={`${SESSION.host}/transcripts/${SAMPLE_SESSION.id}`} className="lp-session-win">
+            <SafariWindow
+              url={`${SESSION.host}/transcripts/${SAMPLE_SESSION.id}`}
+              secure
+              className="lp-session-win"
+            >
               <TranscriptDemo label={SESSION.label} session={SAMPLE_SESSION} />
-            </MacWindow>
+            </SafariWindow>
             <p className="lp-note">{SESSION.note}</p>
           </div>
         </section>

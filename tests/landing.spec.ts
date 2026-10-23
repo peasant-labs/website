@@ -275,6 +275,7 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
   await steps.nth(0).click();
   const record = page.locator('.hw-scroll .hw-view[data-scene="record"]');
   await expect(record.locator(".mac-win-terminal")).toHaveCount(1);
+  await expect(record.locator(".mac-win-terminal .mac-title")).toHaveText(/^shop — (zsh|claude) — 80×24$/);
   await expect(record.locator("table")).toHaveCount(0);
 });
 
@@ -351,9 +352,16 @@ test("a sample session opens in fairtrade's viewer, labelled as sample, with red
   // it is shown in a browser window, at the address a published transcript has
   const browser = section.locator(".mac-win-browser");
   await expect(browser.locator(".mac-lights")).toBeVisible();
-  await expect(browser.locator(".mac-url-text")).toHaveText(
+  await expect(browser.locator(".mac-address-text")).toHaveText(
     new RegExp(`/transcripts/${fixture.session.sessionId}$`),
   );
+  // the real macOS chrome, not a drawing in the site's tokens: rounded window, the system's traffic-light colours
+  expect(await browser.evaluate((window) => getComputedStyle(window).borderTopLeftRadius)).toBe("10px");
+  expect(
+    await browser
+      .locator(".mac-lights i")
+      .evaluateAll((lights) => lights.map((light) => getComputedStyle(light).backgroundColor)),
+  ).toEqual(["rgb(255, 95, 87)", "rgb(254, 188, 46)", "rgb(40, 200, 64)"]);
 
   const height = () => browser.evaluate((window) => window.getBoundingClientRect().height);
   const before = await height();

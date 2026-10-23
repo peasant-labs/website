@@ -32,6 +32,8 @@ export type Shot = Readonly<{
   fill?: number;
   /** frame at most this much of the element's width, from its left edge, so a wide row can be read on a phone */
   width?: number;
+  /** crop to `width` only when the whole element would be framed smaller than this scale; by default it always crops */
+  cropBelow?: number;
 }>;
 
 /** A beat of the scene's own state: from `at` ms the scene renders `phase`. */
@@ -118,11 +120,14 @@ export function SceneStage({
   }, []);
 
   const frame = useCallback(
-    (focus: string, fill: number, width?: number) => {
+    (focus: string, fill: number, width?: number, cropBelow = Infinity) => {
       const camera = cameraRef.current;
       if (!camera) return "none";
       const box = boxOf(camera, focus);
-      return frameFor(width && box.w > width ? { ...box, w: width } : box, viewSize(), fill);
+      const view = viewSize();
+      const whole = Math.min((view.w * fill) / box.w, (view.h * fill) / box.h);
+      const crop = width !== undefined && box.w > width && whole < cropBelow;
+      return frameFor(crop ? { ...box, w: width } : box, view, fill);
     },
     [viewSize],
   );
@@ -171,7 +176,7 @@ export function SceneStage({
     for (const shot of scene.shots) {
       at(shot.at, () => {
         const from = getComputedStyle(camera).transform;
-        const to = frame(shot.focus, shot.fill ?? 0.94, shot.width);
+        const to = frame(shot.focus, shot.fill ?? 0.94, shot.width, shot.cropBelow);
         const animation = camera.animate([{ transform: from }, { transform: to }], {
           duration: shot.move,
           easing: shot.ease === "settle" ? EASE_SETTLE : EASE_MOVE,

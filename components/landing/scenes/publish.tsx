@@ -1,6 +1,6 @@
 "use client";
 
-import { MacDesktop, MacWindow } from "@/components/mac";
+import { MacDesktop, SafariWindow } from "@/components/mac";
 import { SAMPLE_COLLECTIVE, SAMPLE_ID, SAMPLE_TITLE } from "@/components/landing/scenes/sample";
 import type { SceneDefinition } from "@/components/landing/scenes/stage";
 import { Loader } from "@peasant-labs/fairtrade/icons";
@@ -31,8 +31,8 @@ function Publish({ phase }: { phase: number }) {
     : [];
 
   return (
-    <MacDesktop app="browser">
-      <MacWindow kind="browser" url={`localhost:8690/share/${SAMPLE_ID}`} className="scn-full-browser">
+    <MacDesktop app="Safari">
+      <SafariWindow url={`localhost:8690/share/${SAMPLE_ID}`} className="scn-full-browser">
         <div className="scn-publish">
           <div className="dialog framed dialog-wide pub-dialog scn-dialog" data-focus="dialog">
             <div className="dlg-head">
@@ -85,7 +85,7 @@ function Publish({ phase }: { phase: number }) {
             </div>
           </div>
         </div>
-      </MacWindow>
+      </SafariWindow>
     </MacDesktop>
   );
 }

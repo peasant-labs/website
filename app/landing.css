@@ -1100,53 +1100,124 @@
   user-select: none;
 }
 
-/* ---------- a Mac, drawn in tokens: the desktop and its windows ---------- */
+/*
+ * ---------- macOS, drawn in the DOM: the desktop and its windows ----------
+ *
+ * A depiction of the operating system around our product, so it follows macOS
+ * Sequoia rather than fairtrade: real window radii, the system font, the
+ * traffic-light colours and macOS's own light and dark appearances. The raw
+ * colours and the rounded corners here are the OS's, on purpose; fairtrade's
+ * radius 0, tokens and lowercase chrome apply to our product UI inside the
+ * windows, which these rules never reach into. Every size is a multiple of
+ * --mac-u, so a small screen scales the whole chrome down in proportion.
+ */
 
+.mac-desk,
+.mac-win {
+  /* the dark appearance, with the site's dark theme */
+  --mac-u: 1px;
+  --mac-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mac-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --mac-bar-bg: #2d2d2d;
+  --mac-bar-rule: #0d0d0d;
+  --mac-title: rgba(255, 255, 255, 0.7);
+  --mac-icon: rgba(255, 255, 255, 0.62);
+  --mac-icon-off: rgba(255, 255, 255, 0.24);
+  --mac-field: rgba(255, 255, 255, 0.1);
+  --mac-field-ink: rgba(255, 255, 255, 0.86);
+  --mac-edge: rgba(0, 0, 0, 0.85);
+  --mac-rim: rgba(255, 255, 255, 0.16);
+  --mac-shadow: 0 calc(3 * var(--mac-u)) calc(8 * var(--mac-u)) rgba(0, 0, 0, 0.35),
+    0 calc(22 * var(--mac-u)) calc(60 * var(--mac-u)) rgba(0, 0, 0, 0.55);
+  --mac-off: #4d4d4d;
+  --mac-off-rim: #3a3a3a;
+  --mac-term-bg: #1e1e1e;
+  --mac-term-ink: #f2f2f2;
+  --mac-term-dim: #8e8e8e;
+  --mac-term-cursor: #929292;
+  --mac-menu-bg: rgba(22, 22, 22, 0.52);
+  --mac-menu-ink: rgba(255, 255, 255, 0.92);
+  /* Claude Code's own colours in a dark terminal */
+  --cc-accent: #d77757;
+  --cc-box: #888888;
+}
+
+:root[data-theme="light"] :is(.mac-desk, .mac-win) {
+  --mac-bar-bg: #ebebeb;
+  --mac-bar-rule: #d1d1d1;
+  --mac-title: rgba(0, 0, 0, 0.68);
+  --mac-icon: rgba(0, 0, 0, 0.55);
+  --mac-icon-off: rgba(0, 0, 0, 0.2);
+  --mac-field: rgba(0, 0, 0, 0.055);
+  --mac-field-ink: rgba(0, 0, 0, 0.85);
+  --mac-edge: rgba(0, 0, 0, 0.18);
+  --mac-rim: rgba(255, 255, 255, 0);
+  --mac-shadow: 0 calc(2 * var(--mac-u)) calc(6 * var(--mac-u)) rgba(0, 0, 0, 0.08),
+    0 calc(16 * var(--mac-u)) calc(48 * var(--mac-u)) rgba(0, 0, 0, 0.24);
+  --mac-off: #dcdcdc;
+  --mac-off-rim: #c9c9c9;
+  --mac-term-bg: #ffffff;
+  --mac-term-ink: #000000;
+  --mac-term-dim: #6e6e6e;
+  --mac-term-cursor: #929292;
+  --mac-menu-bg: rgba(255, 255, 255, 0.5);
+  --mac-menu-ink: rgba(0, 0, 0, 0.88);
+  --cc-box: #9a9a9a;
+}
+
+/* a calm wallpaper of our own, in the site's earth tones */
 .mac-desk {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
   background:
-    linear-gradient(
-      160deg,
-      color-mix(in srgb, var(--amber) 16%, var(--surface-2)) 0%,
-      var(--surface-2) 52%,
-      color-mix(in srgb, var(--olive) 14%, var(--surface-2)) 100%
-    );
+    radial-gradient(120% 90% at 18% 0%, #6b5432 0%, transparent 62%),
+    linear-gradient(165deg, #3b3022 0%, #23201a 48%, #2a3024 100%);
+  font-family: var(--mac-font);
+  text-transform: none;
 }
 
+:root[data-theme="light"] .mac-desk {
+  background:
+    radial-gradient(120% 90% at 18% 0%, #f6e7c8 0%, transparent 62%),
+    linear-gradient(165deg, #ead9b8 0%, #d9caa9 48%, #b7bd9c 100%);
+}
+
+/*
+ * The menu bar: the app in front in bold, its menus, then the status items and
+ * the clock. macOS blurs the wallpaper behind it; over a smooth gradient a
+ * translucent fill looks the same and costs nothing while the camera moves.
+ */
 .mac-menubar {
   display: flex;
   flex: none;
   align-items: center;
-  gap: 20px;
-  height: 28px;
-  padding: 0 16px;
-  border-bottom: var(--bd);
-  background: color-mix(in srgb, var(--canvas) 82%, transparent);
-  color: var(--ink-2);
-  font-family: var(--font-mono);
-  font-size: 13px;
+  gap: calc(20 * var(--mac-u));
+  height: calc(24 * var(--mac-u));
+  padding: 0 calc(14 * var(--mac-u));
+  background: var(--mac-menu-bg);
+  color: var(--mac-menu-ink);
+  font-size: calc(13 * var(--mac-u));
   letter-spacing: 0;
   white-space: nowrap;
 }
 
 .mac-menu-app {
-  color: var(--ink-strong);
   font-weight: 700;
 }
 
 .mac-menu-end {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: calc(14 * var(--mac-u));
   margin-inline-start: auto;
 }
 
 .mac-menu-end svg {
-  width: 15px;
-  height: 15px;
+  width: calc(15 * var(--mac-u));
+  height: calc(15 * var(--mac-u));
+  stroke-width: 1.9;
 }
 
 .mac-desk-area {
@@ -1155,103 +1226,157 @@
   min-height: 0;
 }
 
+/* a window: ~10px corners, a 1px hairline, the system shadow; in the dark appearance a light inner rim */
 .mac-win {
-  --mac-shade: color-mix(in srgb, var(--canvas) 88%, transparent);
-
+  position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: var(--bd-strong);
-  background: var(--canvas);
-  box-shadow: 0 18px 40px -16px var(--mac-shade);
+  border-radius: calc(10 * var(--mac-u));
+  box-shadow:
+    0 0 0 1px var(--mac-edge),
+    var(--mac-shadow);
+  font-family: var(--mac-font);
 }
 
-:root[data-theme="light"] .mac-win {
-  --mac-shade: color-mix(in srgb, var(--ink-strong) 24%, transparent);
+.mac-win::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--mac-rim);
+  content: "";
+  pointer-events: none;
 }
 
 .mac-bar {
+  position: relative;
   display: flex;
   flex: none;
   align-items: center;
-  gap: 14px;
-  height: 40px;
-  padding: 0 14px;
-  border-bottom: var(--bd);
-  background: var(--surface-2);
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0;
+  border-bottom: 1px solid var(--mac-bar-rule);
+  background: var(--mac-bar-bg);
+  color: var(--mac-icon);
+  text-transform: none;
   white-space: nowrap;
 }
 
-/* the three window buttons: close, minimise, zoom, in the theme's own red, amber and green */
+.mac-win-terminal .mac-bar {
+  height: calc(28 * var(--mac-u));
+  padding-inline: calc(12 * var(--mac-u));
+}
+
+/* Safari's unified toolbar */
+.mac-win-browser .mac-bar {
+  gap: calc(14 * var(--mac-u));
+  height: calc(52 * var(--mac-u));
+  padding-inline: calc(20 * var(--mac-u)) calc(16 * var(--mac-u));
+}
+
+/* the traffic lights: 12px, 8px apart, each with its darker rim; grey on a window that is not in front */
 .mac-lights {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex: none;
-  gap: 8px;
+  gap: calc(8 * var(--mac-u));
 }
 
 .mac-lights i {
   display: block;
-  width: 12px;
-  height: 12px;
+  width: calc(12 * var(--mac-u));
+  height: calc(12 * var(--mac-u));
   border-radius: 50%;
-  background: var(--danger);
+  background: #ff5f57;
+  box-shadow: inset 0 0 0 calc(0.5 * var(--mac-u) + 0.5px) #e0443e;
 }
 
 .mac-lights i:nth-child(2) {
-  background: var(--warning);
+  background: #febc2e;
+  box-shadow: inset 0 0 0 calc(0.5 * var(--mac-u) + 0.5px) #dea123;
 }
 
 .mac-lights i:nth-child(3) {
-  background: var(--success);
+  background: #28c840;
+  box-shadow: inset 0 0 0 calc(0.5 * var(--mac-u) + 0.5px) #1aab29;
+}
+
+.mac-win[data-active="false"] .mac-lights i {
+  background: var(--mac-off);
+  box-shadow: inset 0 0 0 calc(0.5 * var(--mac-u) + 0.5px) var(--mac-off-rim);
 }
 
 .mac-title {
-  flex: 1;
-  min-width: 0;
-  margin-inline-end: 52px;
+  position: absolute;
+  inset: 0 calc(76 * var(--mac-u));
   overflow: hidden;
+  color: var(--mac-title);
+  font-size: calc(13 * var(--mac-u));
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: calc(28 * var(--mac-u));
   text-align: center;
   text-overflow: ellipsis;
 }
 
-.mac-nav {
+.mac-win[data-active="false"] .mac-title {
+  opacity: 0.55;
+}
+
+.mac-tools {
   display: flex;
   flex: none;
-  gap: 6px;
-  color: var(--ink-4);
+  align-items: center;
+  gap: calc(14 * var(--mac-u));
 }
 
-.mac-nav svg,
-.mac-url svg {
+.mac-tools svg,
+.mac-address svg {
   flex: none;
-  width: 14px;
-  height: 14px;
+  width: calc(17 * var(--mac-u));
+  height: calc(17 * var(--mac-u));
+  stroke-width: 1.7;
 }
 
-.mac-url {
+.mac-sidebar {
+  display: flex;
+  align-items: center;
+  gap: calc(2 * var(--mac-u));
+}
+
+.mac-sidebar svg + svg {
+  width: calc(10 * var(--mac-u));
+  height: calc(10 * var(--mac-u));
+}
+
+.mac-tool-off {
+  color: var(--mac-icon-off);
+}
+
+.mac-address {
   display: flex;
   flex: 1;
   align-items: center;
-  gap: 8px;
+  gap: calc(6 * var(--mac-u));
   min-width: 0;
-  max-width: 36rem;
-  height: 28px;
+  max-width: calc(520 * var(--mac-u));
+  height: calc(32 * var(--mac-u));
   margin-inline: auto;
-  padding: 0 10px;
-  border: var(--bd);
-  background: var(--canvas);
-  color: var(--ink-2);
+  padding-inline: calc(12 * var(--mac-u)) calc(9 * var(--mac-u));
+  border-radius: calc(9 * var(--mac-u));
+  background: var(--mac-field);
+  color: var(--mac-field-ink);
+  font-size: calc(13 * var(--mac-u));
+  letter-spacing: 0;
 }
 
-.mac-url svg {
-  color: var(--ink-4);
+.mac-address svg {
+  width: calc(13 * var(--mac-u));
+  height: calc(13 * var(--mac-u));
+  color: var(--mac-icon);
 }
 
-.mac-url-text {
+.mac-address-text {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -1263,62 +1388,111 @@
   position: relative;
   flex: 1;
   min-height: 0;
+  background: var(--canvas);
 }
+
+/* ---------- Terminal, running Claude Code ---------- */
 
 .mac-win-terminal .mac-body {
-  background: var(--term-bg);
-  color: var(--term-ink);
+  background: var(--mac-term-bg);
+  color: var(--mac-term-ink);
 }
 
-/* ---------- the scenes' windows ---------- */
-
-/* record: Claude Code in the terminal, then the browser on the session it opened */
-.scn-rec-term {
-  position: absolute;
-  inset-block-start: 76px;
-  inset-inline-start: 72px;
-  width: 640px;
-  height: 300px;
-}
-
-.scn-term-body {
+/* Terminal's default profile, a 13px monospace grid, and Claude Code's TUI in it */
+.cc {
   display: grid;
   align-content: start;
-  gap: 8px;
   height: 100%;
-  padding: 18px 20px;
-  font-family: var(--font-mono);
-  font-size: 16px;
+  padding: 6px 10px;
+  font-family: var(--mac-mono);
+  font-size: 13px;
   letter-spacing: 0;
-  line-height: 1.5;
-}
-
-.scn-term-body p {
-  max-inline-size: none;
-  margin: 0;
-  letter-spacing: 0;
+  line-height: 17px;
+  white-space: pre-wrap;
   word-spacing: normal;
   overflow-wrap: anywhere;
 }
 
-.scn-term-dim {
-  color: var(--term-dim);
+.cc b {
+  font-weight: 700;
 }
 
-.scn-caret {
+.cc-dim {
+  color: var(--mac-term-dim);
+}
+
+.cc-accent {
+  color: var(--cc-accent);
+}
+
+.cc-gap {
+  height: 17px;
+}
+
+.cc-caret {
   display: inline-block;
-  width: 0.6em;
-  height: 1.1em;
-  vertical-align: text-bottom;
-  background: var(--term-ink);
+  width: 0.62em;
+  height: 15px;
+  vertical-align: -3px;
+  background: var(--mac-term-cursor);
+}
+
+/* the welcome box and the input row: Claude Code's rounded boxes */
+.cc-welcome,
+.cc-input {
+  border: 1px solid var(--cc-box);
+  border-radius: 5px;
+}
+
+.cc-welcome {
+  justify-self: start;
+  width: 52ch;
+  margin-block: 17px 0;
+  padding: 8px 14px;
+  border-color: var(--cc-accent);
+}
+
+.cc-welcome .cc-dim {
+  padding-inline-start: 2ch;
+}
+
+.cc-out {
+  display: grid;
+  margin-block-start: 17px;
+}
+
+.cc-reply {
+  display: grid;
+  grid-template-columns: 4ch minmax(0, 1fr);
+  padding-inline-start: 2ch;
+}
+
+.cc-input {
+  margin-block-start: 17px;
+  padding: 7px 10px;
+}
+
+.cc-hint {
+  padding: 2px 2ch 0;
+}
+
+/* ---------- the scenes' windows ---------- */
+
+/* record: Claude Code in Terminal, then Safari on the session it opened */
+.scn-rec-term {
+  position: absolute;
+  inset-block-start: 48px;
+  inset-inline-start: 52px;
+  width: 660px;
+  height: 440px;
 }
 
 .scn-rec-browser {
   position: absolute;
-  inset-block-start: 40px;
-  inset-inline-start: 392px;
+  inset-block-start: 34px;
+  inset-inline-start: 404px;
   width: 680px;
-  height: 590px;
+  height: 596px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1406,12 +1580,12 @@
 /* review and publish: one browser window across the desktop */
 .scn-full-browser {
   position: absolute;
-  inset: 18px 28px 22px;
+  inset: 14px 24px 16px;
 }
 
 .scn-review {
   height: 100%;
-  padding: 22px 28px;
+  padding: 16px 28px;
   overflow: hidden;
 }
 
@@ -1610,6 +1784,17 @@
 .lp-session-win .mac-body {
   flex: none;
   block-size: clamp(32rem, 82dvh, 48rem);
+}
+
+/* on a phone Safari's chrome scales down in proportion and keeps only what fits: the lights, back, forward and the address */
+@media (max-width: 47.99rem) {
+  .lp-session-win {
+    --mac-u: 0.78px;
+  }
+
+  .lp-session-win :is(.mac-sidebar, .mac-tools-end) {
+    display: none;
+  }
 }
 
 .lp-session .pj-transcript {
