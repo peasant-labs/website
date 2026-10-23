@@ -156,7 +156,8 @@ docsNav:
   - { label: agent evals, href: /docs/guides/evals }
   - { label: pr reviews, href: /docs/guides/reviews }
   - { label: blog, href: /blog }
-# the docs switcher: no other app, only what is coming (the account row reaches online)
-docsSwitcher: [community]
+# the docs sidebar's shortcuts, above its pages: search, then the switcher, which lists no other app,
+# only what is coming (the account row reaches online)
+docsShortcuts: [search, community]
 posts:
   - { slug: reclaiming-data-autonomy-as-a-peasant, title: Reclaiming Data Autonomy as a Peasant }

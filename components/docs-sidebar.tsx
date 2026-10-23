@@ -20,11 +20,12 @@ const ICONS: Record<DocsIcon, ComponentType> = {
 
 /**
  * The docs app's sidebar: fairtrade's shared AppSidebar in its one order, the
- * same as the online and local apps: the mark, the docs pages, search, the
- * switcher (fairtrade lists no other app, only community as soon), then the
- * footer with the theme toggle and the account row, which is "log in", or
- * "dashboard" for a reader signed in there. fairtrade draws the phone top bar
- * and drawer. A page's own sections are in its "on this page" list, not here.
+ * same as the online and local apps: the mark, the shortcuts (search, then the
+ * switcher, where fairtrade lists no other app, only community as soon), the
+ * docs pages, then the footer with the account row, which is "log in", or
+ * "dashboard" for a reader signed in there, and the theme toggle. fairtrade
+ * draws the phone top bar and drawer. A page's own sections are in its "on
+ * this page" list, not here.
  */
 export function DocsSidebar() {
   const pathname = usePathname();

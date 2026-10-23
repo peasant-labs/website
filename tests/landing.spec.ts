@@ -1020,7 +1020,7 @@ test("the docs sidebar lists only destinations that exist and marks the page you
 }) => {
   await page.goto("/docs");
   const sidebar = page.getByRole("complementary", { name: "docs" });
-  const links = sidebar.locator("nav:not(.asb-apps) a.asb-item");
+  const links = sidebar.locator("nav:not(.asb-utils) a.asb-item");
   expect(
     await links.evaluateAll((items) =>
       items.map((item) => ({
@@ -1042,7 +1042,7 @@ test("the docs sidebar lists only destinations that exist and marks the page you
   for (const item of fixture.docsNav.filter((entry) => !entry.href.includes("#"))) {
     await page.goto(item.href);
     await expect(
-      page.getByRole("complementary", { name: "docs" }).locator('nav:not(.asb-apps) [aria-current="page"]'),
+      page.getByRole("complementary", { name: "docs" }).locator('nav:not(.asb-utils) [aria-current="page"]'),
     ).toHaveText(item.label);
   }
 });
@@ -1053,7 +1053,7 @@ test("on a phone the docs sidebar folds into fairtrade's top bar and drawer", as
   await page.goto("/docs/guides/evals");
   await expect(page.locator(".asb-item").first()).toBeHidden();
   await page.getByRole("button", { name: "open the menu" }).tap();
-  await expect(page.locator("nav:not(.asb-apps) a.asb-item").first()).toBeVisible();
+  await expect(page.locator("nav:not(.asb-utils) a.asb-item").first()).toBeVisible();
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations).toEqual([]);
   await context.close();
