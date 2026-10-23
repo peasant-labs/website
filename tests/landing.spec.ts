@@ -378,26 +378,61 @@ test("every section opens on its title alone on a row, in one style at one edge,
 test("the vision stands on its own grounded panel, and the landing ends on a calm split call to action", async ({
   page,
 }) => {
-  await page.goto("/");
-  const panel = page.locator(".lp-vision-inner");
-  const ground = await panel.evaluate((element) => {
-    const style = getComputedStyle(element);
-    const line = getComputedStyle(element.querySelector(".lp-vision-art")!, "::after");
-    return {
-      surface: style.backgroundColor !== getComputedStyle(document.body).backgroundColor,
-      border: style.borderTopWidth,
-      line: line.borderTopWidth,
-    };
-  });
-  expect(ground).toEqual({ surface: true, border: "1px", line: "1px" });
-  await expect(panel.locator("#vision-line")).toHaveText(fixture.vision.line);
-  // the owner's statement in full, word for word: the lead line, then two paragraphs at a reading measure
-  await expect(panel.locator(".lp-vision-story")).toHaveText(fixture.vision.story);
-  const measure = await panel
-    .locator(".lp-vision-story")
-    .first()
-    .evaluate((paragraph) => paragraph.getBoundingClientRect().width / parseFloat(getComputedStyle(paragraph).fontSize));
-  expect(measure).toBeLessThanOrEqual(40);
+  for (const width of [1440, 1280, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const panel = page.locator(".lp-vision-inner");
+    await expect(panel.locator("#vision-line")).toHaveText(fixture.vision.line);
+    // the owner's statement in full, word for word
+    await expect(panel.locator(".lp-vision-story")).toHaveText(fixture.vision.story);
+    const layout = await panel.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const art = element.querySelector(".lp-vision-art")!.getBoundingClientRect();
+      const words = element.querySelector(".lp-vision-words")!.getBoundingClientRect();
+      const line = element.querySelector("#vision-line")!;
+      const title = document.querySelector("#install h2")!;
+      const cta = element.querySelector(".lp-vision-cta")!;
+      // every line of every paragraph, as its right edge, so a last line holding one word shows up
+      const lastLines = [...element.querySelectorAll("#vision-line, .lp-vision-story")].map((paragraph) => {
+        const range = document.createRange();
+        range.selectNodeContents(paragraph);
+        const rows = new Map<number, number>();
+        for (const rect of range.getClientRects()) {
+          const top = Math.round(rect.top);
+          rows.set(top, Math.max(rows.get(top) ?? 0, rect.right - paragraph.getBoundingClientRect().left));
+        }
+        const widths = [...rows.values()];
+        return widths.length > 1 ? widths.at(-1)! / Math.max(...widths) : 1;
+      });
+      return {
+        surface: style.backgroundColor !== getComputedStyle(document.body).backgroundColor,
+        border: style.borderTopWidth,
+        // no rule runs under the picture
+        rule: getComputedStyle(element.querySelector(".lp-vision-art")!, "::after").content,
+        beside: art.right <= words.left + 1,
+        // side by side, both are centred on the panel's height
+        centred: Math.abs(art.top + art.height / 2 - (words.top + words.height / 2)) < 2,
+        // stacked, the picture's left edge is the words' left edge
+        stackedEdge: Math.abs(art.left - words.left) < 2 && art.bottom <= words.top,
+        evenPadding: Math.abs(parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)) < 1,
+        lineFace: getComputedStyle(line).fontFamily === getComputedStyle(title).fontFamily,
+        lineSmaller: parseFloat(getComputedStyle(line).fontSize) < parseFloat(getComputedStyle(title).fontSize),
+        filledCta: cta.classList.contains("btn-primary"),
+        lastLines,
+      };
+    });
+    expect(layout.surface && layout.border === "1px", `the vision has no panel at ${width}`).toBe(true);
+    expect(layout.rule === "none" || layout.rule === "normal", `a rule runs under the picture at ${width}`).toBe(true);
+    if (width >= 1280) expect(layout.beside && layout.centred, `the vision is not a centred split at ${width}`).toBe(true);
+    else expect(layout.stackedEdge, `the picture does not sit on the words' edge at ${width}`).toBe(true);
+    expect(layout.evenPadding, `the vision's padding is uneven at ${width}`).toBe(true);
+    expect(layout.lineFace && layout.lineSmaller, `the lead line is not one step under the section titles at ${width}`).toBe(true);
+    expect(layout.filledCta, "the vision's button is filled amber").toBe(false);
+    for (const share of layout.lastLines) {
+      expect(share, `a paragraph leaves a word or two alone on its last line at ${width}`).toBeGreaterThan(0.33);
+    }
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
 
   // the close: its line at the section titles' size and two buttons of one height, beside a whole picture on a panel
   for (const width of [1440, 390]) {

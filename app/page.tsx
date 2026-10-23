@@ -111,7 +111,7 @@ export default function Home() {
         </section>
 
         <section className="lp-sec lp-vision" aria-labelledby="vision-line">
-          {/* the statement's own stage: a panel, the picture standing on a ground line, the words under it */}
+          {/* the statement's own panel: the picture beside the words */}
           <div className="site-wrap">
             <div className="lp-vision-inner">
               <div className="lp-vision-scene">
@@ -127,7 +127,7 @@ export default function Home() {
                   </p>
                 ))}
                 <Link
-                  className="btn btn-primary site-btn site-btn-xl lp-vision-cta"
+                  className="btn btn-secondary site-btn site-btn-lg lp-vision-cta"
                   href={VISION.cta.href}
                   data-fade
                   style={fade(1)}
