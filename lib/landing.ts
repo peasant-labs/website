@@ -317,24 +317,9 @@ export const INSTALL = {
  */
 export const SESSION = {
   title: "we're setting a new standard for transcript sharing and viewing",
-  /* the short title the reel shows for the sample, the way a curated page names a session */
+  /* the short title the transcript browser shows for the sample, the way a curated page names a session */
   sessionTitle: "fix the staging 403",
   label: "a sample session",
-  /*
-   * The tour the pointer plays on first view, through the real transcript
-   * browser: the runs of the sample's text it rests on, and the tabs and the
-   * tool call it opens on the way (lib/sample-session.ts).
-   */
-  tour: {
-    prompt: "a 403",
-    tool: ".env",
-    marker: "<AWS_ACCESS_KEY>",
-    changes: "diffs",
-    // the first line the change adds, read from its start, so it is in view at any width
-    change: ".dl.add .t",
-    trace: "full trace",
-    answer: "rotate it in the production account",
-  },
   terminal: "shop — claude — 80×24",
   check: {
     label: "the pull request's peasant check",

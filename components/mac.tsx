@@ -12,7 +12,7 @@ import {
   Share,
   Wifi,
 } from "@peasant-labs/fairtrade/icons";
-import type { CSSProperties, ReactNode, Ref } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 /*
  * macOS, drawn in the DOM so the scenes stay animated, themeable and sharp at
@@ -158,23 +158,6 @@ export function MacDesktop({ app, children }: { app: ReactNode; children: ReactN
         </span>
       </div>
       <div className="mac-desk-area">{children}</div>
-    </div>
-  );
-}
-
-/** Where the arrow's tip sits in the pointer's box, as a share of its size: a transform to a point, less this, puts the tip on it. */
-export const POINTER_TIP = { x: 2 / 16, y: 1.5 / 16 } as const;
-
-/**
- * The macOS arrow pointer, for a picture a pointer drives. It is placed by a
- * transform alone, and is never read by assistive technology.
- */
-export function MacPointer({ ref, className }: { ref?: Ref<HTMLDivElement>; className?: string }) {
-  return (
-    <div ref={ref} className={`mac-pointer${className ? ` ${className}` : ""}`} aria-hidden="true">
-      <svg viewBox="0 0 16 16" focusable="false">
-        <path d="M2 1.5v12l3.3-3.1 2.2 4.6 2-.9-2.2-4.5H12z" />
-      </svg>
     </div>
   );
 }

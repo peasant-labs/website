@@ -112,7 +112,6 @@ export default function Home() {
                   label={SESSION.label}
                   session={SAMPLE_SESSION}
                   title={SESSION.sessionTitle}
-                  tour={SESSION.tour}
                 />
               </SafariWindow>
             </SessionWindows>

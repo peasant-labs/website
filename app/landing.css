@@ -2450,58 +2450,6 @@
   max-inline-size: none;
 }
 
-/* what the tour's pointer rests on, lit like a selection */
-::highlight(tour-point) {
-  background-color: color-mix(in oklab, var(--amber) 32%, transparent);
-  color: var(--ink-strong);
-}
-
-/*
- * The pointer that tours the viewer, over everything in it. It shows while
- * the tour runs and is gone the moment the reader takes over.
- */
-.mac-pointer {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  z-index: 30;
-  width: 22px;
-  height: 22px;
-  pointer-events: none;
-}
-
-.mac-pointer svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  /* the arrow's tip, so a press dips toward what it points at */
-  transform-origin: 12.5% 9.4%;
-}
-
-.mac-pointer path {
-  fill: var(--ink-strong);
-  stroke: var(--canvas);
-  stroke-width: 1;
-  stroke-linejoin: round;
-}
-
-@media (max-width: 47.99rem) {
-  .mac-pointer {
-    width: 19px;
-    height: 19px;
-  }
-}
-
-.lp-tour-pointer {
-  opacity: 0;
-  transition: opacity 240ms var(--ease-out);
-}
-
-.lp-viewer[data-touring="true"] .lp-tour-pointer {
-  opacity: 1;
-}
-
 /* the first time they come into view, the back window and the check fan out from behind the front one */
 @media (prefers-reduced-motion: no-preference) {
   .lp-windows-term,

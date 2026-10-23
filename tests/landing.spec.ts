@@ -1160,8 +1160,7 @@ test("under reduced motion the steps stack, each scene on its finished frame, wi
 test("a sample session opens in the real transcript browser, in a wide window that keeps its height", async ({
   page,
 }) => {
-  // the tour stays out of the way here: under reduced motion the browser is simply there to use
-  await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
+  await page.emulateMedia({ colorScheme: "light" });
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
@@ -1253,84 +1252,59 @@ test("a sample session opens in the real transcript browser, in a wide window th
   for (const colorScheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme });
     await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
+    // the windows ease into the new theme; read them once they have arrived
+    await expect
+      .poll(() => page.evaluate(() => document.getAnimations().filter((item) => item instanceof CSSTransition).length))
+      .toBe(0);
     const accessibility = await new AxeBuilder({ page }).include("#session").analyze();
     expect(accessibility.violations, `the section in the ${colorScheme} theme`).toEqual([]);
   }
 });
 
-test("on first view a pointer tours the transcript browser through its real controls, until the reader takes over", async ({
-  page,
-}) => {
+test("the transcript browser rests where it opens, and only the reader's own input changes it", async ({ browser }) => {
   test.setTimeout(60_000);
-  await page.goto("/");
-  const viewer = page.locator("#session [data-session-viewer]");
-  const lit = () =>
-    page.evaluate(() => [...(CSS.highlights.get("tour-point") ?? [])].map(String).join("").trim());
-  await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-
-  // it plays on its own, with a pointer hidden from assistive technology
-  await expect(viewer).toHaveAttribute("data-touring", "true", { timeout: 10_000 });
-  await expect(viewer.locator(".lp-tour-pointer")).toHaveAttribute("aria-hidden", "true");
-  // it opens the tool call that read the credentials, and rests on the key's marker
-  const env = viewer.locator(".tc-head", { hasText: fixture.session.tour.tool }).first();
-  await expect(env).toHaveAttribute("aria-expanded", "true", { timeout: 15_000 });
-  await expect.poll(lit, { timeout: 10_000 }).toBe(fixture.session.tour.marker);
-  // then shows the change in the diffs
-  const tab = (name: string) => viewer.getByRole("tab", { name: new RegExp(`^${name}`) });
-  await expect(tab("diffs")).toHaveAttribute("aria-selected", "true", { timeout: 15_000 });
-
-  // it has no controls of its own
-  await expect(viewer.getByRole("button", { name: /replay|pause|resume|play/ })).toHaveCount(0);
-
-  // a tour that plays to its end plays again, on a fresh browser, when the section comes back after leaving the screen
-  await page.evaluate(async () => {
-    const root = document.querySelector<HTMLElement>("[data-session-viewer]")!;
-    for (let step = 0; step < 400 && root.dataset.touring === "true"; step += 1) {
-      for (const animation of document.getAnimations()) {
-        const end = animation.effect?.getComputedTiming().endTime;
-        if (animation.playState === "running" && Number.isFinite(Number(end))) animation.finish();
-      }
-      await new Promise((resolve) => setTimeout(resolve, 30));
-    }
-  });
-  await expect(viewer).toHaveAttribute("data-touring", "false");
-  const leaveAndReturn = async () => {
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-    await expect(viewer).not.toBeInViewport();
-    await page.waitForTimeout(300);
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 390, height: 844 },
+  ]) {
+    const context = await browser.newContext(viewport.width < 500 ? { ...PHONE, viewport } : { viewport });
+    const page = await context.newPage();
+    await page.goto("/");
+    const viewer = page.locator("#session [data-session-viewer]");
     await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-  };
-  await leaveAndReturn();
-  await expect(viewer).toHaveAttribute("data-touring", "true", { timeout: 5_000 });
-  await expect(tab("full trace")).toHaveAttribute("aria-selected", "true");
-  await expect(env).toHaveAttribute("aria-expanded", "false");
-
-  // the reader's first press ends it for good: the browser stays where they put it, even after leaving and coming back
-  await tab("files").click();
-  await expect(viewer).toHaveAttribute("data-touring", "false");
-  await leaveAndReturn();
-  await page.waitForTimeout(2_000);
-  await expect(viewer).toHaveAttribute("data-touring", "false");
-  await expect(tab("files")).toHaveAttribute("aria-selected", "true");
-
-  // a scroll inside the window ends a tour too
-  await page.reload();
-  await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-  await expect(viewer).toHaveAttribute("data-touring", "true", { timeout: 10_000 });
-  const box = (await viewer.boundingBox())!;
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.wheel(0, 120);
-  await expect(viewer).toHaveAttribute("data-touring", "false");
-
-  // under reduced motion there is no tour
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-  await expect(viewer.locator(".lp-tour-pointer")).toHaveCount(0);
-  await page.waitForTimeout(1_500);
-  await expect(viewer).toHaveAttribute("data-touring", "false");
+    await expect(viewer.locator(".txn-app")).toBeVisible();
+    // what a hand could change: the tab, how far the conversation is scrolled, what is open, anything moving
+    const state = () =>
+      viewer.evaluate((element) => ({
+        tab: element.querySelector('[role="tab"][aria-selected="true"]')?.textContent?.trim().split(/\s/)[0],
+        scrolled: element.querySelector(".txn-stream")?.scrollTop ?? -1,
+        opened: element.querySelectorAll('[aria-expanded="true"]').length,
+        filters: element.querySelector(".txn-body-grid")?.getAttribute("data-right-rail"),
+        moving: document
+          .getAnimations()
+          .filter((animation) => {
+            const target = (animation.effect as KeyframeEffect | null)?.target;
+            return target instanceof Element && element.contains(target) && animation.playState === "running";
+          }).length,
+        pointers: element.querySelectorAll(".mac-pointer, [data-touring]").length,
+        lit: "highlights" in CSS ? CSS.highlights.size : 0,
+      }));
+    // it opens at rest on the full trace, at its top, nothing open but what fairtrade opens by default
+    const opening = await state();
+    expect(opening, `the opening state at ${viewport.width}`).toMatchObject({
+      tab: "full",
+      scrolled: 0,
+      moving: 0,
+      pointers: 0,
+      lit: 0,
+    });
+    if (viewport.width >= 1024) expect(opening.filters).toBe("closed");
+    // and left alone, it stays exactly so
+    await page.waitForTimeout(6_000);
+    expect(await state(), `the browser changed on its own at ${viewport.width}`).toEqual(opening);
+    await context.close();
+  }
 });
-
 test("the theme follows the system until the reader chooses one", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("/");
