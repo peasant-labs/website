@@ -149,7 +149,7 @@
 /* hero */
 
 .lp-hero {
-  padding-block: var(--site-sec-y, clamp(3.5rem, 7.5vw, 7rem));
+  padding-block: var(--site-sec-y);
 }
 
 .lp-hero-inner {
@@ -185,6 +185,17 @@
   margin-block-start: var(--sp-2);
 }
 
+/* on a phone the two buttons stack at one full width, like the closing section's */
+@media (max-width: 47.99rem) {
+  .lp-ctas {
+    width: 100%;
+  }
+
+  .lp-ctas .btn {
+    flex: 1 1 100%;
+  }
+}
+
 /* what the product stands on: four plain tags under the buttons */
 .lp-pillars {
   display: flex;
@@ -206,11 +217,12 @@
   gap: var(--sp-2);
 }
 
+/* the tags' icons stay in ink, so amber is left to the button and the picture's one detail */
 .lp-pillar-ic {
   flex: none;
   width: var(--ic-md);
   height: var(--ic-md);
-  color: var(--amber);
+  color: var(--ink-3);
 }
 
 /*
