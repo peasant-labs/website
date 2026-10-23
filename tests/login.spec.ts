@@ -167,7 +167,23 @@ for (const entry of fixture.header) {
       if (signedIn) {
         await expect(online).toHaveCount(1);
         await expect(online).toHaveAttribute("href", fixture.signedIn.href);
-        await expect(online).toHaveAccessibleName(`${fixture.signedIn.label}, signed in as @${entry.hint}`);
+        // the docs sidebar's row opens online in a new tab, as its other apps do
+        await expect(online).toHaveAccessibleName(
+          `${fixture.signedIn.label}, signed in as @${entry.hint}${docs ? ", opens in a new tab" : ""}`,
+        );
+        if (docs) {
+          await expect(online).toHaveAttribute("target", "_blank");
+          await expect(online.locator(".site-online-handle")).toHaveText(`@${entry.hint}`);
+          if (width === 1440) {
+            // collapsed to the rail, the row is the initial alone, its words a tooltip
+            await page.getByRole("button", { name: "collapse the sidebar" }).click();
+            await expect(online.locator(".site-online-av")).toBeVisible();
+            await expect
+              .poll(() => online.locator(".site-online-text").evaluate((el) => el.getBoundingClientRect().width))
+              .toBeLessThanOrEqual(1);
+            await expect(online).toHaveAttribute("title", `${fixture.signedIn.label}, signed in as @${entry.hint}`);
+          }
+        }
         await expect(login).toBeHidden();
       } else {
         await expect(online).toHaveCount(0);

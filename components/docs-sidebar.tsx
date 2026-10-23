@@ -22,7 +22,7 @@ import { AppSidebar, APP_SIDEBAR_APPS, type AppSidebarGroup } from "@peasant-lab
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore, type ComponentType } from "react";
-import { OnlineLink } from "@/components/online-link";
+import { OnlineAccount } from "@/components/online-link";
 
 const ICONS: Record<DocsIcon, ComponentType> = {
   overview: BookOpen,
@@ -100,7 +100,7 @@ export function DocsSidebar() {
           <a className="dx-login site-login" href={LOGIN_URL}>
             log in
           </a>
-          <OnlineLink className="dx-login" />
+          <OnlineAccount />
         </>
       }
     />
