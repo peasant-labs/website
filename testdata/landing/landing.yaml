@@ -64,9 +64,9 @@ useCases:
       label: researchers
       capabilities: [build evals from real work, study how agents are used, run a class on agents]
       details:
-        - "Collect real coding sessions in a private group, secrets hidden, then download them to test agents."
-        - "Read how people actually talk to their agents and correct them, in sessions shared with your group."
-        - "Students share their sessions with your class's group, so you can see how each worked with an agent."
+        - "Collect real coding transcripts in a private collective, secrets hidden, then download them to test agents."
+        - "Read how people actually talk to their agents and correct them, in transcripts shared with your collective."
+        - "Students publish their sessions to your class's collective, so you can see how each worked with an agent."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-balance, uc-book, uc-slate]
       cta: { label: sign up free, href: "/?login" }
@@ -74,9 +74,9 @@ useCases:
       label: teams
       capabilities: [review the work behind a diff, onboard from real history, "learn from each other's prompts"]
       details:
-        - "Attach the agent sessions behind your pull request, so your group can read how the change was made."
-        - "New teammates read the sessions behind past pull requests to learn why the code looks the way it does."
-        - "Read what your teammates typed to their agents in the sessions they share, and reuse what works."
+        - "Attach the transcripts behind your pull request, so your collective can read how the change was made."
+        - "New teammates read the transcripts behind past pull requests to learn why the code looks the way it does."
+        - "Read what your teammates typed to their agents in the transcripts they share, and reuse what works."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lens, uc-signpost, uc-candles]
       cta: { label: sign up free, href: "/?login" }
@@ -85,8 +85,8 @@ useCases:
       capabilities: [find any past session, explain a change in one comment, publish on every push]
       details:
         - "Search and open your past sessions from supported agents, all kept on your computer."
-        - "Comment /peasant attach on your pull request, then confirm, to link your shared sessions behind its commits."
-        - "Turn it on once, and each push shares that project's sessions, secrets hidden, with your chosen groups."
+        - "Comment /peasant attach on your pull request, then confirm, to link your transcripts behind its commits."
+        - "Turn it on once, and each push publishes that project's sessions, secrets hidden, to your chosen collectives."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lantern, uc-door, uc-bell]
       cta: { label: install now, href: "#install" }
@@ -94,9 +94,9 @@ useCases:
       label: companies
       capabilities: [keep agent data in-house, see which commits agents wrote, usage across teams]
       details:
-        - "Only members of your group can read its sessions, and joining can be limited to your GitHub org."
-        - "A session is linked to the commits its author made while it ran, so a change traces back to it."
-        - "Your group's page lists who shared what, with which agent, plus token and pull request totals."
+        - "Only members of your collective can read its transcripts, and joining can be limited to your GitHub org."
+        - "A session is linked to the commits its author made while it ran, so a change traces back to its transcript."
+        - "Your collective's page lists who shared what, with which agent, plus token and pull request totals."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-chest, uc-scroll, uc-sacks]
       cta: { label: talk to us, href: "mailto:hello@peasantlabs.org" }

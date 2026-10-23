@@ -17,8 +17,7 @@ const CARDS: readonly { capability: Capability; useCase: UseCase }[] = USE_CASES
 const DRAG_PX = 6;
 /* after a touch lets go, the row waits this long before it moves on its own again */
 const TOUCH_REST_MS = 2400;
-/* on a phone the row steps a card at a time instead of drifting, so a card never rests cut by the screen's edge */
-const NARROW = "(max-width: 47.99rem)";
+/* the row steps a card at a time, so it always rests with a whole card on the title's edge */
 const STEP_MS = 4200;
 
 /**
@@ -27,10 +26,11 @@ const STEP_MS = 4200;
  * audience, its headline, a sentence or two on what it is, and its audience's
  * one action. Every card's words are in the page as served.
  *
- * The row moves on its own and loops: on a wide screen it drifts slowly; on a
- * phone it steps one card at a time and rests with a whole card in view. A
- * second set of the cards follows the first, hidden from assistive technology
- * and out of the tab order, and the row steps back by one set when it reaches it. It holds while
+ * The row moves on its own and loops: every few seconds it steps one card
+ * along and rests with a whole card on the title's left edge, the rest of the
+ * row running off to the right. A second set of the cards follows the first,
+ * hidden from assistive technology and out of the tab order, and the row steps
+ * back by one set when it reaches it. It holds while
  * hovered, keyboard-focused, touched, off screen or in a background tab. It is
  * a real scroll area, so a finger swipes it, the arrow keys move it once it
  * has focus, and a mouse can drag it. Under reduced motion it never moves on
@@ -45,10 +45,10 @@ export function UseCases() {
   const restTimer = useRef(0);
   const playing = onScreen && !reduced && !held.hover && !held.focus && !held.touch && !held.drag;
 
-  // On a phone: one card at a time, a smooth step to the next snap point, and back a set at the seam.
+  // One card at a time: a smooth step to the next snap point, and back a set at the seam.
   useEffect(() => {
     const row = rowRef.current;
-    if (!row || !playing || !window.matchMedia(NARROW).matches) return;
+    if (!row || !playing) return;
     const timer = window.setInterval(() => {
       const cards = [...row.querySelectorAll<HTMLElement>(".uc-card")];
       const first = cards[0]!.offsetLeft;
@@ -70,32 +70,6 @@ export function UseCases() {
     return () => window.clearInterval(timer);
   }, [playing]);
 
-  // On a wider screen: the drift, a few pixels a second, read and written once per frame, back a set at the seam.
-  useEffect(() => {
-    const row = rowRef.current;
-    if (!row || !playing || window.matchMedia(NARROW).matches) return;
-    let frame = 0;
-    let last = 0;
-    let carry = 0;
-    const tick = (time: number) => {
-      if (last) {
-        carry += ((time - last) / 1000) * USE_CASES.speed;
-        const whole = Math.trunc(carry);
-        if (whole) {
-          carry -= whole;
-          const clone = row.querySelector<HTMLElement>("[data-clone]");
-          const set = clone ? clone.offsetLeft - (row.firstElementChild as HTMLElement).offsetLeft : 0;
-          let next = row.scrollLeft + whole;
-          if (set && next >= set) next -= set;
-          row.scrollLeft = next;
-        }
-      }
-      last = time;
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [playing]);
 
   useEffect(() => () => window.clearTimeout(restTimer.current), []);
 

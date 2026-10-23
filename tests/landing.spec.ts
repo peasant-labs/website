@@ -269,6 +269,9 @@ test("the row's cards are one size, about three and a half across a wide screen 
         startsWithTitle: Math.abs(first.left - title.left) < 2,
         fades: getComputedStyle(row).maskImage !== "none",
         room: Math.min(...room),
+        // the pictures sit on the page itself: nothing paints behind them
+        boxes: cards.filter((card) => getComputedStyle(card.querySelector(".uc-figure")!).backgroundColor !== "rgba(0, 0, 0, 0)")
+          .length,
         pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
@@ -278,7 +281,8 @@ test("the row's cards are one size, about three and a half across a wide screen 
     expect(geometry.across, `cards across at ${width}`).toBeLessThanOrEqual(high);
     expect(geometry.startsWithTitle, `the row does not start under its title at ${width}`).toBe(true);
     expect(geometry.fades, `the row does not fade at its edges at ${width}`).toBe(true);
-    expect(geometry.room, `a picture is crowded on its panel at ${width}`).toBeGreaterThanOrEqual(16);
+    expect(geometry.room, `a picture is crowded in its space at ${width}`).toBeGreaterThanOrEqual(16);
+    expect(geometry.boxes, `a picture sits on a box at ${width}`).toBe(0);
     expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
   }
 });
@@ -317,31 +321,45 @@ test("every use-case headline keeps room for two lines, so the words under it li
   expect(spread).toBeLessThan(1);
 });
 
-test("the row drifts on its own and loops, holds when hovered, and stands still and snaps under reduced motion", async ({
+test("the row steps a card at a time and loops, resting on the title's edge, holds when hovered, and stands still under reduced motion", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const row = page.locator("[data-use-cases]");
   await row.scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
   await expect(row).toHaveAttribute("data-playing", "true");
+  // at rest a whole card stands on the section title's left edge, and nothing shows left of it
+  const resting = () =>
+    page.evaluate(() => {
+      const element = document.querySelector("[data-use-cases]")!;
+      const edge = document.querySelector("#uses-title")!.getBoundingClientRect().left;
+      const lefts = [...element.querySelectorAll(".uc-card")].map((card) => card.getBoundingClientRect().left);
+      return lefts.some((left) => Math.abs(left - edge) < 2);
+    });
+  expect(await resting()).toBe(true);
+  expect(
+    await row.evaluate((element) => getComputedStyle(element).maskImage.startsWith("linear-gradient(to right, rgba(0, 0, 0, 0)")),
+  ).toBe(true);
   const start = await row.evaluate((element) => element.scrollLeft);
-  await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeGreaterThan(start + 4);
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 8000 }).toBeGreaterThan(start + 10);
+  await expect.poll(resting).toBe(true);
 
   // at the end of the first set it steps back by one set, so the loop never runs out
   const set = await row.evaluate((element) => {
     const clone = element.querySelector<HTMLElement>("[data-clone]")!;
     const set = clone.offsetLeft - (element.firstElementChild as HTMLElement).offsetLeft;
-    element.scrollLeft = set - 1;
+    element.scrollTo({ left: set, behavior: "instant" });
     return set;
   });
-  await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeLessThan(set / 2);
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 10000 }).toBeLessThan(set / 2);
 
   // hovering holds it where it is
   await row.hover();
   await expect(row).toHaveAttribute("data-playing", "false");
   const held = await row.evaluate((element) => element.scrollLeft);
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(5000);
   expect(await row.evaluate((element) => element.scrollLeft)).toBe(held);
 
   await page.emulateMedia({ reducedMotion: "reduce" });

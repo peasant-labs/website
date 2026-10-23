@@ -127,9 +127,8 @@ function capabilityArt(name: string, alt: string): Art {
  */
 export const USE_CASES = {
   title: "find your use case",
-  /* the row of capabilities, as assistive technology names it, and how fast it drifts on its own, in pixels a second */
+  /* the row of capabilities, as assistive technology names it */
   label: "use cases",
-  speed: 24,
   slides: [
     {
       id: "researchers",
@@ -139,21 +138,21 @@ export const USE_CASES = {
         {
           text: "build evals from real work",
           detail:
-            "Collect real coding sessions in a private group, secrets hidden, then download them to test agents.",
+            "Collect real coding transcripts in a private collective, secrets hidden, then download them to test agents.",
           icon: "check",
           art: capabilityArt("uc-balance", "a balance scale with an amber weight in its right pan"),
         },
         {
           text: "study how agents are used",
           detail:
-            "Read how people actually talk to their agents and correct them, in sessions shared with your group.",
+            "Read how people actually talk to their agents and correct them, in transcripts shared with your collective.",
           icon: "chart",
           art: capabilityArt("uc-book", "an open book on a stand with an amber ribbon bookmark"),
         },
         {
           text: "run a class on agents",
           detail:
-            "Students share their sessions with your class's group, so you can see how each worked with an agent.",
+            "Students publish their sessions to your class's collective, so you can see how each worked with an agent.",
           icon: "class",
           art: capabilityArt("uc-slate", "a slate on an easel with an amber apple on its ledge"),
         },
@@ -168,21 +167,21 @@ export const USE_CASES = {
         {
           text: "review the work behind a diff",
           detail:
-            "Attach the agent sessions behind your pull request, so your group can read how the change was made.",
+            "Attach the transcripts behind your pull request, so your collective can read how the change was made.",
           icon: "pull-request",
           art: capabilityArt("uc-lens", "an amber magnifying glass held up to a page"),
         },
         {
           text: "onboard from real history",
           detail:
-            "New teammates read the sessions behind past pull requests to learn why the code looks the way it does.",
+            "New teammates read the transcripts behind past pull requests to learn why the code looks the way it does.",
           icon: "history",
           art: capabilityArt("uc-signpost", "a signpost with three arrows, the top one amber"),
         },
         {
           text: "learn from each other's prompts",
           detail:
-            "Read what your teammates typed to their agents in the sessions they share, and reuse what works.",
+            "Read what your teammates typed to their agents in the transcripts they share, and reuse what works.",
           icon: "conversation",
           art: capabilityArt("uc-candles", "one candle leaning over to light another, both flames amber"),
         },
@@ -204,14 +203,14 @@ export const USE_CASES = {
         {
           text: "explain a change in one comment",
           detail:
-            "Comment `/peasant attach` on your pull request, then confirm, to link your shared sessions behind its commits.",
+            "Comment `/peasant attach` on your pull request, then confirm, to link your transcripts behind its commits.",
           icon: "link",
           art: capabilityArt("uc-door", "an arched door with an amber note pinned to it"),
         },
         {
           text: "publish on every push",
           detail:
-            "Turn it on once, and each push shares that project's sessions, secrets hidden, with your chosen groups.",
+            "Turn it on once, and each push publishes that project's sessions, secrets hidden, to your chosen collectives.",
           icon: "send",
           art: capabilityArt("uc-bell", "an amber town crier's handbell"),
         },
@@ -226,21 +225,21 @@ export const USE_CASES = {
         {
           text: "keep agent data in-house",
           detail:
-            "Only members of your group can read its sessions, and joining can be limited to your GitHub org.",
+            "Only members of your collective can read its transcripts, and joining can be limited to your GitHub org.",
           icon: "lock",
           art: capabilityArt("uc-chest", "a closed chest with an amber padlock"),
         },
         {
           text: "see which commits agents wrote",
           detail:
-            "A session is linked to the commits its author made while it ran, so a change traces back to it.",
+            "A session is linked to the commits its author made while it ran, so a change traces back to its transcript.",
           icon: "code",
           art: capabilityArt("uc-scroll", "a written scroll with an amber wax seal"),
         },
         {
           text: "usage across teams",
           detail:
-            "Your group's page lists who shared what, with which agent, plus token and pull request totals.",
+            "Your collective's page lists who shared what, with which agent, plus token and pull request totals.",
           icon: "chart",
           art: capabilityArt("uc-sacks", "three tied sacks rising in height like a bar chart, the tallest amber"),
         },

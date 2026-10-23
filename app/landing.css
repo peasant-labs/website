@@ -445,13 +445,15 @@
   padding: var(--sp-2) var(--uc-edge);
   scroll-padding-inline: var(--uc-edge);
   scrollbar-width: none;
+  /* nothing shows left of the title's edge; the row runs on to the right and fades out there */
   mask-image: linear-gradient(
     to right,
-    transparent,
-    #000 var(--uc-fade),
+    transparent calc(var(--uc-edge) - var(--sp-3)),
+    #000 var(--uc-edge),
     #000 calc(100% - var(--uc-fade)),
     transparent
   );
+  scroll-snap-type: x mandatory;
 }
 
 .uc::-webkit-scrollbar {
@@ -491,28 +493,14 @@
   }
 }
 
-/*
- * Under reduced motion nothing moves on its own, and on a phone the row steps
- * card by card: either way it settles on a whole card. On a phone the fade is
- * only as wide as the gutter, so no words sit under it.
- */
-.uc[data-static="true"] {
-  scroll-snap-type: x mandatory;
-}
-
-.uc[data-static="true"] .uc-card {
+/* the row settles on a whole card, whether it stepped on its own or was swiped; on a phone the fade is only gutter-wide */
+.uc-card {
   scroll-snap-align: start;
 }
 
 @media (max-width: 47.99rem) {
   .uc {
     --uc-fade: var(--uc-pad);
-
-    scroll-snap-type: x mandatory;
-  }
-
-  .uc-card {
-    scroll-snap-align: start;
   }
 }
 
@@ -524,14 +512,13 @@
   min-width: 0;
 }
 
-/* the picture on its own page-colour panel, whole, with room on every side */
+/* the picture on the page itself, whole, centred in a space of one shape for every card */
 .uc-figure {
   display: grid;
   place-items: center;
   aspect-ratio: 4 / 3;
   margin: 0;
   overflow: hidden;
-  background: var(--surface-2);
 }
 
 /* drawn on an 8px grid at 704 by 528, shown at a quarter or three eighths so every cell lands on whole pixels */
