@@ -124,15 +124,8 @@ vision:
   cta: { label: about us, href: /about }
 docsNav:
   - { label: overview, href: /docs }
-  - { label: install, href: "/docs#install" }
-  - { label: set up, href: "/docs#kickstart" }
-  - { label: publish, href: "/docs#publish" }
   - { label: agent evals, href: /docs/guides/evals }
   - { label: pr reviews, href: /docs/guides/reviews }
-  - { label: cli, href: "/docs#cli" }
-  - { label: agents, href: "/docs#agents" }
-  - { label: redaction, href: "/docs#redaction" }
-  - { label: collectives, href: "/docs#access" }
   - { label: blog, href: /blog }
 posts:
   - { slug: reclaiming-data-autonomy-as-a-peasant, title: Reclaiming Data Autonomy as a Peasant }

@@ -1,19 +1,9 @@
 /**
- * The docs sidebar: every destination it lists exists on this site. Sections of
- * the overview are anchors on /docs; guides are pages of their own.
+ * The docs sidebar: the docs' own pages. Sections of the overview are not
+ * listed here: they are the overview's "on this page" list, and search finds
+ * them.
  */
-export type DocsIcon =
-  | "overview"
-  | "install"
-  | "kickstart"
-  | "publish"
-  | "evals"
-  | "reviews"
-  | "cli"
-  | "agents"
-  | "redaction"
-  | "access"
-  | "blog";
+export type DocsIcon = "overview" | "evals" | "reviews" | "blog";
 
 export type DocsNavItem = Readonly<{
   id: string;
@@ -25,46 +15,36 @@ export type DocsNavItem = Readonly<{
 export type DocsNavGroup = Readonly<{
   id: string;
   label: string | null;
+  /* the nav landmark's name when the group shows no label */
+  ariaLabel: string;
   items: readonly DocsNavItem[];
 }>;
 
 export const DOCS_NAV: readonly DocsNavGroup[] = [
   {
     id: "start",
-    label: "get started",
-    items: [
-      { id: "overview", label: "overview", href: "/docs", icon: "overview" },
-      { id: "install", label: "install", href: "/docs#install", icon: "install" },
-      { id: "kickstart", label: "set up", href: "/docs#kickstart", icon: "kickstart" },
-      { id: "publish", label: "publish", href: "/docs#publish", icon: "publish" },
-    ],
+    label: null,
+    ariaLabel: "docs pages",
+    items: [{ id: "overview", label: "overview", href: "/docs", icon: "overview" }],
   },
   {
     id: "guides",
     label: "guides",
+    ariaLabel: "guides",
     items: [
       { id: "evals", label: "agent evals", href: "/docs/guides/evals", icon: "evals" },
       { id: "reviews", label: "pr reviews", href: "/docs/guides/reviews", icon: "reviews" },
     ],
   },
   {
-    id: "reference",
-    label: "reference",
-    items: [
-      { id: "cli", label: "cli", href: "/docs#cli", icon: "cli" },
-      { id: "agents", label: "agents", href: "/docs#agents", icon: "agents" },
-      { id: "redaction", label: "redaction", href: "/docs#redaction", icon: "redaction" },
-      { id: "access", label: "collectives", href: "/docs#access", icon: "access" },
-    ],
-  },
-  {
     id: "more",
     label: null,
+    ariaLabel: "more",
     items: [{ id: "blog", label: "blog", href: "/blog", icon: "blog" }],
   },
 ];
 
-/** The page a pathname belongs to. Anchors never claim "current": they are parts of the overview. */
+/** The page a pathname belongs to. */
 export function currentDocsItem(pathname: string): string | null {
   if (pathname === "/docs") return "overview";
   if (pathname.startsWith("/docs/guides/evals")) return "evals";
