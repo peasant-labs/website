@@ -6,7 +6,7 @@ header:
   nav:
     - { label: docs, href: /docs }
     - { label: blog, href: /blog }
-  login: { label: log in, href: https://village.peasantlabs.org/login }
+  login: { label: log in, href: "/?login" }
   # the phone menu, in order, then its actions
   menu:
     - { label: docs, href: /docs }
@@ -57,12 +57,12 @@ useCases:
       label: researchers
       sentence: Build evals and studies from real agent work, shared with consent. Start a private collective for your lab or class.
       capabilities: [build evals from real work, study how agents are used, run a class on agents]
-      cta: { label: sign up free, href: https://village.peasantlabs.org/login }
+      cta: { label: sign up free, href: "/?login" }
     - id: teams
       label: teams
       sentence: Read the sessions behind a pull request, redacted, one click from the diff.
       capabilities: [review the work behind a diff, onboard from real history, "learn from each other's prompts"]
-      cta: { label: sign up free, href: https://village.peasantlabs.org/login }
+      cta: { label: sign up free, href: "/?login" }
     - id: developers
       label: developers
       sentence: Every session with your coding agent, searchable on your computer. Works with Claude Code, Codex, Cursor, OpenCode, Pi and Strike.

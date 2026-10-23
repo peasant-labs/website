@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandMark } from "@/components/fairtrade-client";
+import { LoginDialog, useLoginDialog } from "@/components/login-dialog";
 import { Mark } from "@/components/mark";
 import { SiteNav } from "@/components/site-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -49,6 +50,7 @@ export function SiteHeader() {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const [openedOn, setOpenedOn] = useState(pathname);
+  const login = useLoginDialog();
 
   // A route change closes the menu.
   if (open && openedOn !== pathname) {
@@ -162,7 +164,11 @@ export function SiteHeader() {
             install now
           </a>
           <ThemeToggle className="site-icon-btn site-bar-wide" />
-          <a className="btn btn-secondary site-btn site-login site-bar-wide" href={LOGIN_URL}>
+          <a
+            className="btn btn-secondary site-btn site-login site-bar-wide"
+            href={LOGIN_URL}
+            onClick={(event) => login.show(event)}
+          >
             <BrandMark name="github" />
             log in
           </a>
@@ -218,7 +224,14 @@ export function SiteHeader() {
           style={{ "--i": MENU_NAV.length } as CSSProperties}
         >
           <ThemeToggle className="site-sheet-theme" labelled />
-          <a className="btn btn-secondary site-btn site-login" href={LOGIN_URL} onClick={linkClosesMenu}>
+          <a
+            className="btn btn-secondary site-btn site-login"
+            href={LOGIN_URL}
+            onClick={(event) => {
+              linkClosesMenu();
+              login.show(event, buttonRef.current);
+            }}
+          >
             <BrandMark name="github" />
             log in
           </a>
@@ -227,6 +240,7 @@ export function SiteHeader() {
           </a>
         </div>
       </div>
+      <LoginDialog open={login.open} next={login.next} onClose={login.close} returnFocusRef={login.returnFocusRef} />
     </header>
   );
 }

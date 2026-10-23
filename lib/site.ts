@@ -12,8 +12,33 @@ export const site = {
   tagline: "Record, publish, and share agent sessions with people you trust.",
 } as const;
 
-/** where the hosted app signs people in; signed-out visitors of its home are sent here. */
-export const LOGIN_URL = "https://village.peasantlabs.org/login";
+/** the hosted app; signed-out visitors of any of its pages are sent to this site's log-in dialog. */
+export const ONLINE_URL = "https://village.peasantlabs.org";
+
+/** the online app's privacy notice, readable signed out. */
+export const PRIVACY_URL = `${ONLINE_URL}/privacy`;
+
+/**
+ * where "log in" points: the landing page with its log-in dialog open. On a
+ * page that wears the header the dialog opens in place; from the docs and the
+ * blog, or with script off, the link goes to the landing page.
+ */
+export const LOGIN_URL = "/?login";
+
+/* one "/" then not another, no backslash, no control character: a path on the online app, never another host */
+function isSameSitePath(path: string) {
+  const control = [...path].some((char) => char.charCodeAt(0) < 0x20 || char.charCodeAt(0) === 0x7f);
+  return path.startsWith("/") && !path.startsWith("//") && !path.includes("\\") && !control;
+}
+
+/**
+ * The online app's GitHub sign-in start. `next` is where the online app returns
+ * the person after signing in; it is kept only when it is a path on that app.
+ */
+export function githubSignInUrl(next?: string | null) {
+  const start = `${ONLINE_URL}/auth/start?provider=github`;
+  return next && isSameSitePath(next) ? `${start}&next=${encodeURIComponent(next)}` : start;
+}
 
 export const GITHUB_URL = "https://github.com/peasant-labs";
 

@@ -504,6 +504,42 @@ html {
   }
 }
 
+/* ---------- the log-in dialog ---------- */
+
+/* fairtrade's Dialog and SignInProviders draw it; the site only gives the one action the dialog's width and a full target */
+.site-login-dialog .si-split,
+.site-login-dialog .si-split-row {
+  display: flex;
+  width: 100%;
+}
+
+.site-login-dialog .si-split-primary {
+  flex: 1;
+  justify-content: center;
+  height: auto;
+  min-height: var(--target-comfortable);
+}
+
+.site-login-cli {
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+}
+
+/* the command wraps as a whole, never mid-word on a phone */
+.site-login-cli code {
+  color: var(--ink-strong);
+  white-space: nowrap;
+}
+
+.site-login-privacy {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-comfortable);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+}
+
 /* ---------- reveals ---------- */
 
 /*
