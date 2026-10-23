@@ -566,15 +566,19 @@ test("under reduced motion the steps stack, each scene on its finished frame, wi
   ).toBe(0);
 });
 
-test("a sample session plays as a reel of its beats, read by fairtrade's own transcript parts", async ({ page }) => {
+test("a sample session plays as a reel of its beats, driven by a pointer, read by fairtrade's own transcript parts", async ({
+  page,
+}) => {
   await page.goto("/");
   const section = page.locator("#session");
   const reel = section.locator("[data-reel]");
   await expect(reel).toHaveAttribute("aria-label", fixture.session.label);
   await expect(reel).toHaveAttribute("aria-roledescription", "carousel");
-  // the session goes by its short title, with no crumb trail, no session id, and nothing to operate
+  // the session goes by its short title, with no crumb trail, no ids, and nothing to operate
   await expect(reel.locator(".reel-title")).toHaveText(fixture.session.title);
-  await expect(section).not.toContainText(fixture.session.sessionId);
+  for (const id of [fixture.session.sessionId, fixture.session.commitId]) {
+    await expect(section, `the section shows the id ${id}`).not.toContainText(id);
+  }
   await expect(section.getByRole("tab")).toHaveCount(0);
   await expect(section.locator(".txn-app, .txn-crumb")).toHaveCount(0);
   // no explainer beside it: the markers in the reel say what was redacted
@@ -589,6 +593,9 @@ test("a sample session plays as a reel of its beats, read by fairtrade's own tra
   for (const marker of fixture.session.markers) {
     await expect(reel, `the reel does not show ${marker}`).toContainText(marker);
   }
+  // the outcome is the last beat's, not the title's
+  await expect(reel.locator(".reel-head .reel-outcome")).toHaveCount(0);
+  await expect(reel.locator(".reel-beat").last().locator(".reel-outcome")).toHaveCount(1);
 
   // one segment per beat; each can be chosen, and the window keeps its height whichever is shown
   const browser = section.locator(".mac-win-browser");
@@ -609,16 +616,31 @@ test("a sample session plays as a reel of its beats, read by fairtrade's own tra
   // the stage is one picture to assistive technology, described by the beat at hand
   expect(descriptions.size).toBe(fixture.session.beats.length);
 
-  // it plays on its own: a beat's time running out moves the reel on; hovering holds it
+  // a pointer drives it, hidden from assistive technology: it moves on its own, and lights what each beat is about
+  const pointer = reel.locator(".reel-pointer");
+  await expect(pointer).toHaveAttribute("aria-hidden", "true");
   await segments.nth(0).click();
   await page.mouse.move(0, 0);
-  await reel.locator(".reel-seg-fill").dispatchEvent("animationend");
+  await expect(reel).toHaveAttribute("data-playing", "true");
+  const place = () => pointer.evaluate((arrow) => getComputedStyle(arrow).transform);
+  const from = await place();
+  await expect.poll(place).not.toBe(from);
+  const lit = () =>
+    page.evaluate(() => [...(CSS.highlights.get("reel-point") ?? [])].map(String).join("").trim());
+  await expect.poll(lit, { timeout: 5000 }).toBe(fixture.session.points[0]);
+
+  // a beat's time running out is the pointer's press on the next segment, which moves the reel on
+  const fill = reel.locator(".reel-seg-fill");
+  const running = () => fill.evaluate((bar) => bar.getAnimations().map((animation) => animation.playState));
+  await expect.poll(running).toEqual(["running"]);
+  await fill.evaluate((bar) => bar.getAnimations().forEach((animation) => animation.finish()));
   await expect(segments.nth(1)).toHaveAttribute("aria-current", "true");
+
+  // the reader's pointer holds it: the fill pauses where it is, and the reel's pointer steps aside
   await stage.hover();
   await expect(reel).toHaveAttribute("data-playing", "false");
-  expect(await reel.locator(".reel-seg-fill").evaluate((bar) => getComputedStyle(bar).animationPlayState)).toBe(
-    "paused",
-  );
+  await expect.poll(running).toEqual(["paused"]);
+  await expect.poll(() => pointer.evaluate((arrow) => getComputedStyle(arrow).opacity)).toBe("0");
 
   // it is shown in a browser window whose address field carries the padlock and no address
   await expect(browser.locator(".mac-lights")).toBeVisible();
@@ -632,10 +654,15 @@ test("a sample session plays as a reel of its beats, read by fairtrade's own tra
       .evaluateAll((lights) => lights.map((light) => getComputedStyle(light).backgroundColor)),
   ).toEqual(["rgb(255, 95, 87)", "rgb(254, 188, 46)", "rgb(40, 200, 64)"]);
 
-  // under reduced motion nothing plays on its own
+  // under reduced motion there is no pointer and nothing plays on its own: each beat is its finished still
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(page.locator("#session .reel-seg-fill")).toHaveCount(0);
+  await expect(page.locator("#session .reel-pointer")).toHaveCount(0);
+  for (const [index, point] of fixture.session.points.entries()) {
+    await page.locator("#session .reel-segs").getByRole("button").nth(index).click();
+    await expect.poll(lit).toBe(point);
+  }
 });
 
 test("the theme follows the system until the reader chooses one", async ({ page }) => {

@@ -317,15 +317,17 @@ export const SESSION = {
   sessionTitle: "fix the staging 403",
   /*
    * The reel's beats, read from the sample session (lib/sample-session.ts): the
-   * ask, the tool call whose result carries a redaction marker, the edit and its
-   * commit, and the answer it ended on. Each description says what the beat
-   * shows, for the one image the stage is to assistive technology.
+   * ask, the tool call whose result carries a redaction marker, the edit and the
+   * commit it became, and the answer it ended on with the session's outcome.
+   * `point` is where the reel's pointer rests on each. Each description says what
+   * the beat shows, for the one image the stage is to assistive technology.
    */
   reel: [
     {
       id: "prompt",
       label: "the prompt",
       turn: 0,
+      point: "a 403",
       description: "the prompt: Uploads to staging fail with a 403 since this morning. Can you find out why?",
     },
     {
@@ -333,6 +335,7 @@ export const SESSION = {
       label: "a tool call",
       turn: 1,
       tool: "tc_read_env",
+      point: "<AWS_ACCESS_KEY>",
       description: "a tool call: Claude reads .env, and the access key in it shows as <AWS_ACCESS_KEY>, redacted",
     },
     {
@@ -340,12 +343,17 @@ export const SESSION = {
       label: "the change",
       turn: 3,
       tool: "tc_edit_upload",
-      description: "the change: scripts/upload.ts signs with a profile per environment, committed as 9b20f4e",
+      with: "commit",
+      point: ".reel-commit",
+      description:
+        "the change: scripts/upload.ts signs with a profile per environment, committed as use a per-environment aws profile for build uploads",
     },
     {
       id: "outcome",
       label: "the outcome",
       turn: 6,
+      with: "outcome",
+      point: ".reel-outcome",
       description: "the outcome, resolved: rotate the old key in the production account and remove it from .env",
     },
   ],

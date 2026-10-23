@@ -130,7 +130,11 @@ session:
   title: fix the staging 403
   # the reel's beats, as their segments name them, in order
   beats: [the prompt, a tool call, the change, the outcome]
+  # what the pointer lights on each beat, in the same order
+  points: [a 403, "<AWS_ACCESS_KEY>", use a per-environment aws profile for build uploads, resolved]
+  # ids the sample carries, shown nowhere on the page: the session's and its commit's
   sessionId: sess_c41e07
+  commitId: 9b20f4e
   # the pull request's check, in village's own words (backend/internal/digest/render.go) for one transcript and one commit
   check: { name: peasant / prompts, summary: 1 transcript traces 1 of 1 commits }
   # placeholders the redaction engine writes, visible in the reel's beats

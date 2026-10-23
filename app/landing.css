@@ -2169,10 +2169,10 @@
   font-size: var(--fs-sm);
 }
 
-/* the reel sits in a browser window that keeps one height, whichever beat it shows */
+/* the reel sits in a browser window that keeps one height, whichever beat it shows; svh, so a phone's toolbars never resize it */
 .lp-session-win .mac-body {
   flex: none;
-  block-size: clamp(32rem, 82dvh, 48rem);
+  block-size: clamp(28rem, 72svh, 44rem);
 }
 
 /* on a phone Safari's chrome scales down in proportion and keeps only what fits: the lights, back, forward and the address */
@@ -2187,26 +2187,39 @@
 }
 
 /*
- * The transcript reel: the session's title, its agent and outcome, then a
- * stage where the beat at hand sits in the middle at full ink while the others
- * dim, and a slim segment per beat under it.
+ * The transcript reel: the session's title and agent, then a stage where the
+ * beat at hand sits in the middle at full ink while the others dim, and a slim
+ * segment per beat under it. All three keep to one centred column, the width a
+ * transcript page reads at, however wide the window.
  */
 .reel {
+  --reel-col: 52rem;
+  --reel-gutter: max(var(--sp-6), (100% - var(--reel-col)) / 2);
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
   background: var(--surface);
 }
 
 .reel-head {
-  display: grid;
-  gap: var(--sp-2);
-  padding: var(--sp-5) var(--sp-6) var(--sp-4);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2) var(--sp-5);
+  padding: var(--sp-5) var(--reel-gutter) var(--sp-4);
   border-bottom: var(--bd);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
 }
 
 /* the session's own title: user content keeps its case */
 .reel-title {
+  min-width: 0;
   overflow: hidden;
   color: var(--ink-strong);
   font-family: var(--font-display);
@@ -2216,17 +2229,6 @@
   text-overflow: ellipsis;
   text-transform: none;
   white-space: nowrap;
-}
-
-.reel-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-2) var(--sp-4);
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  letter-spacing: 0;
 }
 
 .reel-stage {
@@ -2240,31 +2242,36 @@
   display: grid;
   gap: var(--sp-5);
   margin: 0;
-  padding: var(--sp-6);
+  padding: var(--sp-6) var(--reel-gutter);
   list-style: none;
 }
 
 .reel-beat {
   min-width: 0;
-  max-width: 52rem;
-  opacity: 0.36;
+  opacity: 0.42;
 }
 
 .reel-beat[data-on="true"] {
   opacity: 1;
 }
 
-.reel-tool {
+.reel-part {
   display: grid;
+  justify-items: start;
   gap: var(--sp-3);
+}
+
+.reel-part > :not(.reel-commit, .reel-outcome) {
+  justify-self: stretch;
 }
 
 /*
  * The reel keeps to the words a beat needs: a turn shows who spoke and what
- * was said, without its disclosure, time, link or token count, and an edit
- * shows its lines without repeating its path or a count of lines changed.
+ * was said, without its disclosure, time, link, model or token count, and a
+ * tool call shows its result or its lines without repeating its path or
+ * counting them.
  */
-.reel :is(.txn-turnnum, .txn-turn-disclosure, .txn-anchor, .txn-diff-head),
+.reel :is(.txn-turnnum, .txn-turn-disclosure, .txn-anchor, .txn-turnmodel, .txn-code-head, .txn-diff-head),
 .reel .term-anchor:has(.txn-turntime, .txn-tokbadge) {
   display: none;
 }
@@ -2283,17 +2290,23 @@
   overflow: hidden;
 }
 
+/* the run of text the pointer rests on, lit like a selection */
+::highlight(reel-point) {
+  background-color: color-mix(in oklab, var(--amber) 32%, transparent);
+  color: var(--ink-strong);
+}
+
 .reel-commit {
   color: var(--ink-2);
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
 }
 
-/* one slim segment per beat: the one at hand fills with its time, and any can be chosen */
+/* one slim segment per beat, on the column: the one at hand fills with its time, and any can be chosen */
 .reel-segs {
   display: flex;
   gap: var(--sp-2);
-  padding: 0 var(--sp-5);
+  padding: 0 var(--reel-gutter);
   border-top: var(--bd);
 }
 
@@ -2330,19 +2343,6 @@
   background: var(--amber);
   transform: scaleX(0);
   transform-origin: left center;
-  animation-name: reel-fill;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-
-@keyframes reel-fill {
-  to {
-    transform: scaleX(1);
-  }
-}
-
-.reel[data-playing="false"] .reel-seg-fill {
-  animation-play-state: paused;
 }
 
 /* under reduced motion nothing fills: the chosen beat's segment is simply amber */
@@ -2352,6 +2352,50 @@
 
 .reel-seg:focus-visible {
   outline-offset: -6px;
+}
+
+/*
+ * The pointer that drives the reel, over everything in it. It shows once the
+ * reel first plays, and steps aside while the reader's own pointer or focus
+ * holds the reel.
+ */
+.mac-pointer {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 3;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+.mac-pointer svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* the arrow's tip, so a press dips toward what it points at */
+  transform-origin: 12.5% 9.4%;
+}
+
+.mac-pointer path {
+  fill: var(--ink-strong);
+  stroke: var(--canvas);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.reel-pointer {
+  opacity: 0;
+  transition: opacity 240ms var(--ease-out);
+}
+
+.reel[data-pointer="on"] .reel-pointer {
+  opacity: 1;
+}
+
+.reel[data-held="true"] .reel-pointer {
+  opacity: 0;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -2379,8 +2423,12 @@
 }
 
 @media (max-width: 47.99rem) {
+  .reel {
+    --reel-gutter: var(--sp-4);
+  }
+
   .reel-head {
-    padding: var(--sp-4);
+    padding-block: var(--sp-4);
   }
 
   .reel-title {
@@ -2388,11 +2436,12 @@
   }
 
   .reel-track {
-    padding: var(--sp-4);
+    padding-block: var(--sp-4);
   }
 
-  .reel-segs {
-    padding: 0 var(--sp-4);
+  .mac-pointer {
+    width: 19px;
+    height: 19px;
   }
 }
 
