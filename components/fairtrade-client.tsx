@@ -5,6 +5,7 @@
 // Component. Re-export through this boundary instead.
 export {
   Accordion,
+  AppSidebarLayout,
   BrandMark,
   Breadcrumb,
   Button,

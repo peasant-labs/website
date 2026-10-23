@@ -18,8 +18,8 @@ importers:
         specifier: ^16.2.1
         version: 16.2.6(@mdx-js/loader@3.1.1(supports-color@7.2.0))(@mdx-js/react@3.1.1(@types/react@19.2.14)(react@19.2.4))
       '@peasant-labs/fairtrade':
-        specifier: 0.0.32
-        version: 0.0.32(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1)(supports-color@7.2.0)
+        specifier: 0.0.33
+        version: 0.0.33(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1)(supports-color@7.2.0)
       '@types/mdx':
         specifier: ^2.0.13
         version: 2.0.13
@@ -516,8 +516,8 @@ packages:
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
 
-  '@peasant-labs/fairtrade@0.0.32':
-    resolution: {integrity: sha512-U8NDOg7lYscIsPuUrc9sAA22qk/HWvEvpcA513ZrvLiVN+lOuQz94itYTMrG0RBX1m384LiLLQuFW0JF+Hi02A==}
+  '@peasant-labs/fairtrade@0.0.33':
+    resolution: {integrity: sha512-W/fy8ggCL5cS9NBlqEIIhROYYbk+hK3nGG7v0eiyoo4KBh12G1tfoba4dFXjWUJ8iZ9I9G5zLEVwMUigOXf26Q==}
     engines: {node: '>=26'}
     peerDependencies:
       '@xyflow/react': ^12.0.0
@@ -3255,7 +3255,7 @@ snapshots:
 
   '@nolyfill/is-core-module@1.0.39': {}
 
-  '@peasant-labs/fairtrade@0.0.32(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1)(supports-color@7.2.0)':
+  '@peasant-labs/fairtrade@0.0.33(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1)(supports-color@7.2.0)':
     dependencies:
       '@peasant-labs/schema': 0.29.1
       '@tanstack/react-table': 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)

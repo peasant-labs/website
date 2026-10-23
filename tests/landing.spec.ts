@@ -329,10 +329,13 @@ test("the docs sidebar lists only destinations that exist and marks the page you
 }) => {
   await page.goto("/docs");
   const sidebar = page.getByRole("complementary", { name: "docs" });
-  const links = sidebar.locator(".dx-item");
+  const links = sidebar.locator("nav:not(.asb-apps) a.asb-item");
   expect(
     await links.evaluateAll((items) =>
-      items.map((item) => ({ label: item.textContent?.trim(), href: item.getAttribute("href") })),
+      items.map((item) => ({
+        label: item.querySelector(".asb-label")?.textContent?.trim(),
+        href: item.getAttribute("href"),
+      })),
     ),
   ).toEqual(fixture.docsNav);
 
@@ -348,21 +351,21 @@ test("the docs sidebar lists only destinations that exist and marks the page you
   for (const item of fixture.docsNav.filter((entry) => !entry.href.includes("#"))) {
     await page.goto(item.href);
     await expect(
-      page.getByRole("complementary", { name: "docs" }).locator('[aria-current="page"]'),
+      page.getByRole("complementary", { name: "docs" }).locator('nav:not(.asb-apps) [aria-current="page"]'),
     ).toHaveText(item.label);
   }
 });
 
-test("on a phone the docs sidebar folds into a menu that opens in place", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+test("on a phone the docs sidebar folds into fairtrade's top bar and drawer", async ({ browser }) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
   await page.goto("/docs/guides/evals");
-  const menu = page.getByRole("button", { name: "open the docs menu" });
-  await expect(page.locator(".dx-item").first()).toBeHidden();
-  await menu.click();
-  await expect(page.getByRole("button", { name: "close the docs menu" })).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator(".dx-item").first()).toBeVisible();
+  await expect(page.locator(".asb-item").first()).toBeHidden();
+  await page.getByRole("button", { name: "open the menu" }).tap();
+  await expect(page.locator("nav:not(.asb-apps) a.asb-item").first()).toBeVisible();
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations).toEqual([]);
+  await context.close();
 });
 
 test("the blog lists every post and each post renders under its own title", async ({ page }) => {
