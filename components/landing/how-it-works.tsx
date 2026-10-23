@@ -12,9 +12,8 @@ type StepId = (typeof HOW.steps)[number]["id"];
 /**
  * How it works: three steps beside a small window that acts each one out. The
  * scenes are drawn in HTML and CSS, not recorded: their resting styles are the
- * last frame, and every animation only says where it starts, so reduced motion
- * (which fairtrade's base turns into a near-zero duration) simply shows the
- * finished scene.
+ * last frame, and every animation only says where it starts. Under reduced
+ * motion no animation is attached, so each scene shows its finished frame.
  *
  * A scene plays when it is chosen. Until then it holds its first frame while the
  * window is off screen, so nobody scrolls down to an animation that already

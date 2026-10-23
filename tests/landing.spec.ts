@@ -273,6 +273,66 @@ test("how it works: three steps, each with its scene, and a consent line that re
   }
 });
 
+test("under reduced motion every scene rests on its finished frame, with no cursor", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const steps = page.locator(".hw-step");
+
+  // Read straight away, and with the window off screen: there is nothing to wait for.
+  for (const [index] of fixture.how.steps.entries()) {
+    await steps.nth(index).click();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const frame = await page.locator(".hw-scene").evaluate((scene) => {
+      const style = (selector: string, pseudo?: string) => {
+        const element = scene.querySelector(selector);
+        return element ? getComputedStyle(element, pseudo ?? null) : null;
+      };
+      return {
+        animations: scene.getAnimations({ subtree: true }).length,
+        typedCovers: [...scene.querySelectorAll(".hw-typed")].map(
+          (typed) => getComputedStyle(typed, "::after").transform,
+        ),
+        lines: [...scene.querySelectorAll(".hw-term > div")].map((line) => getComputedStyle(line).opacity),
+        raw: [...scene.querySelectorAll(".hw-raw")].map((raw) => getComputedStyle(raw).opacity),
+        blocks: [...scene.querySelectorAll(".hw-lbl")].map((block) => getComputedStyle(block).opacity),
+        // the digit sitting in the counter's window
+        count: (() => {
+          const slot = scene.querySelector(".hw-cnt");
+          if (!slot) return null;
+          const top = slot.getBoundingClientRect().top;
+          const shown = [...slot.querySelectorAll(".hw-strip span")].find(
+            (digit) => Math.abs(digit.getBoundingClientRect().top - top) < 2,
+          );
+          return shown?.textContent ?? null;
+        })(),
+        chipSkin: style(".hw-chip", "::after")?.opacity ?? null,
+        boxSkin: style(".hw-box", "::after")?.opacity ?? null,
+        done: style(".hw-done")?.opacity ?? null,
+        cursor: style(".hw-cur-track")?.display ?? null,
+      };
+    });
+    expect(frame.animations, `scene ${index + 1} still animates`).toBe(0);
+    if (index === 0) {
+      // every line typed and shown
+      expect(frame.typedCovers.every((transform) => transform === "matrix(0, 0, 0, 1, 0, 0)")).toBe(true);
+      expect(frame.lines.every((opacity) => opacity === "1")).toBe(true);
+    }
+    if (index === 1) {
+      // the three values are hidden behind their blocks, and the count reads 3
+      expect(frame.raw).toEqual(["0", "0", "0"]);
+      expect(frame.blocks).toEqual(["1", "1", "1"]);
+      expect(frame.count).toBe("3");
+    }
+    if (index === 2) {
+      // the collective picked, the box ticked, the confirmation shown, no cursor
+      expect(frame.chipSkin).toBe("0");
+      expect(frame.boxSkin).toBe("0");
+      expect(frame.done).toBe("1");
+      expect(frame.cursor).toBe("none");
+    }
+  }
+});
+
 test("a sample session opens in fairtrade's viewer, labelled as sample, with redaction markers", async ({
   page,
 }) => {
