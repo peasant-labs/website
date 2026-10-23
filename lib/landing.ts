@@ -356,7 +356,7 @@ export const VISION = {
 
 /*
  * The picture that closes the landing, beside its last line and its two
- * buttons: an open gate, in the same dithered family as the use-case pictures.
+ * buttons: a cottage door open on warm light, drawn like the hero and the use-case pictures.
  */
 export const CLOSE = {
   art: art("closing", "a cottage with its door swung open on warm amber light", 704, 528),
