@@ -44,17 +44,17 @@ site:
       h1: a commons for AI coding transcripts
       metadata:
         title: projects | peasant
-        description: peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.
+        description: Peasant keeps the sessions your coding agents leave behind on your own machine. Peasant online is where you publish the ones worth sharing.
         canonical: https://peasantlabs.org/projects
         openGraph:
           title: projects | peasant
-          description: peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.
+          description: Peasant keeps the sessions your coding agents leave behind on your own machine. Peasant online is where you publish the ones worth sharing.
           url: https://peasantlabs.org/projects
           type: website
         twitter:
           card: summary_large_image
           title: projects | peasant
-          description: peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.
+          description: Peasant keeps the sessions your coding agents leave behind on your own machine. Peasant online is where you publish the ones worth sharing.
     - id: peasant
       path: /projects/peasant
       h1: keep your coding-agent transcripts. share the ones you choose.
@@ -234,7 +234,7 @@ viewer:
   label: sample session in the transcript browser
   sessionId: sess_7f2a91
   # the demo transcript must never read as a real record
-  disclosure: sample data, not a real record
+  disclosure: Sample data, not a real record
   turns: 7
   # the viewer opens on its own summary, not in the middle of the raw log
   openingTab: highlights
@@ -257,7 +257,7 @@ story:
 # appears on the page, and the section says so above the panel.
 redaction:
   title: what stays private when you share
-  note: sample data, not a real scan.
+  note: Sample data, not a real scan.
   # standard is the only level that ships; minimal and maximum are gone.
   level: standard
   removedLevels: [minimal, maximum]
@@ -268,9 +268,9 @@ redaction:
 community:
   title: building for community first
   points:
-    - publishing is always a deliberate act, never a default
-    - every shared session carries the reuse license you picked
-    - groups set their own rules, open to all or approved by the owner
+    - Publishing is always a deliberate act, never a default
+    - Every shared session carries the reuse license you picked
+    - Groups set their own rules, open to all or approved by the owner
 faq:
   title: questions
   label: frequently asked questions
@@ -301,11 +301,11 @@ peasant:
     backLabel: back
     copyAllLabel: copy all commands
     steps:
-      - { id: install, title: install, comment: "# one line installs peasant", command: curl -fsSL https://peasantlabs.org/install | bash }
-      - { id: set-up, title: set up, comment: "# choose which projects and sessions to keep", command: peasant kickstart }
-      - { id: bring-work-in, title: bring your work in, comment: "# reads what your agents already saved", command: peasant ingest }
-      - { id: open-it, title: open it, comment: "# opens your sessions in the browser", command: peasant web start }
-      - { id: share-one, title: share one, comment: "# sends one copy to peasant online, only when you ask", command: peasant village push }
+      - { id: install, title: install, comment: "# One line installs peasant", command: curl -fsSL https://peasantlabs.org/install | bash }
+      - { id: set-up, title: set up, comment: "# Choose which projects and sessions to keep", command: peasant kickstart }
+      - { id: bring-work-in, title: bring your work in, comment: "# Reads what your agents already saved", command: peasant ingest }
+      - { id: open-it, title: open it, comment: "# Opens your sessions in the browser", command: peasant web start }
+      - { id: share-one, title: share one, comment: "# Sends one copy to peasant online, only when you ask", command: peasant village push }
   uses:
     - { id: remember-why, title: you forgot how something got built }
     - { id: one-list-for-every-tool, title: you use more than one coding agent }
@@ -328,18 +328,18 @@ village:
     backLabel: back
     copyAllLabel: copy all commands
     steps:
-      - { id: install, title: install, comment: "# one line installs peasant", command: curl -fsSL https://peasantlabs.org/install | bash }
-      - { id: set-up, title: set up, comment: "# choose which projects and sessions to keep", command: peasant kickstart }
-      - { id: bring-work-in, title: bring your work in, comment: "# reads what your agents already saved", command: peasant ingest }
-      - { id: open-it, title: open it, comment: "# opens your sessions in the browser", command: peasant web start }
-      - { id: share-one, title: share one, comment: "# sends one copy to peasant online, only when you ask", command: peasant village push }
+      - { id: install, title: install, comment: "# One line installs peasant", command: curl -fsSL https://peasantlabs.org/install | bash }
+      - { id: set-up, title: set up, comment: "# Choose which projects and sessions to keep", command: peasant kickstart }
+      - { id: bring-work-in, title: bring your work in, comment: "# Reads what your agents already saved", command: peasant ingest }
+      - { id: open-it, title: open it, comment: "# Opens your sessions in the browser", command: peasant web start }
+      - { id: share-one, title: share one, comment: "# Sends one copy to peasant online, only when you ask", command: peasant village push }
   community:
     title: join your community
     joinLabel: join collective
   example:
     head: example collective
     title: desert archivists
-    desc: a shared shelf for redacted transcripts about data pipelines and ingestion.
+    desc: A shared shelf for redacted transcripts about data pipelines and ingestion.
     bullets:
       - verified-only acceptance
       - redaction review required
@@ -451,15 +451,15 @@ evidence:
     internalProvenance: Complete official Entire capability corpus
 comparison:
   title: how it compares to similar tools
-  intro: here is what peasant does next to the closest public tools in this space, checked against their public docs and our own source.
-  bundleDefinition: peasant here means both tools, peasant on your computer and peasant online, and the schema they share. the other column covers similar tools and the documentation they publish.
-  meaningNote: a dash means we did not find it in those tools' public docs. it does not mean they cannot do it.
+  intro: Here is what peasant does next to the closest public tools in this space, checked against their public docs and our own source.
+  bundleDefinition: Peasant here means both tools, peasant on your computer and peasant online, and the schema they share. The other column covers similar tools and the documentation they publish.
+  meaningNote: A dash means we did not find it in those tools' public docs. It does not mean they cannot do it.
   rows:
     - id: keep-it-local
       capability: keep everything on your own machine
       peasantLabs:
         status: "yes"
-        qualification: sessions are stored in a local database, and anything leaving it is an explicit action.
+        qualification: Sessions are stored in a local database, and anything leaving it is an explicit action.
         sources: [peasant-readme]
       entire:
         status: "yes"
@@ -469,7 +469,7 @@ comparison:
       capability: read the sessions your agents already saved
       peasantLabs:
         status: "yes"
-        qualification: reads Claude Code, OpenCode, Codex, Cursor, and Strike sessions into one record.
+        qualification: Reads Claude Code, OpenCode, Codex, Cursor, and Strike sessions into one record.
         sources: [peasant-adapters, peasant-readme]
       entire:
         status: "yes"
@@ -479,7 +479,7 @@ comparison:
       capability: search your past work
       peasantLabs:
         status: partial
-        qualification: keyword search over saved messages, not meaning-based search.
+        qualification: Keyword search over saved messages, not meaning-based search.
         sources: [peasant-search]
       entire:
         status: "yes"
@@ -489,7 +489,7 @@ comparison:
       capability: publish only the sessions you pick
       peasantLabs:
         status: "yes"
-        qualification: publishing is one command per copy, and the original stays local.
+        qualification: Publishing is one command per copy, and the original stays local.
         sources: [peasant-readme, village-readme]
       entire:
         status: "yes"
@@ -499,21 +499,21 @@ comparison:
       capability: set a reuse license on what you share
       peasantLabs:
         status: "yes"
-        qualification: an optional Creative Commons choice travels with each published copy.
+        qualification: An optional Creative Commons choice travels with each published copy.
         sources: [village-governance, peasant-pull]
       entire:
         status: not-documented
-        qualification: we found no per-session reuse license in Entire's public docs.
+        qualification: We found no per-session reuse license in Entire's public docs.
         sources: [entire-declared-corpus-2026-07-28]
     - id: shared-groups
       capability: share into a group other people can join
       peasantLabs:
         status: "yes"
-        qualification: peasant online collectives are either open to contributions or approved by the owner.
+        qualification: Peasant online collectives are either open to contributions or approved by the owner.
         sources: [village-collectives]
       entire:
         status: not-documented
-        qualification: we found no equivalent group moderation model in Entire's public docs.
+        qualification: We found no equivalent group moderation model in Entire's public docs.
         sources: [entire-declared-corpus-2026-07-28]
 viewports:
   - { id: desktop-dark, width: 1280, height: 900, theme: dark, reflowEquivalent: null }

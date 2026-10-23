@@ -811,12 +811,12 @@ export const SUITE = {
   metadata: {
     title: "projects | peasant",
     description:
-      "peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.",
+      "Peasant keeps the sessions your coding agents leave behind on your own machine. Peasant online is where you publish the ones worth sharing.",
     canonical: "/projects",
   },
   title: "a commons for AI coding transcripts",
   intro:
-    "peasant keeps the sessions your coding agents leave behind on your own machine. peasant online is where you publish the ones worth sharing.",
+    "Peasant keeps the sessions your coding agents leave behind on your own machine. Peasant online is where you publish the ones worth sharing.",
   /*
    * The heading is the question a colleague actually asks, and the paragraph
    * under it is the situation that question arrives in. The transcript browser
@@ -825,10 +825,10 @@ export const SUITE = {
    */
   viewerTitle: "\"hey, can you help me review this?\"",
   viewerIntro:
-    "you spent friday afternoon working through a nasty bug with an agent. on monday someone asks how you fixed it. you want to show them that one session, not hand over everything else you have ever done.",
+    "You spent Friday afternoon working through a nasty bug with an agent. On Monday someone asks how you fixed it. You want to show them that one session, not hand over everything else you have ever done.",
   /* Under the panel rather than above it: the run of steps connects straight
    * into the viewer, and a line of small print in that gap breaks the join. */
-  viewerNote: "sample data, not a real record.",
+  viewerNote: "Sample data, not a real record.",
   viewerLabel: "sample session in the transcript browser",
   install: {
     command: "curl -fsSL https://peasantlabs.org/install | bash",
@@ -837,40 +837,40 @@ export const SUITE = {
   // The FAQ answers the licensing question in full. This paragraph only defines
   // the two tools and does not carry legal or availability qualifiers.
   whatIntro:
-    "peasant keeps your coding agent sessions private and searchable, and lets you share one with people you trust. it is two tools: peasant on your computer, and peasant online.",
+    "Peasant keeps your coding agent sessions private and searchable, and lets you share one with people you trust. It is two tools: peasant on your computer, and peasant online.",
   /* Two lines: the section is what we make, then what that means. The break is
    * authored rather than left to wrapping — `white-space: pre-line` on the
    * heading keeps it wherever the line lands. */
   cardsTitle: "our projects,\nlocal and open-source",
-  cardsIntro: "peasant runs on your machine. peasant online is where published copies live.",
+  cardsIntro: "Peasant runs on your machine. Peasant online is where published copies live.",
   story: {
     title: "install, keep, and share your sessions",
     situation:
-      "install peasant, read back what your agents already saved, then publish only the session you choose. four commands, and everything before the last one stays on your machine.",
+      "Install peasant, read back what your agents already saved, then publish only the session you choose. Four commands, and everything before the last one stays on your machine.",
     stepsLabel: "getting started, install to published copy",
     steps: [
       {
         id: "install",
         title: "install",
-        body: "one line, no account. it installs peasant, and everything it does from here runs on your computer.",
+        body: "One line, no account. It installs peasant, and everything it does from here runs on your computer.",
         command: "curl -fsSL https://peasantlabs.org/install | bash",
       },
       {
         id: "ingest",
         title: "bring your sessions in",
-        body: "reads the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already saved on your computer, and keeps them there.",
+        body: "Reads the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already saved on your computer, and keeps them there.",
         command: "peasant ingest",
       },
       {
         id: "open-the-dashboard",
         title: "open it in your browser",
-        body: "look through what it found, read any session back, and choose what stays private before any of it leaves.",
+        body: "Look through what it found, read any session back, and choose what stays private before any of it leaves.",
         command: "peasant web start",
       },
       {
         id: "contribute-to-the-commons",
         title: "share one session",
-        body: "sends the one session you approved to peasant online, with your private details hidden. the original stays on your computer and nothing else goes with it.",
+        body: "Sends the one session you approved to peasant online, with your private details hidden. The original stays on your computer and nothing else goes with it.",
         command: "peasant village push",
       },
     ] as Four<StoryStep>,
@@ -878,11 +878,11 @@ export const SUITE = {
   community: {
     title: "building for community first",
     body:
-      "the sessions are yours first: they sit on your machine and nothing leaves until you send it. peasant online exists for the ones you do send, so the work behind a fix becomes something other people can learn from instead of something that disappears.",
+      "The sessions are yours first: they sit on your machine and nothing leaves until you send it. Peasant online exists for the ones you do send, so the work behind a fix becomes something other people can learn from instead of something that disappears.",
     points: [
-      "publishing is always a deliberate act, never a default",
-      "every shared session carries the reuse license you picked",
-      "groups set their own rules, open to all or approved by the owner",
+      "Publishing is always a deliberate act, never a default",
+      "Every shared session carries the reuse license you picked",
+      "Groups set their own rules, open to all or approved by the owner",
     ] as Three<string>,
   },
   faq: {
@@ -893,37 +893,37 @@ export const SUITE = {
         id: "open-source",
         question: "is it open source?",
         answer:
-          "yes. peasant, online (the village repo) and the shared schema are Apache-2.0. session data you publish can carry its own Creative Commons content license.",
+          "Yes. Peasant, online (the village repo) and the shared schema are Apache-2.0. Session data you publish can carry its own Creative Commons content license.",
       },
       {
         id: "agents",
         question: "which coding agents does it read?",
         answer:
-          "it reads sessions from Claude Code, Codex, Cursor, OpenCode, and Strike. sessions your tools have already deleted cannot be recovered.",
+          "It reads sessions from Claude Code, Codex, Cursor, OpenCode, and Strike. Sessions your tools have already deleted cannot be recovered.",
       },
       {
         id: "uploads",
         question: "does anything get uploaded on its own?",
         answer:
-          "no. peasant stores everything locally and only sends a copy when you run a publish command.",
+          "No. Peasant stores everything locally and only sends a copy when you run a publish command.",
       },
       {
         id: "search",
         question: "how good is the search?",
         answer:
-          "it is keyword search across the text of your saved sessions. it does not search by meaning, so exact words work better than descriptions.",
+          "It is keyword search across the text of your saved sessions. It does not search by meaning, so exact words work better than descriptions.",
       },
       {
         id: "others-work",
         question: "what about sessions other people publish?",
         answer:
-          "you can pull the ones you are allowed to read into a separate local space. they stay theirs, and you cannot republish them.",
+          "You can pull the ones you are allowed to read into a separate local space. They stay theirs, and you cannot republish them.",
       },
       {
         id: "village",
         question: "do i have to use peasant online?",
         answer:
-          "no. peasant works on its own as a local record. peasant online only ever holds copies you send it.",
+          "No. Peasant works on its own as a local record. Peasant online only ever holds copies you send it.",
       },
     ] as readonly [SuiteQuestion, ...SuiteQuestion[]],
   },
@@ -954,12 +954,12 @@ export const PROJECTS = {
     hero: {
       title: "keep your coding-agent transcripts. share the ones you choose.",
       body:
-        "peasant gathers the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already save on your computer, in one place you can search and read back. nothing goes anywhere else unless you send it.",
+        "Peasant gathers the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already save on your computer, in one place you can search and read back. Nothing goes anywhere else unless you send it.",
     },
     start: {
       title: "get started",
       intro:
-        "five commands, start to finish. everything here runs on your own machine.",
+        "Five commands, start to finish. Everything here runs on your own machine.",
       stepsLabel: "setup steps",
       continueLabel: "continue",
       doneLabel: "done",
@@ -969,52 +969,52 @@ export const PROJECTS = {
         {
           id: "install",
           title: "install",
-          comment: "# one line installs peasant",
+          comment: "# One line installs peasant",
           command: "curl -fsSL https://peasantlabs.org/install | bash",
         },
         {
           id: "set-up",
           title: "set up",
-          comment: "# choose which projects and sessions to keep",
+          comment: "# Choose which projects and sessions to keep",
           command: "peasant kickstart",
         },
         {
           id: "bring-work-in",
           title: "bring your work in",
-          comment: "# reads what your agents already saved",
+          comment: "# Reads what your agents already saved",
           command: "peasant ingest",
         },
         {
           id: "open-it",
           title: "open it",
-          comment: "# opens your sessions in the browser",
+          comment: "# Opens your sessions in the browser",
           command: "peasant web start",
         },
         {
           id: "share-one",
           title: "share one",
-          comment: "# sends one copy to peasant online, only when you ask",
+          comment: "# Sends one copy to peasant online, only when you ask",
           command: "peasant village push",
         },
       ] as Five<StartStep>,
     },
     usesTitle: "where it helps",
-    usesIntro: "three things that get easier once every session is in one place.",
+    usesIntro: "Three things that get easier once every session is in one place.",
     uses: [
       {
         id: "remember-why",
         title: "you forgot how something got built",
-        body: "find the session behind a change and read what you and the agent actually did.",
+        body: "Find the session behind a change and read what you and the agent actually did.",
       },
       {
         id: "one-list-for-every-tool",
         title: "you use more than one coding agent",
-        body: "every tool's sessions land in the same list, so you search once instead of four times.",
+        body: "Every tool's sessions land in the same list, so you search once instead of four times.",
       },
       {
         id: "share-just-one",
         title: "you want to share one session",
-        body: "check it, hide what should stay private, and publish that copy to peasant online.",
+        body: "Check it, hide what should stay private, and publish that copy to peasant online.",
       },
     ],
     related: [
@@ -1062,12 +1062,12 @@ export const PROJECTS = {
     hero: {
       title: "a shared home for the agent sessions people publish",
       body:
-        "peasant online holds the sessions people choose to publish. a collective decides who can read them, each one can carry an open license for reuse, and every change to who can see what is kept on record.",
+        "Peasant online holds the sessions people choose to publish. A collective decides who can read them, each one can carry an open license for reuse, and every change to who can see what is kept on record.",
     },
     start: {
       title: "get started",
       intro:
-        "five commands, start to finish. everything here runs on your own machine.",
+        "Five commands, start to finish. Everything here runs on your own machine.",
       stepsLabel: "setup steps",
       continueLabel: "continue",
       doneLabel: "done",
@@ -1078,31 +1078,31 @@ export const PROJECTS = {
         {
           id: "install",
           title: "install",
-          comment: "# one line installs peasant",
+          comment: "# One line installs peasant",
           command: "curl -fsSL https://peasantlabs.org/install | bash",
         },
         {
           id: "set-up",
           title: "set up",
-          comment: "# choose which projects and sessions to keep",
+          comment: "# Choose which projects and sessions to keep",
           command: "peasant kickstart",
         },
         {
           id: "bring-work-in",
           title: "bring your work in",
-          comment: "# reads what your agents already saved",
+          comment: "# Reads what your agents already saved",
           command: "peasant ingest",
         },
         {
           id: "open-it",
           title: "open it",
-          comment: "# opens your sessions in the browser",
+          comment: "# Opens your sessions in the browser",
           command: "peasant web start",
         },
         {
           id: "share-one",
           title: "share one",
-          comment: "# sends one copy to peasant online, only when you ask",
+          comment: "# Sends one copy to peasant online, only when you ask",
           command: "peasant village push",
         },
       ] as Five<StartStep>,
@@ -1110,14 +1110,14 @@ export const PROJECTS = {
     community: {
       title: "join your community",
       body:
-        "a collective is a shared shelf of sessions for a team or a group. look at what one already shares, then join it when you want to add your own and learn from theirs.",
+        "A collective is a shared shelf of sessions for a team or a group. Look at what one already shares, then join it when you want to add your own and learn from theirs.",
       joinLabel: "join collective",
     },
     example: {
       head: "example collective",
       title: "desert archivists",
       desc:
-        "a shared shelf for redacted transcripts about data pipelines and ingestion.",
+        "A shared shelf for redacted transcripts about data pipelines and ingestion.",
       bullets: ["verified-only acceptance", "redaction review required"],
       members: "24",
       transcripts: "118",
@@ -1126,7 +1126,7 @@ export const PROJECTS = {
     governance: {
       title: "who sees what, written down first",
       body:
-        "when you ask to join, the owners see who you are so they can say yes; everyone else still sees you as anonymous. the terms are written out before you agree, so nothing about you is shared without you knowing.",
+        "When you ask to join, the owners see who you are so they can say yes; everyone else still sees you as anonymous. The terms are written out before you agree, so nothing about you is shared without you knowing.",
     },
     related: [
       {
@@ -1188,8 +1188,8 @@ export type RedactionMatch = Readonly<{
 export const REDACTION = {
   title: "what stays private when you share",
   intro:
-    "before a copy leaves your machine, peasant scans it for secrets, personal details, and internal links, then shows you every match it found. you decide what stays hidden, and what it does not catch stays your call rather than a silent pass.",
-  note: "sample data, not a real scan.",
+    "Before a copy leaves your machine, peasant scans it for secrets, personal details, and internal links, then shows you every match it found. You decide what stays hidden, and what it does not catch stays your call rather than a silent pass.",
+  note: "Sample data, not a real scan.",
   label: "redaction review on a sample session",
   /*
    * Standard is the only level the product ships — minimal and maximum are being
@@ -1235,8 +1235,8 @@ export const REDACTION = {
 export const METADATA_EXPLORER = {
   title: "many harnesses, one unified schema",
   intro:
-    "claude code, codex, cursor, strike, opencode, and pi each record their own kinds in their own file. pick a harness, then read its native file line by line beside the unified session peasant lowers it into; each field group is linked to the region of the document it explains.",
-  note: "sample data, not a real record.",
+    "Claude Code, Codex, Cursor, Strike, OpenCode, and Pi each record their own kinds in their own file. Pick a harness, then read its native file line by line beside the unified session peasant lowers it into; each field group is linked to the region of the document it explains.",
+  note: "Sample data, not a real record.",
   label: "schema explorer on a sample session",
 } as const;
 
@@ -1249,11 +1249,11 @@ export const COMPARISON_MARKS = {
 export const COMPARISON = {
   title: "how it compares to similar tools",
   intro:
-    "here is what peasant does next to the closest public tools in this space, checked against their public docs and our own source.",
+    "Here is what peasant does next to the closest public tools in this space, checked against their public docs and our own source.",
   bundleDefinition:
-    "peasant here means both tools, peasant on your computer and peasant online, and the schema they share. the other column covers similar tools and the documentation they publish.",
+    "Peasant here means both tools, peasant on your computer and peasant online, and the schema they share. The other column covers similar tools and the documentation they publish.",
   meaningNote:
-    "a dash means we did not find it in those tools' public docs. it does not mean they cannot do it.",
+    "A dash means we did not find it in those tools' public docs. It does not mean they cannot do it.",
   /*
    * `qualification` and `evidence` below are no longer rendered — the page shows
    * marks only. They stay as the internal record of what each mark was checked
@@ -1267,7 +1267,7 @@ export const COMPARISON = {
       peasantLabs: {
         status: "yes",
         qualification:
-          "sessions are stored in a local database, and anything leaving it is an explicit action.",
+          "Sessions are stored in a local database, and anything leaving it is an explicit action.",
         evidence: ["peasant-readme"],
       },
       entire: {
@@ -1282,7 +1282,7 @@ export const COMPARISON = {
       peasantLabs: {
         status: "yes",
         qualification:
-          "reads Claude Code, OpenCode, Codex, Cursor, and Strike sessions into one record.",
+          "Reads Claude Code, OpenCode, Codex, Cursor, and Strike sessions into one record.",
         evidence: ["peasant-adapters", "peasant-readme"],
       },
       entire: {
@@ -1297,7 +1297,7 @@ export const COMPARISON = {
       capability: "search your past work",
       peasantLabs: {
         status: "partial",
-        qualification: "keyword search over saved messages, not meaning-based search.",
+        qualification: "Keyword search over saved messages, not meaning-based search.",
         evidence: ["peasant-search"],
       },
       entire: {
@@ -1311,7 +1311,7 @@ export const COMPARISON = {
       capability: "publish only the sessions you pick",
       peasantLabs: {
         status: "yes",
-        qualification: "publishing is one command per copy, and the original stays local.",
+        qualification: "Publishing is one command per copy, and the original stays local.",
         evidence: ["peasant-readme", "village-readme"],
       },
       entire: {
@@ -1327,13 +1327,13 @@ export const COMPARISON = {
       peasantLabs: {
         status: "yes",
         qualification:
-          "an optional Creative Commons choice travels with each published copy.",
+          "An optional Creative Commons choice travels with each published copy.",
         evidence: ["village-governance", "peasant-pull"],
       },
       entire: {
         status: "not-documented",
         qualification:
-          "we found no per-session reuse license in Entire's public docs.",
+          "We found no per-session reuse license in Entire's public docs.",
         evidence: ["entire-declared-corpus-2026-07-28"],
       },
     },
@@ -1343,13 +1343,13 @@ export const COMPARISON = {
       peasantLabs: {
         status: "yes",
         qualification:
-          "peasant online collectives are either open to contributions or approved by the owner.",
+          "Peasant online collectives are either open to contributions or approved by the owner.",
         evidence: ["village-collectives"],
       },
       entire: {
         status: "not-documented",
         qualification:
-          "we found no equivalent group moderation model in Entire's public docs.",
+          "We found no equivalent group moderation model in Entire's public docs.",
         evidence: ["entire-declared-corpus-2026-07-28"],
       },
     },

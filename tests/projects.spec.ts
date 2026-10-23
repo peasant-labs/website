@@ -1348,30 +1348,30 @@ function uppercaseSentenceOpenings(value: string): string[] {
     });
 }
 
-async function authoredTextNodes(page: Page): Promise<string[]> {
+/* sentences of prose that open in lowercase; a sentence that opens on code, a quote or a figure is left as written */
+function lowercaseSentenceOpenings(value: string): string[] {
+  return value
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => /^[a-z]/.test(sentence));
+}
+
+/* the headings and the prose a reader reads, outside quoted content, citations, code and decoration */
+async function authoredCopy(page: Page): Promise<{ headings: string[]; prose: string[] }> {
   return page.locator(".pj-main").evaluate((main) => {
-    // The demo transcript is quoted session content, not authored site copy, so
-    // it keeps its natural sentence casing the same way code and citations do.
-    //
-    // Text hidden from assistive technology is decoration by definition, never
-    // prose a reader is meant to read — the design system's avatars derive
-    // uppercase initials from a name ("desert archivists" renders "DA"), and
-    // this guard is about how sentences were authored, not about glyphs a
-    // component generated.
+    // the construction notice is the owner's own words, kept as written
     const excluded =
-      ".pj-citations, .pj-evidence-ledger, [data-transcript-demo], [data-redaction-demo], code, pre, [aria-hidden='true']";
-    const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
-    const values: string[] = [];
-    let node = walker.nextNode();
-    while (node) {
-      const parent = node.parentElement;
-      const value = node.textContent?.trim();
-      if (parent && value && !parent.closest(excluded)) {
-        values.push(value);
-      }
-      node = walker.nextNode();
-    }
-    return values;
+      ".pj-citations, .pj-evidence-ledger, [data-transcript-demo], [data-redaction-demo], [data-under-construction], [aria-hidden='true']";
+    const read = (selector: string) =>
+      [...main.querySelectorAll<HTMLElement>(selector)]
+        .filter((element) => !element.closest(excluded))
+        .map((element) => {
+          const copy = element.cloneNode(true) as HTMLElement;
+          copy.querySelectorAll("code, pre").forEach((code) => code.replaceWith("`code`"));
+          return copy.textContent?.replace(/\s+/g, " ").trim() ?? "";
+        })
+        .filter((text) => text !== "");
+    return { headings: read("h1, h2, h3"), prose: read("[data-reading-text], [data-qualification]") };
   });
 }
 
@@ -1389,14 +1389,24 @@ test("the fixture is a complete independent oracle", () => {
   );
 });
 
-test("project copy is authored lowercase without corrupting preserved literals", async ({ page }) => {
+test("project copy: headings are authored lowercase, prose in sentence case, never coerced by CSS", async ({
+  page,
+}) => {
+  // The interface's own labels are lowercase; sentences a reader reads are written in sentence case,
+  // as in the docs. Quoted session content, citations, code and decoration keep their own casing.
   const projectRoutes = fixture.site.routes.filter((route) => route.path.startsWith("/projects"));
-  const violations: Array<{ route: string; sentence: string }> = [];
+  const violations: Array<{ route: string; kind: string; sentence: string }> = [];
   for (const route of projectRoutes) {
     await page.goto(route.path);
-    for (const value of await authoredTextNodes(page)) {
+    const { headings, prose } = await authoredCopy(page);
+    for (const value of headings) {
       for (const sentence of uppercaseSentenceOpenings(value)) {
-        violations.push({ route: route.path, sentence });
+        violations.push({ route: route.path, kind: "heading", sentence });
+      }
+    }
+    for (const value of prose) {
+      for (const sentence of lowercaseSentenceOpenings(value)) {
+        violations.push({ route: route.path, kind: "prose", sentence });
       }
     }
     const textTransforms = await page
@@ -1503,7 +1513,7 @@ test("village renders the title, get-started wizard, and join-community example"
   const start = page.locator("[data-start]");
   await expect(start).toHaveCount(1);
   await expect(start.locator("h2")).toHaveText(fixture.village.start.title);
-  expect(serverHtml).toContain("five commands, start to finish. everything here runs on your own machine.");
+  expect(serverHtml).toContain("Five commands, start to finish. Everything here runs on your own machine.");
   await expect(page.locator("[data-copy-all]")).toHaveAttribute(
     "aria-label",
     `copy ${fixture.village.start.copyAllLabel}`,

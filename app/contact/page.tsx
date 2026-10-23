@@ -18,7 +18,7 @@ export default function ContactPage() {
               contact
             </h1>
             <p className="pj-lede" data-reading-text>
-              leave your email and we will send you one message when it is ready.
+              Leave your email and we will send you one message when it is ready.
             </p>
           </div>
         </header>

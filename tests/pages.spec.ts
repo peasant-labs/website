@@ -71,10 +71,14 @@ test("on a phone the contact form's field and button are full-size tap targets",
   await context.close();
 });
 
-test("/about says who we are, not that it will later", async ({ page }) => {
+test("/about says who we are, not that it will later, in sentence-case prose", async ({ page }) => {
   await page.goto("/about");
   const main = page.locator("main");
   await expect(main).not.toContainText("will carry");
+  // prose is written in sentence case; only the interface's own labels are lowercase
+  for (const paragraph of await main.locator("p").allTextContents()) {
+    expect(paragraph.trim()[0], paragraph).toMatch(/[A-Z]/);
+  }
   await expect(main.getByRole("link", { name: "the essay on the blog" })).toHaveAttribute(
     "href",
     "/blog/reclaiming-data-autonomy-as-a-peasant",
