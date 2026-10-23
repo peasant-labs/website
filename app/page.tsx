@@ -39,7 +39,16 @@ export default function Home() {
         <section className="lp-sec lp-hero" aria-labelledby="hero-title">
           <div className="site-wrap lp-hero-inner">
             <h1 id="hero-title" data-fade>
-              {HERO.title}
+              {/* a hyphenated word stays on one line: "open-" never ends a line on a phone */}
+              {HERO.title.split(/(\S+-\S+)/).map((part, index) =>
+                index % 2 ? (
+                  <span key={part} className="lp-nowrap">
+                    {part}
+                  </span>
+                ) : (
+                  part
+                ),
+              )}
             </h1>
             <p className="lp-lede" data-fade style={fade(1)}>
               {HERO.lede}
