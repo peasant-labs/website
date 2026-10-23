@@ -86,7 +86,7 @@ export const USE_CASES = {
       id: "teams",
       label: "teams",
       sentence: "Read the sessions behind a pull request, redacted, one click from the diff.",
-      art: art("uc-teams", "a round table with three mugs", 704, 528),
+      art: art("uc-teams", "a wooden table with three mugs", 704, 528),
       capabilities: [
         { text: "review the work behind a diff", icon: "pull-request" },
         { text: "onboard from real history", icon: "history" },
