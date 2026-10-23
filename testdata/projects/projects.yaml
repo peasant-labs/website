@@ -25,19 +25,19 @@ site:
   routes:
     - id: home
       path: /
-      h1: a fair commons for agent transcripts
+      h1: an open commons for agent transcripts
       metadata:
-        title: "peasant: a fair commons for agent transcripts"
+        title: "peasant: an open commons for agent transcripts"
         description: Record, publish, and share agent sessions with people you trust.
         canonical: https://peasantlabs.org
         openGraph:
-          title: "peasant: a fair commons for agent transcripts"
+          title: "peasant: an open commons for agent transcripts"
           description: Record, publish, and share agent sessions with people you trust.
           url: https://peasantlabs.org
           type: website
         twitter:
           card: summary_large_image
-          title: "peasant: a fair commons for agent transcripts"
+          title: "peasant: an open commons for agent transcripts"
           description: Record, publish, and share agent sessions with people you trust.
     - id: projects
       path: /projects

@@ -21,15 +21,18 @@ function art(name: string, alt: string, width: number, height: number): Art {
 
 /*
  * The hero says the mission in the owner's words, "commons" and "agent
- * transcripts". The lede and the tags claim only what ships: peasant and
- * village are open source, sessions stay and are redacted on the computer,
- * nothing leaves until it is published, and a contributor's handle shows on
- * their transcripts unless they turn that off.
+ * transcripts", with "open" for open source. The tags are the four promises
+ * the product stands on, and each is backed by what ships: redaction on the
+ * computer and access set per collective; peasant and village under
+ * Apache-2.0; the same flow for every harness peasant reads; harvesting that
+ * runs in parallel and skips sessions that have not changed. The lede claims
+ * that nothing leaves until it is published, and that a contributor's handle
+ * shows on their transcripts unless they turn that off.
  */
 export const HERO = {
-  title: "a fair commons for agent transcripts",
+  title: "an open commons for agent transcripts",
   lede: "Peasant keeps your coding agent sessions on your computer. When you publish one, it is redacted there first and shared under your handle, only with the collectives you pick.",
-  pillars: ["open source", "local first", "consent always", "credited to you"],
+  pillars: ["secure", "open source", "agent-agnostic", "performant"],
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
   /*
