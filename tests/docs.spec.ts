@@ -102,6 +102,24 @@ test("on a phone search opens from the drawer as a full-screen sheet", async ({ 
   await context.close();
 });
 
+test("on a phone, closing search gives focus to a control the reader can see", async ({ browser }) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
+  await page.goto("/docs");
+  const menu = page.getByRole("button", { name: "open the menu" });
+  for (const close of ["Escape", "close"] as const) {
+    await menu.tap();
+    await page.getByRole("button", { name: /search/ }).tap();
+    await expect(page.getByRole("dialog", { name: "search the docs and blog" })).toBeVisible();
+    if (close === "Escape") await page.keyboard.press("Escape");
+    else await page.getByRole("button", { name: "close" }).tap();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(menu, `after ${close}`).toBeFocused();
+    await expect(menu).toBeVisible();
+  }
+  await context.close();
+});
+
 test("the docs switcher offers no other app", async ({ page }) => {
   await page.goto("/docs");
   const switcher = page.getByRole("complementary", { name: "docs" }).locator(".asb-apps");

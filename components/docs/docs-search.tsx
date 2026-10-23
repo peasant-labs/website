@@ -126,6 +126,31 @@ function isTyping(target: EventTarget | null) {
   return target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName);
 }
 
+const visible = (element: Element) => !element.checkVisibility || element.checkVisibility({ visibilityProperty: true });
+
+/*
+ * Focus goes back to what opened search, if a reader can still see it. On a
+ * phone the sidebar is a drawer that closed when search opened (it may still be
+ * sliding away), so nothing inside it counts and the menu button that reopens
+ * it takes focus instead. Each candidate must actually take focus before we
+ * stop.
+ */
+function restoreFocus(saved: HTMLElement | null) {
+  const bar = document.querySelector(".asb-bar");
+  const drawer = bar && visible(bar) ? document.querySelector(".asb-panel") : null;
+  const candidates = [
+    saved,
+    document.querySelector<HTMLElement>(".asb-search .asb-item"),
+    document.querySelector<HTMLElement>(".asb-menu"),
+    document.getElementById("content"),
+  ];
+  for (const element of candidates) {
+    if (!element?.isConnected || !visible(element) || drawer?.contains(element)) continue;
+    element.focus({ preventScroll: true });
+    if (document.activeElement === element) return;
+  }
+}
+
 export function DocsSearchProvider({ children }: { children: ReactNode }) {
   const [isOpen, setOpen] = useState(false);
   const returnFocus = useRef<HTMLElement | null>(null);
@@ -137,11 +162,7 @@ export function DocsSearchProvider({ children }: { children: ReactNode }) {
 
   const close = useCallback((restore: boolean) => {
     setOpen(false);
-    if (restore) {
-      // the drawer that held the trigger may be gone; then focus the page instead
-      const target = returnFocus.current?.isConnected ? returnFocus.current : document.getElementById("content");
-      requestAnimationFrame(() => target?.focus());
-    }
+    if (restore) requestAnimationFrame(() => restoreFocus(returnFocus.current));
   }, []);
 
   useEffect(() => {
