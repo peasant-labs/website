@@ -650,9 +650,6 @@
     border: var(--bd-strong);
   }
 
-  .pj-transcript > * {
-    min-width: 60rem;
-  }
 
   /*
    * An application surface earns more room than the reading column. Past the
@@ -1329,15 +1326,28 @@
 }
 
 /*
- * `.txn-meta` turns into a horizontally scrolling chip strip under a narrow
- * VIEWPORT media query. Inside the demo that rule misfires: the wrapper already
- * guarantees the composite 60rem regardless of viewport, so the strip has room
- * it does not know about and becomes a scroll region with nothing focusable in
- * it — a serious axe failure at 320px. The wrapper owns the scrolling here.
+ * The viewer reflows on its own below 1080px (one column) and 768px (the phone
+ * header and tab row). Its narrow rule makes `.txn-meta` a sideways-scrolling
+ * strip with nothing focusable in it, which axe fails at 320px; in the demos
+ * the facts wrap instead.
  */
 .pj-transcript .txn-meta {
   flex-wrap: wrap;
   overflow-x: visible;
+  white-space: normal;
+}
+
+/* a tab label stays on one line; the tab row scrolls instead */
+.pj-transcript .txn-tab {
+  white-space: nowrap;
+}
+
+/* The keyboard hints mean nothing without a keyboard. */
+@media (pointer: coarse) {
+  .pj-transcript .txn-footer:has(> .txn-hint:only-child),
+  .pj-transcript .txn-hint {
+    display: none;
+  }
 }
 
 /*
