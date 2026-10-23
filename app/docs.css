@@ -562,7 +562,7 @@
 
 @container dx-page (min-width: 36rem) {
   .dx-ref {
-    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 15.5rem) minmax(0, 1fr);
   }
 
   .dx-ref > div {
