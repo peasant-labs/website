@@ -128,40 +128,58 @@ test("the install commands type in once when the terminal comes into view, and s
   expect(await characters.first().evaluate((character) => getComputedStyle(character).opacity)).toBe("1");
 });
 
-test("the transcript's window slides in from the right once, and rests inside the page", async ({ page }) => {
+test("the session's windows fan out from one stack once, the transcript wide in front, all inside the page", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const stage = page.locator(".lp-session-stage");
-  await expect(stage).toHaveAttribute("data-entered", "false");
-  expect(await stage.evaluate((element) => getComputedStyle(element).opacity)).toBe("0");
+  const windows = page.locator(".lp-windows");
+  const back = windows.locator(".lp-windows-term");
+  await expect(windows).toHaveAttribute("data-fanned", "false");
+  expect(await back.evaluate((element) => getComputedStyle(element).opacity)).toBe("0");
 
-  await stage.scrollIntoViewIfNeeded();
-  await expect(stage).toHaveAttribute("data-entered", "true");
+  await windows.scrollIntoViewIfNeeded();
+  await expect(windows).toHaveAttribute("data-fanned", "true");
   await expect
-    .poll(() => stage.evaluate((element) => getComputedStyle(element).transform))
+    .poll(() => back.evaluate((element) => getComputedStyle(element).transform))
     .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
-  // it rests inside the page, with room beside it: no window runs past the content's edge
-  const edges = await page.evaluate(() => {
-    const window = document.querySelector("#session .mac-win")!.getBoundingClientRect();
-    const wrap = document.querySelector("#session .site-wrap")!;
-    const box = wrap.getBoundingClientRect();
-    const inset = parseFloat(getComputedStyle(wrap).paddingRight);
-    return { right: window.right, contentRight: box.right - inset };
-  });
-  expect(edges.right).toBeLessThanOrEqual(edges.contentRight + 1);
-  // and it takes the whole column: nothing sits beside it
-  const share = await page.evaluate(() => {
-    const window = document.querySelector("#session .mac-win")!.getBoundingClientRect();
-    const column = document.querySelector("#session .lp-session")!;
-    const style = getComputedStyle(column);
-    const inner = column.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
-    return window.width / inner;
-  });
-  expect(share).toBeGreaterThan(0.98);
+  await expect
+    .poll(() => windows.locator(".lp-check").evaluate((element) => getComputedStyle(element).transform))
+    .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    const layout = await windows.evaluate((group) => {
+      const rect = (selector: string) => group.querySelector(selector)!.getBoundingClientRect();
+      const column = group.parentElement!;
+      const style = getComputedStyle(column);
+      const left = column.getBoundingClientRect().left + parseFloat(style.paddingLeft);
+      const inner = column.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      return {
+        back: rect(".lp-windows-term"),
+        front: rect(".lp-windows-front .mac-win"),
+        check: rect(".lp-check"),
+        left,
+        right: left + inner,
+        inner,
+        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+      };
+    });
+    // behind and up to the left; the transcript wide in front; the check over the front window's lower left edge
+    expect(layout.back.left, `at ${width}`).toBeLessThan(layout.front.left);
+    expect(layout.back.top, `at ${width}`).toBeLessThan(layout.front.top);
+    expect(layout.check.left, `at ${width}`).toBeLessThan(layout.front.left);
+    expect(layout.check.right, `at ${width}`).toBeGreaterThan(layout.front.left);
+    expect(layout.check.top, `at ${width}`).toBeLessThan(layout.front.bottom);
+    if (width === 1440) expect(layout.front.width / layout.inner).toBeGreaterThan(0.85);
+    expect(layout.front.right, `the transcript runs past the content at ${width}`).toBeLessThanOrEqual(layout.right + 1);
+    expect(layout.back.left, `the Terminal runs past the content at ${width}`).toBeGreaterThanOrEqual(layout.left - 1);
+    expect(layout.overflow, `the page overflows at ${width}`).toBe(false);
+  }
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  expect(await stage.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
+  expect(await back.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
 });
 
 test("the transcript reel fits at phone and tablet widths, with its redaction markers read whole", async ({

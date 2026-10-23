@@ -48,7 +48,7 @@ export type LandingFixture = {
     title: string;
     beats: string[];
     sessionId: string;
-    note: string;
+    check: { name: string; summary: string };
     markers: string[];
   };
   vision: { line: string; cta: Link };

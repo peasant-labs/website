@@ -41,21 +41,27 @@
   padding-block: clamp(3rem, 7.5vw, 7.5rem);
 }
 
-.lp-stack > h2,
-.uc-title,
-.lp-install-head > h2,
-.lp-session-head > h2 {
+/*
+ * Every section opens on the same header: its title on a row of its own, at
+ * the content's left edge, with clear space before the content starts. A row
+ * holds the title and at most one short link beside it.
+ */
+.lp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-7);
+  margin-block-end: clamp(2rem, 4.5vw, 4rem);
+}
+
+.lp-title {
   color: var(--ink-strong);
   font-family: var(--font-display);
   font-size: clamp(1.875rem, 3.4vw, 2.75rem);
   font-weight: 700;
   line-height: 1.12;
   text-wrap: balance;
-}
-
-.lp-stack {
-  display: grid;
-  gap: clamp(2.5rem, 5vw, 4.5rem);
 }
 
 /* the agents peasant reads, drifting under the hero and fading out at both edges */
@@ -467,11 +473,6 @@
   display: grid;
   gap: 0 clamp(2rem, 5vw, 4rem);
   min-width: 0;
-}
-
-.uc-title {
-  grid-column: 1 / -1;
-  margin-block-end: clamp(2.5rem, 5vw, 4rem);
 }
 
 .uc-card:nth-of-type(n + 2) {
@@ -1902,20 +1903,7 @@
 
 /* get started */
 
-/* the heading and the docs link on top, then the tabs, then the Terminal across the whole column */
-.lp-install {
-  display: grid;
-  gap: clamp(2.5rem, 5vw, 4rem);
-}
-
-.lp-install-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--sp-4) var(--sp-7);
-}
-
+/* under the header: the tabs, then the Terminal across the whole column */
 .lp-install-guide {
   display: inline-flex;
   align-items: center;
@@ -2093,28 +2081,94 @@
 
 /* a published session */
 
-/* the heading and its note on top, then one browser window across the whole column */
-.lp-session {
-  display: grid;
-  gap: clamp(2.5rem, 5vw, 4rem);
+/*
+ * Three windows, layered: Claude Code behind and up to the left, the transcript
+ * in front and wide, the pull request's check over the front window's lower
+ * left edge. A phone keeps all three with smaller offsets.
+ */
+.lp-windows {
+  --lp-windows-x: clamp(1rem, 6vw, 5rem);
+
+  position: relative;
+  min-width: 0;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem) 0;
+  padding-inline-start: var(--lp-windows-x);
 }
 
-.lp-session-head {
+.lp-windows-term {
+  position: absolute;
+  z-index: 0;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: min(80%, 34rem);
+}
+
+.lp-windows-term .mac-win {
+  height: clamp(12rem, 26vw, 22rem);
+}
+
+.lp-windows-reply {
+  grid-template-columns: 2ch minmax(0, 1fr);
+  padding-inline-start: 0;
+}
+
+.lp-windows-front {
+  position: relative;
+  z-index: 1;
+}
+
+/* the check holds nothing to press, so a press on the window under its edge reaches the window */
+.lp-check {
+  position: absolute;
+  z-index: 2;
+  inset-block-end: clamp(4rem, 7vw, 6rem);
+  inset-inline-start: 0;
+  pointer-events: none;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--sp-4) var(--sp-7);
-  min-width: 0;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  max-width: calc(100% - var(--sp-5));
+  padding: var(--sp-4) var(--sp-5);
+  border: var(--bd-strong);
+  background: var(--canvas);
+  box-shadow: var(--overlay-shadow);
 }
 
-.lp-note {
-  max-inline-size: 46ch;
+/* on a phone the check sits under the window, over its lower edge only, clear of the reel's controls */
+@media (max-width: 47.99rem) {
+  .lp-check {
+    position: relative;
+    inset: auto;
+    width: fit-content;
+    margin-block-start: -0.75rem;
+    margin-inline-start: calc(-1 * var(--lp-windows-x));
+  }
+}
+
+.lp-check-ic {
+  flex: none;
+  width: var(--ic-lg);
+  height: var(--ic-lg);
+  margin-block-start: 2px;
+  color: var(--success);
+}
+
+.lp-check-text {
+  display: grid;
+  gap: 2px;
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
+
+.lp-check-name {
+  color: var(--ink-strong);
+  font-size: var(--fs-body);
+  font-weight: 700;
+}
+
+.lp-check-summary {
   color: var(--ink-3);
-}
-
-.lp-session-stage {
-  min-width: 0;
+  font-size: var(--fs-sm);
 }
 
 /* the reel sits in a browser window that keeps one height, whichever beat it shows */
@@ -2344,48 +2398,76 @@
   }
 }
 
-
-
-
-/* the first time it comes into view, the window slides in a little from the right */
+/* the first time they come into view, the back window and the check fan out from behind the front one */
 @media (prefers-reduced-motion: no-preference) {
-  .lp-session-stage {
+  .lp-windows-term,
+  .lp-check {
     transition:
-      transform 900ms var(--ease-spring),
+      transform 1000ms var(--ease-spring),
       opacity 600ms var(--ease-out);
   }
 
-  .js-reveal .lp-session-stage[data-entered="false"] {
+  .lp-check {
+    transition-delay: 240ms;
+  }
+
+  .js-reveal .lp-windows[data-fanned="false"] .lp-windows-term {
     opacity: 0;
-    transform: translate3d(2.5rem, 0, 0);
+    transform: translate3d(18%, 2.5rem, 0) scale(0.94);
+  }
+
+  .js-reveal .lp-windows[data-fanned="false"] .lp-check {
+    opacity: 0;
+    transform: translate3d(0, 1.5rem, 0);
   }
 }
 
 /* vision */
 
 /*
- * The picture, then the statement under it at a moderate size, then its
- * button, centred, with more air above and below than any other section.
+ * The statement's own stage: a page-colour panel with a hairline, like the
+ * other pictures' panels, larger. The picture stands on a ground line that runs
+ * the panel's width; the statement and its button stand under it, centred.
  *
- * The picture is drawn on an 8px cell grid at 1200 by 512. It shows whole, at
- * a half (600px) or a quarter (300px) of that, which on a 2x or 3x screen
- * lands every cell on whole device pixels.
+ * The picture is drawn on an 8px cell grid at 1200 by 512, its figures' feet
+ * on row 452. It shows whole, at a half (600px) or a quarter (300px) of that,
+ * which on a 2x or 3x screen lands every cell on whole device pixels.
  */
-.lp-vision {
-  padding-block: clamp(4rem, 10vw, 10rem);
-}
-
 .lp-vision-inner {
   display: grid;
   justify-items: center;
   gap: clamp(2rem, 4vw, 3rem);
+  overflow: hidden;
+  padding: clamp(3rem, 7vw, 6rem) clamp(1.25rem, 5vw, 4rem);
+  border: var(--bd);
+  background: var(--surface-2);
   text-align: center;
 }
 
+.lp-vision-scene {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+}
+
 .lp-vision-art {
+  position: relative;
   width: 300px;
   max-width: 100%;
-  margin-block-end: var(--sp-4);
+}
+
+.lp-vision-art .art-img {
+  position: relative;
+  z-index: 1;
+}
+
+/* the ground, under the figures' feet, out to the panel's edges */
+.lp-vision-art::after {
+  content: "";
+  position: absolute;
+  inset-block-start: calc(452 / 512 * 100%);
+  inset-inline: -100vw;
+  border-top: 1px solid var(--rule-strong);
 }
 
 @media (min-width: 48rem) {
@@ -2406,10 +2488,109 @@
   text-wrap: balance;
 }
 
-/* the footer that closes the landing: whitespace above and between, no rules */
+/*
+ * The landing ends on a destination: the mark, the line at display size, then
+ * install, its first command to copy in place, and the docs. Room above it and
+ * below it sets it apart from the footer's links, with no rules.
+ */
 .site-shell:has(> .lp) .site-foot,
 .site-shell:has(> .lp) .site-foot-cta-row {
   border: 0;
+}
+
+.site-foot-close {
+  margin-block-end: clamp(2.5rem, 6vw, 5rem);
+  padding-block: clamp(4rem, 10vw, 9rem);
+}
+
+.site-foot-close .site-foot-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  text-align: center;
+}
+
+.site-foot-close-mark {
+  width: 2.25rem;
+  height: 2.75rem;
+  color: var(--amber);
+}
+
+.site-foot-close .site-foot-line {
+  max-inline-size: 16ch;
+  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+.site-foot-close .site-foot-actions {
+  align-items: center;
+  justify-content: center;
+  justify-self: stretch;
+  gap: var(--sp-4);
+}
+
+/* the first command, in the site's mono on a raised ground, with its copy button */
+.close-cmd {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: 100%;
+  min-height: 52px;
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
+  border: var(--bd-strong);
+  background: var(--surface-2);
+  text-align: start;
+}
+
+.close-cmd-text {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
+  overflow-wrap: break-word;
+}
+
+.close-cmd-copy {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--target-comfortable);
+  padding: 0 var(--sp-3);
+  border: 0;
+  background: transparent;
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+.close-cmd-copy svg {
+  width: var(--ic-sm);
+  height: var(--ic-sm);
+}
+
+.close-cmd-copy:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: -3px;
+}
+
+@media (max-width: 47.99rem) {
+  .close-cmd {
+    flex: 1 1 100%;
+  }
+
+  .close-cmd-text {
+    font-size: 13px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

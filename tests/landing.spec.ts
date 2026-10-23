@@ -299,6 +299,79 @@ test("each audience cycles on its own clock, a quarter apart, holds on hover, an
   await expect(uses.locator(".uc-seg")).toHaveCount(0);
 });
 
+test("every section opens on its title alone on a row, in one style at one edge, with room before its content", async ({
+  page,
+}) => {
+  for (const [width, least] of [
+    [1440, 48],
+    [390, 32],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const heads = await page.evaluate(() =>
+      ["uses", "install", "session"].map((id) => {
+        const head = document.querySelector(`#${id} .lp-head`) as HTMLElement;
+        const title = head.querySelector("h2")!;
+        const content = head.nextElementSibling as HTMLElement;
+        const style = getComputedStyle(title);
+        return {
+          id,
+          // a title shares its row with one short link at most, never with the section's content
+          others: [...head.children].filter((child) => child !== title).map((child) => child.tagName),
+          room: content.getBoundingClientRect().top - head.getBoundingClientRect().bottom,
+          left: Math.round(title.getBoundingClientRect().left),
+          size: style.fontSize,
+          family: style.fontFamily,
+        };
+      }),
+    );
+    for (const head of heads) {
+      expect(head.others.every((tag) => tag === "A"), `#${head.id} shares its title row at ${width}`).toBe(true);
+      expect(head.others.length, `#${head.id} crowds its title row at ${width}`).toBeLessThanOrEqual(1);
+      expect(head.room, `too little room under #${head.id}'s title at ${width}`).toBeGreaterThanOrEqual(least);
+    }
+    expect(new Set(heads.map((head) => head.left)).size, `the titles do not share one edge at ${width}`).toBe(1);
+    expect(new Set(heads.map((head) => `${head.size} ${head.family}`)).size, `the titles differ at ${width}`).toBe(1);
+  }
+});
+
+test("the vision stands on its own grounded panel, and the landing ends on a full call to action", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const panel = page.locator(".lp-vision-inner");
+  const ground = await panel.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const line = getComputedStyle(element.querySelector(".lp-vision-art")!, "::after");
+    return {
+      surface: style.backgroundColor !== getComputedStyle(document.body).backgroundColor,
+      border: style.borderTopWidth,
+      line: line.borderTopWidth,
+    };
+  });
+  expect(ground).toEqual({ surface: true, border: "1px", line: "1px" });
+  await expect(panel.locator("#vision-line")).toHaveText(fixture.vision.line);
+
+  // the close: the line at display size, install with its first command to copy in place, and the docs
+  const close = page.locator("footer [data-footer-cta]");
+  const sizes = await page.evaluate(() => ({
+    line: parseFloat(getComputedStyle(document.querySelector("footer .site-foot-line")!).fontSize),
+    title: parseFloat(getComputedStyle(document.querySelector("#install h2")!).fontSize),
+  }));
+  expect(sizes.line).toBeGreaterThan(sizes.title);
+  // the reader's own system's line: PowerShell for a Windows visitor, the shell one for everyone else
+  const windows = await page.evaluate(() => /windows/i.test(navigator.userAgent));
+  const command = fixture.install.platforms[windows ? 1 : 0]!.command;
+  await expect(close.locator("[data-install-line] [data-command]")).toHaveText(command);
+  await close.getByRole("button", { name: `copy ${command}` }).click();
+  await expect(close.getByRole("button", { name: `copied ${command}` })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(command);
+
+  // other pages keep the compact row, with no command in it
+  await page.goto("/about");
+  await expect(page.locator("footer [data-install-line]")).toHaveCount(0);
+});
+
 test("whitespace, not rules, separates the sections, with generous room between them", async ({ page }) => {
   for (const [width, least] of [
     [1440, 160],
@@ -485,9 +558,14 @@ test("a sample session plays as a reel of its beats, read by fairtrade's own tra
   await expect(section).not.toContainText(fixture.session.sessionId);
   await expect(section.getByRole("tab")).toHaveCount(0);
   await expect(section.locator(".txn-app, .txn-crumb")).toHaveCount(0);
-  await expect(section.locator(".lp-note")).toHaveText(fixture.session.note);
-  // one window, nothing stacked behind or over it
-  await expect(section.locator(".mac-win")).toHaveCount(1);
+  // no explainer beside it: the markers in the reel say what was redacted
+  await expect(section.locator(".lp-note")).toHaveCount(0);
+  // behind it, Claude Code where the session was recorded, hidden from assistive technology;
+  // over its corner, the pull request's check in village's own words
+  await expect(section.locator(".lp-windows-term")).toHaveAttribute("aria-hidden", "true");
+  await expect(section.locator(".lp-windows-term .mac-win-terminal")).toBeVisible();
+  await expect(section.locator(".lp-check-name")).toHaveText(fixture.session.check.name);
+  await expect(section.locator(".lp-check-summary")).toHaveText(fixture.session.check.summary);
   // the values peasant redacted show as their markers
   for (const marker of fixture.session.markers) {
     await expect(reel, `the reel does not show ${marker}`).toContainText(marker);

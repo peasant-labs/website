@@ -4,7 +4,7 @@ import { GetStarted } from "@/components/landing/get-started";
 import { HeroFlow } from "@/components/landing/hero-flow";
 import { LandingIcon } from "@/components/landing/icons";
 import { HowItWorks } from "@/components/landing/how-it-works";
-import { SessionStage } from "@/components/landing/session-stage";
+import { SessionWindows } from "@/components/landing/session-windows";
 import { TranscriptReel } from "@/components/landing/transcript-reel";
 import { UseCases } from "@/components/landing/use-cases";
 import { SafariWindow } from "@/components/mac";
@@ -79,9 +79,9 @@ export default function Home() {
         </section>
 
         <section id="install" className="lp-sec" aria-labelledby="install-title">
-          <div className="site-wrap lp-install">
-            <div className="lp-install-head">
-              <h2 id="install-title" data-fade>
+          <div className="site-wrap">
+            <div className="lp-head">
+              <h2 id="install-title" className="lp-title" data-fade>
                 {INSTALL.title}
               </h2>
               <Link className="site-link lp-install-guide" href={INSTALL.guide.href}>
@@ -94,13 +94,12 @@ export default function Home() {
 
         <section id="session" className="lp-sec" aria-labelledby="session-title">
           <div className="site-wrap lp-session">
-            <div className="lp-session-head">
-              <h2 id="session-title" data-fade>
+            <div className="lp-head">
+              <h2 id="session-title" className="lp-title" data-fade>
                 {SESSION.title}
               </h2>
-              <p className="lp-note">{SESSION.note}</p>
             </div>
-            <SessionStage>
+            <SessionWindows>
               <SafariWindow secure className="lp-session-win">
                 <TranscriptReel
                   label={SESSION.label}
@@ -109,24 +108,29 @@ export default function Home() {
                   beats={SESSION.reel}
                 />
               </SafariWindow>
-            </SessionStage>
+            </SessionWindows>
           </div>
         </section>
 
         <section className="lp-sec lp-vision" aria-labelledby="vision-line">
-          <div className="site-wrap lp-vision-inner">
-            <Art art={VISION.art} className="lp-vision-art" />
-            <p id="vision-line" className="lp-vision-line" data-fade>
-              {VISION.line}
-            </p>
-            <Link
-              className="btn btn-primary site-btn site-btn-xl"
-              href={VISION.cta.href}
-              data-fade
-              style={fade(1)}
-            >
-              {VISION.cta.label}
-            </Link>
+          {/* the statement's own stage: a panel, the picture standing on a ground line, the words under it */}
+          <div className="site-wrap">
+            <div className="lp-vision-inner">
+              <div className="lp-vision-scene">
+                <Art art={VISION.art} className="lp-vision-art" />
+              </div>
+              <p id="vision-line" className="lp-vision-line" data-fade>
+                {VISION.line}
+              </p>
+              <Link
+                className="btn btn-primary site-btn site-btn-xl"
+                href={VISION.cta.href}
+                data-fade
+                style={fade(1)}
+              >
+                {VISION.cta.label}
+              </Link>
+            </div>
           </div>
         </section>
       </main>

@@ -10,7 +10,7 @@ import { useRef, useState } from "react";
 const CAPS = 3;
 
 /**
- * The use cases: the heading, then the four audiences side by side, two by two
+ * The use cases: the section's heading on its own row, then the four audiences, two by two
  * on a wide screen and one under another on a phone. Each card leads with what
  * its audience can do: under its picture, the audience as a small label, then
  * the capability now showing as the card's headline, the three segments that
@@ -31,14 +31,18 @@ export function UseCases() {
   const reduced = useReducedMotion();
 
   return (
-    <div ref={rootRef} className="uc" data-use-cases>
-      <h2 id="uses-title" className="uc-title" data-fade>
-        {USE_CASES.title}
-      </h2>
-      {USE_CASES.slides.map((useCase, order) => (
-        <UseCaseCard key={useCase.id} useCase={useCase} order={order} running={onScreen} reduced={reduced} />
-      ))}
-    </div>
+    <>
+      <div className="lp-head">
+        <h2 id="uses-title" className="lp-title" data-fade>
+          {USE_CASES.title}
+        </h2>
+      </div>
+      <div ref={rootRef} className="uc" data-use-cases>
+        {USE_CASES.slides.map((useCase, order) => (
+          <UseCaseCard key={useCase.id} useCase={useCase} order={order} running={onScreen} reduced={reduced} />
+        ))}
+      </div>
+    </>
   );
 }
 

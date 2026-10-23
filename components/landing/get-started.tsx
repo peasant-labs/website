@@ -198,3 +198,48 @@ function CommandLine({
     </li>
   );
 }
+
+/**
+ * The install command alone, for the closing call to action: the reader's
+ * system's line, whole, with a copy button. It wraps on a phone rather than
+ * scrolling.
+ */
+export function InstallLine() {
+  const platform = useSyncExternalStore(noSubscription, detectPlatform, () => "unix" as const);
+  const install = INSTALL.platforms.find((item) => item.id === platform)!;
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = window.setTimeout(() => setCopied(false), 1500);
+    return () => window.clearTimeout(timer);
+  }, [copied]);
+
+  return (
+    <div className="close-cmd" data-install-line>
+      <code className="close-cmd-text" data-command>
+        {install.command}
+      </code>
+      <button
+        type="button"
+        className="close-cmd-copy"
+        aria-label={copied ? `copied ${install.command}` : `copy ${install.command}`}
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(install.command);
+            setCopied(true);
+          } catch {
+            // A denied clipboard leaves the button as it was rather than claiming success.
+          }
+        }}
+      >
+        {copied ? (
+          <Check aria-hidden="true" focusable="false" />
+        ) : (
+          <Copy aria-hidden="true" focusable="false" />
+        )}
+        <span>{copied ? "copied" : "copy"}</span>
+      </button>
+    </div>
+  );
+}
