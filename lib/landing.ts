@@ -300,8 +300,8 @@ export const INSTALL = {
  */
 export const SESSION = {
   title: "what a reviewer reads",
-  /* the address bar of the browser the viewer is shown in: where a published transcript lives */
-  host: "village.peasantlabs.org",
+  /* the short title the viewer shows for the sample, the way a curated page names a session */
+  sessionTitle: "fix the staging 403",
   label: "sample session in the transcript viewer",
   note: "Sample session, not a real record. Values peasant redacted show as markers like <EMAIL>.",
   terminal: "shop — claude — 80×24",

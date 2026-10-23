@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "@/components/landing/use-motion";
 import { DEMO_SESSION } from "@/lib/demo-session";
 import { currentTheme, subscribeToTheme, type Theme } from "@/lib/theme";
 import {
@@ -7,7 +8,10 @@ import {
   TranscriptViewer,
   type TranscriptWireInput,
 } from "@peasant-labs/fairtrade/ui";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+
+/* how long the shown view takes to fade out before the chosen one fades in */
+const SWITCH_MS = 140;
 
 /**
  * The viewer opens on its own summary rather than the raw log. fairtrade
@@ -49,15 +53,43 @@ function breadcrumbFor(session: TranscriptWireInput) {
 export function TranscriptDemo({
   label,
   session = DEMO_SESSION,
+  title,
+  breadcrumb: showBreadcrumb = true,
+  crossfade = false,
 }: {
   label: string;
   session?: TranscriptWireInput;
+  /** an editorial title in place of the one derived from the first prompt */
+  title?: string;
+  /** false leaves out the crumb trail, for a page that keeps to the fewest words */
+  breadcrumb?: boolean;
+  /** a change of tab fades the shown view out and the chosen one in, instead of swapping in one frame */
+  crossfade?: boolean;
 }) {
   // The site owns the theme; the viewer follows it rather than shipping its own.
   const theme = useSyncExternalStore<Theme>(subscribeToTheme, currentTheme, () => "dark");
-  const viewModel = useMemo(() => adaptTranscript(session), [session]);
-  const breadcrumb = useMemo(() => breadcrumbFor(session), [session]);
+  const viewModel = useMemo(() => {
+    const adapted = adaptTranscript(session);
+    return title ? { ...adapted, session: { ...adapted.session, title } } : adapted;
+  }, [session, title]);
+  const breadcrumb = useMemo(() => (showBreadcrumb ? breadcrumbFor(session) : []), [session, showBreadcrumb]);
   const [activeTab, setActiveTab] = useState<Tab>(OPENING_TAB);
+  const [switching, setSwitching] = useState(false);
+  const pending = useRef<number | undefined>(undefined);
+  const reduced = useReducedMotion();
+
+  function changeTab(tab: Tab) {
+    if (!crossfade || reduced) {
+      setActiveTab(tab);
+      return;
+    }
+    window.clearTimeout(pending.current);
+    setSwitching(true);
+    pending.current = window.setTimeout(() => {
+      setActiveTab(tab);
+      setSwitching(false);
+    }, SWITCH_MS);
+  }
 
   return (
     <div
@@ -66,13 +98,14 @@ export function TranscriptDemo({
       data-contained-overflow
       role="group"
       aria-label={label}
+      data-switching={switching ? "true" : undefined}
     >
       <TranscriptViewer
         viewModel={viewModel}
         capabilities={READ_ONLY}
         theme={theme}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={changeTab}
         breadcrumb={breadcrumb}
       />
     </div>

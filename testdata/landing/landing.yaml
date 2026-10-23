@@ -113,6 +113,8 @@ install:
   guide: { label: read our docs, href: /docs }
 session:
   label: sample session in the transcript viewer
+  # the viewer names the sample by this short title; its id is shown nowhere
+  title: fix the staging 403
   sessionId: sess_c41e07
   note: Sample session, not a real record. Values peasant redacted show as markers like <EMAIL>.
   # placeholders the redaction engine writes, visible in the opening view or the full trace

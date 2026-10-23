@@ -1859,6 +1859,30 @@
   border: 0;
 }
 
+/* the sample is shown without a crumb trail; the viewer's empty trail leaves the page and its landmarks */
+.lp-session .txn-crumb:empty {
+  display: none;
+}
+
+/* a change of tab: the view under the tabs fades out, and the chosen one fades in */
+@media (prefers-reduced-motion: no-preference) {
+  .lp-session .txn-body-grid {
+    transition: opacity 220ms var(--ease-out);
+  }
+
+  .lp-session [data-switching] .txn-body-grid {
+    opacity: 0;
+    transition-duration: 140ms;
+  }
+
+  .lp-session .txn-tab {
+    transition:
+      color 220ms var(--ease-out),
+      border-color 220ms var(--ease-out),
+      box-shadow 220ms var(--ease-out);
+  }
+}
+
 /*
  * Three windows, fanned: Claude Code behind and to the left, the transcript in
  * front, the pull request's check on top at the lower left. A phone keeps the

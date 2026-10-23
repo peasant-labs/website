@@ -29,6 +29,8 @@ type WindowProps = {
   focus?: string;
   /** false draws the window as macOS draws one behind the front window: grey buttons, dimmed title */
   active?: boolean;
+  /** for a window that opens during a scene: false keeps it mounted but not yet shown */
+  open?: boolean;
   className?: string;
   style?: CSSProperties;
   children: ReactNode;
@@ -48,6 +50,7 @@ function Frame({
   kind,
   focus,
   active = true,
+  open,
   className,
   style,
   bar,
@@ -58,6 +61,7 @@ function Frame({
       className={`mac-win mac-win-${kind}${className ? ` ${className}` : ""}`}
       data-focus={focus}
       data-active={active ? "true" : "false"}
+      data-open={open === undefined ? undefined : open ? "true" : "false"}
       style={style}
     >
       {/* the window's chrome is decoration; what the window holds keeps its own semantics */}
@@ -85,14 +89,18 @@ export function TerminalWindow({ title, ...props }: WindowProps & { title: strin
   );
 }
 
-/** A Safari window with its one unified toolbar: sidebar, back and forward, the address field, and its tools. */
+/**
+ * A Safari window with its one unified toolbar: sidebar, back and forward, the
+ * address field, and its tools. The field shows no address unless given one:
+ * the scenes keep to the words their step needs.
+ */
 export function SafariWindow({
   url,
   secure = false,
   ...props
 }: WindowProps & {
   /** the address as Safari shows it, without the scheme */
-  url: string;
+  url?: string;
   /** an https address: the padlock in the field */
   secure?: boolean;
 }) {
@@ -113,7 +121,7 @@ export function SafariWindow({
           </span>
           <span className="mac-address">
             {secure ? <Lock focusable="false" className="mac-address-lock" /> : null}
-            <span className="mac-address-text">{url}</span>
+            <span className="mac-address-text">{url ?? ""}</span>
             <RotateCw focusable="false" className="mac-address-reload" />
           </span>
           <span className="mac-tools mac-tools-end">
@@ -131,7 +139,7 @@ export function SafariWindow({
  * The desktop a scene plays on: the menu bar, starting at the app in front,
  * with the status items and the clock, over a calm wallpaper of our own.
  */
-export function MacDesktop({ app, children }: { app: string; children: ReactNode }) {
+export function MacDesktop({ app, children }: { app: ReactNode; children: ReactNode }) {
   return (
     <div className="mac-desk">
       <div className="mac-menubar" aria-hidden="true">

@@ -414,19 +414,20 @@ test("a sample session opens in fairtrade's viewer, labelled as sample, with red
   await expect(demo).toHaveAttribute("aria-label", fixture.session.label);
   await expect(demo.locator(".txn-app")).toHaveCount(1);
   await expect(demo.locator("img")).toHaveCount(0);
-  await expect(demo).toContainText(fixture.session.sessionId);
+  // the session goes by its short title, with no crumb trail and no session id
+  await expect(demo.locator(".txn-title")).toHaveText(fixture.session.title);
+  await expect(demo).not.toContainText(fixture.session.sessionId);
   await expect(section.locator(".lp-note")).toHaveText(fixture.session.note);
   // on top, the pull request's check in village's own words; behind, Claude Code, hidden from assistive technology
   await expect(section.locator(".lp-check-name")).toHaveText(fixture.session.check.name);
   await expect(section.locator(".lp-check-summary")).toHaveText(fixture.session.check.summary);
   await expect(section.locator(".lp-windows-term")).toHaveAttribute("aria-hidden", "true");
   await expect(section.locator(".lp-windows-term .mac-win-terminal")).toBeVisible();
-  // it is shown in a browser window, at the address a published transcript has
+  // it is shown in a browser window whose address field carries the padlock and no address
   const browser = section.locator(".mac-win-browser");
   await expect(browser.locator(".mac-lights")).toBeVisible();
-  await expect(browser.locator(".mac-address-text")).toHaveText(
-    new RegExp(`/transcripts/${fixture.session.sessionId}$`),
-  );
+  await expect(browser.locator(".mac-address-lock")).toBeVisible();
+  await expect(browser.locator(".mac-address-text")).toHaveText("");
   // the real macOS chrome, not a drawing in the site's tokens: rounded window, the system's traffic-light colours
   expect(await browser.evaluate((window) => getComputedStyle(window).borderTopLeftRadius)).toBe("10px");
   expect(

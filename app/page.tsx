@@ -104,12 +104,14 @@ export default function Home() {
               <p className="lp-note">{SESSION.note}</p>
             </div>
             <SessionWindows>
-              <SafariWindow
-                url={`${SESSION.host}/transcripts/${SAMPLE_SESSION.id}`}
-                secure
-                className="lp-session-win"
-              >
-                <TranscriptDemo label={SESSION.label} session={SAMPLE_SESSION} />
+              <SafariWindow secure className="lp-session-win">
+                <TranscriptDemo
+                  label={SESSION.label}
+                  session={SAMPLE_SESSION}
+                  title={SESSION.sessionTitle}
+                  breadcrumb={false}
+                  crossfade
+                />
               </SafariWindow>
             </SessionWindows>
           </div>
