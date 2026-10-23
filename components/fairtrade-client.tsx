@@ -21,4 +21,5 @@ export {
   MetaItem,
   SignInProviders,
   StepIndicator,
+  Tabs,
 } from "@peasant-labs/fairtrade/ui";

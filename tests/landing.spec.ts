@@ -114,64 +114,93 @@ test("the hero buttons move to their sections, smoothly unless motion is reduced
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe("auto");
 });
 
-test("the install panel shows three numbered commands, each with what it does and its own copy", async ({ page }) => {
+test("the install card is fairtrade's tabs and CommandBlocks, three numbered commands each with what it does", async ({
+  page,
+}) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const shell = page.locator("[data-install-shell]");
-    // a plain panel: no window chrome, no prompt, nothing typing
-    await expect(shell.locator(".mac-win, .gs-prompt")).toHaveCount(0);
-    await expect(shell.locator("[data-typing], .gs-ch, .gs-caret")).toHaveCount(0);
+    // fairtrade's own parts, as the docs use them: its tablist and its command blocks; nothing of our own
+    await expect(shell.locator('[role="tablist"].tabs')).toHaveCount(1);
+    await expect(shell.locator(".mac-win, .gs-prompt, .gs-copy")).toHaveCount(0);
 
     for (const platform of fixture.install.platforms) {
       const tab = shell.getByRole("tab", { name: platform.label });
       await tab.click();
       await expect(tab).toHaveAttribute("aria-selected", "true");
-      const lines = shell.locator(".gs-line");
+      const panel = shell.locator('[role="tabpanel"]:not([hidden])');
+      const lines = panel.locator(".gs-line");
       await expect(lines).toHaveCount(3);
-      await expect(lines.locator("[data-command]")).toHaveText([
-        platform.command,
-        fixture.install.kickstart,
-        fixture.install.push,
-      ]);
+      // fairtrade draws its muted "$" before each command
+      await expect(lines.locator(".cli-cmd code")).toHaveText(
+        [platform.command, fixture.install.kickstart, fixture.install.push].map((command) => `$ ${command}`),
+      );
       await expect(lines.locator(".gs-note")).toHaveText(fixture.install.notes);
       await expect(lines.locator(".gs-n")).toHaveText(["1", "2", "3"]);
 
       const rows = await lines.evaluateAll((items) =>
         items.map((item) => {
-          const row = item.getBoundingClientRect();
-          const number = item.querySelector(".gs-n")!.getBoundingClientRect();
-          const command = item.querySelector("[data-command]")!.getBoundingClientRect();
-          const copy = item.querySelector(".gs-copy")!.getBoundingClientRect();
+          const block = item.querySelector(".cli-cmd")!.getBoundingClientRect();
+          const code = item.querySelector(".cli-cmd code")!.getBoundingClientRect();
+          const copy = item.querySelector(".cli-copy")!.getBoundingClientRect();
           return {
-            // never cut off: the command wraps inside its row rather than overflowing it
-            whole: command.right <= copy.left + 1,
-            // the number starts on the command's line
-            numberOnCommand: Math.abs(number.top - command.top) < 4,
-            // copy is a full-size target, centred on its row, at the row's end
-            target: copy.height >= 44,
-            centred: Math.abs(copy.top + copy.height / 2 - (row.top + row.height / 2)) < 2,
+            // the command shows whole, inside its block, never under the copy button
+            whole: code.right <= copy.left + 1 && code.width > 0,
+            // commands read at the 16px floor, as in the docs
+            size: getComputedStyle(item.querySelector(".cli-cmd-line")!).fontSize,
+            // the copy button is a full tap target at the block's right edge
+            target: copy.height >= 44 && copy.width >= 44 && Math.abs(copy.right - block.right) < 2,
+            // the block runs across its row, not just around its command
+            across: block.width >= item.getBoundingClientRect().width * 0.8,
           };
         }),
       );
       for (const row of rows) {
         expect(row, `a row is off at ${width} on ${platform.label}`).toEqual({
           whole: true,
-          numberOnCommand: true,
+          size: "16px",
           target: true,
-          centred: true,
+          across: true,
         });
       }
     }
 
+    // a long address breaks after its slashes, never inside a word
+    const curl = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').first().locator(".cli-cmd code");
+    await expect(curl.locator("wbr")).toHaveCount(2);
+    if (width === 390) {
+      const lines = await curl.evaluate((code) => {
+        const range = document.createRange();
+        range.selectNodeContents(code);
+        const rows = new Map<number, string>();
+        const walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) {
+          const text = walker.currentNode as Text;
+          for (let index = 0; index < text.length; index += 1) {
+            range.setStart(text, index);
+            range.setEnd(text, index + 1);
+            const top = Math.round(range.getBoundingClientRect().top);
+            rows.set(top, (rows.get(top) ?? "") + text.data[index]);
+          }
+        }
+        return [...rows.values()].map((row) => row.trim());
+      });
+      for (const line of lines) {
+        expect(line, "a command line starts or ends inside a word").toMatch(/^(\$ )?[^\s]*(\s[^\s]+)*$/);
+      }
+      expect(lines.some((line) => line.endsWith("https://")), `the address does not break after its scheme: ${lines}`).toBe(true);
+    }
+
     // every command copies exactly, and says so
-    const first = shell.locator(".gs-line").first();
     const command = fixture.install.platforms.at(-1)!.command;
-    await first.getByRole("button", { name: `copy ${command}` }).click();
-    await expect(first.getByRole("button", { name: `copied ${command}` })).toBeVisible();
+    const first = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').first();
+    await first.getByRole("button", { name: new RegExp(command.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) }).click();
+    await expect(first.locator(".cli-copy")).toContainText("copied");
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(command);
 
-    // the tabs are a real tablist: arrow keys move between systems
+    // the tabs are fairtrade's tablist: arrow keys move between systems
+    await shell.getByRole("tab", { name: fixture.install.platforms[0]!.label }).click();
     await shell.getByRole("tab", { name: fixture.install.platforms[0]!.label }).focus();
     await page.keyboard.press("ArrowRight");
     await expect(shell.getByRole("tab", { name: fixture.install.platforms[1]!.label })).toBeFocused();
