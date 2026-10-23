@@ -437,6 +437,69 @@ test("a quiet line under the row shows where it is, one segment per card, fillin
   await expect(line.locator('.uc-progress-seg[data-state="on"]')).toHaveCount(1);
 });
 
+test("every card, the last ones too, can rest whole on the title's edge, with nothing of the one before showing", async ({
+  page,
+}) => {
+  for (const [width, motion] of [
+    [1440, "no-preference"],
+    [390, "no-preference"],
+    [1440, "reduce"],
+    [390, "reduce"],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: motion });
+    await page.goto("/");
+    const row = page.locator("[data-use-cases]");
+    await row.scrollIntoViewIfNeeded();
+    await row.hover();
+    const rests = await row.evaluate(async (element) => {
+      const edge = document.querySelector("#uses-title")!.getBoundingClientRect().left;
+      const cards = [...element.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
+      const first = cards[0]!.offsetLeft;
+      const fadeFrom = edge - 12;
+      const out: { index: number; onEdge: boolean; previousHidden: boolean }[] = [];
+      for (const [index, card] of cards.entries()) {
+        element.scrollTo({ left: card.offsetLeft - first, behavior: "instant" });
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const left = card.getBoundingClientRect().left;
+        const previous = cards[index - 1]?.getBoundingClientRect().right ?? -Infinity;
+        out.push({ index, onEdge: Math.abs(left - edge) < 2, previousHidden: previous <= fadeFrom });
+      }
+      return out;
+    });
+    for (const rest of rests) {
+      expect(rest, `card ${rest.index + 1} does not rest on the edge at ${width}, ${motion}`).toEqual({
+        index: rest.index,
+        onEdge: true,
+        previousHidden: true,
+      });
+    }
+  }
+});
+
+test("after the docs card the row steps on to the first card, and the line wraps back to its first segment", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  await row.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  // stand on the last card, the docs one
+  await row.evaluate((element) => {
+    const cards = [...element.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
+    element.scrollTo({ left: cards.at(-1)!.offsetLeft - cards[0]!.offsetLeft, behavior: "instant" });
+  });
+  const segments = page.locator(".uc-progress-seg");
+  const count = await segments.count();
+  const onIndex = () =>
+    segments.evaluateAll((items) => items.findIndex((item) => item.getAttribute("data-state") === "on"));
+  await expect.poll(onIndex).toBe(count - 1);
+  // the next step is the first card again, on the edge, and the first segment
+  await expect.poll(onIndex, { timeout: 9000 }).toBe(0);
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 3000 }).toBeLessThan(2);
+});
+
 test("every use-case headline keeps room for two lines, so the words under it line up across the row", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");

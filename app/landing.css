@@ -467,7 +467,8 @@
   gap: var(--uc-gap);
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  padding: var(--sp-2) var(--uc-edge);
+  /* room after the last card, so even it can rest on the title's edge: the row never stops right-aligned */
+  padding: var(--sp-2) calc(100% - var(--uc-edge) - var(--uc-card)) var(--sp-2) var(--uc-edge);
   scroll-padding-inline: var(--uc-edge);
   scrollbar-width: none;
   /* nothing shows left of the title's edge; the row runs on to the right and fades out there */
