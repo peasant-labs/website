@@ -85,7 +85,7 @@ install:
     - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash" }
     - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex" }
   kickstart: peasant kickstart
-  guide: { label: read the install guide, href: /docs#install }
+  guide: { label: read our docs, href: /docs }
 session:
   label: sample session in the transcript viewer
   sessionId: sess_c41e07

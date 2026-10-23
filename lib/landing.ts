@@ -155,7 +155,7 @@ export const HOW = {
 /** The two commands, exactly as the installer scripts document themselves. */
 export const INSTALL = {
   title: "get started in two commands",
-  guide: { label: "read the install guide", href: "/docs#install" },
+  guide: { label: "read our docs", href: "/docs" },
   platforms: [
     {
       id: "unix",
