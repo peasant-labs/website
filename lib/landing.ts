@@ -41,14 +41,14 @@ export const HERO = {
   secondary: { label: "learn more", href: "#how" },
   /*
    * The picture under the buttons tells its story without words, so its
-   * accessible name says it: a transcript leaves the laptop, a scanner turns
-   * its secret amber, a stamp marks it published, and it joins the stack
-   * beside a person. There is no reputation score: the stack is the
-   * transcripts credited to them.
+   * accessible name says it: a card lifts out of the laptop, a sieve turns its
+   * secret amber, a stamp marks it published, and it settles on the shared
+   * stack where a small group stands. There is no reputation score: the one
+   * who lights up as it lands is the person it is credited to.
    */
   flow: {
     label:
-      "A transcript card rises out of a laptop that runs Claude Code, Codex, Cursor, OpenCode, Pi and Strike. It passes a scanner that turns its secret line amber, gets a check stamp as you publish it, and lands on a growing stack of transcripts beside a person: the commons, each one credited to you.",
+      "A transcript card lifts out of a laptop running Claude Code, Codex, Cursor, OpenCode, Pi and Strike, glides through a sieve that turns its secret line amber, is stamped as you publish it, and settles on a shared stack beside a small group of people: the commons. As it lands, one of them, you, lights up amber.",
     agents: [
       { mark: "claude", name: "Claude Code" },
       { mark: "codex", name: "Codex" },

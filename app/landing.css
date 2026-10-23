@@ -123,8 +123,8 @@
 /*
  * The hero's picture (components/landing/hero-flow.tsx). That file owns where
  * everything sits and when it moves; this owns how it looks: ink strokes, one
- * amber accent for what redaction hides, no words. Sizes inside a card are in
- * hundredths of the card, so it reads the same at any scale.
+ * amber accent, no words. Sizes inside a card are in hundredths of the card,
+ * so it reads the same at any scale.
  */
 .lp-hero-flow {
   margin-block-start: clamp(2.5rem, 5vw, 4rem);
@@ -161,8 +161,7 @@
 }
 
 .hf-line,
-.hf-sieve,
-.hf-beam,
+.hf-wire,
 .hf-ground {
   fill: none;
   vector-effect: non-scaling-stroke;
@@ -180,16 +179,14 @@
   stroke-width: 1;
 }
 
-/* the scanner: a dashed line, lit amber while a card passes through it */
-.hf-sieve {
-  stroke: var(--ink-3);
-  stroke-width: 2;
-  stroke-dasharray: 4 6;
+/* the people at the stack are filled with the page, so one standing in front covers one behind */
+.hf-line.hf-person {
+  fill: var(--canvas);
 }
 
-.hf-beam {
-  stroke: var(--amber);
-  stroke-width: 3;
+/* the person who notices a card land: their head fills amber, then lets go */
+.hf-notice {
+  fill: var(--amber-fill);
   opacity: 0;
 }
 
@@ -204,15 +201,18 @@
   height: 100%;
 }
 
-/* a card: its agent's mark and three thick lines, the middle one a secret */
-.hf-card {
+/* a card travels on two layers, across and down, so its path can bend */
+.hf-card-x {
   inset-block-start: 0;
   inset-inline-start: 0;
+}
+
+.hf-card {
+  position: relative;
   box-sizing: border-box;
   container-type: inline-size;
   border: 2px solid var(--ink-2);
   background: var(--canvas);
-  transform-origin: 0 0;
 }
 
 .hf-card-body {
@@ -247,14 +247,13 @@
   background: var(--ink-2);
 }
 
-/* the secret, once the scanner has passed it: an amber block over the line */
+/* the secret, once the sieve has passed over it: an amber block over the line */
 .hf-mask {
   position: absolute;
   inset-block: -1.5cqw;
   inset-inline-start: -2cqw;
   width: calc(58% + 4cqw);
   background: var(--amber-fill);
-  transform-origin: right center;
 }
 
 /* the stamp: a check pressed onto the card as it is published */
@@ -268,10 +267,29 @@
   stroke-width: 2.25;
 }
 
+/* the table the stack stands on, drawn over the cards that have sunk into it */
+.hf-table {
+  z-index: 5;
+  box-sizing: border-box;
+  border: 2px solid var(--ink-2);
+  border-block-end: 0;
+  background: var(--canvas);
+}
+
+/* the sieve: a short mesh drawn over the card passing through it */
+.hf-mesh {
+  z-index: 11;
+  overflow: visible;
+}
+
+.hf-wire {
+  stroke: var(--ink-3);
+  stroke-width: 1;
+}
+
 .hf-toggle {
   position: absolute;
-  inset-block-start: 0;
-  inset-inline-end: 0;
+  z-index: 12;
 }
 
 @media (prefers-reduced-motion: reduce) {
