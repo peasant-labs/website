@@ -197,7 +197,7 @@ export const USE_CASES = {
         {
           text: "find any past session",
           detail:
-            "Peasant indexes your agents' sessions on this computer, so you can search them and open one in the browser.",
+            "Peasant indexes sessions from the agents it supports on this computer, so you can search them and open one.",
           icon: "search",
           art: capabilityArt("uc-lantern", "a lantern with amber glass"),
         },
@@ -233,7 +233,7 @@ export const USE_CASES = {
         {
           text: "see which commits agents wrote",
           detail:
-            "A transcript keeps the commits its session made, so a change traces back to the transcript behind it.",
+            "Peasant links a session to the commits made while it ran, so a change traces back to its transcript.",
           icon: "code",
           art: capabilityArt("uc-scroll", "a written scroll with an amber wax seal"),
         },
