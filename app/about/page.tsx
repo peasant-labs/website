@@ -1,5 +1,4 @@
 import { SiteShell } from "@/components/site-shell";
-import { UnderConstruction } from "@/components/under-construction";
 import { metadataForRoute } from "@/lib/projects";
 import Link from "next/link";
 
@@ -17,8 +16,6 @@ export default function AboutPage() {
   return (
     <SiteShell>
       <main id="content" className="pj-main" tabIndex={-1}>
-        <UnderConstruction />
-
         <header className="pj-catalog-hero">
           <div className="pj-hero-copy">
             <h1 id="project-heading" tabIndex={-1}>
