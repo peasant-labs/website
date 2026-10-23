@@ -16,7 +16,7 @@ export const SCREEN = { width: 1120, height: 700 } as const;
  * phone's view, so the camera shows them near their own size and the words
  * stay readable; the scene CSS reflows the windows for it ([data-compact]).
  */
-const COMPACT = { width: 440, height: 358 } as const;
+const COMPACT = { width: 360, height: 316 } as const;
 /* a view narrower than this plays the compact screen */
 const COMPACT_BELOW = 560;
 
@@ -128,31 +128,65 @@ function keepInside(offset: number, view: number, screen: number) {
 function frameFor(box: Box, view: { w: number; h: number }, fill: number, screen: Screen, least = 0) {
   const fit = Math.min((view.w * fill) / box.w, (view.h * fill) / box.h, MAX_ZOOM);
   const scale = Math.max(fit, least);
-  // a box too tall to fit at the least scale is read from its top, the way a reader scrolls into it
-  const margin = (view.h * (1 - fill)) / 2;
-  const top = fit < least ? margin - box.y * scale : view.h / 2 - (box.y + box.h / 2) * scale;
-  const x = keepInside(view.w / 2 - (box.x + box.w / 2) * scale, view.w, screen.width * scale);
+  // a box too big to show whole at the least scale is read from its top left, the way a reader comes to it
+  const marginX = (view.w * (1 - fill)) / 2;
+  const marginY = (view.h * (1 - fill)) / 2;
+  const left = box.w * scale > view.w - 2 * marginX ? marginX - box.x * scale : view.w / 2 - (box.x + box.w / 2) * scale;
+  const top = box.h * scale > view.h - 2 * marginY ? marginY - box.y * scale : view.h / 2 - (box.y + box.h / 2) * scale;
+  const x = keepInside(left, view.w, screen.width * scale);
   const y = keepInside(top, view.h, screen.height * scale);
   return `translate(${x}px, ${y}px) scale(${scale})`;
 }
 
-/* on the compact screen the camera never pulls back so far that a window's words drop below reading size */
-const COMPACT_LEAST = 0.82;
+/*
+ * The camera never pulls back so far that words drop below reading size: the
+ * smallest type in a scene is 13px (the system chrome and the terminal), and
+ * it must read at 14px or more on a wide screen and 12px or more on a phone.
+ * A scene is never shown whole at a smaller scale; the camera frames the part
+ * that matters at that size instead.
+ */
+const SMALLEST_TYPE = 13;
+const READ_AT = { wide: 14, phone: 12 } as const;
 
 /*
  * A framing never shows a menu-bar word cut at its edge: an item the framing
- * would cut fades out, and fades back in once a framing takes it in whole.
+ * would cut, across or along it, fades out, and fades back in once a framing
+ * takes it in whole.
  */
 function settleMenuBar(camera: HTMLElement, transform: string, view: { w: number; h: number }) {
   const lens = new DOMMatrix(transform);
   if (!lens.a) return;
-  const from = -lens.e / lens.a;
-  const to = (view.w - lens.e) / lens.a;
+  const from = { x: -lens.e / lens.a, y: -lens.f / lens.d };
+  const to = { x: (view.w - lens.e) / lens.a, y: (view.h - lens.f) / lens.d };
   for (const item of camera.querySelectorAll<HTMLElement>(".mac-menubar > span:not(.mac-menu-end), .mac-menu-end > *")) {
-    const left = layoutOffset(item, camera).x;
-    const cut = left < from - 0.5 || left + item.offsetWidth > to + 0.5 ? "true" : "false";
+    const at = layoutOffset(item, camera);
+    const cut =
+      at.x < from.x - 0.5 ||
+      at.x + item.offsetWidth > to.x + 0.5 ||
+      at.y < from.y - 0.5 ||
+      at.y + item.offsetHeight > to.y + 0.5
+        ? "true"
+        : "false";
     if (item.dataset.cut !== cut) item.dataset.cut = cut;
   }
+}
+
+/*
+ * A target inside a page that scrolls ([data-scroll], overflow hidden) and
+ * out of its view is scrolled into the middle of it, smoothly, the way a
+ * reader scrolls down a page; the box returned is where it will be once the
+ * scroll ends, so the camera arrives with it.
+ */
+function scrollIntoPage(camera: HTMLElement, focus: string, box: Box): Box {
+  const target = targetOf(camera, focus);
+  const page = target?.closest<HTMLElement>("[data-scroll]");
+  if (!target || !page) return box;
+  const inPage = layoutOffset(target, page).y;
+  const wanted = Math.max(0, Math.min(page.scrollHeight - page.clientHeight, inPage + target.offsetHeight / 2 - page.clientHeight / 2));
+  const shift = wanted - page.scrollTop;
+  if (Math.abs(shift) < 1) return box;
+  page.scrollTo({ top: wanted, behavior: "smooth" });
+  return { ...box, y: box.y - shift };
 }
 
 /* the element a focus names: a name marked with data-focus, or a selector into a component's own markup */
@@ -237,12 +271,12 @@ export function SceneStage({
     (focus: string, fill: number, width?: number, cropBelow = Infinity) => {
       const camera = cameraRef.current;
       if (!camera) return "none";
-      const box = boxOf(camera, focus);
+      const box = scrollIntoPage(camera, focus, boxOf(camera, focus));
       const view = viewSize();
       const whole = Math.min((view.w * fill) / box.w, (view.h * fill) / box.h);
       // the compact screen is laid out to be read whole, so it never needs a row cropped to its start
       const crop = !compact && width !== undefined && box.w > width && whole < cropBelow;
-      const least = compact && focus !== "all" ? COMPACT_LEAST : 0;
+      const least = (compact ? READ_AT.phone : READ_AT.wide) / SMALLEST_TYPE;
       const to = frameFor(crop ? { ...box, w: width } : box, view, fill, screen, least);
       settleMenuBar(camera, to, view);
       return to;
@@ -281,23 +315,27 @@ export function SceneStage({
   }, [rest, reduced, started, phase]);
 
   // A part marked data-flip that a beat pushes along glides from where it was (FLIP), so nothing jumps.
+  // A change of screen size is a new layout, not a move: it is recorded, never animated.
+  const flipLayout = useRef(compact);
   useLayoutEffect(() => {
     const screen = screenRef.current;
     if (!screen) return;
+    const relaid = flipLayout.current !== compact;
+    flipLayout.current = compact;
     const now = new Map<string, { x: number; y: number }>();
     for (const element of screen.querySelectorAll<HTMLElement>("[data-flip]")) {
       const key = element.dataset.flip!;
       const at = layoutOffset(element, screen);
       now.set(key, at);
       const was = flipFrom.current.get(key);
-      if (reduced || !started || !was || (was.x === at.x && was.y === at.y)) continue;
+      if (relaid || reduced || !started || !was || (was.x === at.x && was.y === at.y)) continue;
       element.animate(
         [{ transform: `translate(${was.x - at.x}px, ${was.y - at.y}px)` }, { transform: "none" }],
         { duration: FLIP_MS, easing: EASE_MOVE },
       );
     }
     flipFrom.current = now;
-  }, [phase, reduced, started]);
+  }, [phase, reduced, started, compact]);
 
   // Hold the take, and the scene's own short animations, whenever it is not playing.
   useEffect(() => {
@@ -388,7 +426,7 @@ export function SceneStage({
       for (const cue of scene.cursor) {
         at(cue.at, () => {
           const target = targetOf(camera, cue.to);
-          const box = boxOf(camera, cue.to);
+          const box = scrollIntoPage(camera, cue.to, boxOf(camera, cue.to));
           const [ax, ay] = cue.aim ?? [0.5, 0.5];
           const to: [number, number] = [box.x + box.w * ax, box.y + box.h * ay];
           const from = here;

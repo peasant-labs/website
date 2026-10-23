@@ -675,6 +675,43 @@ test("a scene plays only while it can be seen, and holds where it is under the r
   await expect(page.locator('.hw-layer[data-on="true"] .scn-view')).toHaveAttribute("data-paused", "true");
 });
 
+test("every word in a scene reads at a real size, on a wide screen and on a phone", async ({ browser }) => {
+  for (const [kind, options] of [
+    ["wide", { viewport: { width: 1440, height: 900 } }],
+    ["phone", PHONE],
+  ] as const) {
+    const floor = fixture.how.readable[kind];
+    const context = await browser.newContext(options);
+    const page = await context.newPage();
+    await page.goto("/");
+    const height = page.viewportSize()!.height;
+    const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
+    for (const [index] of fixture.how.steps.entries()) {
+      await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + height * (index * 0.4 + 0.2));
+      await page.waitForTimeout(1800);
+      const smallest = await page.evaluate(() => {
+        const layer = document.querySelector('.hw-scroll .hw-layer[data-on="true"]')!;
+        const view = layer.querySelector(".scn-view")!.getBoundingClientRect();
+        const lens = new DOMMatrix(getComputedStyle(layer.querySelector(".scn-camera")!).transform).a;
+        let least = Infinity;
+        const walker = document.createTreeWalker(layer.querySelector(".scn-screen")!, NodeFilter.SHOW_TEXT);
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          if (!node.textContent?.trim()) continue;
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          const box = range.getBoundingClientRect();
+          const inView = box.width > 0 && box.right > view.left && box.left < view.right && box.bottom > view.top && box.top < view.bottom;
+          const shown = node.parentElement!.checkVisibility({ opacityProperty: true, visibilityProperty: true });
+          if (inView && shown) least = Math.min(least, parseFloat(getComputedStyle(node.parentElement!).fontSize) * lens);
+        }
+        return least;
+      });
+      expect(smallest, `${kind} step ${index + 1}: text at ${smallest.toFixed(1)}px`).toBeGreaterThanOrEqual(floor - 0.05);
+    }
+    await context.close();
+  }
+});
+
 test("on a phone the scene holds under the header with the steps right under it, one open at a time", async ({
   browser,
 }) => {

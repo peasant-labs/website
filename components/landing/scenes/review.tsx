@@ -25,7 +25,7 @@ function Review({ phase }: { phase: number }) {
   return (
     <MacDesktop app="Safari">
       <SafariWindow className="scn-full-browser">
-        <div className="scn-review">
+        <div className="scn-review" data-scroll>
           <div className="scn-panel" data-focus="review">
             <RedactionReview
               readOnly
@@ -50,8 +50,7 @@ export const REVIEW_SCENE: SceneDefinition = {
   finalPhase: TOTAL,
   cues: Array.from({ length: TOTAL }, (_, index) => ({ at: SCAN_FROM + index * SCAN_EVERY, phase: index + 1 })),
   shots: [
-    { at: 0, focus: "all", move: 1 },
-    { at: 500, focus: "review", move: 1000, fill: 0.96 },
+    { at: 0, focus: "review", move: 1, fill: 0.96 },
     { at: 2500, focus: pairAt(1), move: 900, fill: 0.9, width: 360 },
     { at: 3700, focus: pairAt(2), move: 800, fill: 0.9, width: 360 },
     { at: 4800, focus: pairAt(3), move: 800, fill: 0.9, width: 360 },

@@ -109,6 +109,8 @@ how:
     - title: publish
       body: Pick who can read it, like your team or a research group, and publish. Nothing leaves until you do.
   publishLabel: publish
+  # the smallest any word in a scene may render, in px, on a wide screen and on a phone
+  readable: { wide: 14, phone: 12 }
   # what each scene shows on its finished frame, read from the real components
   finals:
     - { scene: record, texts: ["Welcome to Claude Code!", "> /peasant", 'peasant: opened "fix the staging 403" · not published', "fix the staging 403", "not published"] }

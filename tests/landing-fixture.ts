@@ -35,6 +35,7 @@ export type LandingFixture = {
   how: {
     steps: Array<{ title: string; body: string }>;
     publishLabel: string;
+    readable: { wide: number; phone: number };
     finals: Array<{ scene: string; texts: string[] }>;
   };
   install: {

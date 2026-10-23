@@ -1516,6 +1516,7 @@
 }
 
 .scn-review {
+  position: relative;
   height: 100%;
   padding: 22px 28px;
   overflow: hidden;
@@ -1523,7 +1524,7 @@
 
 /* the panel keeps to the window's left, so its framing starts clear of the menu bar's words */
 .scn-review .scn-panel {
-  max-width: 760px;
+  max-width: 560px;
 }
 
 /* mid-scan the review has found nothing yet; its "nothing found" line would claim the scan is over */
@@ -1546,7 +1547,7 @@
 }
 
 .scn-modal .scn-dialog {
-  width: 600px;
+  width: 560px;
   /* it opens from the page's publish button, up and to the left of it */
   transform-origin: 18% 0%;
 }
@@ -1589,14 +1590,15 @@
 /*
  * ---------- the compact screen a phone plays ----------
  *
- * A phone's view lays the scenes out on a 440 by 358 screen (stage.tsx), so
- * the camera shows them near their own size: the windows fill it, the menu
- * bar keeps what fits, the terminal reads a size up, and nothing in a window
- * is wider than the window.
+ * A phone lays the scenes out on a 360 by 316 screen (stage.tsx), about the
+ * size of the phone's view, so the camera shows them at about their own size
+ * and every word reads at 12px or more. The windows fill the screen, the menu
+ * bar and Safari's bar keep what fits, and nothing in a window is wider than
+ * the window.
  */
 .scn-camera[data-compact] .mac-menubar {
-  gap: 14px;
-  padding-inline: 12px;
+  gap: 12px;
+  padding-inline: 10px;
 }
 
 .scn-camera[data-compact] .mac-menubar > span:nth-child(n + 4):not(.mac-menu-end),
@@ -1611,52 +1613,63 @@
 
 .scn-camera[data-compact] .mac-win-browser .mac-bar {
   gap: 10px;
-  padding-inline: 12px;
+  height: 38px;
+  padding-inline: 10px;
 }
 
 .scn-camera[data-compact] .mac-address {
-  height: 26px;
+  height: 24px;
 }
 
 .scn-camera[data-compact] .scn-rec-term {
-  inset-block-start: 14px;
-  inset-inline-start: 12px;
-  width: 416px;
+  inset-block-start: 8px;
+  inset-inline-start: 6px;
+  width: 348px;
   height: 200px;
 }
 
 .scn-camera[data-compact] .cc {
+  gap: 12px;
   padding: 8px 10px;
   font-size: 15px;
   line-height: 19px;
 }
 
 .scn-camera[data-compact] .scn-rec-browser {
-  inset-block-start: 44px;
-  inset-inline-start: 24px;
-  width: 404px;
-  height: 302px;
+  inset-block-start: 28px;
+  inset-inline-start: 14px;
+  width: 340px;
+  height: 242px;
 }
 
 .scn-camera[data-compact] .scn-page {
-  gap: 16px;
-  padding: 18px;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.scn-camera[data-compact] .scn-page-top {
+  gap: 8px;
 }
 
 .scn-camera[data-compact] .scn-page-title {
-  font-size: 22px;
+  font-size: 20px;
+}
+
+.scn-camera[data-compact] .scn-turns {
+  gap: 6px;
+  padding-block-start: 10px;
 }
 
 .scn-camera[data-compact] .scn-turn {
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .scn-camera[data-compact] .scn-full-browser {
-  inset: 8px;
+  inset: 4px;
 }
 
 .scn-camera[data-compact] .scn-review {
-  padding: 10px;
+  padding: 8px;
 }
 
 .scn-camera[data-compact] .scn-review .rdx-code {
@@ -1664,24 +1677,35 @@
   overflow-wrap: anywhere;
 }
 
-/* the publish window fits the compact page whole: tighter rows, Safari's slimmer bar, one suggestion */
-.scn-camera[data-compact] .mac-win-browser .mac-bar {
-  height: 40px;
+@media (prefers-reduced-motion: no-preference) {
+  .scn-review[data-scroll] {
+    scroll-behavior: smooth;
+  }
 }
 
+.scn-camera[data-compact] .scn-published {
+  flex-wrap: wrap;
+  gap: 2px 12px;
+}
+
+.scn-camera[data-compact] .scn-published > * {
+  white-space: nowrap;
+}
+
+/* the publish window fits the compact page whole: tight rows, one suggestion */
 .scn-camera[data-compact] .scn-modal .scn-dialog {
-  width: calc(100% - 20px);
+  width: calc(100% - 12px);
 }
 
 .scn-camera[data-compact] .scn-dialog :is(.dlg-head, .dlg-body, .dlg-foot) {
-  padding-block: 10px;
+  padding-block: 8px;
 }
 
 .scn-camera[data-compact] .scn-dialog .dlg-body {
   min-height: 0;
 }
 
-.scn-camera[data-compact] .scn-dialog .pub-picker-row:nth-child(n + 2) {
+.scn-camera[data-compact] .scn-dialog :is(.pub-picker-row:nth-child(n + 2), .pub-picker-label) {
   display: none;
 }
 

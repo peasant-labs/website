@@ -71,8 +71,9 @@ export const RECORD_SCENE: SceneDefinition = {
     // a wide screen reads the whole row; a phone leans in on its start
     { at: 400, focus: "cc-input", move: 800, fill: 0.92, width: 430, cropBelow: 0.8 },
     { at: 2550, focus: "cc-out", move: 700, fill: 0.92, width: 430, cropBelow: 0.8 },
-    { at: 3300, focus: "all", move: 1200 },
-    { at: 4600, focus: "browser", move: 1300, ease: "settle", fill: 0.97 },
+    // the camera crosses to Safari as it rises in front, and settles on the session it opened
+    { at: 3400, focus: "browser", move: 1400, fill: 0.97 },
+    { at: 5000, focus: "page-head", move: 1100, ease: "settle", fill: 0.9 },
   ],
   // the pointer clicks into Claude Code's input, then, once Safari is in front, crosses to it and settles on publish
   cursorFrom: [560, 330],
@@ -81,6 +82,7 @@ export const RECORD_SCENE: SceneDefinition = {
     { at: 3900, to: "browser", move: 800, aim: [0.55, 0.62] },
     { at: 5100, to: ".scn-page .pub-bar-action", move: 800 },
   ],
-  finalFocus: "all",
+  finalFocus: "browser",
+  finalFill: 0.97,
   Render: Record,
 };

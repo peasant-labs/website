@@ -65,7 +65,7 @@ function Publish({ phase }: { phase: number }) {
               </section>
             </div>
             <div className="dlg-foot">
-              <div className="pub-foot">
+              <div className="pub-foot" data-focus="foot">
                 <Button variant="secondary" size="sm">
                   cancel
                 </Button>
@@ -105,8 +105,7 @@ export const PUBLISH_SCENE: SceneDefinition = {
     { at: 6150, phase: PUBLISHED },
   ],
   shots: [
-    { at: 0, focus: "all", move: 1 },
-    { at: 300, focus: "page-head", move: 900, fill: 0.78 },
+    { at: 0, focus: "page-head", move: 1, fill: 0.78 },
     { at: 1700, focus: "dialog", move: 900, fill: 0.92 },
     // the camera follows the pointer down to the window's foot, where publish is
     { at: 4300, focus: "foot", move: 650, fill: 0.9 },
