@@ -16,7 +16,7 @@ export const SAMPLE_MATCHES: RedactionMatch[] = [
     id: "key",
     category: "secrets",
     confidence: 0.99,
-    secret: "AWS_ACCESS_KEY_ID=AKIA2F3E7Q9KX4EXAMPLE",
+    secret: "AWS_ACCESS_KEY_ID=AKIA2F3E…EXAMPLE",
     after: "AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY>",
   },
   {
