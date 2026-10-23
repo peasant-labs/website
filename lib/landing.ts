@@ -353,8 +353,8 @@ export const VISION = {
   art: art(
     "vision3",
     "a cottage beside two peasants who carry one basket of grain between them, the basket in amber",
-    1200,
-    512,
+    840,
+    360,
   ),
 } as const;
 
