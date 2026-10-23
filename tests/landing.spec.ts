@@ -342,13 +342,27 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
   // replay is the icon alone, named for assistive technology
   const replay = page.locator("#how").getByRole("button", { name: "replay" });
   await expect(replay).toHaveText("");
-  // all three steps stay written out, so changing step moves nothing in the list
   await expect(page.locator(".hw-step-body")).toHaveText(fixture.how.steps.map((step) => step.body));
+  const list = page.locator(".hw-steps");
+  let listHeight: number | null = null;
 
   for (const [index] of fixture.how.steps.entries()) {
     await steps.nth(index).click();
     await expect(steps.nth(index)).toHaveAttribute("aria-pressed", "true");
+    await expect(steps.nth(index)).toHaveAttribute("aria-expanded", "true");
     await expect(page.locator(".hw-steps > li").nth(index)).toHaveAttribute("data-on", "true");
+    // only the current step's description is open; the others show their title alone
+    await expect
+      .poll(() =>
+        page
+          .locator(".hw-step-more")
+          .evaluateAll((parts) => parts.map((part) => part.getBoundingClientRect().height > 1)),
+      )
+      .toEqual(fixture.how.steps.map((_, at) => at === index));
+    // and the list keeps one height whichever step is open, so nothing below it moves
+    const height = await list.evaluate((element) => element.getBoundingClientRect().height);
+    if (listHeight === null) listHeight = height;
+    expect(Math.abs(height - listHeight)).toBeLessThan(1);
     // the section is held while it is read: the window stays on screen
     await expect(page.locator(".hw-window")).toBeInViewport();
     const view = page.locator(".hw-scroll .hw-view");
@@ -402,38 +416,39 @@ test("scrolling walks the held section through steps 1, 2 and 3, then lets the p
   await expect(page.locator("#install")).toBeInViewport();
 });
 
-test("on a phone the scene window holds under the header and each step reads right under it", async ({
+test("on a phone the scene holds under the header with the steps right under it, one open at a time", async ({
   browser,
 }) => {
   const context = await browser.newContext(PHONE);
   const page = await context.newPage();
   await page.goto("/");
-  const flow = page.locator(".hw-flow-step");
-  await expect(flow).toHaveCount(fixture.how.steps.length);
-  // read down until the scene is held under the header: the first step is straight under it, with no band between
-  await page.locator(".hw-side").evaluate((side) => {
-    const header = document.querySelector(".site-bar")!.getBoundingClientRect();
-    window.scrollTo({ top: window.scrollY + side.getBoundingClientRect().top - header.bottom + 4, behavior: "instant" });
-  });
-  await expect(flow.nth(0)).toHaveAttribute("data-on", "true");
-  for (const index of [0, 1, 2]) {
-    // bring each step up to the scene, the way reading down does
-    await flow.nth(index).evaluate((step) => {
-      const scene = document.querySelector(".hw-side .hw-view")!.getBoundingClientRect();
-      window.scrollTo({ top: window.scrollY + step.getBoundingClientRect().top - scene.bottom - 16, behavior: "instant" });
-    });
-    await expect(flow.nth(index)).toHaveAttribute("data-on", "true");
-    const layout = await flow.nth(index).evaluate((step) => {
-      const side = document.querySelector(".hw-side")!.getBoundingClientRect();
-      const scene = document.querySelector(".hw-side .hw-view")!.getBoundingClientRect();
+  const items = page.locator(".hw-steps > li");
+  await expect(items).toHaveCount(fixture.how.steps.length);
+  const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
+  const height = page.viewportSize()!.height;
+  for (const [index, offset] of [0.2, 1.2, 1.9].entries()) {
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + height * offset);
+    await expect(items.nth(index)).toHaveAttribute("data-on", "true");
+    await expect
+      .poll(() =>
+        page
+          .locator(".hw-step-more")
+          .evaluateAll((parts) => parts.map((part) => part.getBoundingClientRect().height > 1)),
+      )
+      .toEqual(fixture.how.steps.map((_, at) => at === index));
+    const layout = await page.evaluate(() => {
+      const scene = document.querySelector(".hw-scroll .hw-view")!.getBoundingClientRect();
+      const list = document.querySelector(".hw-steps")!.getBoundingClientRect();
       const header = document.querySelector(".site-bar")!.getBoundingClientRect();
       return {
-        held: Math.abs(side.top - header.bottom) < 2 && side.height < window.innerHeight * 0.6,
-        gap: step.getBoundingClientRect().top - scene.bottom,
+        held: Math.abs(scene.top - header.bottom) < 2,
+        gap: list.top - scene.bottom,
+        fits: list.bottom <= window.innerHeight,
       };
     });
-    expect(layout.held, `the window is not held under the header at step ${index + 1}`).toBe(true);
-    expect(layout.gap, `step ${index + 1} does not read right under the scene`).toBeLessThanOrEqual(24);
+    expect(layout.held, `the scene is not held under the header at step ${index + 1}`).toBe(true);
+    expect(layout.gap, `the steps do not sit right under the scene at step ${index + 1}`).toBeLessThanOrEqual(24);
+    expect(layout.fits, `the steps run off the screen at step ${index + 1}`).toBe(true);
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
   await context.close();

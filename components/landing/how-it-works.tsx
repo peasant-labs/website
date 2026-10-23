@@ -8,46 +8,38 @@ import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
 import { LandingIcon } from "@/components/landing/icons";
 import { HOW } from "@/lib/landing";
 import { RotateCcw } from "@peasant-labs/fairtrade/icons";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const SCENES: readonly SceneDefinition[] = [RECORD_SCENE, REVIEW_SCENE, PUBLISH_SCENE];
-/* on a phone, how far under the held scene a step's top may be and still count as reached */
-const FLOW_REACH = 24;
 /* replay fades the scene all the way out before the fresh take fades in: the layer's fade is 420ms */
 const REWIND_MS = 440;
-const WIDE = "(min-width: 62.5rem)";
-
-function subscribeToWide(onChange: () => void) {
-  const query = window.matchMedia(WIDE);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-}
 
 /**
  * How it works, told by scrolling. The section holds still while the page
  * scrolls through it, about one screen per step, and each step's scene plays
  * as it becomes the current one; after the third the page simply carries on.
- * Nothing hijacks the scroll: three markers in the section's height say which
- * step the middle of the screen is on, so momentum, the keyboard and the
- * scroll bar all work as usual. Choosing a step scrolls to it. All three
- * steps stay written out, the current one in full ink, so changing steps moves
- * nothing in the list.
+ * Nothing hijacks the scroll: three markers down the section's height, one a
+ * third each, say which step the middle of the screen is on, so momentum, the
+ * keyboard and the scroll bar all work as usual. Choosing a step scrolls to it.
+ *
+ * The steps show their titles; only the current one opens its description,
+ * and the last one closes as it does, both on one height transition. The list
+ * holds the height of its tallest open state from the start, so nothing below
+ * it moves, and the stepping follows the markers, never the list, so opening
+ * and closing cannot feed back into which step is current.
  *
  * The three scenes are stacked in one screen and crossfade: the next one
  * starts its take from the first frame as it fades in, while the last one
  * fades out where it was, so a change of step never cuts.
  *
- * On a phone the scene window sticks under the header and the step texts run
- * straight on beneath it, with no room held between them: the current step is
- * the last one whose top has reached the scene, so it always reads just under
- * it.
+ * A phone holds the same way, the scene on top and the steps right under it;
+ * the heading slides away under the header so the two fit the screen.
  *
- * Under reduced motion nothing is held: the three steps stack, each beside its
- * scene at its finished frame.
+ * Under reduced motion nothing is held: the three steps stack, each open,
+ * beside its scene at its finished frame.
  */
 export function HowItWorks({ title }: { title: string }) {
   const reduced = useReducedMotion();
-  const wide = useSyncExternalStore(subscribeToWide, () => window.matchMedia(WIDE).matches, () => true);
   const [active, setActive] = useState(0);
   /* one take counter per scene: a scene starts a fresh take each time it becomes current, and on replay */
   const [takes, setTakes] = useState<readonly number[]>(() => SCENES.map(() => 0));
@@ -59,15 +51,16 @@ export function HowItWorks({ title }: { title: string }) {
     setTakes((current) => current.map((value, index) => (index === active ? value + 1 : value)));
   }
   const markRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const flowRefs = useRef<(HTMLLIElement | null)[]>([]);
   const windowRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLHeadingElement>(null);
+  const stepsRef = useRef<HTMLOListElement>(null);
   const onScreen = useOnScreen(windowRef, 0.4);
 
-  // The step whose marker (wide) or text (phone) holds the middle of the screen is the current one.
-  // Wide screens: the step whose marker holds the middle of the screen is the current one.
+  // The step whose marker holds the middle of the screen is the current one.
   useEffect(() => {
-    if (reduced || !wide) return;
+    if (reduced) return;
     const targets = markRefs.current.filter((element): element is HTMLDivElement => element !== null);
     const observer = new IntersectionObserver(
       (entries) => {
@@ -81,23 +74,46 @@ export function HowItWorks({ title }: { title: string }) {
     );
     targets.forEach((target) => observer.observe(target));
     return () => observer.disconnect();
-  }, [reduced, wide]);
+  }, [reduced]);
 
-  // Phones: the step texts run straight on under the held scene, and the current one is the last to reach it.
+  // The list holds its tallest open state: every title, and the longest description open.
+  // The heading's height is kept too, for a phone, where it slides away under the header.
+  useLayoutEffect(() => {
+    if (reduced) return;
+    const root = rootRef.current;
+    const list = stepsRef.current;
+    const head = headRef.current;
+    if (!root || !list || !head) return;
+    const measure = () => {
+      const rows = [...list.children].map((item) => item.querySelector<HTMLElement>(".hw-step")?.offsetHeight ?? 0);
+      const bodies = [...list.querySelectorAll<HTMLElement>(".hw-step-body")].map((body) => body.scrollHeight);
+      const rules = list.offsetHeight - list.clientHeight + list.children.length;
+      root.style.setProperty(
+        "--hw-steps-h",
+        `${rows.reduce((sum, row) => sum + row, 0) + Math.max(0, ...bodies) + rules}px`,
+      );
+      const gap = parseFloat(getComputedStyle(head.parentElement!).rowGap) || 0;
+      root.style.setProperty("--hw-head-h", `${head.offsetHeight + gap}px`);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    observer.observe(head);
+    return () => observer.disconnect();
+  }, [reduced]);
+
+  // While the section is held, the header it sits under stays (see app/landing.css).
   useEffect(() => {
-    if (reduced || wide) return;
+    if (reduced) return;
     let frame = 0;
     const measure = () => {
       frame = 0;
-      const side = windowRef.current;
-      if (!side) return;
-      const scene = side.querySelector(".hw-view") ?? side;
-      const below = scene.getBoundingClientRect().bottom + FLOW_REACH;
-      const reached = flowRefs.current.filter((step) => step && step.getBoundingClientRect().top <= below).length;
-      setActive(Math.max(0, reached - 1));
-      // while the scene is held, the header that it sits under stays (see app/landing.css)
-      const holding = Math.abs(side.getBoundingClientRect().top - parseFloat(getComputedStyle(side).top)) < 1;
-      if (rootRef.current) rootRef.current.dataset.holding = holding ? "true" : "false";
+      const pin = pinRef.current;
+      if (!pin || !rootRef.current) return;
+      const top = parseFloat(getComputedStyle(pin).top) || 0;
+      const box = rootRef.current.getBoundingClientRect();
+      const holding = box.top <= top + 1 && box.bottom >= window.innerHeight;
+      rootRef.current.dataset.holding = holding ? "true" : "false";
     };
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(measure);
@@ -110,11 +126,10 @@ export function HowItWorks({ title }: { title: string }) {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
-  }, [reduced, wide]);
+  }, [reduced]);
 
   function goTo(index: number) {
-    const target = (wide ? markRefs.current : flowRefs.current)[index];
-    target?.scrollIntoView({ block: "center" });
+    markRefs.current[index]?.scrollIntoView({ block: "center" });
   }
 
   if (reduced) {
@@ -147,13 +162,13 @@ export function HowItWorks({ title }: { title: string }) {
 
   return (
     <div ref={rootRef} className="hw hw-scroll" data-active={current.id}>
-      <div className="hw-pin">
+      <div className="hw-pin" ref={pinRef}>
         <div className="site-wrap hw-pin-inner">
-          <h2 id="how-title" data-fade>
+          <h2 id="how-title" data-fade ref={headRef}>
             {title}
           </h2>
           <div className="hw-grid">
-            <ol className="hw-steps">
+            <ol className="hw-steps" ref={stepsRef}>
               {HOW.steps.map((step, index) => {
                 const on = index === active;
                 return (
@@ -162,13 +177,18 @@ export function HowItWorks({ title }: { title: string }) {
                       type="button"
                       className="hw-step"
                       aria-pressed={on}
-                      aria-controls="hw-window"
+                      aria-expanded={on}
+                      aria-controls={`hw-more-${step.id}`}
                       onClick={() => goTo(index)}
                     >
                       <LandingIcon name={step.icon} className="hw-ic" />
                       <span className="hw-step-title">{step.title}</span>
                     </button>
-                    <p className="hw-step-body">{step.body}</p>
+                    <div className="hw-step-more" id={`hw-more-${step.id}`}>
+                      <div className="hw-step-clip">
+                        <p className="hw-step-body">{step.body}</p>
+                      </div>
+                    </div>
                   </li>
                 );
               })}
@@ -216,7 +236,7 @@ export function HowItWorks({ title }: { title: string }) {
         </div>
       </div>
 
-      {/* wide screens: one marker per step down the section's height */}
+      {/* one marker per step down the section's height */}
       <div className="hw-marks" aria-hidden="true">
         {HOW.steps.map((step, index) => (
           <div
@@ -229,23 +249,6 @@ export function HowItWorks({ title }: { title: string }) {
         ))}
       </div>
 
-      {/* phones: the step texts scroll under the held window */}
-      <ol className="hw-flow site-wrap">
-        {HOW.steps.map((step, index) => (
-          <li
-            key={step.id}
-            className="hw-flow-step"
-            data-on={index === active ? "true" : "false"}
-            ref={(element) => {
-              flowRefs.current[index] = element;
-            }}
-          >
-            <LandingIcon name={step.icon} className="hw-ic" />
-            <h3 className="hw-step-title">{step.title}</h3>
-            <p className="hw-flow-body">{step.body}</p>
-          </li>
-        ))}
-      </ol>
     </div>
   );
 }

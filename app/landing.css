@@ -778,11 +778,10 @@
   height: 100dvh;
 }
 
-.hw-flow {
-  display: none;
-}
-
+/* the list holds the height of its tallest open state (measured), so opening and closing moves nothing below */
 .hw-steps {
+  box-sizing: border-box;
+  min-height: var(--hw-steps-h, auto);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -808,10 +807,8 @@
   cursor: pointer;
 }
 
-/* all three steps stay written out; the current one is in full ink, so a change of step moves nothing */
 .hw-step .hw-ic,
-.hw-step .hw-step-title,
-.hw-step-body {
+.hw-step .hw-step-title {
   transition:
     color 320ms var(--ease-out),
     border-color 320ms var(--ease-out);
@@ -826,15 +823,52 @@
   color: var(--ink-strong);
 }
 
+/*
+ * Only the current step opens its description. The opening and the closing
+ * are one height transition on a grid row (0fr to 1fr), so the rows below
+ * glide rather than jump, and the words fade in as they are uncovered.
+ */
+.hw-step-more {
+  display: grid;
+  grid-template-rows: 0fr;
+}
+
+.hw-steps > li[data-on="true"] .hw-step-more {
+  grid-template-rows: 1fr;
+}
+
+.hw-step-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
 .hw-step-body {
   padding: 0 0 var(--sp-5) calc(2.75rem + var(--sp-4));
-  color: var(--ink-3);
+  color: var(--ink-2);
   font-size: 1.0625rem;
   line-height: 1.55;
 }
 
+.hw-steps .hw-step-body {
+  opacity: 0;
+}
+
 .hw-steps > li[data-on="true"] .hw-step-body {
-  color: var(--ink-2);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hw-step-more {
+    transition: grid-template-rows 400ms var(--ease-in-out);
+  }
+
+  .hw-steps .hw-step-body {
+    transition: opacity 240ms var(--ease-out);
+  }
+
+  .hw-steps > li[data-on="true"] .hw-step-body {
+    transition: opacity 320ms var(--ease-out) 120ms;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -914,51 +948,32 @@
 }
 
 /*
- * Phones and narrow windows: the heading, then the scene window held under the
- * header, then the three step texts scrolling beneath it. The wide layout's
- * wrappers step aside (display: contents) so the window's sticky range is the
- * whole section.
+ * Phones and narrow windows hold the same way: the scene on top and the steps
+ * right under it, 12px apart. The heading slides away under the header as the
+ * section takes hold (the held block's top is the header's height less the
+ * heading's, measured), so the scene sits flush under the header.
  */
 @media (max-width: 62.49rem) {
-  .hw-scroll {
-    display: flex;
-    flex-direction: column;
+  .hw-pin {
+    --hw-bar: 3.5rem;
+
+    inset-block-start: calc(var(--hw-bar) - var(--sp-2) - var(--hw-head-h, 0px));
+    align-items: start;
     height: auto;
-    padding-block: clamp(4rem, 9vw, 6rem) 0;
+    padding-block: var(--sp-2) var(--sp-4);
   }
 
-  .hw-pin,
-  .hw-pin-inner,
   .hw-grid {
-    display: contents;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 
-  .hw-scroll h2 {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 75rem;
-    margin-inline: auto;
-    padding-inline: var(--sp-4);
-    margin-block-end: var(--sp-5);
-  }
-
-  .hw-steps,
-  .hw-marks {
-    display: none;
-  }
-
-  /* held flush under the header, its own ground covering the text that scrolls beneath */
   .hw-side {
-    position: sticky;
-    inset-block-start: 3.5rem;
-    z-index: 1;
-    box-sizing: border-box;
-    width: 100%;
-    padding: var(--sp-2) var(--sp-4) var(--sp-3);
-    background: var(--canvas);
+    order: -1;
   }
 
   .hw-scroll .hw-window {
+    position: relative;
     max-width: none;
   }
 
@@ -968,15 +983,22 @@
     min-height: 13rem;
   }
 
+  .hw-step {
+    min-height: 3.5rem;
+  }
+
+  .hw-step-body {
+    padding-inline-start: 0;
+  }
+
   /*
    * From a tablet's width the header is taller, and it steps up out of view
-   * while reading down. The scene holds under it, so while the scene is held
-   * the header stays: its leaving would open a band above the scene, or a
-   * gap under it.
+   * while reading down. The section holds under it, so while it is held the
+   * header stays: its leaving would open a band above the scene.
    */
   @media (min-width: 48rem) {
-    .hw-side {
-      inset-block-start: calc(4rem + 1px);
+    .hw-pin {
+      --hw-bar: calc(4rem + 1px);
     }
 
     :root:has(.hw-scroll[data-holding="true"]) .site-bar[data-hidden="true"] {
@@ -984,11 +1006,7 @@
     }
   }
 
-  /* replay sits on the scene's corner, so nothing stands between the scene and the step under it */
-  .hw-scroll .hw-window {
-    position: relative;
-  }
-
+  /* replay sits on the scene's corner, so nothing stands between the scene and the steps under it */
   .hw-scroll .hw-foot {
     position: absolute;
     inset-block-end: 6px;
@@ -1001,54 +1019,6 @@
     height: 2.25rem;
     border-color: var(--rule);
     background: color-mix(in srgb, var(--canvas) 88%, transparent);
-  }
-
-  /*
-   * The step texts run straight on under the held scene, with no height held
-   * for them: the current one reads just under the scene, the next one follows,
-   * and each slides up under the scene in turn.
-   */
-  .hw-flow {
-    display: grid;
-    gap: var(--sp-6);
-    margin: 0;
-    padding-block: var(--sp-2) var(--sp-6);
-    list-style: none;
-  }
-
-  .hw-flow-step {
-    display: grid;
-    grid-template-columns: 2.75rem minmax(0, 1fr);
-    align-items: center;
-    gap: var(--sp-2) var(--sp-3);
-  }
-
-  .hw-flow-step .hw-ic,
-  .hw-flow-step .hw-step-title,
-  .hw-flow-body {
-    transition:
-      color 320ms var(--ease-out),
-      border-color 320ms var(--ease-out);
-  }
-
-  .hw-flow-step[data-on="true"] .hw-ic {
-    border-color: var(--rule-strong);
-    color: var(--amber);
-  }
-
-  .hw-flow-step[data-on="true"] .hw-step-title {
-    color: var(--ink-strong);
-  }
-
-  .hw-flow-body {
-    grid-column: 1 / -1;
-    color: var(--ink-3);
-    font-size: 1.0625rem;
-    line-height: 1.55;
-  }
-
-  .hw-flow-step[data-on="true"] .hw-flow-body {
-    color: var(--ink-2);
   }
 }
 
