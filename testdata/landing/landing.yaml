@@ -44,9 +44,9 @@ agents:
   names: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
 # the sections after the hero, in reading order: id and heading
 sections:
+  - { id: install, heading: get started in two commands }
   - { id: uses, heading: find your use case }
   - { id: how, heading: how it works }
-  - { id: install, heading: get started in two commands }
   - { id: session, heading: what a reviewer reads }
 # copy from earlier designs of the page that must not come back
 removed:
@@ -120,9 +120,11 @@ how:
 # the commands as scripts/install.sh and scripts/install.ps1 document themselves, typed at each shell's prompt
 install:
   platforms:
-    - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash", prompt: "you@macbook ~ %" }
-    - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex", prompt: 'PS C:\Users\you>' }
+    - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash", prompt: "$" }
+    - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex", prompt: "PS>" }
   kickstart: peasant kickstart
+  # what each step does, over its command
+  steps: [install peasant, set it up]
   guide: { label: read our docs, href: /docs }
 session:
   label: a sample session

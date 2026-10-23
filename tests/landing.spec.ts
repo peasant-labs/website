@@ -100,8 +100,9 @@ test("the install terminal types each platform's exact command at its prompt, wh
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const shell = page.locator("[data-install-shell]");
-  // the commands sit in a Terminal window, not in a box of the site's own
+  // the commands sit in a Terminal window, not in a box of the site's own, with the systems as its tabs
   await expect(shell.locator(".mac-win-terminal .gs-lines")).toHaveCount(1);
+  await expect(shell.locator(".mac-win-terminal").getByRole("tablist")).toHaveCount(1);
   // and the Terminal takes the page's own appearance: light on the light theme, dark on the dark one
   for (const theme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: theme });
@@ -123,6 +124,29 @@ test("the install terminal types each platform's exact command at its prompt, wh
     await expect(lines.nth(0).locator("[data-command]")).toHaveText(platform.command);
     await expect(lines.nth(1).locator("[data-command]")).toHaveText(fixture.install.kickstart);
     await expect(lines.locator(".gs-prompt")).toHaveText([platform.prompt, platform.prompt]);
+    // each step says what it does, numbered, over its command
+    for (const [index, step] of fixture.install.steps.entries()) {
+      await expect(lines.nth(index).locator(".gs-step")).toHaveText(`${index + 1}${step}`);
+    }
+    // each copy is as tall as a command line and sits at its own step's right edge,
+    // beside the step's words on a phone so the command keeps the whole width
+    const placed = await lines.evaluateAll((items) =>
+      items.map((item) => {
+        const text = item.querySelector(".gs-text")!.getBoundingClientRect();
+        const step = item.querySelector(".gs-step")!.getBoundingClientRect();
+        const copy = item.querySelector(".gs-copy")!.getBoundingClientRect();
+        const line = parseFloat(getComputedStyle(item.querySelector(".gs-text")!).lineHeight);
+        return {
+          height: Math.abs(copy.height - line) < 1,
+          inStep: copy.top < text.top && copy.bottom > step.top,
+          rightEdge: copy.right >= text.right - 1,
+        };
+      }),
+    );
+    expect(placed).toEqual([
+      { height: true, inStep: true, rightEdge: true },
+      { height: true, inStep: true, rightEdge: true },
+    ]);
 
     // Never cut off: the line wraps inside the window rather than overflowing it.
     const clipped = await lines
@@ -563,7 +587,7 @@ test("scrolling walks the held section through steps 1, 2 and 3, then lets the p
   }
   // after the third step the section lets go and the next one arrives
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * 3.2);
-  await expect(page.locator("#install")).toBeInViewport();
+  await expect(page.locator("#session")).toBeInViewport();
 });
 
 test("on a phone the scene holds under the header with the steps right under it, one open at a time", async ({

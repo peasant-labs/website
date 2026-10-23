@@ -68,16 +68,6 @@ export default function Home() {
 
         <AgentMarquee />
 
-        <section id="uses" className="lp-sec" aria-labelledby="uses-title">
-          <div className="site-wrap">
-            <UseCases />
-          </div>
-        </section>
-
-        <section id="how" className="lp-sec lp-how" aria-labelledby="how-title">
-          <HowItWorks title={HOW.title} />
-        </section>
-
         <section id="install" className="lp-sec" aria-labelledby="install-title">
           <div className="site-wrap">
             <div className="lp-head">
@@ -90,6 +80,16 @@ export default function Home() {
             </div>
             <GetStarted />
           </div>
+        </section>
+
+        <section id="uses" className="lp-sec" aria-labelledby="uses-title">
+          <div className="site-wrap">
+            <UseCases />
+          </div>
+        </section>
+
+        <section id="how" className="lp-sec lp-how" aria-labelledby="how-title">
+          <HowItWorks title={HOW.title} />
         </section>
 
         <section id="session" className="lp-sec" aria-labelledby="session-title">

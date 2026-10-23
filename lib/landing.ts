@@ -284,24 +284,26 @@ export const HOW = {
 export const INSTALL = {
   title: "get started in two commands",
   guide: { label: "read our docs", href: "/docs" },
-  /* each platform's commands are typed at its own shell's prompt, in a Terminal window titled for that shell */
+  /* each platform's commands are typed at its shell's short prompt, in a Terminal window titled for that shell */
   platforms: [
     {
       id: "unix",
       label: "macos and linux",
       command: "curl -fsSL https://peasantlabs.org/install | bash",
       title: "you — -zsh — 80×24",
-      prompt: "you@macbook ~ %",
+      prompt: "$",
     },
     {
       id: "windows",
       label: "windows",
       command: "irm https://peasantlabs.org/install.ps1 | iex",
       title: "you — pwsh — 80×24",
-      prompt: "PS C:\\Users\\you>",
+      prompt: "PS>",
     },
   ],
   kickstart: "peasant kickstart",
+  /* what each step does, in two or three words, over its command */
+  steps: ["install peasant", "set it up"],
 } as const;
 
 /*

@@ -42,6 +42,7 @@ export type LandingFixture = {
   install: {
     platforms: Array<{ label: string; command: string; prompt: string }>;
     kickstart: string;
+    steps: string[];
     guide: Link;
   };
   session: {

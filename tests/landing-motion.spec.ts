@@ -119,6 +119,14 @@ test("the install commands type in once when the terminal comes into view, and s
   );
   expect(delays[1]!).toBeGreaterThan(delays[0]!);
   expect(delays[2]!).toBeGreaterThan(delays[1]!);
+  // both commands are whole within about a second and a half, then stay
+  const lastDelay = await terminal
+    .locator(".gs-line")
+    .last()
+    .locator(".gs-ch")
+    .last()
+    .evaluate((character) => parseFloat(getComputedStyle(character).animationDelay));
+  expect(lastDelay).toBeLessThanOrEqual(1.5);
   await expect(terminal).toHaveAttribute("data-typing", "done", { timeout: 6000 });
   expect(await characters.last().evaluate((character) => getComputedStyle(character).opacity)).toBe("1");
 
