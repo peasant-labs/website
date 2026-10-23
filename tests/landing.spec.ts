@@ -368,6 +368,21 @@ test("on a phone the docs sidebar folds into fairtrade's top bar and drawer", as
   await context.close();
 });
 
+test("the docs starting points sit two by two on a wide screen, with no card left alone", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/docs");
+  const rows = await page.locator(".dx-guide").evaluateAll((cards) => {
+    const byTop = new Map<number, number>();
+    for (const card of cards) {
+      const top = Math.round(card.getBoundingClientRect().top);
+      byTop.set(top, (byTop.get(top) ?? 0) + 1);
+    }
+    return [...byTop.values()];
+  });
+  expect(rows.every((count) => count === rows[0])).toBe(true);
+  expect(rows[0]).toBeGreaterThan(1);
+});
+
 test("the blog lists every post and each post renders under its own title", async ({ page }) => {
   await page.goto("/blog");
   const cards = page.locator(".bx-post");

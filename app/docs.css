@@ -186,10 +186,21 @@
   max-width: none;
 }
 
+/* the four starting points: one column on a phone, two by two from a tablet up, never an orphan */
 .dx-guides {
   display: grid;
   gap: var(--sp-7) var(--sp-6);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 40rem) {
+  .dx-guides {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.dx-guide-art {
+  max-width: 30rem;
 }
 
 .dx-guide {
