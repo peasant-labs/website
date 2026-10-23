@@ -20,19 +20,23 @@ function art(name: string, alt: string, width: number, height: number): Art {
 }
 
 /*
- * The hero says the mission in the owner's words: an open-source commons for
- * agent transcripts. The tags are the four promises the product stands on, and
- * each is backed by what ships: redaction on the computer and access set per
- * collective; peasant and village both under Apache-2.0; the same flow for
- * every harness peasant reads; harvesting that runs in parallel and skips
- * sessions that have not changed. The lede claims
- * that nothing leaves until it is published, and that a contributor's handle
- * shows on their transcripts unless they turn that off.
+ * The hero says the mission in the owner's words: the open-source commons for
+ * agent transcripts. The tags name the four promises the product stands on by
+ * what backs each one: sessions stay on the computer, peasant and village are
+ * Apache-2.0, the same flow serves every harness peasant reads, and harvesting
+ * skips sessions that have not changed. The lede claims that nothing leaves
+ * until it is published, and that a contributor's handle shows on their
+ * transcripts unless they turn that off.
  */
 export const HERO = {
   title: "the open-source commons for agent transcripts",
   lede: "Peasant keeps your coding agent sessions on your computer. When you publish one, it is redacted there first and shared under your handle, only with the collectives you pick.",
-  pillars: ["secure", "apache-2.0", "agent-agnostic", "performant"],
+  pillars: [
+    { text: "local first", icon: "laptop" },
+    { text: "open source", icon: "code" },
+    { text: "agent-agnostic", icon: "bot" },
+    { text: "incremental indexing", icon: "layers" },
+  ],
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
   /*
@@ -83,7 +87,10 @@ export type LandingIconName =
   | "terminal"
   | "company"
   | "record"
-  | "review";
+  | "review"
+  | "laptop"
+  | "bot"
+  | "layers";
 
 /** a capability carries its own picture, which shows while its caption does */
 export type Capability = Readonly<{ text: string; icon: LandingIconName; art: Art }>;

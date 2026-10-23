@@ -11,6 +11,8 @@ test("the landing reads in order and carries none of the removed sections", asyn
   await expect(page.locator("h1")).toHaveText(fixture.hero.title);
   await expect(page.locator(".lp-lede")).toHaveText(fixture.hero.lede);
   await expect(page.locator(".lp-pillars li")).toHaveText(fixture.hero.pillars);
+  // each tag leads with a drawn icon that the words already explain
+  await expect(page.locator('.lp-pillars li > svg[aria-hidden="true"]')).toHaveCount(fixture.hero.pillars.length);
 
   const order = await page
     .locator("main > section[id]")

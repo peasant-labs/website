@@ -1,6 +1,7 @@
 import { Art } from "@/components/art";
 import { GetStarted } from "@/components/landing/get-started";
 import { HeroFlow } from "@/components/landing/hero-flow";
+import { LandingIcon } from "@/components/landing/icons";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { UseCases } from "@/components/landing/use-cases";
 import { SafariWindow } from "@/components/mac";
@@ -51,7 +52,10 @@ export default function Home() {
             </div>
             <ul className="lp-pillars" data-fade style={fade(3)}>
               {HERO.pillars.map((pillar) => (
-                <li key={pillar}>{pillar}</li>
+                <li key={pillar.text}>
+                  <LandingIcon name={pillar.icon} className="lp-pillar-ic" />
+                  {pillar.text}
+                </li>
               ))}
             </ul>
           </div>

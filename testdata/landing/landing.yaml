@@ -30,7 +30,7 @@ footer:
 hero:
   title: the open-source commons for agent transcripts
   lede: Peasant keeps your coding agent sessions on your computer. When you publish one, it is redacted there first and shared under your handle, only with the collectives you pick.
-  pillars: [secure, apache-2.0, agent-agnostic, performant]
+  pillars: [local first, open source, agent-agnostic, incremental indexing]
   # the picture under the buttons: the agents peasant reads, then the words it shows
   flow:
     agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]

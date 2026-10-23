@@ -113,11 +113,11 @@
   gap: var(--sp-2);
 }
 
-.lp-pillars li::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  background: var(--amber);
+.lp-pillar-ic {
+  flex: none;
+  width: var(--ic-md);
+  height: var(--ic-md);
+  color: var(--amber);
 }
 
 /*
