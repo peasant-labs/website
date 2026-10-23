@@ -57,8 +57,14 @@ removed:
   - discord
   - data commons built by commoners
 # one row of every capability, each tagged with its audience and saying in one or two sentences
-# what it is (all twelve in the server's HTML); grouped here by audience
+# what it is (all twelve in the server's HTML); grouped here by audience; then one card on to the docs
 useCases:
+  more:
+    tag: docs
+    text: explore more in the docs
+    detail: Set up, publishing, redaction and collectives, with guides for evals and pull request reviews.
+    picture: uc-docs
+    cta: { label: read our docs, href: /docs }
   slides:
     - id: researchers
       label: researchers

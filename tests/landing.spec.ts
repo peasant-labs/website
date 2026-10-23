@@ -233,7 +233,7 @@ test("the install card is fairtrade's tabs and CommandBlocks, three numbered com
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
 });
 
-test("the use cases are one row of all twelve capabilities, each tagged with its audience, all in the served page", async ({
+test("the use cases are one row of all twelve capabilities, each tagged with its audience, then the docs card, all in the served page", async ({
   page,
 }) => {
   await page.goto("/");
@@ -245,29 +245,35 @@ test("the use cases are one row of all twelve capabilities, each tagged with its
   await expect(row.getByRole("button")).toHaveCount(0);
 
   const cards = row.locator(".uc-card:not([aria-hidden])");
-  const all = fixture.useCases.slides.flatMap((slide) =>
-    slide.capabilities.map((capability, index) => ({
-      slide,
-      capability,
-      detail: slide.details[index]!,
-      picture: slide.pictures[index]!,
-    })),
-  );
+  const { more } = fixture.useCases;
+  const all = [
+    ...fixture.useCases.slides.flatMap((slide) =>
+      slide.capabilities.map((capability, index) => ({
+        tag: slide.label,
+        capability,
+        detail: slide.details[index]!,
+        picture: slide.pictures[index]!,
+        cta: slide.cta,
+      })),
+    ),
+    // the last card leads on to the docs, in the same shape
+    { tag: more.tag, capability: more.text, detail: more.detail, picture: more.picture, cta: more.cta },
+  ];
   await expect(cards).toHaveCount(all.length);
-  for (const [index, { slide, capability, detail, picture }] of all.entries()) {
+  for (const [index, { tag, capability, detail, picture, cta }] of all.entries()) {
     const card = cards.nth(index);
     await expect(card.locator("h3")).toHaveText(capability);
     await expect(card.locator(".uc-cap-detail")).toHaveText(detail);
     // a small tag names the audience, with its icon, the card's one icon besides the action's arrow
-    await expect(card.locator(".uc-tag")).toHaveText(slide.label);
+    await expect(card.locator(".uc-tag")).toHaveText(tag);
     await expect(card.locator(".uc-tag svg")).toHaveCount(1);
     await expect(card.locator("h3 svg, .uc-cap-detail svg, figure svg")).toHaveCount(0);
     await expect(card.locator("img").first()).toHaveAttribute(
       "src",
       new RegExp(`^/art/${picture}-(light|dark)\\.png$`),
     );
-    const cta = card.getByRole("link", { name: slide.cta.label, exact: true });
-    await expect(cta).toHaveAttribute("href", slide.cta.href);
+    const link = card.getByRole("link", { name: cta.label, exact: true });
+    await expect(link).toHaveAttribute("href", cta.href);
   }
   // the loop's second set is hidden from assistive technology and out of the tab order
   const clones = row.locator('.uc-card[aria-hidden="true"]');
@@ -321,9 +327,18 @@ test("the row's cards are one size, about three and a half across a wide screen 
         startsWithTitle: Math.abs(first.left - title.left) < 2,
         fades: getComputedStyle(row).maskImage !== "none",
         room: Math.min(...room),
-        // the pictures sit on the page itself: nothing paints behind them
-        boxes: cards.filter((card) => getComputedStyle(card.querySelector(".uc-figure")!).backgroundColor !== "rgba(0, 0, 0, 0)")
-          .length,
+        count: cards.length,
+        // every picture sits on its own tinted panel, as wide as the card, so the panel's edges are the words' edges
+        panels: cards.filter((card) => {
+          const figure = card.querySelector(".uc-figure")!;
+          const box = figure.getBoundingClientRect();
+          const words = card.querySelector(".uc-cap-detail")!.getBoundingClientRect();
+          return (
+            getComputedStyle(figure).backgroundColor !== getComputedStyle(document.body).backgroundColor &&
+            Math.abs(box.left - words.left) < 1 &&
+            Math.abs(box.width - card.getBoundingClientRect().width) < 1
+          );
+        }).length,
         // amber is the picture's alone: the tag's icon and the action are in ink
         amber: cards.filter((card) => {
           const amber = getComputedStyle(document.documentElement).getPropertyValue("--amber").trim();
@@ -344,7 +359,7 @@ test("the row's cards are one size, about three and a half across a wide screen 
     expect(geometry.startsWithTitle, `the row does not start under its title at ${width}`).toBe(true);
     expect(geometry.fades, `the row does not fade at its edges at ${width}`).toBe(true);
     expect(geometry.room, `a picture is crowded in its space at ${width}`).toBeGreaterThanOrEqual(16);
-    expect(geometry.boxes, `a picture sits on a box at ${width}`).toBe(0);
+    expect(geometry.panels, `a picture has no panel across its card at ${width}`).toBe(geometry.count);
     expect(geometry.amber, `a card's tag or action is amber at ${width}`).toBe(0);
     expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
   }
@@ -369,6 +384,57 @@ test("on a phone the row steps one card at a time and rests with a whole card at
   await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 8000 }).toBeGreaterThan(start + 10);
   await expect.poll(resting).toBe(true);
   await context.close();
+});
+
+test("a quiet line under the row shows where it is, one segment per card, filling with the time on the current one", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  const line = page.locator(".uc-progress");
+  // a reading, not a control: hidden from assistive technology, with nothing to press
+  await expect(line).toHaveAttribute("aria-hidden", "true");
+  await expect(line.locator("button, a")).toHaveCount(0);
+  const cards = await row.locator(".uc-card:not([aria-hidden])").count();
+  await expect(line.locator(".uc-progress-seg")).toHaveCount(cards);
+  // it sits under the row, on the title's edge
+  const edges = await page.evaluate(() => ({
+    line: document.querySelector(".uc-progress")!.getBoundingClientRect(),
+    row: document.querySelector("[data-use-cases]")!.getBoundingClientRect(),
+    title: document.querySelector("#uses-title")!.getBoundingClientRect().left,
+  }));
+  expect(edges.line.top).toBeGreaterThan(edges.row.bottom - 1);
+  expect(Math.abs(edges.line.left - edges.title)).toBeLessThan(2);
+
+  await row.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  const on = line.locator('.uc-progress-seg[data-state="on"]');
+  await expect(on).toHaveCount(1);
+  const first = await line.locator(".uc-progress-seg").evaluateAll((segments) =>
+    segments.findIndex((segment) => segment.getAttribute("data-state") === "on"),
+  );
+  // the current segment fills over the time the row rests, then the row steps on and the next one takes over
+  await expect(on.locator(".uc-progress-fill")).toHaveCount(1);
+  await expect
+    .poll(
+      () =>
+        line
+          .locator(".uc-progress-seg")
+          .evaluateAll((segments) => segments.findIndex((segment) => segment.getAttribute("data-state") === "on")),
+      { timeout: 9000 },
+    )
+    .toBe(first + 1);
+  // hovering the row holds the fill where it is
+  await row.hover();
+  expect(await line.locator(".uc-progress-fill").evaluate((fill) => getComputedStyle(fill).animationPlayState)).toBe(
+    "paused",
+  );
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(line.locator(".uc-progress-fill")).toHaveCount(0);
+  await expect(line.locator('.uc-progress-seg[data-state="on"]')).toHaveCount(1);
 });
 
 test("every use-case headline keeps room for two lines, so the words under it line up across the row", async ({ page }) => {

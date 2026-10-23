@@ -100,7 +100,8 @@ export type LandingIconName =
   | "record"
   | "review"
   | "bot"
-  | "zap";
+  | "zap"
+  | "book";
 
 /** a capability: its headline, one or two sentences on what it is, and its own picture, which shows while it does */
 export type Capability = Readonly<{ text: string; detail: string; icon: LandingIconName; art: Art }>;
@@ -129,6 +130,15 @@ export const USE_CASES = {
   title: "find your use case",
   /* the row of capabilities, as assistive technology names it */
   label: "use cases",
+  /* after the twelve, one card that leads on to the docs, in the same shape */
+  more: {
+    tag: "docs",
+    icon: "book",
+    text: "explore more in the docs",
+    detail: "Set up, publishing, redaction and collectives, with guides for evals and pull request reviews.",
+    cta: { label: "read our docs", href: "/docs" },
+    art: capabilityArt("uc-docs", "an open book with written pages, one line in amber"),
+  },
   slides: [
     {
       id: "researchers",

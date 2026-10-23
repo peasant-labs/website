@@ -1,5 +1,6 @@
 import type { LandingIconName } from "@/lib/landing";
 import {
+  BookOpen,
   Bot,
   Building2,
   ChartNoAxesColumn,
@@ -43,6 +44,7 @@ const ICONS: Record<LandingIconName, ComponentType<SVGProps<SVGSVGElement>>> = {
   review: ShieldCheck,
   bot: Bot,
   zap: Zap,
+  book: BookOpen,
 };
 
 /** A landing icon, decorative: the words beside it carry the meaning. */

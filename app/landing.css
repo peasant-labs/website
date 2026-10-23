@@ -511,13 +511,17 @@
   min-width: 0;
 }
 
-/* the picture on the page itself, whole, centred in a space of one shape for every card */
+/*
+ * The picture on its own tinted panel across the card's width, so the panel's
+ * edges are the words' edges and the drawing sits centred inside it.
+ */
 .uc-figure {
   display: grid;
   place-items: center;
   aspect-ratio: 4 / 3;
   margin: 0;
   overflow: hidden;
+  background: var(--surface-2);
 }
 
 /* drawn on an 8px grid at 704 by 528, shown at a quarter or three eighths so every cell lands on whole pixels */
@@ -529,6 +533,53 @@
 @media (min-width: 64rem) {
   .uc-art {
     width: 264px;
+  }
+}
+
+/*
+ * Under the row, where it is: one thin segment per card, the current one in
+ * ink, filling with the time left before the row steps on. It holds when the
+ * row holds; under reduced motion it only marks where the row rests.
+ */
+.uc-progress {
+  display: flex;
+  gap: var(--sp-1);
+  max-width: 24rem;
+  margin: var(--sp-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.uc-progress-seg {
+  position: relative;
+  flex: 1 1 0;
+  height: 2px;
+  overflow: hidden;
+  background: var(--rule);
+}
+
+.uc-progress[data-static="true"] .uc-progress-seg[data-state="on"] {
+  background: var(--ink-3);
+}
+
+.uc-progress-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--ink-3);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation-name: uc-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.uc-progress[data-playing="false"] .uc-progress-fill {
+  animation-play-state: paused;
+}
+
+@keyframes uc-progress {
+  to {
+    transform: scaleX(1);
   }
 }
 
