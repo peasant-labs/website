@@ -31,6 +31,20 @@ html {
 
 /* ---------- frame ---------- */
 
+/*
+ * The site's rhythm, in fairtrade's steps. The spacing scale stops at --sp-8
+ * (56px), so the wider values are whole multiples of a step.
+ *   --site-sec-y      a section's padding at each end: 56px on a phone, 112px
+ *                     wide; two sections meet across twice that
+ *   --site-head-gap   a section title to its content: 32px to 64px
+ *   --site-title-fs   a section title: --fs-xl on a phone to --fs-group wide
+ */
+:root {
+  --site-sec-y: clamp(var(--sp-8), 7.5vw, calc(var(--sp-8) * 2));
+  --site-head-gap: clamp(var(--sp-6), 4.5vw, calc(var(--sp-6) * 2));
+  --site-title-fs: clamp(var(--fs-xl), 3.4vw, var(--fs-group));
+}
+
 .site-wrap {
   box-sizing: border-box;
   width: 100%;

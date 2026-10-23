@@ -43,11 +43,12 @@
 }
 
 /*
- * The page breathes: about 200px between sections on a wide screen and about
- * 100px on a phone, and whitespace alone separates them; no rule runs between.
+ * The page breathes: 224px between sections on a wide screen and 112px on a
+ * phone (twice --site-sec-y), and whitespace alone separates them; no rule
+ * runs between.
  */
 .lp-sec {
-  padding-block: clamp(3rem, 7.5vw, 7.5rem);
+  padding-block: var(--site-sec-y);
 }
 
 /*
@@ -61,13 +62,13 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--sp-3) var(--sp-7);
-  margin-block-end: clamp(2rem, 4.5vw, 4rem);
+  margin-block-end: var(--site-head-gap);
 }
 
 .lp-title {
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+  font-size: var(--site-title-fs);
   font-weight: 700;
   line-height: 1.12;
   text-wrap: balance;
@@ -651,7 +652,7 @@
 .hw h2 {
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+  font-size: var(--site-title-fs);
   font-weight: 700;
   line-height: 1.12;
   text-wrap: balance;
@@ -682,9 +683,10 @@
   padding-block: 5rem var(--sp-6);
 }
 
+/* the held screen is bound by the window's height, so its title sits closer than other sections' (24px to 40px) */
 .hw-pin-inner {
   display: grid;
-  gap: clamp(1.5rem, 3vw, 2.5rem);
+  gap: clamp(var(--sp-5), 3vw, var(--sp-7));
 }
 
 .hw-grid {
@@ -936,12 +938,12 @@
 /* reduced motion: the steps stack, each beside its finished scene */
 .hw-stacked {
   display: grid;
-  gap: clamp(2rem, 4vw, 3.5rem);
+  gap: var(--site-head-gap);
   box-sizing: border-box;
   width: 100%;
   max-width: 75rem;
   margin-inline: auto;
-  padding: clamp(5rem, 9vw, 8rem) var(--sp-6);
+  padding: var(--site-sec-y) var(--sp-6);
 }
 
 @media (max-width: 47.99rem) {
@@ -2484,7 +2486,7 @@
 
 .site-foot-close .site-foot-line {
   max-inline-size: 22ch;
-  font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+  font-size: var(--site-title-fs);
   line-height: 1.12;
 }
 
