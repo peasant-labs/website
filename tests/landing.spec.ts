@@ -919,6 +919,14 @@ test("a sample session opens in the real transcript browser, in a wide window th
       .locator(".mac-lights i")
       .evaluateAll((lights) => lights.map((light) => getComputedStyle(light).backgroundColor)),
   ).toEqual(["rgb(255, 95, 87)", "rgb(254, 188, 46)", "rgb(40, 200, 64)"]);
+
+  // every window in the section reads at AA in both themes, the Terminal's dimmed title behind the browser too
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme });
+    await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
+    const accessibility = await new AxeBuilder({ page }).include("#session").analyze();
+    expect(accessibility.violations, `the section in the ${colorScheme} theme`).toEqual([]);
+  }
 });
 
 test("on first view a pointer tours the transcript browser through its real controls, until the reader takes over", async ({

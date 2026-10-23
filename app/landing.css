@@ -1047,6 +1047,8 @@
   --mac-bar-bg: #2d2d2d;
   --mac-bar-rule: #0d0d0d;
   --mac-title: rgba(255, 255, 255, 0.7);
+  /* the title of a window behind the front one: dimmer, as macOS draws it, and still AA on the bar (4.9:1) */
+  --mac-title-off: #9a9a9a;
   --mac-icon: rgba(255, 255, 255, 0.62);
   --mac-icon-off: rgba(255, 255, 255, 0.24);
   --mac-field: rgba(255, 255, 255, 0.1);
@@ -1072,6 +1074,7 @@
   --mac-bar-bg: #ebebeb;
   --mac-bar-rule: #d1d1d1;
   --mac-title: rgba(0, 0, 0, 0.68);
+  --mac-title-off: #666666;
   --mac-icon: rgba(0, 0, 0, 0.55);
   --mac-icon-off: rgba(0, 0, 0, 0.2);
   --mac-field: rgba(0, 0, 0, 0.055);
@@ -1249,7 +1252,7 @@
 }
 
 .mac-win[data-active="false"] .mac-title {
-  opacity: 0.55;
+  color: var(--mac-title-off);
 }
 
 .mac-tools {
@@ -1812,9 +1815,12 @@
       transform 460ms var(--ease-out);
   }
 
-  .mac-win .mac-body,
-  .mac-win .mac-title {
+  .mac-win .mac-body {
     transition: opacity 320ms var(--ease-out);
+  }
+
+  .mac-win .mac-title {
+    transition: color 320ms var(--ease-out);
   }
 
   .mac-lights i {
