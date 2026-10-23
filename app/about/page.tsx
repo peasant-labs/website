@@ -1,6 +1,7 @@
 import { SiteShell } from "@/components/site-shell";
 import { UnderConstruction } from "@/components/under-construction";
 import { metadataForRoute } from "@/lib/projects";
+import Link from "next/link";
 
 export const metadata = metadataForRoute({
   title: "about | peasant labs",
@@ -26,7 +27,11 @@ export default function AboutPage() {
             <p className="pj-lede" data-reading-text>
               peasant labs builds the tools for keeping the sessions your coding agents
               leave behind, and for publishing only the ones you choose. the full account
-              of why is on the front page; this page will carry the shorter one.
+              of why is in{" "}
+              <Link className="site-link" href="/blog/reclaiming-data-autonomy-as-a-peasant">
+                the essay on the blog
+              </Link>
+              ; this page will carry the shorter one.
             </p>
           </div>
         </header>
