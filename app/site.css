@@ -137,11 +137,7 @@ html {
   color: var(--amber);
 }
 
-/*
- * The destinations sit beside the mark, read as one group with it; the
- * actions keep the far edge. The bar's own install button reserves its width
- * while hidden, so nothing may be placed by the gap it leaves.
- */
+/* the destinations sit beside the mark, read as one group with it; the actions keep the far edge */
 .site-nav {
   display: flex;
   align-items: center;
@@ -171,27 +167,6 @@ html {
   align-items: center;
   gap: var(--sp-2);
   margin-inline-start: auto;
-}
-
-/* the landing's install, offered by the bar once the hero's own has scrolled away */
-.site-bar-install {
-  opacity: 0;
-  transform: translateY(-4px);
-  visibility: hidden;
-  transition:
-    opacity var(--dur-3) var(--ease-out),
-    transform var(--dur-3) var(--ease-out),
-    visibility 0s linear var(--dur-3);
-}
-
-.site-bar-install[data-shown="true"] {
-  opacity: 1;
-  transform: none;
-  visibility: visible;
-  transition:
-    opacity var(--dur-3) var(--ease-out),
-    transform var(--dur-3) var(--ease-out),
-    visibility 0s;
 }
 
 .site-bar .site-menu-btn {
@@ -345,8 +320,7 @@ html {
   }
 
   .site-bar .site-nav,
-  .site-bar .site-bar-wide,
-  .site-bar .site-bar-install {
+  .site-bar .site-bar-wide {
     display: none;
   }
 
@@ -361,7 +335,46 @@ html {
 
 .site-foot {
   border-top: var(--bd);
-  padding-block: var(--sp-7);
+  padding-block-end: var(--sp-7);
+}
+
+/* the call to action every page ends with: one line, then install and the docs */
+.site-foot-cta-row {
+  margin-block-end: var(--sp-7);
+  padding-block: clamp(3rem, 6vw, 4.5rem);
+  border-bottom: var(--bd);
+}
+
+.site-foot-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5) var(--sp-7);
+}
+
+.site-foot-line {
+  max-inline-size: 22ch;
+  color: var(--ink-strong);
+  font-family: var(--font-display);
+  font-size: clamp(1.625rem, 3vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.site-foot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+@media (max-width: 47.99rem) {
+  .site-foot-actions,
+  .site-foot-actions .btn {
+    flex: 1 1 100%;
+  }
 }
 
 .site-foot-inner {

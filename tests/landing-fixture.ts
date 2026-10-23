@@ -7,8 +7,11 @@ export type Link = { label: string; href: string };
 
 export type LandingFixture = {
   version: 1;
-  header: { nav: Link[]; login: Link; menu: Link[]; install: Link };
-  footer: Link[];
+  header: { nav: Link[]; login: Link; menu: Link[] };
+  footer: {
+    cta: { line: string; primary: Link & { landingHref: string }; secondary: Link };
+    nav: Link[];
+  };
   hero: {
     title: string;
     lede: string;

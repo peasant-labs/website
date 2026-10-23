@@ -18,7 +18,6 @@ import {
 } from "react";
 
 const DESKTOP = "(min-width: 48rem)";
-const INSTALL_HREF = "/#install";
 
 /* The page behind an open menu stays put; the lock is released synchronously so a link can scroll. */
 function lockScroll(locked: boolean) {
@@ -30,11 +29,11 @@ function lockScroll(locked: boolean) {
  *
  * On a wide screen it is a sticky bar that steps out of the way while you read
  * down and comes back as soon as you scroll up; it draws its bottom rule only
- * once the page has moved, and on the landing page it picks up a small
- * "install now" once the hero's own button has scrolled away.
+ * once the page has moved. It offers no install: the page's own buttons and the
+ * footer do.
  *
  * On a phone it is a compact bar with one menu button. The menu is an opaque
- * sheet under the bar with every destination, the theme, sign-in and install;
+ * sheet under the bar with every destination, the theme and sign-in;
  * it traps focus while open and closes on Escape, an outside tap, a link, or a
  * route change, handing focus back to the button.
  */
@@ -43,9 +42,6 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  // which page the hero's button was last seen scrolled away on; elsewhere the bar offers nothing
-  const [installAwayOn, setInstallAwayOn] = useState<string | null>(null);
-  const showInstall = installAwayOn === pathname;
   const headerRef = useRef<HTMLElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -88,18 +84,6 @@ export function SiteHeader() {
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, []);
-
-  // The landing's own install button: once it has scrolled away, the bar offers one.
-  useEffect(() => {
-    const target = document.querySelector("[data-hero-install]");
-    if (!target) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry) return;
-      setInstallAwayOn(!entry.isIntersecting && entry.boundingClientRect.top < 0 ? pathname : null);
-    });
-    observer.observe(target);
-    return () => observer.disconnect();
-  }, [pathname]);
 
   // While open: Escape and outside taps close; the page behind does not scroll.
   useEffect(() => {
@@ -154,15 +138,6 @@ export function SiteHeader() {
         </Link>
         <SiteNav />
         <div className="site-bar-actions">
-          <a
-            className="btn btn-primary site-btn site-bar-install"
-            href={INSTALL_HREF}
-            data-shown={showInstall ? "true" : "false"}
-            aria-hidden={showInstall ? undefined : true}
-            tabIndex={showInstall ? undefined : -1}
-          >
-            install now
-          </a>
           <ThemeToggle className="site-icon-btn site-bar-wide" />
           <a
             className="btn btn-secondary site-btn site-login site-bar-wide"
@@ -234,9 +209,6 @@ export function SiteHeader() {
           >
             <BrandMark name="github" />
             log in
-          </a>
-          <a className="btn btn-primary site-btn site-btn-lg" href={INSTALL_HREF} onClick={linkClosesMenu}>
-            install now
           </a>
         </div>
       </div>

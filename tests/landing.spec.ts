@@ -46,7 +46,34 @@ test("header and footer carry exactly the fixture destinations", async ({ page }
     await footer.evaluateAll((links) =>
       links.map((link) => ({ label: link.textContent?.trim(), href: link.getAttribute("href") })),
     ),
-  ).toEqual(fixture.footer);
+  ).toEqual(fixture.footer.nav);
+});
+
+test("every page ends with the footer's call to action", async ({ page }) => {
+  const { cta } = fixture.footer;
+  for (const [path, installHref] of [
+    ["/", cta.primary.landingHref],
+    ["/about", cta.primary.href],
+    ["/projects", cta.primary.href],
+  ] as const) {
+    await page.goto(path);
+    const band = page.locator("footer [data-footer-cta]");
+    await expect(band).toContainText(cta.line);
+    await expect(band.getByRole("link", { name: cta.primary.label, exact: true })).toHaveAttribute(
+      "href",
+      installHref,
+    );
+    await expect(band.getByRole("link", { name: cta.secondary.label, exact: true })).toHaveAttribute(
+      "href",
+      cta.secondary.href,
+    );
+  }
+
+  // on the landing it is the only call to action after the vision, and install lands on the section
+  await page.goto("/");
+  await page.locator("footer [data-footer-cta]").getByRole("link", { name: cta.primary.label }).click();
+  await expect(page).toHaveURL(/#install$/);
+  await expect(page.locator("#install")).toBeInViewport();
 });
 
 test("the hero buttons move to their sections, smoothly unless motion is reduced", async ({ page }) => {
@@ -96,7 +123,7 @@ test("the install shell shows each platform's exact command, whole, and copies i
   await page.keyboard.press("ArrowRight");
   await expect(shell.getByRole("tab", { name: fixture.install.platforms[1]!.label })).toBeFocused();
 
-  const guide = page.getByRole("link", { name: fixture.install.guide.label });
+  const guide = page.locator("#install").getByRole("link", { name: fixture.install.guide.label });
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
 });
 

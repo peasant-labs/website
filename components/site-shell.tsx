@@ -6,12 +6,19 @@ import { SiteHeader } from "@/components/site-header";
  * footer below. `/projects` gets it from its layout; the standalone routes
  * mount it directly, so every page outside the docs shares one frame.
  */
-export function SiteShell({ children }: { children: React.ReactNode }) {
+export function SiteShell({
+  children,
+  landing = false,
+}: {
+  children: React.ReactNode;
+  /** the landing page: the footer's install stays on the page */
+  landing?: boolean;
+}) {
   return (
     <div className="project-shell site-shell" data-project-shell>
       <SiteHeader />
       {children}
-      <SiteFooter />
+      <SiteFooter landing={landing} />
     </div>
   );
 }

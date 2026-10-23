@@ -31,7 +31,7 @@ export const metadata: Metadata = {
  */
 export default function Home() {
   return (
-    <SiteShell>
+    <SiteShell landing>
       <main id="content" className="lp" tabIndex={-1}>
         <section className="lp-sec lp-hero" aria-labelledby="hero-title">
           <div className="site-wrap lp-hero-inner">
@@ -42,7 +42,7 @@ export default function Home() {
               {HERO.lede}
             </p>
             <div className="lp-ctas" data-fade style={fade(2)}>
-              <a className="btn btn-primary site-btn site-btn-xl" href={HERO.primary.href} data-hero-install>
+              <a className="btn btn-primary site-btn site-btn-xl" href={HERO.primary.href}>
                 {HERO.primary.label}
               </a>
               <a className="btn btn-secondary site-btn site-btn-xl" href={HERO.secondary.href}>

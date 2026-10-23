@@ -31,10 +31,8 @@ test("on a phone the header is the mark and one menu button, and the menu behave
     "href",
     fixture.header.login.href,
   );
-  await expect(sheet.getByRole("link", { name: fixture.header.install.label })).toHaveAttribute(
-    "href",
-    fixture.header.install.href,
-  );
+  // install lives on the page and in the footer, never in the header
+  await expect(sheet.getByText(fixture.footer.cta.primary.label)).toHaveCount(0);
   await expect(sheet.locator("[data-theme-toggle]")).toBeVisible();
   // the page behind does not scroll while the menu is open
   expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe("hidden");
@@ -60,22 +58,17 @@ test("on a phone the header is the mark and one menu button, and the menu behave
   await context.close();
 });
 
-test("on a wide screen the header steps away while reading down and offers install once the hero's has gone", async ({
-  page,
-}) => {
+test("on a wide screen the header steps away while reading down and never offers install", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const header = page.locator(".site-bar");
-  const install = page.locator(".site-bar-install");
   await expect(header).toHaveAttribute("data-scrolled", "false");
-  await expect(install).toHaveAttribute("data-shown", "false");
   await page.mouse.wheel(0, 1500);
   await expect(header).toHaveAttribute("data-hidden", "true");
   await expect(header).toHaveAttribute("data-scrolled", "true");
   await page.mouse.wheel(0, -400);
   await expect(header).toHaveAttribute("data-hidden", "false");
-  await expect(install).toHaveAttribute("data-shown", "true");
-  await expect(install).toHaveAttribute("href", fixture.header.install.href);
+  await expect(header.getByText(fixture.footer.cta.primary.label)).toHaveCount(0);
   await expect(header.getByRole("button", { name: "open the menu" })).toBeHidden();
 });
 

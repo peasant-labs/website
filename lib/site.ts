@@ -66,4 +66,15 @@ export const FOOTER_NAV = [
   { id: "contact", label: "contact", href: "/contact" },
 ] as const;
 
+/**
+ * The call to action every page ends with, at the top of the footer. Install
+ * points at the landing's install section: in place on the landing, across from
+ * any other page.
+ */
+export const FOOTER_CTA = {
+  line: "try peasant on your own sessions",
+  primary: { label: "install now", href: "/#install", landingHref: "#install" },
+  secondary: { label: "read our docs", href: "/docs" },
+} as const;
+
 export type SiteNavSection = (typeof SITE_NAV)[number];

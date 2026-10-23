@@ -14,13 +14,19 @@ header:
     - { label: projects, href: /projects }
     - { label: about, href: /about }
     - { label: contact, href: /contact }
-  install: { label: install now, href: "/#install" }
 footer:
-  - { label: docs, href: /docs }
-  - { label: blog, href: /blog }
-  - { label: projects, href: /projects }
-  - { label: github, href: https://github.com/peasant-labs }
-  - { label: contact, href: /contact }
+  # the call to action every page ends with; install points at the landing's
+  # install section, in place on the landing and across from any other page
+  cta:
+    line: try peasant on your own sessions
+    primary: { label: install now, href: "/#install", landingHref: "#install" }
+    secondary: { label: read our docs, href: /docs }
+  nav:
+    - { label: docs, href: /docs }
+    - { label: blog, href: /blog }
+    - { label: projects, href: /projects }
+    - { label: github, href: https://github.com/peasant-labs }
+    - { label: contact, href: /contact }
 hero:
   title: a fair commons for agent transcripts
   lede: Peasant keeps your coding agent sessions on your computer. When you publish one, it is redacted there first and shared under your handle, only with the collectives you pick.
