@@ -128,6 +128,10 @@
  * centred inside it with room around it.
  */
 .dx-pic {
+  --dx-pic-w: 13rem;
+
+  display: grid;
+  place-items: center;
   aspect-ratio: 4 / 3;
   padding: 6%;
   border: var(--bd);
@@ -138,11 +142,21 @@
  * Drawn smooth: every docs picture shows at well under half its drawn size,
  * where square-pixel scaling would turn the dither into a blocky moiré.
  */
+/*
+ * Each picture is drawn at twice its shown size on a fixed cell grid, so it
+ * shows at exactly that size (13rem for the docs, 30rem for the blog): on a
+ * 2x screen every cell lands on whole pixels. It shrinks only when the panel
+ * is narrower.
+ */
 .dx-pic .art-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: min(100%, var(--dx-pic-w));
+  height: auto;
   image-rendering: auto;
+}
+
+.bx-post-art.dx-pic,
+.bx-figure.dx-pic {
+  --dx-pic-w: 30rem;
 }
 
 /* ---------- header ---------- */
@@ -988,7 +1002,7 @@
 
 /* a post's lead picture: a wide panel, so it leads in without pushing the first paragraph a screen down */
 .bx-figure.dx-pic {
-  aspect-ratio: 2 / 1;
+  aspect-ratio: auto;
   padding: var(--sp-5);
 }
 
