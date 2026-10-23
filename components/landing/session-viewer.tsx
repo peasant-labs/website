@@ -24,6 +24,9 @@ const READ_ONLY = {
 /* no crumb trail: the sample has nowhere to navigate to, and its id is shown nowhere */
 const NO_CRUMBS: never[] = [];
 
+/* the browser draws the viewer itself: its relative times and counts are the reader's clock's and locale's, not the build's */
+const noChange = () => () => {};
+
 /* the reader's own input inside the window; any of it ends the tour */
 const TAKE_OVER = ["pointerdown", "wheel", "touchstart", "keydown"] as const;
 
@@ -125,6 +128,7 @@ export function SessionViewer({
 }) {
   // The site owns the theme; the viewer follows it rather than shipping its own.
   const theme = useSyncExternalStore<Theme>(subscribeToTheme, currentTheme, () => "dark");
+  const drawn = useSyncExternalStore(noChange, () => true, () => false);
   const viewModel = useMemo(() => {
     const adapted = adaptTranscript(session);
     return { ...adapted, session: { ...adapted.session, title } };
@@ -175,32 +179,34 @@ export function SessionViewer({
       aria-label={label}
       tabIndex={-1}
     >
-      <TranscriptViewer
-        key={take}
-        viewModel={viewModel}
-        capabilities={READ_ONLY}
-        theme={theme}
-        breadcrumb={NO_CRUMBS}
-        showTail={false}
-        showOutcome={false}
-        headerActions={
-          reduced ? undefined : (
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm btn-icon"
-              aria-label={replay}
-              onClick={() => {
-                // a fresh viewer, back at its start, and the tour again; focus stays in the window
-                setTake((value) => value + 1);
-                setPlayed(true);
-                rootRef.current?.focus({ preventScroll: true });
-              }}
-            >
-              <RotateCcw aria-hidden="true" focusable="false" />
-            </button>
-          )
-        }
-      />
+      {drawn ? (
+        <TranscriptViewer
+          key={take}
+          viewModel={viewModel}
+          capabilities={READ_ONLY}
+          theme={theme}
+          breadcrumb={NO_CRUMBS}
+          showTail={false}
+          showOutcome={false}
+          headerActions={
+            reduced ? undefined : (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm btn-icon"
+                aria-label={replay}
+                onClick={() => {
+                  // a fresh viewer, back at its start, and the tour again; focus stays in the window
+                  setTake((value) => value + 1);
+                  setPlayed(true);
+                  rootRef.current?.focus({ preventScroll: true });
+                }}
+              >
+                <RotateCcw aria-hidden="true" focusable="false" />
+              </button>
+            )
+          }
+        />
+      ) : null}
       {reduced ? null : <MacPointer ref={pointerRef} className="lp-tour-pointer" />}
     </div>
   );

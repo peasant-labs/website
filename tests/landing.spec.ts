@@ -636,11 +636,18 @@ test("a sample session opens in the real transcript browser, in a wide window th
   page,
 }) => {
   // the tour stays out of the way here: under reduced motion the browser is simply there to use
-  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   const section = page.locator("#session");
   const viewer = section.locator("[data-session-viewer]");
   await expect(viewer).toHaveAttribute("aria-label", fixture.session.label);
+  // the browser draws the viewer after the page hydrates, so its relative times can never break hydration
+  // (a broken one re-renders the document and drops the theme the head script set)
+  await expect(viewer.locator(".txn-app")).toBeVisible();
+  expect(errors).toEqual([]);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   // the session goes by its short title, with no crumb trail and no session id
   await expect(viewer.getByRole("heading", { name: fixture.session.title })).toBeVisible();
   await expect(section).not.toContainText(fixture.session.sessionId);
