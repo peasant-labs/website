@@ -1,0 +1,9 @@
+/*
+ * The not-found and error pages: the catalog hero's heading and lede, then one
+ * row of actions. Only spacing lives here; every value is a fairtrade token.
+ */
+.nf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
