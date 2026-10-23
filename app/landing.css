@@ -2402,34 +2402,31 @@
 
 /*
  * The statement's own panel, at the content's width: the picture on the left,
- * the words on the right, both centred on the panel's height, with the same
- * room above and below. A phone stacks them, the picture first, its left edge
- * on the words' edge. The picture carries its own ground in its contact
- * shadows; no rule runs under it, and nothing it draws leaves its box.
- *
- * The picture is drawn at 1200 by 512 and fills its column.
+ * the words on the right, both centred on the panel's height. The section
+ * carries the room around the panel; the panel's own padding is smaller and
+ * even. A phone stacks them, the picture first, its left edge on the words'
+ * edge. The picture carries its own ground in its contact shadows; no rule
+ * runs under it, and nothing it draws leaves its box.
  */
 .lp-vision-inner {
-  --lp-vision-pad: var(--site-sec-y, clamp(3rem, 6vw, 5rem));
-
   display: grid;
   align-items: center;
-  gap: var(--sp-7) clamp(2rem, 5vw, 4.5rem);
-  padding: var(--lp-vision-pad);
+  gap: var(--sp-6) var(--site-head-gap);
+  padding: clamp(var(--sp-6), 5vw, calc(var(--sp-8) + var(--sp-5)));
   border: var(--bd);
   background: var(--surface-2);
 }
 
-/* side by side from 72rem: the picture at its drawn size, 420px, and the words in the rest */
+/* side by side from 72rem: the picture at its drawn size, 440px square, and the words in the rest */
 @media (min-width: 72rem) {
   .lp-vision-inner {
-    grid-template-columns: 420px minmax(0, 1fr);
+    grid-template-columns: 440px minmax(0, 1fr);
   }
 }
 
 @media (max-width: 47.99rem) {
   .lp-vision-inner {
-    --lp-vision-pad: var(--sp-5);
+    padding: var(--sp-6) var(--sp-5);
   }
 }
 
@@ -2437,54 +2434,62 @@
   min-width: 0;
 }
 
-/*
- * The picture is drawn at twice 420 by 180 and shows at that size beside the
- * words; stacked, it fills the column up to 560px, and on a phone the column.
- */
+/* drawn at twice 440 square; it shows at that size, and only shrinks when its column is narrower */
 .lp-vision-art {
   display: block;
   width: 100%;
-  max-width: 560px;
+  max-width: 440px;
+  aspect-ratio: 1;
+}
+
+.lp-vision-art .art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* the words: the lead line in the section titles' face one step down, then why, then the way to the rest */
 .lp-vision-words {
   display: grid;
   justify-items: start;
-  gap: var(--sp-4);
   min-width: 0;
-  max-width: 64ch;
+}
+
+.lp-vision-words > * {
+  max-inline-size: var(--measure-prose);
 }
 
 .lp-vision-line {
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: var(--fs-xl);
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.2;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
-/* on a phone the lead line is smaller and balanced, so it never leaves a word on a line of its own */
-@media (max-width: 47.99rem) {
-  .lp-vision-line {
-    font-size: 1.3125rem;
-    text-wrap: balance;
-  }
-}
-
-/* short paragraphs: balanced, so no line ends on a word or two alone */
 .lp-vision-story {
+  margin-block-start: var(--sp-4);
   color: var(--ink-2);
   font-family: var(--font-body);
   font-size: var(--fs-md);
   line-height: 1.65;
-  text-wrap: balance;
+  text-wrap: pretty;
+}
+
+.lp-vision-line + .lp-vision-story {
+  margin-block-start: var(--sp-5);
 }
 
 .lp-vision-cta {
-  margin-block-start: var(--sp-3);
+  margin-block-start: var(--sp-6);
+}
+
+@media (max-width: 47.99rem) {
+  .lp-vision-line {
+    font-size: var(--fs-lg);
+  }
 }
 
 /*

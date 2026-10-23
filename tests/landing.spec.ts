@@ -486,17 +486,21 @@ test("the vision stands on its own grounded panel, and the landing ends on a cal
       const line = element.querySelector("#vision-line")!;
       const title = document.querySelector("#install h2")!;
       const cta = element.querySelector(".lp-vision-cta")!;
-      // every line of every paragraph, as its right edge, so a last line holding one word shows up
+      // the text of the last line of every paragraph, read character by character
       const lastLines = [...element.querySelectorAll("#vision-line, .lp-vision-story")].map((paragraph) => {
         const range = document.createRange();
-        range.selectNodeContents(paragraph);
-        const rows = new Map<number, number>();
-        for (const rect of range.getClientRects()) {
-          const top = Math.round(rect.top);
-          rows.set(top, Math.max(rows.get(top) ?? 0, rect.right - paragraph.getBoundingClientRect().left));
+        const rows = new Map<number, string>();
+        const walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) {
+          const text = walker.currentNode as Text;
+          for (let index = 0; index < text.length; index += 1) {
+            range.setStart(text, index);
+            range.setEnd(text, index + 1);
+            const top = Math.round(range.getBoundingClientRect().top);
+            rows.set(top, (rows.get(top) ?? "") + text.data[index]);
+          }
         }
-        const widths = [...rows.values()];
-        return widths.length > 1 ? widths.at(-1)! / Math.max(...widths) : 1;
+        return [...rows.values()].at(-1)!.trim();
       });
       return {
         surface: style.backgroundColor !== getComputedStyle(document.body).backgroundColor,
@@ -513,6 +517,7 @@ test("the vision stands on its own grounded panel, and the landing ends on a cal
         lineSmaller: parseFloat(getComputedStyle(line).fontSize) < parseFloat(getComputedStyle(title).fontSize),
         filledCta: cta.classList.contains("btn-primary"),
         lastLines,
+        art: { width: art.width, height: art.height },
       };
     });
     expect(layout.surface && layout.border === "1px", `the vision has no panel at ${width}`).toBe(true);
@@ -522,9 +527,13 @@ test("the vision stands on its own grounded panel, and the landing ends on a cal
     expect(layout.evenPadding, `the vision's padding is uneven at ${width}`).toBe(true);
     expect(layout.lineFace && layout.lineSmaller, `the lead line is not one step under the section titles at ${width}`).toBe(true);
     expect(layout.filledCta, "the vision's button is filled amber").toBe(false);
-    for (const share of layout.lastLines) {
-      expect(share, `a paragraph leaves a word or two alone on its last line at ${width}`).toBeGreaterThan(0.33);
+    for (const line of layout.lastLines) {
+      expect(line, `a paragraph leaves one word alone on its last line at ${width}`).toContain(" ");
     }
+    // the picture is a square, 440px beside the words and no wider than that when stacked
+    expect(Math.abs(layout.art.width - layout.art.height), `the picture is not square at ${width}`).toBeLessThan(1);
+    if (width >= 1280) expect(layout.art.width).toBe(440);
+    else expect(layout.art.width).toBeLessThanOrEqual(440);
   }
   await page.setViewportSize({ width: 1440, height: 900 });
 
