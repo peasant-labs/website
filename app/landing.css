@@ -105,6 +105,34 @@
   margin-block-start: var(--sp-5);
 }
 
+/* what the product stands on: four plain tags under the buttons */
+.lp-pillars {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2) var(--sp-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
+}
+
+.lp-pillars li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.lp-pillars li::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--amber);
+}
+
 /*
  * On a phone the wide art would shrink to a strip. It keeps a readable height
  * instead and shows its centre, cropped at the edges of the screen.

@@ -48,6 +48,11 @@ export default function Home() {
                 {HERO.secondary.label}
               </a>
             </div>
+            <ul className="lp-pillars" data-fade style={fade(3)}>
+              {HERO.pillars.map((pillar) => (
+                <li key={pillar}>{pillar}</li>
+              ))}
+            </ul>
           </div>
           <Art art={HERO.art} className="lp-hero-art" important />
         </section>

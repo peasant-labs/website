@@ -19,9 +19,17 @@ function art(name: string, alt: string, width: number, height: number): Art {
   return { light: `/art/${name}-light.png`, dark: `/art/${name}-dark.png`, alt, width, height };
 }
 
+/*
+ * The hero says the mission in the owner's words, "commons" and "agent
+ * transcripts". The lede and the tags claim only what ships: peasant and
+ * village are open source, sessions stay and are redacted on the computer,
+ * nothing leaves until it is published, and a contributor's handle shows on
+ * their transcripts unless they turn that off.
+ */
 export const HERO = {
-  title: "data commons built by commoners",
-  lede: "Record, publish, and share agent sessions with people you trust.",
+  title: "a fair commons for agent transcripts",
+  lede: "Peasant keeps your coding agent sessions on your computer. When you publish one, it is redacted there first and shared under your handle, only with the collectives you pick.",
+  pillars: ["open source", "local first", "consent always", "credited to you"],
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
   art: art("hero2", "five wheat sheaves in a row, the tallest in the middle in amber", 1200, 512),

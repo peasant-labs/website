@@ -12,6 +12,7 @@ export type LandingFixture = {
   hero: {
     title: string;
     lede: string;
+    pillars: string[];
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };

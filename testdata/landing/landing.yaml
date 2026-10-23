@@ -22,8 +22,9 @@ footer:
   - { label: github, href: https://github.com/peasant-labs }
   - { label: contact, href: /contact }
 hero:
-  title: data commons built by commoners
-  lede: Record, publish, and share agent sessions with people you trust.
+  title: a fair commons for agent transcripts
+  lede: Peasant keeps your coding agent sessions on your computer. When you publish one, it is redacted there first and shared under your handle, only with the collectives you pick.
+  pillars: [open source, local first, consent always, credited to you]
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
 # the sections after the hero, in reading order: id and heading
@@ -41,6 +42,7 @@ removed:
   - six agent harnesses
   - they see how it is used
   - discord
+  - data commons built by commoners
 useCases:
   slideMs: 6000
   captionMs: 2000
