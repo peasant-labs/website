@@ -122,7 +122,6 @@ html {
   align-items: center;
   gap: 10px;
   min-height: var(--target-comfortable);
-  margin-inline-end: auto;
   color: var(--ink-strong);
   font-family: var(--font-mono);
   font-size: var(--fs-body);
@@ -138,10 +137,16 @@ html {
   color: var(--amber);
 }
 
+/*
+ * The destinations sit beside the mark, read as one group with it; the
+ * actions keep the far edge. The bar's own install button reserves its width
+ * while hidden, so nothing may be placed by the gap it leaves.
+ */
 .site-nav {
   display: flex;
   align-items: center;
   gap: 0 var(--sp-5);
+  margin-inline-start: var(--sp-2);
 }
 
 .site-nav-link {
@@ -165,6 +170,7 @@ html {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
+  margin-inline-start: auto;
 }
 
 /* the landing's install, offered by the bar once the hero's own has scrolled away */
@@ -363,6 +369,10 @@ html {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-3) var(--sp-6);
+}
+
+.site-foot-brand {
+  margin-inline-end: auto;
 }
 
 .site-foot-nav {
