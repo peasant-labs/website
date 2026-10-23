@@ -11,26 +11,6 @@
 :root {
   scrollbar-color: var(--rule-strong) var(--canvas);
   caret-color: var(--amber);
-
-  /*
-   * The terminal surface used by the install shell and the record scene. In the
-   * light theme it inverts to the strongest ink, the way a terminal reads on a
-   * light page; in the dark theme it stays dark and steps up one surface, so it
-   * never becomes a bright slab on a dark page. Aliases only, never new values.
-   */
-  --term-bg: var(--surface-2);
-  --term-ink: var(--ink-strong);
-  --term-dim: var(--ink-3);
-  --term-accent: var(--amber);
-  --term-rule: var(--rule-strong);
-}
-
-:root[data-theme="light"] {
-  --term-bg: var(--ink-strong);
-  --term-ink: var(--canvas);
-  --term-dim: color-mix(in srgb, var(--canvas) 72%, transparent);
-  --term-accent: var(--amber-fill);
-  --term-rule: color-mix(in srgb, var(--canvas) 24%, transparent);
 }
 
 ::selection {

@@ -102,6 +102,17 @@ test("the install terminal types each platform's exact command at its prompt, wh
   const shell = page.locator("[data-install-shell]");
   // the commands sit in a Terminal window, not in a box of the site's own
   await expect(shell.locator(".mac-win-terminal .gs-lines")).toHaveCount(1);
+  // and the Terminal takes the page's own appearance: light on the light theme, dark on the dark one
+  for (const theme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme: theme });
+    await page.goto("/");
+    const lightness = await shell.locator(".gs-term .mac-body").evaluate((body) => {
+      const [r, g, b] = getComputedStyle(body).backgroundColor.match(/\d+/g)!.map(Number);
+      return (0.2126 * r! + 0.7152 * g! + 0.0722 * b!) / 255;
+    });
+    if (theme === "light") expect(lightness, "the install terminal is inverted on the light theme").toBeGreaterThan(0.8);
+    else expect(lightness, "the install terminal is bright on the dark theme").toBeLessThan(0.2);
+  }
 
   for (const platform of fixture.install.platforms) {
     const tab = shell.getByRole("tab", { name: platform.label });
