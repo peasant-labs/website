@@ -41,6 +41,38 @@ test("the search index holds every docs page, every linked section and every pos
   for (const doc of index.docs) expect(doc.text.length, `${doc.href} is indexed empty`).toBeGreaterThan(0);
 });
 
+test("on a phone no docs command wraps at a hyphen inside a word", async ({ browser }) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
+  for (const { path } of anchors.pages) {
+    await page.goto(path);
+    const commands = page.locator(".dx-cmd .cli-cmd-line code");
+    await expect(commands.first()).toHaveAttribute("data-breaks", "marked");
+    for (const lines of await commands.evaluateAll((codes) =>
+      codes.map((code) => {
+        const range = document.createRange();
+        const rows = new Map<number, string>();
+        const walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) {
+          const text = walker.currentNode as Text;
+          for (let index = 0; index < text.length; index += 1) {
+            range.setStart(text, index);
+            range.setEnd(text, index + 1);
+            const top = Math.round(range.getBoundingClientRect().top);
+            rows.set(top, (rows.get(top) ?? "") + text.data[index]);
+          }
+        }
+        return [...rows.values()].map((row) => row.trim());
+      }),
+    )) {
+      for (const line of lines.slice(0, -1)) {
+        expect(line, `${path}: "${lines.join(" / ")}" wraps inside a word`).not.toMatch(/-$/);
+      }
+    }
+  }
+  await context.close();
+});
+
 test("every shortcut opens search with the field focused, and esc gives focus back", async ({ page }) => {
   await page.goto("/docs/guides/evals");
   for (const { key } of search.openers) {

@@ -132,12 +132,8 @@ test("the install card is fairtrade's tabs and CommandBlocks, three numbered com
       const panel = shell.locator('[role="tabpanel"]:not([hidden])');
       const lines = panel.locator(".gs-line");
       await expect(lines).toHaveCount(3);
-      // fairtrade draws its muted "$" before each command; read as plain text, the line is the command
-      const drawn = await lines
-        .locator(".cli-cmd code")
-        .evaluateAll((codes) =>
-          codes.map((code) => (code.textContent ?? "").replaceAll("\u2060", "").replaceAll("\u00a0", " ")),
-        );
+      // fairtrade draws its muted "$" before each command; the line's characters are the command's, so a selection copies it
+      const drawn = await lines.locator(".cli-cmd code").evaluateAll((codes) => codes.map((code) => code.textContent));
       expect(drawn).toEqual(
         [platform.command, fixture.install.kickstart, fixture.install.push].map((command) => `$ ${command}`),
       );
