@@ -998,13 +998,13 @@
 /*
  * Phones and narrow windows hold the same way: the title, then the scene, then
  * the steps 12px under it, centred as one block in the room under the header.
- * The scene's height gives way first, so the block fits a short screen; on a
- * screen too short for even its smallest scene the block starts at the top.
+ * The scene's height gives way first, down to 10rem, so the block fits a
+ * screen as short as 360 by 640; on a shorter one it starts at the top.
  */
 @media (max-width: 62.49rem) {
   .hw-scroll {
     --hw-bar: 3.5rem;
-    --hw-scene-h: max(13rem, min(46dvh - 6rem, var(--hw-room) - var(--hw-head-h, 4rem) - 2 * var(--sp-3) - 12px - var(--hw-steps-h, 21rem)));
+    --hw-scene-h: max(10rem, min(46dvh - 6rem, var(--hw-room) - var(--hw-head-h, 4rem) - 2 * var(--sp-3) - 12px - var(--hw-steps-h, 21rem)));
     --hw-free: calc(var(--hw-room) - var(--hw-head-h, 4rem) - 2 * var(--sp-3) - var(--hw-scene-h) - 12px - var(--hw-steps-h, 21rem));
   }
 

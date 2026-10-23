@@ -842,6 +842,26 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
   await expect(record.locator("table")).toHaveCount(0);
 });
 
+test("on a short phone the held block still fits under the header", async ({ browser }) => {
+  const context = await browser.newContext({ ...PHONE, viewport: { width: 375, height: 667 } });
+  const page = await context.newPage();
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 667 * 0.6);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const header = document.querySelector(".site-bar")!.getBoundingClientRect();
+        const title = document.querySelector(".hw-scroll h2")!.getBoundingClientRect();
+        const steps = document.querySelector(".hw-steps")!.getBoundingClientRect();
+        return title.top >= header.bottom && steps.bottom <= window.innerHeight;
+      }),
+    )
+    .toBe(true);
+  await context.close();
+});
+
 test("held on a wide screen, the title and scene sit centred under the header", async ({ browser }) => {
   for (const viewport of [
     { width: 1440, height: 900 },
