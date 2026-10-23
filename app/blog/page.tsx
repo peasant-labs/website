@@ -34,7 +34,7 @@ export default function BlogIndex() {
         <div className="bx-posts">
           {POSTS.map((post) => (
             <Link key={post.slug} className="bx-post" href={`/blog/${post.slug}`}>
-              <Art art={post.art} className="bx-post-art" />
+              <Art art={post.art} className="dx-pic bx-post-art" />
               <span className="bx-meta">
                 {post.kind} · <time dateTime={post.published}>{formatPostDate(post.published)}</time>
               </span>

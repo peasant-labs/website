@@ -43,7 +43,7 @@ export default function DocsHome() {
         <div className="dx-guides">
           {DOCS_START.map((guide) => (
             <Link key={guide.id} className="dx-guide" href={guide.href}>
-              <Art art={guide.art} className="dx-guide-art" />
+              <Art art={guide.art} className="dx-pic dx-guide-art" />
               <span className="dx-guide-text">
                 <span className="dx-guide-title">{guide.title}</span>
                 <span className="dx-guide-desc">

@@ -153,7 +153,7 @@ export function DocHead({
         </h1>
         <p className="dx-lede">{lede}</p>
       </div>
-      {art ? <Art art={art} className="dx-head-art" important /> : null}
+      {art ? <Art art={art} className="dx-pic dx-head-art" important /> : null}
     </header>
   );
 }

@@ -53,7 +53,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         <p className="bx-meta">
           peasant · <time dateTime={post.published}>{formatPostDate(post.published)}</time>
         </p>
-        <Art art={post.art} className="bx-figure" />
+        <Art art={post.art} className="dx-pic bx-figure" />
         <div className="bx-body prose">
           <Body />
         </div>
