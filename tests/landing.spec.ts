@@ -301,6 +301,16 @@ test("the row's cards are one size, about three and a half across a wide screen 
         // the pictures sit on the page itself: nothing paints behind them
         boxes: cards.filter((card) => getComputedStyle(card.querySelector(".uc-figure")!).backgroundColor !== "rgba(0, 0, 0, 0)")
           .length,
+        // amber is the picture's alone: the tag's icon and the action are in ink
+        amber: cards.filter((card) => {
+          const amber = getComputedStyle(document.documentElement).getPropertyValue("--amber").trim();
+          const probe = document.createElement("span");
+          probe.style.color = amber;
+          document.body.append(probe);
+          const value = getComputedStyle(probe).color;
+          probe.remove();
+          return [".uc-ic", ".uc-cta"].some((selector) => getComputedStyle(card.querySelector(selector)!).color === value);
+        }).length,
         pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
@@ -312,6 +322,7 @@ test("the row's cards are one size, about three and a half across a wide screen 
     expect(geometry.fades, `the row does not fade at its edges at ${width}`).toBe(true);
     expect(geometry.room, `a picture is crowded in its space at ${width}`).toBeGreaterThanOrEqual(16);
     expect(geometry.boxes, `a picture sits on a box at ${width}`).toBe(0);
+    expect(geometry.amber, `a card's tag or action is amber at ${width}`).toBe(0);
     expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
   }
 });
