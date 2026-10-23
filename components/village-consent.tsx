@@ -25,44 +25,28 @@ export const GOVERNANCE_AXES = [
     icon: Eye,
     key: "identity",
     tone: "reveal",
-    value: (
-      <>
-        profile revealed to <span className="mono">owners</span>
-      </>
-    ),
-    scope: "others still see you as anon",
+    value: "the owners see your profile",
+    scope: "everyone else sees you as anonymous",
   },
   {
     icon: Globe,
     key: "data access",
     tone: "open",
-    value: (
-      <>
-        <span className="mono">public</span>: anyone can browse the dataset
-      </>
-    ),
-    scope: "no membership required",
+    value: "anyone can read what it shares",
+    scope: "no need to be a member",
   },
   {
     icon: Share2,
     key: "contribution",
     tone: "open",
-    value: (
-      <>
-        <span className="mono">private</span> → <span className="mono">shared</span>
-      </>
-    ),
-    scope: "the full record is shared",
+    value: "what you add is shared with the whole collective",
+    scope: "the full record, not a summary",
   },
   {
     icon: Archive,
     key: "retention",
     tone: "restricted",
-    value: (
-      <>
-        <span className="mono">mandatory</span>: auto-retracted on leave
-      </>
-    ),
-    scope: "set by the collective",
+    value: "if you leave, what you added is taken out",
+    scope: "the collective sets this",
   },
 ] as const;

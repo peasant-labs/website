@@ -9,8 +9,8 @@ export const metadata = metadataForRoute({
 });
 
 /**
- * A destination the header promises but the copy has not filled yet. It exists
- * so the nav link lands somewhere honest rather than on a 404.
+ * Who we are and what we make, in a few plain lines; the long account of why
+ * is the essay on the blog.
  */
 export default function AboutPage() {
   return (
@@ -22,13 +22,17 @@ export default function AboutPage() {
               about
             </h1>
             <p className="pj-lede" data-reading-text>
-              we build peasant: the tools for keeping the sessions your coding agents leave
-              behind, and for publishing only the ones you choose. the full account
-              of why is in{" "}
+              we build peasant, an app that keeps the sessions your coding agents leave on
+              your computer, and peasant online, where you publish the ones you choose for
+              your team or a research group. both are open source under Apache-2.0.
+            </p>
+            <p className="pj-lede" data-reading-text>
+              we think the people who do the work should have a stake in the data it
+              produces. the long version is{" "}
               <Link className="site-link" href="/blog/reclaiming-data-autonomy-as-a-peasant">
                 the essay on the blog
               </Link>
-              ; this page will carry the shorter one.
+              .
             </p>
           </div>
         </header>

@@ -283,8 +283,10 @@
   }
 
   @media (min-width: 48rem) {
+    /* the short copy sits level with the middle of the tall example card, not over an empty column */
     .pj-village-join {
       grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+      align-items: center;
     }
 
     .pj-village-governance {
@@ -1977,4 +1979,61 @@
 
 .pj-comparison-table thead tr > .tbl-th:first-child {
   z-index: calc(var(--z-sticky) + 1);
+}
+
+/*
+ * The get-started wizard on a page. fairtrade sticks the wizard's footer to the
+ * bottom of the viewport, for a dialog that scrolls inside itself; on a page it
+ * slid over the step's command and, on a phone, over the rail. Here it sits
+ * under the body. The first and last step names line up with the rail's ends
+ * rather than overhanging its border. Unlayered, like the overrides above, to
+ * win over fairtrade's unlayered component CSS.
+ */
+.pj-start-body .swz-foot {
+  position: static;
+}
+
+.pj-start-body .swz-cell:first-child .swz-step {
+  align-items: flex-start;
+}
+
+.pj-start-body .swz-cell:last-child .swz-step {
+  align-items: flex-end;
+}
+
+/*
+ * On a phone a step's command breaks between its words onto as many lines as it
+ * needs, with copy on its own full-width row under it, so the whole command and
+ * its copy are always in view.
+ */
+@media (max-width: 47.99rem) {
+  .pj-start-step .pj-command-scroll {
+    overflow: visible;
+  }
+
+  .pj-start-step .cli-cmd {
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .pj-start-step .cli-cmd-line {
+    flex: 1 1 100%;
+    overflow: visible;
+  }
+
+  .pj-start-step .cli-cmd-line code {
+    white-space: pre-wrap;
+  }
+
+  .pj-start-step .cli-copy {
+    flex: 1 1 100%;
+    min-height: var(--target-comfortable);
+    border-top: var(--bd);
+    border-left: 0;
+  }
+
+  /* the contact form's field and button are full-size tap targets */
+  .pj-contact-form :is(input, button) {
+    min-height: var(--target-comfortable);
+  }
 }
