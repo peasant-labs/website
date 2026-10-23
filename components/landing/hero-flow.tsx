@@ -7,29 +7,29 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /*
  * The hero's picture, told without words and drawn the way the site's
- * pictures are: closed silhouettes with a bold outline, filled with dither
- * marks (dot, plus, square, checker) on a cell grid, lighter on lit faces and
- * denser in shadow, with amber for what is yours or hidden.
+ * pictures are: low-poly shapes in a fine halftone dot screen, warm-grey
+ * hairline edges, soft dotted shadows on a ground of scattered dots, and one
+ * amber accent.
  *
- * A transcript card lifts out of a laptop that runs the agents, glides on a
- * gentle arc through a sieve that sweeps its secret line amber, is stamped as
- * it is published, and slides down onto the shared stack, which eases down a
- * notch to make room while one of the people standing at it lights up. Its
- * accessible name tells the same story.
+ * A transcript card lifts out of a laptop that runs the agents, glides through
+ * a sieve that sweeps its secret line amber, is stamped as it is published,
+ * and slides down onto the shared stack, which eases down a notch to make room
+ * while one of the people standing at it lights up. Its accessible name tells
+ * the same story.
  *
  * Every card makes the same journey, one cycle after the last, so the loop
  * never resets: a card lands on top, sinks one notch a cycle and slips behind
- * the table after four, and comes back out of the laptop on its next turn.
+ * the base after four, and comes back out of the laptop on its next turn.
  *
- * Everything is placed on the cell grid, and every drawing uses the cell as
- * its unit, so one set of patterns fills them all, pinned to each object: the
- * texture travels with a card instead of shimmering across it. The picture
+ * Everything is placed on one cell grid, and every drawing uses the cell as its
+ * unit, so one set of dot patterns fills them all, pinned to each object: the
+ * screen travels with a card instead of shimmering across it. The picture
  * shows at fixed widths where a cell is a whole number of pixels (3px on a
  * phone and a mid-size screen, 4px on a wide one). A card moves on two nested
- * layers, across and down, each with its own curve, which bends its path into
- * an arc. Only transform, opacity and clip-path move; z-index steps a card
- * behind the one that lands on it. The resting state is one finished frame,
- * and the loop is laid over it only when motion is allowed.
+ * layers, across and down, each with its own curve, which bends its path. Only
+ * transform, opacity and clip-path move; z-index steps a card behind the one
+ * that lands on it. The resting state is one finished frame, and the loop is
+ * laid over it only when motion is allowed.
  */
 
 const FLOW = HERO.flow;
@@ -37,27 +37,29 @@ const AGENTS = FLOW.agents;
 const COUNT = AGENTS.length;
 /* the laptop shows three marks at a time: the first three agents, then the other three */
 const SHOWN = 3;
-/* how many cards show on the stack before one slips behind the table */
+/* how many cards show on the stack before one slips behind the base */
 const DEPTH = 4;
 
-/* one cycle per card; a card's own animation runs for all six cycles */
-const CYCLE = 6000;
+/* one calm cycle per card; a card's own animation runs for all six cycles */
+const CYCLE = 8500;
 const LOOP = CYCLE * COUNT;
 
-/* a card's journey, from the start of its cycle */
+/* a card's journey, from the start of its cycle: each move eases in and out, and each beat holds */
 const BEAT = {
-  lifted: 700,
-  crest: 1700,
-  glided: 2800,
-  pressed: 2900,
-  settled: 3150,
-  landed: 4100,
+  lifted: 900,
+  leave: 1400,
+  atSieve: 2500,
+  leaveSieve: 3000,
+  stamped: 4200,
+  settled: 4450,
+  drop: 4700,
+  landed: 5700,
   /* the stack makes room while the card comes down */
-  roomFrom: 3250,
-  roomTo: 4000,
-  noticed: 4400,
-  forgetFrom: 5200,
-  forgotten: 5800,
+  roomFrom: 4800,
+  roomTo: 5600,
+  noticed: 6100,
+  forgetFrom: 7400,
+  forgotten: 8000,
 } as const;
 
 /*
@@ -93,81 +95,81 @@ type Person = readonly [x: number, height: number];
 
 /** One layout, every measure in cells. */
 type Layout = Readonly<{
-  /** the picture's size */
   width: number;
   height: number;
   ground: number;
-  /** the laptop: the screen's outer edge, the display's inset, and the deck's depth and reach past the screen */
+  /** the laptop: its screen, and the deck's depth and reach past the screen */
   screen: Rect;
-  inset: number;
   deck: readonly [depth: number, reach: number];
-  /** the three marks on the display: centres and one size */
+  /** the three marks on the screen: centres and one size */
   marks: readonly Point[];
   mark: number;
-  /** centres: lifted out of the laptop, the top of the arc (wide only), stamped above the stack */
+  /** centres: lifted out of the laptop, held in the sieve, stamped above the stack */
   lifted: Point;
-  crest: number;
+  atSieve: Point;
   stamped: Point;
-  /** on a wide screen the card travels across and rises then falls; on a phone it travels down and bends across late */
+  /** a wide screen reads left to right; a phone top to bottom */
   travel: "across" | "down";
-  /** the sieve: a short mesh panel across the card's path */
+  /** the sieve: a short framed mesh across the card's path */
   sieve: Rect;
-  /** the stack: its left edge, the table's top, the step between cards and the table's reach past them */
-  stack: readonly [left: number, tableTop: number, notch: number, reach: number];
-  /** the people at the stack: each one's centre and height, then the head's radius and the body's half width */
+  /** the stack: its left edge, the base's top and the step between cards */
+  stack: readonly [left: number, baseTop: number, notch: number];
+  /** the people at the stack: each one's centre and height, and one half width */
   people: readonly Person[];
-  head: number;
   halfWidth: number;
 }>;
 
-const PHONE: Layout = {
-  width: 100,
-  height: 184,
-  ground: 180,
-  screen: [18, 6, 64, 36],
-  inset: 3,
-  deck: [6, 5],
-  marks: [35, 50, 65].map((x) => [x, 24] as const),
-  mark: 12,
-  lifted: [50, 62],
-  crest: 0,
-  stamped: [30, 106],
-  travel: "down",
-  sieve: [14, 82, 72, 6],
-  stack: [6, 170, 3, 4],
-  people: [
-    [65, 38],
-    [73, 44],
-    [81, 35],
-    [89, 41],
-  ],
-  head: 4,
-  halfWidth: 5,
-};
-
+/*
+ * A wide screen: the laptop and the commons on one ground, an even gap between
+ * the groups and the same margin outside, the screen's top level with the
+ * stack's. The card travels on a shallow arc above them, through the sieve
+ * standing in the gap, and the base under the stack is the cards' width.
+ */
 const WIDE: Layout = {
   width: 250,
-  height: 118,
-  ground: 112,
-  screen: [8, 66, 72, 38],
-  inset: 3,
-  deck: [8, 6],
-  marks: [25, 44, 63].map((x) => [x, 85] as const),
-  mark: 14,
-  lifted: [56, 48],
-  crest: 34,
-  stamped: [168, 36],
+  height: 156,
+  ground: 122,
+  screen: [20, 71, 72, 43],
+  deck: [8, 4],
+  marks: [36, 56, 76].map((x) => [x, 92] as const),
+  mark: 15,
+  lifted: [56, 52],
+  atSieve: [115, 46],
+  stamped: [158, 52],
   travel: "across",
-  sieve: [100, 12, 10, 48],
-  stack: [144, 100, 3, 4],
+  sieve: [112, 25, 6, 42],
+  stack: [134, 114, 3],
   people: [
-    [205, 44],
-    [216, 50],
-    [227, 41],
-    [238, 47],
+    [197, 38],
+    [208, 43],
+    [219, 35],
+    [230, 41],
   ],
-  head: 5,
-  halfWidth: 7,
+  halfWidth: 8,
+};
+
+/* a phone: the laptop on top, the sieve under it, the stack and the people on the ground */
+const PHONE: Layout = {
+  width: 100,
+  height: 152,
+  ground: 145,
+  screen: [26, 6, 48, 26],
+  deck: [5, 4],
+  marks: [36, 50, 64].map((x) => [x, 19] as const),
+  mark: 10,
+  lifted: [50, 42],
+  atSieve: [50, 66],
+  stamped: [28, 80],
+  travel: "down",
+  sieve: [12, 70, 76, 4],
+  stack: [4, 140, 3],
+  people: [
+    [63, 31],
+    [72, 35],
+    [81, 28],
+    [90, 33],
+  ],
+  halfWidth: 6.5,
 };
 
 /* the person who lights up as each card lands: the tallest, nearest the stack */
@@ -198,62 +200,43 @@ type Track = readonly (readonly [ms: number, value: number, ease?: Curve])[];
 /** the top of the stack's top card */
 const stackTop = (layout: Layout) => layout.stack[1] - CARD.h - (DEPTH - 1) * layout.stack[2];
 
-/** the card's centre across (x) and down (y), in cells, for a card that starts on one of the three marks */
-function tracks(layout: Layout, slot: number) {
-  const [markX, markY] = layout.marks[slot]!;
+/** the card's centre across (0) or down (1), in cells, for a card that starts on one of the three marks */
+function track(layout: Layout, slot: number, axis: 0 | 1): Track {
+  const from = layout.marks[slot]![axis];
   const [stackLeft, , notch] = layout.stack;
-  const topCentre = stackTop(layout) + CARD.h / 2;
-  const stackX = stackLeft + CARD.w / 2;
+  const rest = axis === 0 ? stackLeft + CARD.w / 2 : stackTop(layout) + CARD.h / 2;
   const sinks: [number, number, Curve?][] = [];
-  for (let depth = 1; depth <= DEPTH; depth += 1) {
-    sinks.push([depth * CYCLE + BEAT.roomFrom, topCentre + (depth - 1) * notch, "in-out"]);
-    sinks.push([depth * CYCLE + BEAT.roomTo, topCentre + depth * notch]);
+  if (axis === 1) {
+    for (let depth = 1; depth <= DEPTH; depth += 1) {
+      sinks.push([depth * CYCLE + BEAT.roomFrom, rest + (depth - 1) * notch, "in-out"]);
+      sinks.push([depth * CYCLE + BEAT.roomTo, rest + depth * notch]);
+    }
   }
-  const x: Track =
-    layout.travel === "across"
-      ? [
-          [0, markX, "out"],
-          [BEAT.lifted, layout.lifted[0], "in-out"],
-          [BEAT.glided, layout.stamped[0]],
-          [LOOP, stackX],
-        ]
-      : [
-          [0, markX, "out"],
-          [BEAT.lifted, layout.lifted[0]],
-          [(BEAT.lifted + BEAT.glided) / 2, layout.lifted[0], "in-out"],
-          [BEAT.glided, layout.stamped[0]],
-          [LOOP, stackX],
-        ];
-  const glide: Track =
-    layout.travel === "across"
-      ? [
-          [BEAT.lifted, layout.lifted[1], "out"],
-          [BEAT.crest, layout.crest, "in-out"],
-        ]
-      : [[BEAT.lifted, layout.lifted[1], "in-out"]];
-  const y: Track = [
-    [0, markY, "out"],
-    ...glide,
-    [BEAT.glided, layout.stamped[1]],
-    [BEAT.settled, layout.stamped[1], "in-out"],
-    [BEAT.landed, topCentre],
+  return [
+    [0, from, "in-out"],
+    [BEAT.lifted, layout.lifted[axis]],
+    [BEAT.leave, layout.lifted[axis], "in-out"],
+    [BEAT.atSieve, layout.atSieve[axis]],
+    [BEAT.leaveSieve, layout.atSieve[axis], "in-out"],
+    [BEAT.stamped, layout.stamped[axis]],
+    [BEAT.drop, layout.stamped[axis], "in-out"],
+    [BEAT.landed, rest],
     ...sinks,
-    [LOOP, topCentre + DEPTH * notch],
+    [LOOP, axis === 1 ? rest + DEPTH * notch : rest],
   ];
-  return { x, y };
 }
 
 /** a track's value at a moment, following its curves */
-function valueAt(track: Track, ms: number) {
-  for (let index = 0; index < track.length - 1; index += 1) {
-    const [from, start, ease] = track[index]!;
-    const [to, end] = track[index + 1]!;
+function valueAt(stops: Track, ms: number) {
+  for (let index = 0; index < stops.length - 1; index += 1) {
+    const [from, start, ease] = stops[index]!;
+    const [to, end] = stops[index + 1]!;
     if (ms >= from && ms <= to) {
       const progress = to === from ? 1 : (ms - from) / (to - from);
       return start + (end - start) * (ease ? curve(ease)(progress) : progress);
     }
   }
-  return track[track.length - 1]![1];
+  return stops[stops.length - 1]![1];
 }
 
 /* ---------- the stylesheet ---------- */
@@ -280,25 +263,25 @@ function unit(layout: Layout) {
 }
 
 /* a layer moves its card's top-left corner; the card is drawn at the origin */
-function shiftStops(layout: Layout, track: Track, axis: "x" | "y"): Stop[] {
+function shiftStops(layout: Layout, stops: Track, axis: 0 | 1): Stop[] {
   const cq = unit(layout);
-  const half = axis === "x" ? CARD.w / 2 : CARD.h / 2;
-  return track.map(([ms, value, ease]) => [
+  const half = axis === 0 ? CARD.w / 2 : CARD.h / 2;
+  return stops.map(([ms, value, ease]) => [
     ms,
-    `transform: ${axis === "x" ? "translateX" : "translateY"}(${cq(value - half)})`,
+    `transform: ${axis === 0 ? "translateX" : "translateY"}(${cq(value - half)})`,
     ease,
   ]);
 }
 
 /*
  * The secret line turns amber where the sieve meets it, sampled from the
- * card's own path so the sweep stays under the mesh. On a wide screen the card
- * crosses sideways and the amber follows the mesh along the line, from its
- * right end; on a phone the card crosses downwards and the block fills from
- * its lower edge.
+ * card's own path so the sweep stays under the mesh: on a wide screen from the
+ * line's right end as the card crosses sideways, on a phone from its lower
+ * edge as the card crosses downwards.
  */
 function sweepStops(layout: Layout): Stop[] {
-  const { x, y } = tracks(layout, 1);
+  const x = track(layout, 1, 0);
+  const y = track(layout, 1, 1);
   const [sx, sy, sw, sh] = layout.sieve;
   const [mx, my, mw, mh] = ON_CARD.mask;
   const shown = (fraction: number) => {
@@ -310,7 +293,7 @@ function sweepStops(layout: Layout): Stop[] {
       ? (valueAt(x, ms) - CARD.w / 2 + mx + mw - (sx + sw / 2)) / mw
       : (valueAt(y, ms) - CARD.h / 2 + my + mh - (sy + sh / 2)) / mh;
   const samples: Stop[] = [[0, shown(0)]];
-  for (let ms = BEAT.lifted; ms <= BEAT.glided; ms += 50) samples.push([ms, shown(fraction(ms)), "linear"]);
+  for (let ms = BEAT.leave; ms <= BEAT.stamped; ms += 50) samples.push([ms, shown(fraction(ms)), "linear"]);
   samples.push([LOOP, shown(1)]);
   return samples;
 }
@@ -320,8 +303,7 @@ function finishedAt(layout: Layout) {
   const moment = BEAT.landed + 200;
   return (index: number) => {
     const local = (moment + ((COUNT - index) % COUNT) * CYCLE) % LOOP;
-    const { x, y } = tracks(layout, index % SHOWN);
-    return { x: valueAt(x, local), y: valueAt(y, local) };
+    return { x: valueAt(track(layout, index % SHOWN, 0), local), y: valueAt(track(layout, index % SHOWN, 1), local) };
   };
 }
 
@@ -330,7 +312,6 @@ function layoutRules(layout: Layout) {
   const half = layout.mark / 2;
   const at = finishedAt(layout);
   const [sx, sy, sw, sh] = layout.sieve;
-  const [stackLeft, tableTop, , reach] = layout.stack;
   return [
     `.hf { aspect-ratio: ${layout.width} / ${layout.height} }`,
     ...layout.marks.flatMap(([x, y], slot) =>
@@ -340,7 +321,7 @@ function layoutRules(layout: Layout) {
     ),
     `.hf-card { width: ${cq(CARD.w)}; height: ${cq(CARD.h)} }`,
     `.hf-mesh-${layout.travel} { left: ${cq(sx)}; top: ${cq(sy)}; width: ${cq(sw)}; height: ${cq(sh)} }`,
-    `.hf-table-${layout.travel} { left: ${cq(stackLeft - reach)}; top: ${cq(tableTop)}; width: ${cq(CARD.w + 2 * reach)}; height: ${cq(layout.ground - tableTop)} }`,
+    `.hf-base-${layout.travel} { left: ${cq(layout.stack[0] - 1)}; top: ${cq(layout.stack[1])}; width: ${cq(CARD.w + 4)}; height: ${cq(layout.ground - layout.stack[1])} }`,
     ...AGENTS.map((_, index) => {
       const rest = at(index);
       return `.hf-x${index} { transform: translateX(${cq(rest.x - CARD.w / 2)}) }\n.hf-y${index} { transform: translateY(${cq(rest.y - CARD.h / 2)}) }`;
@@ -349,13 +330,10 @@ function layoutRules(layout: Layout) {
 }
 
 function layoutKeyframes(layout: Layout) {
-  const slots = Array.from({ length: SHOWN }, (_, slot) => {
-    const { x, y } = tracks(layout, slot);
-    return [
-      keyframes(`hf-x-${slot}`, LOOP, shiftStops(layout, x, "x")),
-      keyframes(`hf-y-${slot}`, LOOP, shiftStops(layout, y, "y")),
-    ];
-  }).flat();
+  const slots = Array.from({ length: SHOWN }, (_, slot) => [
+    keyframes(`hf-x-${slot}`, LOOP, shiftStops(layout, track(layout, slot, 0), 0)),
+    keyframes(`hf-y-${slot}`, LOOP, shiftStops(layout, track(layout, slot, 1), 1)),
+  ]).flat();
   return [...slots, keyframes("hf-sweep", LOOP, sweepStops(layout))].join("\n");
 }
 
@@ -371,11 +349,11 @@ function sharedKeyframes() {
 
   const gone = DEPTH * CYCLE + BEAT.roomTo;
   const card = keyframes("hf-card", LOOP, [
-    [0, "opacity: 0; transform: scale(0.3)", "out"],
-    [BEAT.lifted * 0.2, "opacity: 1; transform: scale(0.5)", "out"],
+    [0, "opacity: 0; transform: scale(0.3)", "in-out"],
+    [200, "opacity: 1; transform: scale(0.42)", "in-out"],
     [BEAT.lifted, "opacity: 1; transform: scale(1)"],
-    [BEAT.glided, "opacity: 1; transform: scale(1)", "out"],
-    [BEAT.pressed, "opacity: 1; transform: scale(0.96)", "out"],
+    [BEAT.stamped, "opacity: 1; transform: scale(1)", "out"],
+    [BEAT.stamped + 100, "opacity: 1; transform: scale(0.96)", "out"],
     [BEAT.settled, "opacity: 1; transform: scale(1)"],
     [gone, "opacity: 1; transform: scale(1)", "out"],
     [gone + 300, "opacity: 0; transform: scale(1)"],
@@ -383,7 +361,7 @@ function sharedKeyframes() {
   ]);
   const stamp = keyframes("hf-stamp", LOOP, [
     [0, "opacity: 0; transform: scale(1.12)"],
-    [BEAT.glided, "opacity: 0; transform: scale(1.12)", "out"],
+    [BEAT.stamped, "opacity: 0; transform: scale(1.12)", "out"],
     [BEAT.settled, "opacity: 1; transform: scale(1)"],
     [LOOP, "opacity: 1; transform: scale(1)"],
   ]);
@@ -403,27 +381,27 @@ function sharedKeyframes() {
   const marks = AGENTS.map((_, index) => {
     const t = index * CYCLE;
     const lift: Stop[] = [
-      [t, rest, "out"],
-      [t + 250, dip, "out"],
-      [t + 900, rest],
+      [t, rest, "in-out"],
+      [t + 350, dip, "in-out"],
+      [t + 1100, rest],
     ];
     const stops: Stop[] =
       index < SHOWN
         ? [
             ...(index === 0 ? [] : ([[0, rest]] as Stop[])),
             ...lift,
-            [swap - 400, rest, "out"],
+            [swap - 500, rest, "out"],
             [swap - 100, hidden],
-            [LOOP - 400, hidden, "out"],
+            [LOOP - 500, hidden, "out"],
             [LOOP - 100, rest],
             [LOOP, rest],
           ]
         : [
             [0, hidden],
-            [swap - 400, hidden, "out"],
+            [swap - 500, hidden, "out"],
             [swap - 100, rest],
             ...lift,
-            [LOOP - 400, rest, "out"],
+            [LOOP - 500, rest, "out"],
             [LOOP - 100, hidden],
             [LOOP, hidden],
           ];
@@ -466,8 +444,8 @@ const RESTING = [
 /*
  * Three sizes, each a whole number of pixels per cell: a phone shows the tall
  * layout 300px wide (3px cells), a mid-size screen the wide one 750px wide
- * (3px), a wide screen 1000px wide (4px). The marks in each pattern are drawn
- * in thirds or quarters of a cell, so each set lands on whole pixels.
+ * (3px), a wide screen 1000px wide (4px). The dots in each pattern are drawn in
+ * thirds or quarters of a cell, so each set lands on whole pixels.
  */
 const STYLESHEET = [
   RESTING,
@@ -479,115 +457,150 @@ const STYLESHEET = [
   `@media (prefers-reduced-motion: no-preference) {\n${motionRules()}\n}`,
 ].join("\n");
 
-/* ---------- the patterns ---------- */
+/* ---------- the dot screens ---------- */
 
 /*
- * The dither marks, after the pictures' own: a dot, a plus, a square and a
- * checker on a cell, laid out over two by two cells. Light is a lone dot,
- * mid a dot in every cell, dark plusses with dots between them, amber a square
- * in every cell. Each comes in thirds and in quarters of a cell.
+ * A fine, regular halftone: one dot per cell, its size the tone. Paper is a
+ * dot in every other cell, light a small dot in every cell, mid a larger one,
+ * dark the largest; shade is the soft screen of a contact shadow, and amber
+ * the mid screen in amber. The ground is a sparse scatter over a large tile.
  */
 type Grid = 3 | 4;
 
-function marks(grid: Grid, kind: "dot" | "plus" | "square", cx: number, cy: number, className: string, key: string) {
-  const p = 1 / grid;
-  if (kind === "dot") {
-    const at = grid === 3 ? p : 2 * p;
-    return <rect key={key} className={className} x={cx + at} y={cy + at} width={p} height={p} />;
-  }
-  if (kind === "square") {
-    return <rect key={key} className={className} x={cx + p} y={cy + p} width={2 * p} height={2 * p} />;
-  }
-  const arm = grid === 3 ? 1 : 3 * p;
-  const offset = grid === 3 ? 0 : p;
-  const middle = grid === 3 ? p : 2 * p;
-  return (
-    <g key={key} className={className}>
-      <rect x={cx + middle} y={cy + offset} width={p} height={arm} />
-      <rect x={cx + offset} y={cy + middle} width={arm} height={p} />
-    </g>
-  );
-}
+const SCATTER = [
+  [1, 2], [7, 1], [13, 4], [19, 2], [26, 3], [31, 1], [4, 8], [10, 10], [17, 7], [23, 9], [29, 11], [2, 14],
+  [8, 16], [15, 13], [21, 17], [27, 15], [33, 18], [5, 21], [12, 22], [18, 20], [25, 23], [31, 22], [9, 26], [22, 27],
+] as const;
 
 function Patterns({ grid }: { grid: Grid }) {
-  const tile = (id: string, children: ReactNode) => (
-    <pattern id={`hf-${id}-${grid}`} patternUnits="userSpaceOnUse" width={2} height={2}>
+  const p = 1 / grid;
+  /* a square dot of `size` pixels, centred in its cell as nearly as whole pixels allow */
+  const dot = (x: number, y: number, size: number, key: string, className = "hf-dot") => {
+    const start = Math.floor((grid - size) / 2) * p;
+    return <rect key={key} className={className} x={x + start} y={y + start} width={size * p} height={size * p} />;
+  };
+  const tile = (id: string, w: number, h: number, children: ReactNode) => (
+    <pattern id={`hf-${id}-${grid}`} patternUnits="userSpaceOnUse" width={w} height={h}>
       {children}
     </pattern>
   );
+  const large = grid === 4 ? 3 : 2;
+  const medium = 2;
   return (
     <>
-      {tile("light", [marks(grid, "dot", 0, 0, "hf-ink", "a")])}
-      {tile("mid", [
-        marks(grid, "dot", 0, 0, "hf-ink", "a"),
-        marks(grid, "dot", 1, 0, "hf-ink", "b"),
-        marks(grid, "dot", 0, 1, "hf-ink", "c"),
-        marks(grid, "dot", 1, 1, "hf-ink", "d"),
-      ])}
-      {tile("dark", [
-        marks(grid, "plus", 0, 0, "hf-ink", "a"),
-        marks(grid, "plus", 1, 1, "hf-ink", "b"),
-        marks(grid, "dot", 1, 0, "hf-ink", "c"),
-        marks(grid, "dot", 0, 1, "hf-ink", "d"),
-      ])}
-      {tile("amber", [
-        marks(grid, "square", 0, 0, "hf-amber", "a"),
-        marks(grid, "square", 1, 1, "hf-amber", "b"),
-        marks(grid, "square", 1, 0, "hf-amber", "c"),
-        marks(grid, "square", 0, 1, "hf-amber", "d"),
-      ])}
+      {tile("paper", 2, 2, [dot(0, 0, 1, "a")])}
+      {tile("light", 1, 1, [dot(0, 0, 1, "a")])}
+      {tile("mid", 1, 1, [dot(0, 0, medium, "a")])}
+      {tile("dark", 1, 1, [dot(0, 0, large, "a")])}
+      {tile("shade", 2, 1, [dot(0, 0, 1, "a")])}
+      {tile("amber", 1, 1, [dot(0, 0, medium, "a", "hf-amber")])}
+      {tile("ground", 36, 30, SCATTER.map(([x, y], index) => dot(x, y, 1, String(index))))}
     </>
   );
 }
 
 /* ---------- the drawings ---------- */
 
-/** a closed shape: filled with the panel to cover what is behind it, then textured, then outlined */
-function Solid({ d, tone }: { d: string; tone: "light" | "mid" | "dark" | "amber" | "none" }) {
+type Tone = "paper" | "light" | "mid" | "dark" | "amber" | "none";
+
+/** a closed face: filled with the panel to cover what is behind it, screened, then edged with a hairline */
+function Face({ d, tone, edge = true }: { d: string; tone: Tone; edge?: boolean }) {
   return (
     <>
       <path className="hf-fill" d={d} />
       {tone === "none" ? null : <path className={`hf-tone-${tone}`} d={d} />}
-      <path className="hf-out" d={d} />
+      {edge ? <path className="hf-out" d={d} /> : null}
     </>
   );
 }
 
 const rect = (x: number, y: number, w: number, h: number) => `M${x} ${y}H${x + w}V${y + h}H${x}Z`;
+const poly = (points: readonly Point[]) => `M${points.map(([x, y]) => `${x} ${y}`).join("L")}Z`;
+const ellipse = (cx: number, cy: number, rx: number, ry: number) =>
+  `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
 
 /* which of the two layouts a drawing belongs to; the stylesheet shows one */
 const sizeClass = (layout: Layout) => (layout.travel === "across" ? "hf-wide" : "hf-phone");
 
-/** The still parts: the ground, the laptop and the people. */
+/** A person seen from the front, low-poly: a pointed hood over a body that widens to the ground. */
+function personFaces([x, height]: Person, halfWidth: number, ground: number) {
+  const top = ground - height;
+  const hood = halfWidth * 0.85;
+  const neck = top + height * 0.36;
+  const hoodFace = poly([
+    [x, top],
+    [x + hood, top + hood * 0.9],
+    [x + hood * 0.8, neck],
+    [x - hood * 0.8, neck],
+    [x - hood, top + hood * 0.9],
+  ]);
+  const body = poly([
+    [x - hood * 0.8, neck],
+    [x + hood * 0.8, neck],
+    [x + halfWidth, ground],
+    [x - halfWidth, ground],
+  ]);
+  /* the body's shaded half: light falls from the left */
+  const shadow = poly([
+    [x, neck],
+    [x + hood * 0.8, neck],
+    [x + halfWidth, ground],
+    [x, ground],
+  ]);
+  return { hoodFace, body, shadow };
+}
+
+/** The still parts: the ground's scatter, the shadows, the laptop and the people. */
 function Scene({ layout }: { layout: Layout }) {
   const [sx, sy, sw, sh] = layout.screen;
   const [depth, reach] = layout.deck;
-  const { ground, head, halfWidth, inset } = layout;
-  const deck = `M${sx} ${sy + sh}H${sx + sw}L${sx + sw + reach} ${sy + sh + depth}H${sx - reach}Z`;
+  const { ground, halfWidth } = layout;
+  const deckTop = sy + sh;
+  const deck = poly([
+    [sx, deckTop],
+    [sx + sw, deckTop],
+    [sx + sw + reach, deckTop + depth],
+    [sx - reach, deckTop + depth],
+  ]);
+  const lip = poly([
+    [sx - reach, deckTop + depth - 1],
+    [sx + sw + reach, deckTop + depth - 1],
+    [sx + sw + reach, deckTop + depth],
+    [sx - reach, deckTop + depth],
+  ]);
+  const side = poly([
+    [sx + sw, sy],
+    [sx + sw + 2, sy + 1],
+    [sx + sw + 2, deckTop],
+    [sx + sw, deckTop],
+  ]);
+  const inset = layout.travel === "across" ? 3 : 2;
+  const peopleLeft = layout.people[0]![0] - halfWidth;
+  const peopleRight = layout.people[layout.people.length - 1]![0] + halfWidth;
   const ordered = layout.people
     .map((person, index) => ({ person, index }))
     .sort((a, b) => Number(a.index === NOTICER) - Number(b.index === NOTICER));
   return (
     <svg className={`hf-art ${sizeClass(layout)}`} viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true" focusable="false">
-      <path className="hf-tone-mid" d={rect(0, ground - 1, layout.width, 1)} />
-      <Solid d={rect(sx, sy, sw, sh)} tone="dark" />
-      <Solid d={rect(sx + inset, sy + inset, sw - 2 * inset, sh - 2 * inset)} tone="light" />
-      <Solid d={deck} tone="dark" />
-      {ordered.map(({ person: [x, height], index }) => {
-        const top = ground - height;
-        const headY = top + head;
-        const shoulders = top + 2 * head + 1;
-        const corner = Math.round(halfWidth * 0.6);
-        const left = x - halfWidth;
-        const right = x + halfWidth;
-        const body = `M${left} ${ground}V${shoulders + corner}Q${left} ${shoulders} ${left + corner} ${shoulders}H${right - corner}Q${right} ${shoulders} ${right} ${shoulders + corner}V${ground}Z`;
-        const face = `M${x - head} ${headY}a${head} ${head} 0 1 0 ${2 * head} 0a${head} ${head} 0 1 0 ${-2 * head} 0Z`;
+      <path className="hf-tone-ground" d={rect(0, 0, layout.width, layout.height)} />
+      <path className="hf-tone-shade" d={ellipse(sx + sw / 2 + 6, ground, sw / 2 + reach + 4, depth * 0.6)} />
+      <path className="hf-tone-shade" d={ellipse((peopleLeft + peopleRight) / 2 + 4, ground, (peopleRight - peopleLeft) / 2 + 4, depth * 0.6)} />
+      <Face d={side} tone="dark" />
+      <Face d={rect(sx, sy, sw, sh)} tone="mid" />
+      <Face d={rect(sx + inset, sy + inset, sw - 2 * inset, sh - 2 * inset)} tone="paper" />
+      <Face d={deck} tone="light" />
+      <Face d={lip} tone="dark" edge={false} />
+      <path className="hf-out" d={deck} />
+      {ordered.map(({ person, index }) => {
+        const faces = personFaces(person, halfWidth, ground);
         return (
-          <g key={x}>
-            <Solid d={body} tone="dark" />
-            <Solid d={face} tone="light" />
-            {index === NOTICER ? <path className="hf-notice hf-tone-amber" d={face} /> : null}
-            {index === NOTICER ? <path className="hf-notice hf-out" d={face} /> : null}
+          <g key={person[0]}>
+            <Face d={faces.body} tone="mid" edge={false} />
+            <path className="hf-tone-dark" d={faces.shadow} />
+            <path className="hf-out" d={faces.body} />
+            <Face d={faces.hoodFace} tone="light" />
+            {index === NOTICER ? <path className="hf-notice hf-tone-amber" d={faces.body} /> : null}
+            {index === NOTICER ? <path className="hf-notice hf-out" d={faces.body} /> : null}
           </g>
         );
       })}
@@ -595,24 +608,39 @@ function Scene({ layout }: { layout: Layout }) {
   );
 }
 
-/** The table the stack stands on: a lit top and a shaded front, drawn over the cards that have sunk into it. */
-function Table({ layout }: { layout: Layout }) {
-  const w = CARD.w + 2 * layout.stack[3];
+/** The base the stack stands on, a low box as wide as the cards, drawn over the cards that have sunk into it. */
+function Base({ layout }: { layout: Layout }) {
+  const w = CARD.w + 4;
   const h = layout.ground - layout.stack[1];
   return (
-    <svg className={`hf-table hf-table-${layout.travel} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
-      <Solid d={rect(0, 0, w, 3)} tone="light" />
-      <Solid d={rect(0, 3, w, h - 3)} tone="dark" />
+    <svg className={`hf-base hf-base-${layout.travel} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
+      <path className="hf-tone-shade" d={ellipse(w / 2 + 3, h, w / 2 + 2, 1.5)} />
+      <Face d={rect(0, 0, w - 2, 2)} tone="light" />
+      <Face d={rect(0, 2, w - 2, h - 2)} tone="mid" />
+      <Face d={poly([[w - 2, 0], [w, 1], [w, h], [w - 2, h]])} tone="dark" />
     </svg>
   );
 }
 
-/** The sieve: a short framed mesh of plusses, drawn over the card passing through it. */
+/** The sieve: a framed mesh of hairlines, drawn over the card passing through it. */
 function Mesh({ layout }: { layout: Layout }) {
   const [, , w, h] = layout.sieve;
+  const step = 2;
+  const across = layout.travel === "across";
+  const wires = [];
+  for (let at = step; at < (across ? h : w); at += step) {
+    wires.push(
+      across ? (
+        <line key={at} className="hf-wire" x1={0} y1={at} x2={w} y2={at} />
+      ) : (
+        <line key={at} className="hf-wire" x1={at} y1={0} x2={at} y2={h} />
+      ),
+    );
+  }
   return (
     <svg className={`hf-mesh hf-mesh-${layout.travel} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
-      <path className="hf-tone-dark" d={rect(0, 0, w, h)} />
+      <path className="hf-tone-light" d={rect(0, 0, w, h)} />
+      {wires}
       <path className="hf-out" d={rect(0, 0, w, h)} />
     </svg>
   );
@@ -633,10 +661,10 @@ function Card({ mark, index }: { mark: string; index: number }) {
   return (
     <div className={`hf-card hf-c${index}`}>
       <svg className="hf-card-art" viewBox={`0 0 ${CARD.w} ${CARD.h}`} aria-hidden="true" focusable="false">
-        <Solid d={rect(0, 0, CARD.w, CARD.h)} tone="light" />
+        <Face d={rect(0, 0, CARD.w, CARD.h)} tone="paper" />
         <path className="hf-tone-mid" d={`M${CARD.w - 2} 1H${CARD.w}V${CARD.h}H1V${CARD.h - 2}H${CARD.w - 2}Z`} />
         {ON_CARD.lines.map(([x, y, w]) => (
-          <path key={y} className="hf-ink" d={rect(x, y, w, 2)} />
+          <path key={y} className="hf-line" d={rect(x, y, w, 1.5)} />
         ))}
         <path className="hf-out" d={rect(0, 0, CARD.w, CARD.h)} />
       </svg>
@@ -645,12 +673,12 @@ function Card({ mark, index }: { mark: string; index: number }) {
       </span>
       <span className={`hf-mask hf-k${index}`} style={box(maskX, maskY, maskW, maskH)}>
         <svg viewBox={`0 0 ${maskW} ${maskH}`} aria-hidden="true" focusable="false">
-          <Solid d={rect(0, 0, maskW, maskH)} tone="amber" />
+          <Face d={rect(0, 0, maskW, maskH)} tone="amber" />
         </svg>
       </span>
       <span className={`hf-stamp hf-t${index}`} style={box(stampX, stampY, stampSize, stampSize)}>
         <svg viewBox={`0 0 ${stampSize} ${stampSize}`} aria-hidden="true" focusable="false">
-          <path className="hf-ink" d={`M0 ${r}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`} />
+          <Face d={ellipse(r, r, r, r)} tone="dark" />
           <path className="hf-knock" d={`M${r * 0.5} ${r}L${r * 0.85} ${r * 1.4}L${r * 1.5} ${r * 0.62}`} />
         </svg>
       </span>
@@ -713,8 +741,8 @@ export function HeroFlow() {
             </div>
           ))}
 
-          <Table layout={PHONE} />
-          <Table layout={WIDE} />
+          <Base layout={PHONE} />
+          <Base layout={WIDE} />
           <Mesh layout={PHONE} />
           <Mesh layout={WIDE} />
         </div>
