@@ -1,3 +1,4 @@
+import { artSrc } from "@/lib/art-src";
 import type { Art as ArtSource } from "@/lib/landing";
 import Image from "next/image";
 
@@ -33,8 +34,8 @@ export function Art({
 
   return (
     <span className={`art${className ? ` ${className}` : ""}`}>
-      <Image {...common} alt={art.alt} src={art.light} className="art-img art-light" />
-      <Image {...common} alt={art.alt} src={art.dark} className="art-img art-dark" />
+      <Image {...common} alt={art.alt} src={artSrc(art.light)} className="art-img art-light" />
+      <Image {...common} alt={art.alt} src={artSrc(art.dark)} className="art-img art-dark" />
     </span>
   );
 }
