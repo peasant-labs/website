@@ -18,7 +18,7 @@ footer:
   # the call to action every page ends with; install points at the landing's
   # install section, in place on the landing and across from any other page
   cta:
-    line: try peasant on your own sessions
+    line: try peasant on your own agent sessions
     primary: { label: install now, href: "/#install", landingHref: "#install" }
     secondary: { label: read our docs, href: /docs }
   nav:

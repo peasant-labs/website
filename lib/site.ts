@@ -72,7 +72,7 @@ export const FOOTER_NAV = [
  * any other page.
  */
 export const FOOTER_CTA = {
-  line: "try peasant on your own sessions",
+  line: "try peasant on your own agent sessions",
   primary: { label: "install now", href: "/#install", landingHref: "#install" },
   secondary: { label: "read our docs", href: "/docs" },
 } as const;
