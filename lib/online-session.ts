@@ -5,7 +5,7 @@
  * no token and grants nothing. The online app still decides who is signed in,
  * so a stale hint only leads to its log-in popup.
  *
- * The header reads it to offer "open online" in place of "log in".
+ * The header reads it to offer "dashboard" in place of "log in".
  */
 export const ONLINE_HINT_COOKIE = "peasant_online";
 

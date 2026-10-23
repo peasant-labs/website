@@ -20,7 +20,7 @@ import {
 
 const DESKTOP = "(min-width: 48rem)";
 
-/* The menu's stops: links and buttons that are drawn. One of "log in" and "open online" is always hidden. */
+/* The menu's stops: links and buttons that are drawn. One of "log in" and "dashboard" is always hidden. */
 function menuStops(sheet: HTMLElement | null) {
   return [...(sheet?.querySelectorAll<HTMLElement>("a, button") ?? [])].filter(
     (element) => element.getClientRects().length > 0,

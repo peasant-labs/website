@@ -500,7 +500,7 @@ html {
 /* ---------- signed in to online ---------- */
 
 /* the head script marks <html data-online> before the first paint, so exactly
-   one way in shows from the start: "log in", or "open online" for somebody the
+   one way in shows from the start: "log in", or "dashboard" for somebody the
    online app's hint names. These rules only hide; each link keeps its own display. */
 :root[data-online="in"] .site-login {
   display: none;
@@ -527,7 +527,7 @@ html {
 }
 
 /* the docs sidebar's signed-in account row: the initial, then the handle over
-   "open online", aligned like the sidebar's own items */
+   "dashboard", aligned like the sidebar's own items */
 .site-online-account {
   justify-content: flex-start;
   gap: var(--sp-3);

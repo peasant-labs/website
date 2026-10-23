@@ -8,7 +8,7 @@ export type LoginFixture = {
   online: string;
   next: Array<{ name: string; address: string; start: string }>;
   signedIn: { cookie: string; label: string; href: string };
-  header: Array<{ name: string; hint: string | null; address: string; shows: "log in" | "open online"; hintAfter: string | null }>;
+  header: Array<{ name: string; hint: string | null; address: string; shows: "log in" | "dashboard"; hintAfter: string | null }>;
   required: string[];
 };
 

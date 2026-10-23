@@ -10,7 +10,7 @@ const handleNow = () => (document.documentElement.dataset.online === "in" ? onli
 
 /**
  * The header's way into the online app for somebody already signed in to it:
- * their initial and "open online". It sits beside "log in", and the head
+ * their initial and "dashboard". It sits beside "log in", and the head
  * script's `data-online` on <html> picks which of the two shows before the
  * first paint; the initial fills in once the page is interactive, inside a box
  * of fixed size, so nothing moves.
@@ -25,14 +25,14 @@ export function OnlineLink({ className = "", onClick }: { className?: string; on
     <a
       className={["site-online", className].filter(Boolean).join(" ")}
       href={ONLINE_URL}
-      aria-label={handle ? `open online, signed in as @${handle}` : "open online"}
+      aria-label={handle ? `dashboard, signed in as @${handle}` : "dashboard"}
       title={handle ? `signed in as @${handle}` : undefined}
       onClick={onClick}
     >
       <span className="site-online-av" aria-hidden="true">
         {handle?.charAt(0).toUpperCase()}
       </span>
-      open online
+      dashboard
     </a>
   );
 }
@@ -40,13 +40,13 @@ export function OnlineLink({ className = "", onClick }: { className?: string; on
 /**
  * The docs sidebar's account row for somebody signed in to the online app,
  * built like the sidebar's own items: the person's initial at the item-icon
- * size, their handle over "open online", and the external mark. The online
+ * size, their handle over "dashboard", and the external mark. The online
  * app opens in a new tab, like every other app the sidebar leads to. In the
  * collapsed rail only the initial shows, with the same words as its tooltip.
  */
 export function OnlineAccount() {
   const handle = useOnlineHandle();
-  const name = handle ? `open online, signed in as @${handle}` : "open online";
+  const name = handle ? `dashboard, signed in as @${handle}` : "dashboard";
   return (
     <a
       className="asb-account site-online site-online-account"
@@ -61,7 +61,7 @@ export function OnlineAccount() {
       </span>
       <span className="asb-label site-online-text" aria-hidden="true">
         <span className="site-online-handle">{handle ? `@${handle}` : ""}</span>
-        <span className="site-online-open">open online</span>
+        <span className="site-online-open">dashboard</span>
       </span>
       <span className="asb-ext" aria-hidden="true">
         <ExternalLink />

@@ -36,10 +36,10 @@ next:
     start: https://village.peasantlabs.org/auth/start?provider=github
 # the header's way in, by what the online app's hint cookie (peasant_online)
 # says. `hint` is the cookie's value (null: no cookie); `address` the page
-# opened. The header shows "log in" or "open online", never both.
+# opened. The header shows "log in" or "dashboard", never both.
 signedIn:
   cookie: peasant_online
-  label: open online
+  label: dashboard
   href: https://village.peasantlabs.org
 header:
   - name: no hint offers log in
@@ -47,25 +47,25 @@ header:
     address: /
     shows: log in
     hintAfter: null
-  - name: a hint offers open online with the person's handle
+  - name: a hint offers the dashboard with the person's handle
     hint: alice-dev
     address: /
-    shows: open online
+    shows: dashboard
     hintAfter: alice-dev
   - name: arriving to log in clears a hint left behind
     hint: alice-dev
     address: /?login
     shows: log in
     hintAfter: null
-  - name: the docs offer open online too
+  - name: the docs offer the dashboard too
     hint: alice-dev
     address: /docs
-    shows: open online
+    shows: dashboard
     hintAfter: alice-dev
 # the cases above that must never disappear from this file
 required:
   - no hint offers log in
-  - a hint offers open online with the person's handle
+  - a hint offers the dashboard with the person's handle
   - arriving to log in clears a hint left behind
   - a path on the online app is kept
   - a protocol-relative address to another host is dropped
