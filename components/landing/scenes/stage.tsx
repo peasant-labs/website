@@ -37,7 +37,7 @@ export type Shot = Readonly<{
 /** A beat of the scene's own state: from `at` ms the scene renders `phase`. */
 export type Cue = Readonly<{ at: number; phase: number }>;
 
-/** A cursor move to an element marked `data-focus`, with a press ring when it arrives. */
+/** A cursor move to an element marked `data-focus`, pressing it when it arrives. */
 export type CursorCue = Readonly<{ at: number; to: string; move: number; press?: boolean }>;
 
 export type SceneDefinition = Readonly<{
@@ -110,7 +110,6 @@ export function SceneStage({
   const cameraRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState(reduced ? scene.finalPhase : 0);
-  const [pressAt, setPressAt] = useState<{ key: number; x: number; y: number } | null>(null);
   // A take starts the first time the scene can be seen, and is not stopped by scrolling away.
   const [started, setStarted] = useState(false);
   if (playing && !started && !reduced) setStarted(true);
@@ -206,7 +205,16 @@ export function SceneStage({
             cursor.style.transform = to;
             animation.cancel();
             running.delete(animation);
-            if (cue.press) setPressAt({ key: cue.at, x: box.x + box.w / 2, y: box.y + box.h / 2 });
+            // a press is the arrow dipping, the way a click feels, with nothing drawn around it
+            const arrow = cursor.firstElementChild;
+            if (cue.press && arrow) {
+              const press = arrow.animate(
+                [{ transform: "scale(1)" }, { transform: "scale(0.82)" }, { transform: "scale(1)" }],
+                { duration: 240, easing: EASE_SETTLE },
+              );
+              running.add(press);
+              press.onfinish = () => running.delete(press);
+            }
           };
         });
       }
@@ -227,21 +235,11 @@ export function SceneStage({
           <Render phase={reduced ? scene.finalPhase : phase} />
         </div>
         {scene.cursor?.length && !reduced ? (
-          <>
-            <div className="scn-cursor" ref={cursorRef} aria-hidden="true">
-              <svg viewBox="0 0 16 16">
-                <path d="M2 1.5v12l3.3-3.1 2.2 4.6 2-.9-2.2-4.5H12z" />
-              </svg>
-            </div>
-            {pressAt ? (
-              <span
-                key={pressAt.key}
-                className="scn-press"
-                aria-hidden="true"
-                style={{ left: pressAt.x, top: pressAt.y }}
-              />
-            ) : null}
-          </>
+          <div className="scn-cursor" ref={cursorRef} aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <path d="M2 1.5v12l3.3-3.1 2.2 4.6 2-.9-2.2-4.5H12z" />
+            </svg>
+          </div>
         ) : null}
       </div>
     </div>
