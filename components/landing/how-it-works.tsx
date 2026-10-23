@@ -5,6 +5,7 @@ import { RECORD_SCENE } from "@/components/landing/scenes/record";
 import { REVIEW_SCENE } from "@/components/landing/scenes/review";
 import { SceneStage, type SceneDefinition } from "@/components/landing/scenes/stage";
 import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
+import { LandingIcon } from "@/components/landing/icons";
 import { HOW } from "@/lib/landing";
 import { ChevronLeft, ChevronRight, RotateCcw } from "@peasant-labs/fairtrade/icons";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -77,9 +78,7 @@ export function HowItWorks({ title }: { title: string }) {
           {HOW.steps.map((step, index) => (
             <li key={step.id} className="hw-stack-step">
               <div className="hw-stack-copy">
-                <span className="hw-n" aria-hidden="true">
-                  {index + 1}
-                </span>
+                <LandingIcon name={step.icon} className="hw-ic" />
                 <h3 className="hw-step-title">{step.title}</h3>
                 <p className="hw-step-body">{step.body}</p>
               </div>
@@ -113,9 +112,7 @@ export function HowItWorks({ title }: { title: string }) {
                       aria-controls="hw-window"
                       onClick={() => goTo(index)}
                     >
-                      <span className="hw-n" aria-hidden="true">
-                        {index + 1}
-                      </span>
+                      <LandingIcon name={step.icon} className="hw-ic" />
                       <span className="hw-step-title">{step.title}</span>
                     </button>
                     <p className="hw-step-body" hidden={!on}>
@@ -189,9 +186,7 @@ export function HowItWorks({ title }: { title: string }) {
               flowRefs.current[index] = element;
             }}
           >
-            <span className="hw-n" aria-hidden="true">
-              {index + 1}
-            </span>
+            <LandingIcon name={step.icon} className="hw-ic" />
             <h3 className="hw-step-title">{step.title}</h3>
             <p className="hw-flow-body">{step.body}</p>
           </li>

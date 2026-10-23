@@ -1,37 +1,21 @@
 "use client";
 
 import { Art } from "@/components/art";
+import { LandingIcon } from "@/components/landing/icons";
 import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
-import { USE_CASES, type CapabilityIcon, type UseCase } from "@/lib/landing";
-import {
-  ChartNoAxesColumn,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Code,
-  GitPullRequest,
-  GraduationCap,
-  HistoryIcon,
-  Link as LinkIcon,
-  Lock,
-  MessageCircle,
-  Search,
-  Send,
-} from "@peasant-labs/fairtrade/icons";
+import { USE_CASES, type UseCase } from "@/lib/landing";
 import {
   useCallback,
-  useEffect,
   useLayoutEffect,
   useRef,
   useState,
-  type ComponentType,
   type KeyboardEvent,
   type PointerEvent,
-  type SVGProps,
 } from "react";
 
 const SLIDES = USE_CASES.slides;
 const COUNT = SLIDES.length;
+const CAPS = 3;
 /* the track: a copy of the last slide, the slides, a copy of the first, so the loop never rewinds */
 const TRACK: readonly { slide: UseCase; real: number | null }[] = [
   { slide: SLIDES[COUNT - 1]!, real: null },
@@ -47,33 +31,6 @@ const DAMP_FROM = 0.6;
 
 type Motion = "slide" | "release" | "none";
 
-const CAPABILITY_ICONS: Record<CapabilityIcon, ComponentType<SVGProps<SVGSVGElement>>> = {
-  check: Check,
-  chart: ChartNoAxesColumn,
-  class: GraduationCap,
-  "pull-request": GitPullRequest,
-  history: HistoryIcon,
-  conversation: MessageCircle,
-  search: Search,
-  link: LinkIcon,
-  send: Send,
-  lock: Lock,
-  code: Code,
-};
-
-/*
- * On a phone the tab row scrolls sideways. Bring the chosen tab into the row's
- * view without moving the page, which scrollIntoView would do.
- */
-function revealInRow(tab: HTMLElement) {
-  const row = tab.closest<HTMLElement>(".uc-tabs-row");
-  if (!row) return;
-  const tabBox = tab.getBoundingClientRect();
-  const rowBox = row.getBoundingClientRect();
-  if (tabBox.left < rowBox.left) row.scrollLeft -= rowBox.left - tabBox.left;
-  else if (tabBox.right > rowBox.right) row.scrollLeft += tabBox.right - rowBox.right;
-}
-
 function damp(dx: number, width: number) {
   const limit = width * DAMP_FROM;
   if (Math.abs(dx) <= limit) return dx;
@@ -81,16 +38,20 @@ function damp(dx: number, width: number) {
 }
 
 /**
- * The use-case carousel: one slide per audience, its picture beside a heading,
- * a sentence and one action, and its three capabilities cycling as a caption
- * on the picture.
+ * The use-case carousel: one slide per audience, its picture on its own panel
+ * beside a heading, a sentence and one action, and its three capabilities
+ * cycling as a caption bar along the panel's foot.
  *
- * It plays on its own: every few seconds it moves forward, and after the last
- * audience it carries on to the first without rewinding, because the track ends
- * in copies of its first and last slides that it quietly swaps for the real
- * ones. A thin bar under the chosen tab shows the time to the next slide. It
- * holds while hovered, keyboard-focused, touched, off screen or in a background
- * tab; under reduced motion it never moves on its own.
+ * All four audiences stand side by side as labelled tabs, each with its icon
+ * and its own track, so the whole set reads at a glance. It plays on its own:
+ * the chosen tab's track fills with the slide's time, and the caption's three
+ * segments fill one capability at a time; a segment can be chosen to jump to
+ * its capability. After the last audience it carries on to the first without
+ * rewinding, because the track ends in copies of its first and last slides that
+ * it quietly swaps for the real ones. Both clocks are CSS animations, so they
+ * pause exactly where they are while the carousel is hovered, keyboard-focused,
+ * touched, off screen or in a background tab; under reduced motion nothing
+ * moves on its own and the capabilities stand as a list.
  *
  * On touch the slide follows the finger and settles by distance or by a flick.
  * The audiences are real tabs, so it is fully operable from the keyboard.
@@ -99,6 +60,8 @@ export function UseCases() {
   const [pos, setPos] = useState(1);
   const [round, setRound] = useState(0);
   const [caption, setCaption] = useState(0);
+  /* a chosen capability restarts both clocks from its place in the slide */
+  const [picked, setPicked] = useState({ key: 0, from: 0 });
   const [held, setHeld] = useState({ hover: false, focus: false, touch: false });
   const rootRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -137,16 +100,6 @@ export function UseCases() {
     motion.current = "slide";
   }, [pos, reduced, apply]);
 
-  // The captions cycle with the slide, three to a slide, and hold with it.
-  useEffect(() => {
-    if (!playing) return;
-    const timer = window.setInterval(
-      () => setCaption((current) => (current + 1) % 3),
-      USE_CASES.captionMs,
-    );
-    return () => window.clearInterval(timer);
-  }, [playing, index]);
-
   /* A copy of an end slide is swapped for the real one without motion. */
   function normalize() {
     const real = pos === 0 ? COUNT : pos === COUNT + 1 ? 1 : pos;
@@ -163,7 +116,13 @@ export function UseCases() {
     if (next === pos) apply(next, 0, reduced ? "none" : how);
     else setPos(next);
     setCaption(0);
+    setPicked({ key: 0, from: 0 });
     setRound((value) => value + 1);
+  }
+
+  function pickCaption(capIndex: number) {
+    setCaption(capIndex);
+    setPicked((current) => ({ key: current.key + 1, from: capIndex }));
   }
 
   function step(delta: 1 | -1) {
@@ -174,11 +133,7 @@ export function UseCases() {
     const target = (((real % COUNT) + COUNT) % COUNT) + 1;
     const from = normalize();
     if (target !== from) moveTo(target);
-    const tab = tabRefs.current[target - 1];
-    if (tab) {
-      revealInRow(tab);
-      if (focus) tab.focus();
-    }
+    if (focus) tabRefs.current[target - 1]?.focus();
   }
 
   function onTabKey(event: KeyboardEvent<HTMLDivElement>) {
@@ -266,7 +221,7 @@ export function UseCases() {
         }
       }}
     >
-      <div className="uc-tabs-row" data-contained-overflow>
+      <div className="uc-tabs-row">
         <div className="uc-tabs" role="tablist" aria-label="audiences" onKeyDown={onTabKey}>
           {SLIDES.map((slide, slideIndex) => {
             const selected = slideIndex === index;
@@ -285,12 +240,16 @@ export function UseCases() {
                 tabIndex={selected ? 0 : -1}
                 onClick={() => choose(slideIndex)}
               >
-                {slide.label}
+                <LandingIcon name={slide.icon} className="uc-tab-ic" />
+                <span className="uc-tab-label">{slide.label}</span>
                 {selected && !reduced ? (
                   <span
-                    key={round}
+                    key={`${round}-${picked.key}`}
                     className="uc-progress"
-                    style={{ animationDuration: `${USE_CASES.slideMs}ms` }}
+                    style={{
+                      animationDuration: `${USE_CASES.slideMs}ms`,
+                      animationDelay: `${-picked.from * USE_CASES.captionMs}ms`,
+                    }}
                     aria-hidden="true"
                     onAnimationEnd={() => step(1)}
                   />
@@ -332,6 +291,7 @@ export function UseCases() {
           {TRACK.map(({ slide, real }, at) => {
             const shown = at === pos;
             const isReal = real !== null;
+            const current = shown ? caption : 0;
             return (
               <div
                 key={isReal ? slide.id : `copy-${at}`}
@@ -345,22 +305,46 @@ export function UseCases() {
               >
                 <figure className="uc-figure">
                   <Art art={slide.art} className="uc-art" />
-                  <figcaption className="uc-caption">
-                    <ul className="uc-caps" data-static={reduced ? "true" : "false"}>
+                  <figcaption className="uc-caption" data-static={reduced ? "true" : "false"}>
+                    <ul className="uc-caps">
                       {slide.capabilities.map((capability, capIndex) => {
-                        const Icon = CAPABILITY_ICONS[capability.icon];
-                        const on = reduced || capIndex === (shown ? caption : 0);
+                        const on = reduced || capIndex === current;
                         return (
                           <li key={capability.text} className="uc-cap" data-on={on ? "true" : "false"}>
-                            <Icon className="uc-cap-ic" aria-hidden="true" focusable="false" />
+                            <LandingIcon name={capability.icon} className="uc-cap-ic" />
                             <span className="uc-cap-text">{capability.text}</span>
-                            <span className="uc-cap-n" aria-hidden="true">
-                              {capIndex + 1} / {slide.capabilities.length}
-                            </span>
                           </li>
                         );
                       })}
                     </ul>
+                    {reduced ? null : (
+                      <div className="uc-segs" role="group" aria-label={`${slide.label}: capabilities`}>
+                        {slide.capabilities.map((capability, capIndex) => (
+                          <button
+                            key={capability.text}
+                            type="button"
+                            className="uc-seg"
+                            aria-label={`show capability ${capIndex + 1} of ${CAPS}: ${capability.text}`}
+                            aria-current={capIndex === current ? "true" : undefined}
+                            data-state={capIndex < current ? "done" : capIndex === current ? "on" : "next"}
+                            onClick={() => pickCaption(capIndex)}
+                          >
+                            <span className="uc-seg-track">
+                              {shown && capIndex === current ? (
+                                <span
+                                  key={`${round}-${picked.key}-${capIndex}`}
+                                  className="uc-seg-fill"
+                                  style={{ animationDuration: `${USE_CASES.captionMs}ms` }}
+                                  onAnimationEnd={() => {
+                                    if (capIndex < CAPS - 1) setCaption(capIndex + 1);
+                                  }}
+                                />
+                              ) : null}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </figcaption>
                 </figure>
                 <div className="uc-copy">
@@ -378,30 +362,6 @@ export function UseCases() {
             );
           })}
         </div>
-      </div>
-
-      <div className="uc-arrows">
-        <button
-          type="button"
-          className="site-icon-btn site-icon-btn-boxed"
-          aria-label="previous use case"
-          aria-controls="uc-stage"
-          onClick={() => step(-1)}
-        >
-          <ChevronLeft aria-hidden="true" focusable="false" />
-        </button>
-        <span className="uc-count" aria-hidden="true">
-          {index + 1} / {COUNT}
-        </span>
-        <button
-          type="button"
-          className="site-icon-btn site-icon-btn-boxed"
-          aria-label="next use case"
-          aria-controls="uc-stage"
-          onClick={() => step(1)}
-        >
-          <ChevronRight aria-hidden="true" focusable="false" />
-        </button>
       </div>
     </div>
   );

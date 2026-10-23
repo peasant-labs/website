@@ -99,12 +99,19 @@ test("the install shell shows each platform's exact command, whole, and copies i
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
 });
 
-test("the use-case carousel: one slide per audience, tabs, arrows and keys", async ({ page }) => {
+test("the use-case carousel: one slide per audience, labelled tabs, captions you can step through, and keys", async ({
+  page,
+}) => {
   await page.goto("/");
   const carousel = page.locator("[data-use-cases]");
   await expect(carousel).toHaveAttribute("aria-roledescription", "carousel");
   const tabs = carousel.getByRole("tab");
   await expect(tabs).toHaveText(fixture.useCases.slides.map((slide) => slide.label));
+  // every audience carries its icon, so the set reads at a glance
+  await expect(tabs.locator("svg.uc-tab-ic")).toHaveCount(fixture.useCases.slides.length);
+  // the arrows and their "n / 4" counter are gone: the tabs are the way between audiences
+  await expect(carousel.locator(".uc-arrows")).toHaveCount(0);
+  await expect(carousel.getByRole("button", { name: /use case$/ })).toHaveCount(0);
 
   for (const slide of fixture.useCases.slides) {
     await carousel.getByRole("tab", { name: slide.label }).click();
@@ -114,9 +121,16 @@ test("the use-case carousel: one slide per audience, tabs, arrows and keys", asy
     // one picture per slide (one per theme is in the DOM; one is shown)
     await expect(panel.locator("img:visible")).toHaveCount(1);
     await expect(panel.locator(".uc-cap-text")).toHaveText(slide.capabilities);
-    // the capabilities are a caption on the picture, not controls
-    await expect(panel.locator(".uc-caption button, .uc-caption a")).toHaveCount(0);
+    // the capabilities are a caption along the picture's panel, with one segment per capability to step to
     await expect(panel.locator(".uc-figure .uc-caption")).toHaveCount(1);
+    await expect(panel.locator(".uc-caption a")).toHaveCount(0);
+    const segments = panel.locator(".uc-caption").getByRole("button");
+    await expect(segments).toHaveCount(slide.capabilities.length);
+    await segments.nth(2).click();
+    await expect(panel.locator('.uc-cap[data-on="true"] .uc-cap-text')).toHaveText([slide.capabilities[2]!]);
+    await expect(segments.nth(2)).toHaveAttribute("aria-current", "true");
+    await segments.nth(0).click();
+    await expect(panel.locator('.uc-cap[data-on="true"] .uc-cap-text')).toHaveText([slide.capabilities[0]!]);
     // beside the picture: the audience, its sentence, and one action
     await expect(panel.locator(".uc-copy h3")).toHaveText(slide.label);
     await expect(panel.locator(".uc-copy p")).toHaveText(slide.sentence);
@@ -136,35 +150,45 @@ test("the use-case carousel: one slide per audience, tabs, arrows and keys", asy
   await page.keyboard.press("Home");
   await expect(carousel.getByRole("tab", { name: first.label })).toHaveAttribute("aria-selected", "true");
 
-  await carousel.getByRole("button", { name: "previous use case" }).click();
-  await expect(carousel.getByRole("tab", { name: last.label })).toHaveAttribute("aria-selected", "true");
-  await carousel.getByRole("button", { name: "next use case" }).click();
-  await expect(carousel.getByRole("tab", { name: first.label })).toHaveAttribute("aria-selected", "true");
+  // the segments are reachable from the keyboard too
+  await page.keyboard.press("Tab");
+  await expect(visibleSlide(page).locator(".uc-caption").getByRole("button").first()).toBeFocused();
 });
 
-test("the use-case stage sets the picture beside its copy, with the tabs in one row above", async ({ page }) => {
+test("the use-case stage sets the picture on its panel beside its copy, with every audience's tab in view above", async ({
+  page,
+}) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const geometry = await page.evaluate(() => {
       const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
       const tabs = [...document.querySelectorAll(".uc-tab")].map((tab) => tab.getBoundingClientRect());
+      const row = rect(".uc-tabs-row");
       const figure = rect('.uc-panel[data-active="true"] .uc-figure');
       const copy = rect('.uc-panel[data-active="true"] .uc-copy');
       const stage = rect(".uc-stage");
-      const arrows = rect(".uc-arrows");
+      const rows = new Set(tabs.map((tab) => Math.round(tab.top))).size;
+      const panel = getComputedStyle(document.querySelector('.uc-panel[data-active="true"] .uc-figure')!);
       return {
-        oneRow: tabs.every((tab) => Math.abs(tab.top - tabs[0]!.top) < 1),
+        rows,
+        allInView: tabs.every((tab) => tab.left >= row.left - 1 && tab.right <= row.right + 1),
         tabsAbove: tabs.every((tab) => tab.bottom <= stage.top + 1),
+        // the picture sits on a surface of its own, not on the page
+        panelGround: panel.backgroundColor !== getComputedStyle(document.body).backgroundColor,
+        figureLeftAtTabs: Math.abs(figure.left - tabs[0]!.left) < 1,
         copyBeside: copy.left >= figure.right - 1,
         copyBelow: copy.top >= figure.bottom - 1,
-        arrowsBelow: arrows.top >= stage.bottom - 1,
         pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
-    expect(geometry.oneRow, `tabs wrap at ${width}`).toBe(true);
+    expect(geometry.rows, `tabs are not ${width === 1440 ? "one row" : "two by two"} at ${width}`).toBe(
+      width === 1440 ? 1 : 2,
+    );
+    expect(geometry.allInView, `a tab is out of view at ${width}`).toBe(true);
     expect(geometry.tabsAbove, `tabs are not above the stage at ${width}`).toBe(true);
-    expect(geometry.arrowsBelow, `arrows are not under the stage at ${width}`).toBe(true);
+    expect(geometry.panelGround, `the picture has no panel of its own at ${width}`).toBe(true);
+    expect(geometry.figureLeftAtTabs, `the picture's panel does not line up with the tabs at ${width}`).toBe(true);
     expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
     if (width === 1440) expect(geometry.copyBeside, "copy is not beside the picture").toBe(true);
     else expect(geometry.copyBelow, "copy is not under the picture on a phone").toBe(true);
@@ -174,20 +198,29 @@ test("the use-case stage sets the picture beside its copy, with the tabs in one 
 test("captions fade through one capability at a time, hold on hover, and stand still under reduced motion", async ({
   page,
 }) => {
-  await page.clock.install();
   await page.goto("/");
   const carousel = page.locator("[data-use-cases]");
   await carousel.scrollIntoViewIfNeeded();
   const slide = fixture.useCases.slides[0]!;
   const on = carousel.locator('.uc-panel[data-active="true"] .uc-cap[data-on="true"] .uc-cap-text');
+  const fill = carousel.locator('.uc-panel[data-active="true"] .uc-seg-fill');
 
   await expect(on).toHaveText([slide.capabilities[0]!]);
   await page.mouse.move(0, 0);
-  await page.clock.runFor(fixture.useCases.captionMs + 50);
+  // each capability lasts as long as its segment takes to fill
+  expect(await fill.evaluate((bar) => getComputedStyle(bar).animationDuration)).toBe(
+    `${fixture.useCases.captionMs / 1000}s`,
+  );
+  await fill.dispatchEvent("animationend");
   await expect(on).toHaveText([slide.capabilities[1]!]);
 
+  // hovering holds both clocks where they are
   await carousel.locator(".uc-stage").hover();
-  await page.clock.runFor(fixture.useCases.captionMs * 2);
+  await expect(carousel).toHaveAttribute("data-playing", "false");
+  expect(await fill.evaluate((bar) => getComputedStyle(bar).animationPlayState)).toBe("paused");
+  expect(
+    await carousel.locator(".uc-progress").evaluate((bar) => getComputedStyle(bar).animationPlayState),
+  ).toBe("paused");
   await expect(on).toHaveText([slide.capabilities[1]!]);
 
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -199,6 +232,8 @@ test("captions fade through one capability at a time, hold on hover, and stand s
     "1",
     "1",
   ]);
+  // with nothing cycling there is nothing to step through
+  await expect(page.locator('.uc-panel[data-active="true"] .uc-seg')).toHaveCount(0);
 });
 
 test("how it works: three steps, each with its scene; choosing one scrolls to it", async ({ page }) => {
@@ -206,6 +241,10 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
   await page.goto("/");
   const steps = page.locator(".hw-step");
   await expect(steps.locator(".hw-step-title")).toHaveText(fixture.how.steps.map((step) => step.title));
+  // each step is illustrated by its icon
+  await expect(steps.locator("svg.hw-ic")).toHaveCount(fixture.how.steps.length);
+  // the scene is the screen itself: no window shell around it
+  await expect(page.locator(".hw-titlebar")).toHaveCount(0);
 
   for (const [index, step] of fixture.how.steps.entries()) {
     await steps.nth(index).click();

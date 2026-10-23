@@ -29,8 +29,8 @@ export const HERO = {
 
 export type UseCaseCta = Readonly<{ label: string; href: string }>;
 
-/** the drawn icon beside a capability in the caption; the component maps each to a lucide mark */
-export type CapabilityIcon =
+/** a drawn icon beside an audience, a capability or a step; components/landing/icons maps each to a lucide mark */
+export type LandingIconName =
   | "check"
   | "chart"
   | "class"
@@ -41,13 +41,20 @@ export type CapabilityIcon =
   | "link"
   | "send"
   | "lock"
-  | "code";
+  | "code"
+  | "research"
+  | "team"
+  | "terminal"
+  | "company"
+  | "record"
+  | "review";
 
-export type Capability = Readonly<{ text: string; icon: CapabilityIcon }>;
+export type Capability = Readonly<{ text: string; icon: LandingIconName }>;
 
 export type UseCase = Readonly<{
   id: string;
   label: string;
+  icon: LandingIconName;
   sentence: string;
   art: Art;
   capabilities: readonly [Capability, Capability, Capability];
@@ -72,6 +79,7 @@ export const USE_CASES = {
     {
       id: "researchers",
       label: "researchers",
+      icon: "research",
       sentence:
         "Build evals and studies from real agent work, shared with consent. Start a private collective for your lab or class.",
       art: art("uc-researchers", "an open book with a quill in an inkwell", 704, 528),
@@ -85,6 +93,7 @@ export const USE_CASES = {
     {
       id: "teams",
       label: "teams",
+      icon: "team",
       sentence: "Read the sessions behind a pull request, redacted, one click from the diff.",
       art: art("uc-teams", "a wooden table with three mugs", 704, 528),
       capabilities: [
@@ -97,6 +106,7 @@ export const USE_CASES = {
     {
       id: "developers",
       label: "developers",
+      icon: "terminal",
       sentence:
         "Every session with your coding agent, searchable on your computer. Works with Claude Code, Codex, Cursor, OpenCode, Pi and Strike.",
       art: art("uc-developers", "an enchanted quill writing on a floating scroll", 704, 528),
@@ -110,6 +120,7 @@ export const USE_CASES = {
     {
       id: "companies",
       label: "companies",
+      icon: "company",
       sentence:
         "Access can follow your GitHub organization, with redaction rules for your own names. Village is open source, and we host it for you.",
       art: art("uc-companies", "a small two-tower castle with a padlocked gate", 704, 528),
@@ -139,6 +150,7 @@ export const HOW = {
     {
       id: "review",
       title: "review",
+      icon: "review",
       body: "Before anything leaves, peasant hides secrets, personal details, file paths and internal names, and shows you exactly what it hid.",
       scene:
         "the redaction review finds an AWS key, an email address and a home folder path, and shows each as it will leave, replaced by its placeholder: 3 matches",
@@ -146,6 +158,7 @@ export const HOW = {
     {
       id: "publish",
       title: "publish",
+      icon: "send",
       body: "Share transcripts for code review, radical openness, or transparent research processes.",
       scene:
         "in the publish window, the eval-crowd collective is added to who can read it and publish is pressed; the session is published to eval-crowd",

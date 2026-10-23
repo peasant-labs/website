@@ -19,6 +19,12 @@
       box-shadow var(--dur-2) ease;
   }
 
+  .uc-seg {
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+
+  .uc-tab:active,
+  .uc-seg:active,
   .gs-copy:active,
   .hw-replay:active {
     transform: scale(0.97);
@@ -122,31 +128,25 @@
   min-width: 0;
 }
 
-/* one row of tabs; on a narrow screen the row scrolls inside itself */
-.uc-tabs-row {
-  min-width: 0;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  scrollbar-width: none;
-  border-bottom: var(--bd);
-}
-
-.uc-tabs-row::-webkit-scrollbar {
-  display: none;
-}
-
+/*
+ * The four audiences side by side, each a labelled tab with its icon over its
+ * own track, so the whole set reads at a glance; two by two on a phone. The
+ * chosen tab's track fills with the time left on its slide.
+ */
 .uc-tabs {
-  display: flex;
-  gap: 0 var(--sp-6);
-  width: max-content;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3) var(--sp-5);
 }
 
 .uc-tab {
-  display: inline-flex;
+  position: relative;
+  display: flex;
   align-items: center;
-  flex: none;
-  min-height: 3rem;
-  padding: 0;
+  gap: var(--sp-3);
+  min-width: 0;
+  min-height: 3.5rem;
+  padding: var(--sp-3) var(--sp-2) calc(var(--sp-3) + 3px) 0;
   border: 0;
   background: transparent;
   color: var(--ink-3);
@@ -154,9 +154,24 @@
   font-size: var(--fs-md);
   font-weight: 700;
   letter-spacing: 0;
+  text-align: start;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: inset 0 -3px 0 transparent;
+  box-shadow: inset 0 -3px 0 var(--rule);
+}
+
+.uc-tab-ic {
+  flex: none;
+  width: 1.375rem;
+  height: 1.375rem;
+  color: var(--ink-4);
+  transition: color var(--dur-2) ease;
+}
+
+.uc-tab-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .uc-tab[aria-selected="true"] {
@@ -164,21 +179,18 @@
   box-shadow: inset 0 -3px 0 var(--amber);
 }
 
-/* while the carousel plays, the chosen tab's underline fills with the time left on the slide */
-.uc-tab {
-  position: relative;
+.uc-tab[aria-selected="true"] .uc-tab-ic {
+  color: var(--amber);
 }
 
+/* while the carousel plays, the chosen tab's track fills with the time left on the slide */
 .uc[data-playing] .uc-tab[aria-selected="true"]:has(.uc-progress) {
   box-shadow: inset 0 -3px 0 var(--rule-strong);
 }
 
-.uc-progress {
+.uc-progress,
+.uc-seg-fill {
   position: absolute;
-  inset-inline: 0;
-  inset-block-end: 0;
-  height: 3px;
-  background: var(--amber);
   transform: scaleX(0);
   transform-origin: left center;
   animation-name: uc-progress;
@@ -186,7 +198,14 @@
   animation-fill-mode: forwards;
 }
 
-.uc[data-playing="false"] .uc-progress {
+.uc-progress {
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 3px;
+  background: var(--amber);
+}
+
+.uc[data-playing="false"] :is(.uc-progress, .uc-seg-fill) {
   animation-play-state: paused;
 }
 
@@ -198,21 +217,21 @@
 
 @media (max-width: 47.99rem) {
   .uc-tabs {
-    gap: 0 var(--sp-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-2) var(--sp-4);
   }
 
   .uc-tab {
+    min-height: 3rem;
     font-size: var(--fs-body);
+  }
+
+  .uc-tab-ic {
+    width: var(--ic-lg);
+    height: var(--ic-lg);
   }
 }
 
-.uc-arrows {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-}
-
-.uc-count,
 .hw-count {
   min-width: 5ch;
   color: var(--ink-3);
@@ -251,11 +270,25 @@
   }
 }
 
+/* the picture on its own panel, so it sits square with the copy instead of floating on the page */
 .uc-figure {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 44rem;
   margin: 0;
+  border: var(--bd);
+  background: var(--surface-2);
+}
+
+.uc-art {
+  padding: clamp(var(--sp-4), 3vw, var(--sp-7));
+}
+
+.uc-art .art-img {
+  width: auto;
+  max-width: 100%;
+  max-height: 22rem;
+  margin-inline: auto;
 }
 
 .uc-copy {
@@ -284,17 +317,20 @@
 }
 
 /*
- * The caption: an opaque ink chip on the picture's bottom-left corner. The icon
- * takes the amber that reads on that ink in each theme.
+ * The caption: an ink bar along the panel's foot, the capability on the left
+ * and its three segments on the right. The icon and the filled segments take
+ * the amber that reads on that ink in each theme.
  */
 .uc-caption {
   --chip-accent: var(--amber-dim);
 
-  position: absolute;
-  inset-inline-start: var(--sp-4);
-  inset-block-end: var(--sp-4);
-  max-width: calc(100% - 2 * var(--sp-4));
-  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 3.25rem;
+  padding: 0 var(--sp-2) 0 var(--sp-4);
+  background: var(--ink-strong);
+  color: var(--canvas);
 }
 
 :root[data-theme="light"] .uc-caption {
@@ -303,6 +339,8 @@
 
 .uc-caps {
   display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -313,16 +351,14 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: 10px var(--sp-4);
-  background: var(--ink-strong);
-  color: var(--canvas);
+  padding-block: 10px;
   font-family: var(--font-mono);
   font-size: var(--fs-body);
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1.3;
   opacity: 0;
-  transition: opacity 700ms var(--ease-out);
+  transition: opacity 400ms var(--ease-out);
 }
 
 .uc-cap[data-on="true"] {
@@ -338,45 +374,90 @@
 
 .uc-cap-text {
   flex: 1 1 auto;
+  min-width: 0;
 }
 
-.uc-cap-n {
+/* the three segments: each one is a way to its capability, and the current one fills with its time */
+.uc-segs {
+  display: flex;
   flex: none;
-  margin-inline-start: var(--sp-2);
-  color: color-mix(in srgb, var(--canvas) 72%, transparent);
-  font-size: var(--fs-sm);
-  font-weight: 400;
-  font-variant-numeric: tabular-nums;
+}
+
+.uc-seg {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: var(--target-comfortable);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.uc-seg-track {
+  position: relative;
+  display: block;
+  width: 1.5rem;
+  height: 3px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--canvas) 34%, transparent);
+  transition: background-color var(--dur-2) ease;
+}
+
+.uc-seg[data-state="done"] .uc-seg-track {
+  background: var(--chip-accent);
+}
+
+.uc-seg[data-state="on"] .uc-seg-track {
+  background: color-mix(in srgb, var(--canvas) 58%, transparent);
+}
+
+.uc-seg-fill {
+  inset: 0;
+  background: var(--chip-accent);
+}
+
+.uc-seg:focus-visible {
+  outline: var(--focus-ring-width) solid var(--canvas);
+  outline-offset: -6px;
 }
 
 /* reduced motion: the three capabilities stand as a plain list under the picture */
-.uc-caption:has(.uc-caps[data-static="true"]) {
+.uc-caption[data-static="true"] {
   --chip-accent: var(--amber);
 
-  position: static;
-  max-width: none;
-  margin-block-start: var(--sp-4);
+  display: block;
+  padding: var(--sp-4) var(--sp-5);
+  border-top: var(--bd);
+  background: transparent;
+  color: var(--ink-strong);
 }
 
-.uc-caps[data-static="true"] {
+.uc-caption[data-static="true"] .uc-caps {
   gap: var(--sp-2);
 }
 
-.uc-caps[data-static="true"] .uc-cap {
+.uc-caption[data-static="true"] .uc-cap {
   grid-area: auto;
-  padding: 0;
-  background: transparent;
-  color: var(--ink-strong);
+  padding-block: 0;
   opacity: 1;
-}
-
-.uc-caps[data-static="true"] .uc-cap-n {
-  display: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .uc-tab:hover {
     color: var(--ink-strong);
+  }
+
+  .uc-tab:hover .uc-tab-ic {
+    color: var(--ink-2);
+  }
+
+  .uc-tab[aria-selected="true"]:hover .uc-tab-ic {
+    color: var(--amber);
+  }
+
+  .uc-seg:hover .uc-seg-track {
+    background: color-mix(in srgb, var(--canvas) 72%, transparent);
   }
 }
 
@@ -386,15 +467,16 @@
   padding-block: 0;
 }
 
-.hw-n {
+/* each step's icon, on a small tile; the current step's turns amber */
+.hw-ic {
   flex: none;
-  width: 2.5rem;
-  color: var(--ink-4);
-  font-family: var(--font-mono);
-  font-size: 2rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
+  box-sizing: border-box;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0.6875rem;
+  border: var(--bd);
+  background: var(--surface-2);
+  color: var(--ink-3);
 }
 
 .hw-step-title {
@@ -488,12 +570,15 @@
   cursor: pointer;
 }
 
-.hw-step .hw-n,
+.hw-step .hw-ic,
 .hw-step .hw-step-title {
-  transition: color var(--dur-2) ease;
+  transition:
+    color var(--dur-2) ease,
+    border-color var(--dur-2) ease;
 }
 
-.hw-step[aria-pressed="true"] .hw-n {
+.hw-step[aria-pressed="true"] .hw-ic {
+  border-color: var(--rule-strong);
   color: var(--amber);
 }
 
@@ -502,7 +587,7 @@
 }
 
 .hw-step-body {
-  padding: 0 0 var(--sp-5) calc(2.5rem + var(--sp-4));
+  padding: 0 0 var(--sp-5) calc(2.75rem + var(--sp-4));
   color: var(--ink-2);
   font-size: 1.0625rem;
   line-height: 1.55;
@@ -669,8 +754,9 @@
 
   .hw-flow-step {
     display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr);
+    grid-template-columns: 2.75rem minmax(0, 1fr);
     align-content: center;
+    align-items: center;
     gap: var(--sp-2) var(--sp-3);
     min-height: 55vh;
     opacity: 0.4;
@@ -681,12 +767,13 @@
     opacity: 1;
   }
 
-  .hw-flow-step .hw-n {
-    grid-row: span 2;
+  .hw-flow-step[data-on="true"] .hw-ic {
+    border-color: var(--rule-strong);
+    color: var(--amber);
   }
 
-  .hw-flow-step[data-on="true"] .hw-n {
-    color: var(--amber);
+  .hw-flow-body {
+    grid-column: 1 / -1;
   }
 
   .hw-flow-step[data-on="true"] .hw-step-title {
@@ -740,12 +827,13 @@
 
 .hw-stack-copy {
   display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr);
-  gap: var(--sp-2) var(--sp-3);
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-3);
 }
 
-.hw-stack-copy .hw-n {
-  grid-row: span 2;
+.hw-stack-copy .hw-ic {
+  border-color: var(--rule-strong);
   color: var(--amber);
 }
 
@@ -754,6 +842,7 @@
 }
 
 .hw-stack-copy .hw-step-body {
+  grid-column: 1 / -1;
   padding: 0;
 }
 
