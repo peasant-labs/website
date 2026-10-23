@@ -145,92 +145,143 @@ const PHONE_CARD: CardPlan = {
 };
 
 /*
- * A peasant, traced from the pictures' village, in cells from the middle of
- * its hem: a peaked hat whose brim is wider than the shoulders, a head under
- * it, shoulders, arms hanging at the sides and a robe that widens to the hem.
- * The rake stands upright beside its holder, a hand on the handle; the
- * basket rides at the other's hip.
+ * The peasants, traced from the pictures' village and stood up as people, in
+ * cells from the middle of the ground under them: a hat with a tall peaked
+ * crown, shaped like a house, on a short brim a little wider than the head,
+ * over a face, a neck, shoulders wider than it, sleeves standing off the body
+ * with a hand at the end of each, a sash, a robe flaring to the ground and two
+ * feet under its hem. Each stands their own way: one holds the rake upright,
+ * one carries the basket, one waves at the card coming in.
  */
+
+/** one part of a figure: its outline, its light, and the light right of the figure's middle */
+type Part = Readonly<{ points: readonly Point[]; light: Light; right?: Light }>;
+
 type Figure = Readonly<{
-  hat: readonly Point[];
-  body: readonly Point[];
-  arms: readonly (readonly Point[])[];
-  rake: Readonly<{ handle: readonly [Point, Point]; head: readonly [Point, Point]; teeth: readonly Point[]; hand: readonly [Point, Point] }>;
-  basket: readonly Point[];
-  handle: readonly Point[];
+  /** ink behind the figure: the rake */
+  behind: readonly (readonly Point[])[];
+  parts: readonly Part[];
+  /** ink over it: the sash */
+  front: readonly (readonly Point[])[];
+  /** the basket that lights up as a card lands */
+  basket?: readonly Point[];
 }>;
 
-const WIDE_FIGURE: Figure = {
-  hat: [[0, -41], [8, -37], [8, -36], [-8, -36], [-8, -37]],
-  body: [[-2, -36], [2, -36], [2, -31], [4, -31], [5, -30], [5, -17], [7, 0], [-7, 0], [-5, -17], [-5, -30], [-4, -31], [-2, -31]],
-  arms: [
-    [[-3, -29], [-3, -17], [-5, -17]],
-    [[3, -29], [3, -17], [5, -17]],
-  ],
-  rake: {
-    handle: [[10, 0], [10, -46]],
-    head: [[7, -47], [13, -47]],
-    teeth: [[7, -48], [9, -48], [11, -48], [13, -48]],
-    hand: [[5, -18], [9, -18]],
-  },
-  basket: [[5, -16], [11, -16], [10, -11], [6, -11]],
-  handle: [[6, -17], [7, -18], [9, -18], [10, -17]],
-};
+const WIDE_BODY: readonly Part[] = [
+  { points: [[-1, -31], [1, -31], [5, -29], [6, -28], [6, -18], [9, -2], [-9, -2], [-6, -18], [-6, -28], [-5, -29]], light: "mid", right: "shade" },
+  { points: [[-5, -1], [-2, -1], [-2, 0], [-5, 0]], light: "deep" },
+  { points: [[2, -1], [5, -1], [5, 0], [2, 0]], light: "deep" },
+  { points: [[-2, -36], [2, -36], [3, -35], [3, -32], [2, -31], [-2, -31], [-3, -32], [-3, -35]], light: "lit" },
+  { points: [[0, -43], [3, -40], [3, -38], [5, -38], [5, -36], [-5, -36], [-5, -38], [-3, -38], [-3, -40]], light: "lit", right: "shade" },
+  /* the left arm hangs at the side */
+  { points: [[-5, -29], [-8, -27], [-10, -17], [-10, -15], [-7, -15], [-7, -26]], light: "lit" },
+  { points: [[-9, -14], [-8, -14], [-8, -13], [-9, -13]], light: "deep" },
+];
+const WIDE_SASH = [[[-6, -18], [6, -18]]] as const;
 
-const PHONE_FIGURE: Figure = {
-  hat: [[0, -23], [4, -21], [5, -20], [-5, -20], [-4, -21]],
-  body: [[-2, -20], [2, -20], [2, -17], [4, -16], [4, -9], [5, 0], [-5, 0], [-4, -9], [-4, -16], [-2, -17]],
-  arms: [
-    [[-2, -15], [-2, -9], [-4, -9]],
-    [[2, -15], [2, -9], [4, -9]],
-  ],
+const WIDE_FIGURES = {
   rake: {
-    handle: [[7, 0], [7, -28]],
-    head: [[5, -29], [9, -29]],
-    teeth: [[5, -30], [7, -30], [9, -30]],
-    hand: [[4, -10], [6, -10]],
+    behind: [[[12, 0], [12, -46]], [[9, -47], [15, -47]], [[9, -48], [9, -48]], [[11, -48], [11, -48]], [[13, -48], [13, -48]], [[15, -48], [15, -48]]],
+    parts: [
+      ...WIDE_BODY,
+      { points: [[5, -29], [8, -28], [11, -24], [11, -22], [9, -22], [7, -25]], light: "mid" },
+      { points: [[11, -22], [12, -22], [12, -21], [11, -21]], light: "deep" },
+    ],
+    front: WIDE_SASH,
   },
-  basket: [[4, -8], [8, -8], [7, -4], [5, -4]],
-  handle: [[5, -9], [7, -9]],
-};
+  basket: {
+    behind: [],
+    parts: [
+      ...WIDE_BODY,
+      { points: [[5, -29], [8, -27], [10, -17], [10, -15], [7, -15], [7, -26]], light: "mid" },
+      { points: [[8, -14], [9, -14], [9, -13], [8, -13]], light: "deep" },
+    ],
+    front: WIDE_SASH,
+    basket: [[6, -11], [12, -11], [11, -6], [7, -6]],
+  },
+  wave: {
+    behind: [],
+    parts: [
+      ...WIDE_BODY,
+      { points: [[6, -29], [8, -29], [11, -37], [9, -38]], light: "mid" },
+      { points: [[9, -40], [10, -40], [10, -39], [9, -39]], light: "deep" },
+    ],
+    front: WIDE_SASH,
+  },
+} satisfies Record<string, Figure>;
+
+const PHONE_BODY: readonly Part[] = [
+  { points: [[-1, -18], [1, -18], [3, -17], [4, -16], [4, -11], [5, -2], [-5, -2], [-4, -11], [-4, -16], [-3, -17]], light: "mid", right: "shade" },
+  { points: [[-3, -1], [-2, -1], [-2, 0], [-3, 0]], light: "deep" },
+  { points: [[2, -1], [3, -1], [3, 0], [2, 0]], light: "deep" },
+  { points: [[-1, -22], [1, -22], [2, -21], [2, -19], [1, -18], [-1, -18], [-2, -19], [-2, -21]], light: "lit" },
+  { points: [[0, -27], [2, -25], [2, -24], [3, -24], [3, -22], [-3, -22], [-3, -24], [-2, -24], [-2, -25]], light: "lit", right: "shade" },
+  { points: [[-3, -17], [-6, -15], [-6, -9], [-5, -9], [-5, -15]], light: "lit" },
+];
+const PHONE_SASH = [[[-4, -11], [4, -11]]] as const;
+
+const PHONE_FIGURES = {
+  rake: {
+    behind: [[[8, 0], [8, -28]], [[6, -29], [10, -29]], [[6, -30], [6, -30]], [[8, -30], [8, -30]], [[10, -30], [10, -30]]],
+    parts: [...PHONE_BODY, { points: [[3, -17], [5, -17], [8, -14], [7, -13]], light: "mid" }],
+    front: PHONE_SASH,
+  },
+  basket: {
+    behind: [],
+    parts: [...PHONE_BODY, { points: [[3, -17], [6, -15], [6, -9], [5, -9], [5, -15]], light: "mid" }],
+    front: PHONE_SASH,
+    basket: [[4, -8], [8, -8], [7, -4], [5, -4]],
+  },
+  wave: {
+    behind: [],
+    parts: [...PHONE_BODY, { points: [[3, -17], [5, -17], [7, -23], [6, -24]], light: "mid" }],
+    front: PHONE_SASH,
+  },
+} satisfies Record<string, Figure>;
 
 /*
- * A wheat sheaf, flat like the pictures': a bundle fanned at the top, where
- * the ears are, pinched by a twine band and splayed at the foot, outlined like
- * everything else, with its stalks drawn down it. In cells from the middle of
- * its foot.
+ * A wheat sheaf, flat like the pictures': a fan of stalks gathered by a twine
+ * band about three fifths of the way up and splayed to a flared foot, each
+ * stalk topped with an ear, the outer ears drooping outward, and the stalks
+ * behind shown as a light tone between them. In cells from the middle of its
+ * foot; it stands as tall as a peasant's face.
  */
 type SheafPlan = Readonly<{
-  outline: readonly Point[];
+  back: readonly (readonly Point[])[];
+  stalks: readonly (readonly Point[])[];
+  ears: readonly (readonly Point[])[];
   band: Rect;
-  stalks: readonly (readonly [Point, Point])[];
 }>;
 
-const WIDE_SHEAF: SheafPlan = {
-  outline: [
-    [-2, -13], [-6, -19], [-6, -24], [-5, -22], [-3, -28], [-2, -25], [0, -29], [2, -25], [3, -28], [5, -22], [6, -24], [6, -19],
-    [2, -13], [2, -10], [5, 0], [-5, 0], [-2, -10],
-  ],
-  band: [-3, -12, 7, 2],
-  stalks: [
-    [[0, -13], [0, -27]],
-    [[-1, -15], [-3, -26]],
-    [[1, -15], [3, -26]],
-    [[0, -10], [0, -2]],
-  ],
-};
+function sheafPlan(height: number, top: number, foot: number, count: number): SheafPlan {
+  const band = -Math.round(height * 0.6);
+  const stalks: Point[][] = [];
+  const ears: Point[][] = [];
+  const tips: Point[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const t = (index / (count - 1)) * 2 - 1;
+    const side = Math.sign(t);
+    const [x, y]: Point = [Math.round(t * top), -height + Math.round(t * t * height * 0.22)];
+    tips.push([x, y]);
+    stalks.push([[Math.round(t * 2), band - 1], [x, y]]);
+    stalks.push([[Math.round(t * 2), band + 2], [Math.round(t * foot), 0]]);
+    ears.push(Math.abs(t) < 0.4 ? [[x, y], [x, y - 2]] : [[x, y], [x + side, y - 1], [x + 2 * side, y], [x + 2 * side, y + 1]]);
+  }
+  return {
+    back: [
+      [[-2, band - 1], ...tips, [2, band - 1]],
+      [[-2, band + 2], [2, band + 2], [foot, 0], [-foot, 0]],
+    ],
+    stalks,
+    ears,
+    band: [-3, band, 7, 2],
+  };
+}
 
-const PHONE_SHEAF: SheafPlan = {
-  outline: [
-    [-1, -8], [-4, -11], [-4, -13], [-3, -12], [-2, -15], [-1, -13], [0, -16], [1, -13], [2, -15], [3, -12], [4, -13], [4, -11],
-    [1, -8], [1, -6], [2, 0], [-2, 0], [-1, -6],
-  ],
-  band: [-1, -7, 3, 1],
-  stalks: [[[0, -8], [0, -15]]],
-};
+const WIDE_SHEAF = sheafPlan(33, 5, 5, 7);
 
-/** a person at the commons: the column they stand on, and what they hold */
-type Person = readonly [x: number, holds: "rake" | "basket" | null];
+/** who stands at the commons, left to right: a sheaf, or a peasant and whether their basket lights up */
+type Member = Readonly<{ sheaf: SheafPlan } | { figure: Figure; noticed?: boolean }>;
 
 /** One layout, every measure in cells. */
 type Layout = Readonly<{
@@ -238,8 +289,6 @@ type Layout = Readonly<{
   width: number;
   height: number;
   card: CardPlan;
-  figure: Figure;
-  sheaf: SheafPlan;
   /** the laptop: its deck's front-left cell, the row it stands on, its width, depth in steps and thickness, and its lid's height and bezel */
   laptop: Readonly<{ x: number; ground: number; w: number; depth: number; deck: number; screen: number; bezel: number }>;
   /** the three marks on the screen, a centred group: the step between them and their size */
@@ -250,11 +299,8 @@ type Layout = Readonly<{
   crest: number;
   /** the stack: its cards' left column, the row its base stands on, the base's height and depth, and the step between cards */
   stack: Readonly<{ left: number; ground: number; base: number; depth: number; notch: number }>;
-  /** the commons: the row it stands on, the peasants, the one whose basket lights up, and the sheaves' columns */
-  commons: number;
-  people: readonly Person[];
-  noticer: number;
-  sheaves: readonly number[];
+  /** the commons: the row it stands on, its first column, the gap between its members, and its members */
+  commons: Readonly<{ ground: number; from: number; gap: number; members: readonly Member[] }>;
   /** how many rows of contact shadow lie under everything */
   shadow: number;
 }>;
@@ -264,55 +310,54 @@ type Layout = Readonly<{
  * groups on one ground, the laptop, the stack and the commons, with the same
  * gap between them and the same margin outside, and the same air above the
  * scene as below it. The laptop is about one and a half cards wide; a
- * peasant stands as tall as a card, and the wheat reaches their shoulders.
+ * peasant stands as tall as a card, and the wheat reaches their faces.
  */
 const WIDE: Layout = {
   name: "wide",
   width: 333,
   height: 104,
   card: WIDE_CARD,
-  figure: WIDE_FIGURE,
-  sheaf: WIDE_SHEAF,
-  laptop: { x: 15, ground: 78, w: 80, depth: 8, deck: 3, screen: 46, bezel: 3 },
+  laptop: { x: 14, ground: 78, w: 80, depth: 8, deck: 3, screen: 46, bezel: 3 },
   marks: [24, 16],
   onScreen: 0.85,
   crest: 28,
-  stack: { left: 132, ground: 78, base: 4, depth: 2, notch: 3 },
-  commons: 78,
-  people: [
-    [239, "rake"],
-    [265, "basket"],
-    [292, null],
-  ],
-  noticer: 1,
-  sheaves: [220, 311],
+  stack: { left: 127, ground: 78, base: 4, depth: 2, notch: 3 },
+  commons: {
+    ground: 78,
+    from: 206,
+    gap: 3,
+    members: [
+      { sheaf: WIDE_SHEAF },
+      { figure: WIDE_FIGURES.rake },
+      { figure: WIDE_FIGURES.basket, noticed: true },
+      { figure: WIDE_FIGURES.wave },
+      { sheaf: WIDE_SHEAF },
+    ],
+  },
   shadow: 3,
 };
 
 /*
  * A phone, at 4:5, in two tiers with the same air above and below: the
- * laptop and the stack side by side on top, the commons centred under them.
+ * laptop and the stack side by side on top, the three peasants centred under
+ * them; the wheat is left out, too small here to read as wheat.
  */
 const PHONE: Layout = {
   name: "phone",
   width: 100,
   height: 125,
   card: PHONE_CARD,
-  figure: PHONE_FIGURE,
-  sheaf: PHONE_SHEAF,
   laptop: { x: 5, ground: 55, w: 40, depth: 4, deck: 2, screen: 26, bezel: 2 },
   marks: [11, 7],
   onScreen: 0.85,
   crest: 22,
   stack: { left: 62, ground: 55, base: 3, depth: 1, notch: 2 },
-  commons: 99,
-  people: [
-    [32, "rake"],
-    [50, "basket"],
-    [67, null],
-  ],
-  noticer: 1,
-  sheaves: [19, 80],
+  commons: {
+    ground: 99,
+    from: 23,
+    gap: 4,
+    members: [{ figure: PHONE_FIGURES.rake }, { figure: PHONE_FIGURES.basket, noticed: true }, { figure: PHONE_FIGURES.wave }],
+  },
   shadow: 2,
 };
 
@@ -890,20 +935,17 @@ function Box({ x, y, w, h, depth, front = "mid", top = "lit", side = "shade" }: 
 /* which of the two layouts a drawing belongs to; the stylesheet shows one */
 const sizeClass = (layout: Layout) => `hf-${layout.name}`;
 
-function Peasant({ figure, person: [x, holds], ground, lit }: { figure: Figure; person: Person; ground: number; lit: boolean }) {
+function Peasant({ figure, x, ground, lit }: { figure: Figure; x: number; ground: number; lit: boolean }) {
   const place = (points: readonly Point[]) => shift(points, x, ground);
-  const { rake } = figure;
   return (
     <g>
-      {holds === "rake" ? (
-        <Strokes runs={[place(rake.handle), place(rake.head), place(rake.hand), ...rake.teeth.map((tooth) => place([tooth, tooth]))]} />
-      ) : null}
-      <Face points={place(figure.body)} light="mid" split={[x, "shade"]} />
-      {figure.arms.length ? <Strokes runs={figure.arms.map(place)} /> : null}
-      <Face points={place(figure.hat)} light="lit" split={[x, "shade"]} />
-      {holds === "basket" ? (
+      {figure.behind.length ? <Strokes runs={figure.behind.map(place)} /> : null}
+      {figure.parts.map((part, index) => (
+        <Face key={index} points={place(part.points)} light={part.light} split={part.right ? [x, part.right] : undefined} />
+      ))}
+      <Strokes runs={figure.front.map(place)} />
+      {figure.basket ? (
         <>
-          <Strokes runs={[place(figure.handle)]} />
           <Face points={place(figure.basket)} light="mid" />
           {lit ? (
             <g className="hf-notice">
@@ -921,20 +963,44 @@ function Sheaf({ plan, x, ground }: { plan: SheafPlan; x: number; ground: number
   const [bx, by, bw, bh] = plan.band;
   return (
     <g>
-      <Face points={place(plan.outline)} light="lit" split={[x, "mid"]} />
-      <Strokes runs={plan.stalks.map(place)} />
+      {plan.back.map((points, index) => (
+        <Face key={index} points={place(points)} light="lit" edge={false} />
+      ))}
+      <Strokes runs={plan.stalks.map(place)} light="shade" />
+      <Strokes runs={plan.ears.map(place)} />
       <Face points={place(corners(bx, by, bw, bh))} light="deep" />
     </g>
   );
 }
 
-/** how far a figure reaches either side of its column, with what it holds */
-function reach(points: readonly Point[]) {
-  const xs = points.map(([px]) => px);
-  return [Math.min(...xs), Math.max(...xs)] as const;
+/** every point a commons member is drawn through */
+function pointsOf(member: Member): Point[] {
+  if ("sheaf" in member) return [...member.sheaf.back.flat(), ...member.sheaf.ears.flat()];
+  const { figure } = member;
+  return [...figure.behind.flat(), ...figure.parts.flatMap((part) => part.points), ...(figure.basket ?? [])];
 }
 
-/** The still parts: the ground's scatter, the laptop, the wheat and the peasants, each with its shadow. */
+/** how far a member reaches either side of its column, overall and where it meets the ground */
+function reach(member: Member) {
+  const points = pointsOf(member);
+  const xs = points.map(([x]) => x);
+  const foot = points.filter(([, y]) => y >= -2).map(([x]) => x);
+  return { from: Math.min(...xs), to: Math.max(...xs), footFrom: Math.min(...foot), footTo: Math.max(...foot) };
+}
+
+/** the commons' members set out left to right from its first column, the same gap between each */
+function arrange(layout: Layout) {
+  const { from, gap, members } = layout.commons;
+  let cursor = from;
+  return members.map((member) => {
+    const extent = reach(member);
+    const x = cursor - extent.from;
+    cursor = x + extent.to + 1 + gap;
+    return { member, x, extent };
+  });
+}
+
+/** The still parts: the ground's scatter, the laptop, and the commons, each with its shadow. */
 const Scene = memo(function Scene({ layout }: { layout: Layout }) {
   const { x, ground, w, depth, deck } = layout.laptop;
   const { deckTop, lid, display } = screenOf(layout);
@@ -944,31 +1010,26 @@ const Scene = memo(function Scene({ layout }: { layout: Layout }) {
     back([x + w - 8, deckTop], depth - 2),
     back([x + 7, deckTop], depth - 2),
   ];
-  const [sheafFrom, sheafTo] = reach(layout.sheaf.outline);
-  const [bodyFrom, bodyTo] = reach(layout.figure.body);
-  const people = layout.people
-    .map((person, index) => ({ person, index }))
-    .sort((a, b) => Number(a.index === layout.noticer) - Number(b.index === layout.noticer));
+  const commons = arrange(layout);
+  const { ground: field } = layout.commons;
   return (
     <svg className={`hf-art ${sizeClass(layout)}`} viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true" focusable="false">
       <path className="hf-tone-ground" d={`M0 0h${layout.width}v${layout.height}h${-layout.width}z`} />
       <Shadow from={x} to={x + w + 1} ground={ground} rows={layout.shadow} />
-      {layout.sheaves.map((sx) => (
-        <Shadow key={sx} from={sx + sheafFrom} to={sx + sheafTo} ground={layout.commons} rows={layout.shadow} />
-      ))}
-      {layout.people.map(([px]) => (
-        <Shadow key={px} from={px + bodyFrom} to={px + bodyTo} ground={layout.commons} rows={layout.shadow} />
+      {commons.map(({ x: mx, extent }) => (
+        <Shadow key={mx} from={mx + extent.footFrom} to={mx + extent.footTo} ground={field} rows={layout.shadow} />
       ))}
       <Box x={x} y={deckTop} w={w} h={deck} depth={depth} front="deep" top="mid" side="deep" />
       <Face points={keys} light="shade" />
       <Box x={lid[0]} y={lid[1]} w={lid[2]} h={lid[3]} depth={1} front="mid" top="mid" side="deep" />
       <Face points={corners(...display)} light="lit" />
-      {layout.sheaves.map((sx) => (
-        <Sheaf key={sx} plan={layout.sheaf} x={sx} ground={layout.commons} />
-      ))}
-      {people.map(({ person, index }) => (
-        <Peasant key={person[0]} figure={layout.figure} person={person} ground={layout.commons} lit={index === layout.noticer} />
-      ))}
+      {commons.map(({ member, x: mx }) =>
+        "sheaf" in member ? (
+          <Sheaf key={mx} plan={member.sheaf} x={mx} ground={field} />
+        ) : (
+          <Peasant key={mx} figure={member.figure} x={mx} ground={field} lit={member.noticed === true} />
+        ),
+      )}
     </svg>
   );
 });
