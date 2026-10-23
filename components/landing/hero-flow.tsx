@@ -42,28 +42,35 @@ const SHOWN = 3;
 /* how many cards show on the stack before one slips behind the base */
 const DEPTH = 4;
 
-/* one calm cycle per card; a card's own animation runs for all six cycles */
-const CYCLE = 8500;
+/* one cycle per card, mostly a calm pause after it lands; a card's own animation runs for all six cycles */
+const CYCLE = 6000;
 const LOOP = CYCLE * COUNT;
 
-/* a card's journey, from the start of its cycle: each move eases in and out, and each beat holds */
+/*
+ * A card's journey, from the start of its cycle, as one continuous motion:
+ * it grows out of its mark onto the screen and keeps growing a little while
+ * the scan line runs down it; it is already setting off as the scan ends, and
+ * flies one arc to the stack on a single ease, so it never stops mid-path. It
+ * is stamped on the fly at the top of the arc, lands softly and settles once;
+ * the only stillness is the calm pause before the next card.
+ */
 const BEAT = {
-  onScreen: 700,
-  scanFrom: 900,
-  scanTo: 1900,
-  lift: 2300,
-  lifted: 3100,
-  crest: 3700,
-  stamped: 4400,
-  settled: 4650,
-  drop: 4900,
-  landed: 5900,
+  onScreen: 450,
+  scanFrom: 400,
+  scanTo: 1150,
+  lift: 1000,
+  landed: 3000,
+  /* the top of the arc is half way through the flight */
+  crest: 2000,
+  stampFrom: 1950,
+  stampTo: 2300,
   /* the stack makes room while the card comes down */
-  roomFrom: 5000,
-  roomTo: 5800,
-  noticed: 6300,
-  forgetFrom: 7600,
-  forgotten: 8200,
+  roomFrom: 2400,
+  roomTo: 2950,
+  settled: 3250,
+  noticed: 3500,
+  forgetFrom: 5000,
+  forgotten: 5700,
 } as const;
 
 /*
@@ -239,10 +246,8 @@ type Layout = Readonly<{
   marks: readonly [step: number, size: number];
   /** how small a card shows on the screen */
   onScreen: number;
-  /** centres: lifted out of the laptop, the top of its arc, stamped just above the stack */
-  lifted: Point;
-  crest: Point;
-  stamped: Point;
+  /** the row the middle of a card passes at the top of its arc */
+  crest: number;
   /** the stack: its cards' left column, the row its base stands on, the base's height and depth, and the step between cards */
   stack: Readonly<{ left: number; ground: number; base: number; depth: number; notch: number }>;
   /** the commons: the row it stands on, the peasants, the one whose basket lights up, and the sheaves' columns */
@@ -271,9 +276,7 @@ const WIDE: Layout = {
   laptop: { x: 15, ground: 78, w: 80, depth: 8, deck: 3, screen: 46, bezel: 3 },
   marks: [24, 16],
   onScreen: 0.85,
-  lifted: [88, 36],
-  crest: [124, 29],
-  stamped: [162, 35],
+  crest: 28,
   stack: { left: 132, ground: 78, base: 4, depth: 2, notch: 3 },
   commons: 78,
   people: [
@@ -300,9 +303,7 @@ const PHONE: Layout = {
   laptop: { x: 5, ground: 55, w: 40, depth: 4, deck: 2, screen: 26, bezel: 2 },
   marks: [11, 7],
   onScreen: 0.85,
-  lifted: [42, 31],
-  crest: [58, 24],
-  stamped: [77, 29],
+  crest: 22,
   stack: { left: 62, ground: 55, base: 3, depth: 1, notch: 2 },
   commons: 99,
   people: [
@@ -366,13 +367,16 @@ function curve(name: Curve) {
 
 /* ---------- the journey, as positions over a card's own time ---------- */
 
-type Track = readonly (readonly [ms: number, value: number, ease?: Curve])[];
+type Track = readonly (readonly [ms: number, value: number, ease?: Curve | "linear"])[];
 
 /** the row the stack's bottom card stands on: the front of the base's top */
 const baseTop = (layout: Layout) => layout.stack.ground - layout.stack.base + 1;
 
 /** the top of the stack's top card */
 const stackTop = (layout: Layout) => baseTop(layout) - layout.card.h - (DEPTH - 1) * layout.stack.notch;
+
+/* how finely the flight is sampled into keyframes */
+const FLIGHT_STEPS = 40;
 
 /** the card's centre across (0) or down (1), in cells, for a card that starts on one of the three marks */
 function track(layout: Layout, slot: number, axis: 0 | 1): Track {
@@ -387,14 +391,26 @@ function track(layout: Layout, slot: number, axis: 0 | 1): Track {
       sinks.push([depth * CYCLE + BEAT.roomTo, rest + depth * notch]);
     }
   }
+  /*
+   * The flight is one curve from the screen to the stack, bowed up so its top
+   * is at the crest, and the card runs along it on one ease: sampled finely,
+   * so the two layers, across and down, trace the same path at the same pace.
+   */
+  const [sx, sy] = screenCentre(layout);
+  const [rx, ry] = [left + layout.card.w / 2, stackTop(layout) + layout.card.h / 2];
+  const bow = 2 * layout.crest - (sy + ry) / 2;
+  const along = curve("in-out");
+  const flight: [number, number, "linear"][] = [];
+  for (let step = 1; step < FLIGHT_STEPS; step += 1) {
+    const p = along(step / FLIGHT_STEPS);
+    const point = axis === 0 ? (1 - p) ** 2 * sx + 2 * p * (1 - p) * ((sx + rx) / 2) + p ** 2 * rx : (1 - p) ** 2 * sy + 2 * p * (1 - p) * bow + p ** 2 * ry;
+    flight.push([BEAT.lift + ((BEAT.landed - BEAT.lift) * step) / FLIGHT_STEPS, point, "linear"]);
+  }
   return [
-    [0, from, "in-out"],
+    [0, from, "out"],
     [BEAT.onScreen, screen],
-    [BEAT.lift, screen, "in-out"],
-    [BEAT.lifted, layout.lifted[axis], axis === 0 ? "in-out" : "out"],
-    [BEAT.crest, layout.crest[axis], "in-out"],
-    [BEAT.stamped, layout.stamped[axis]],
-    [BEAT.drop, layout.stamped[axis], "in-out"],
+    [BEAT.lift, screen, "linear"],
+    ...flight,
     [BEAT.landed, rest],
     ...sinks,
     [LOOP, axis === 1 ? rest + DEPTH * notch : rest],
@@ -408,7 +424,7 @@ function valueAt(stops: Track, ms: number) {
     const [to, end] = stops[index + 1]!;
     if (ms >= from && ms <= to) {
       const progress = to === from ? 1 : (ms - from) / (to - from);
-      return start + (end - start) * (ease ? curve(ease)(progress) : progress);
+      return start + (end - start) * (ease && ease !== "linear" ? curve(ease)(progress) : progress);
     }
   }
   return stops[stops.length - 1]![1];
@@ -538,24 +554,25 @@ function sharedKeyframes(phoneScale: number, wideScale: number) {
   z.push([LOOP, "z-index: 1"]);
 
   const gone = DEPTH * CYCLE + BEAT.roomTo;
+  /* a card grows onto the screen and keeps growing a little under the scan, reaches full size as it lifts, and settles once as it lands */
   const card = (name: string, small: number) =>
     keyframes(name, LOOP, [
-      [0, `opacity: 0; transform: scale(${n(small * 0.35)})`, "in-out"],
-      [200, `opacity: 1; transform: scale(${n(small * 0.5)})`, "in-out"],
-      [BEAT.onScreen, `opacity: 1; transform: scale(${small})`],
-      [BEAT.lift, `opacity: 1; transform: scale(${small})`, "in-out"],
-      [BEAT.lifted, "opacity: 1; transform: scale(1)"],
-      [BEAT.stamped, "opacity: 1; transform: scale(1)", "out"],
-      [BEAT.stamped + 100, "opacity: 1; transform: scale(0.96)", "out"],
+      [0, `opacity: 0; transform: scale(${n(small * 0.4)})`, "out"],
+      [BEAT.onScreen, `opacity: 1; transform: scale(${small})`, "linear"],
+      [BEAT.lift, `opacity: 1; transform: scale(${n(small * 1.03)})`, "in-out"],
+      [BEAT.crest, "opacity: 1; transform: scale(1)"],
+      [BEAT.landed, "opacity: 1; transform: scale(1)", "out"],
+      [BEAT.landed + 100, "opacity: 1; transform: scale(0.975)", "out"],
       [BEAT.settled, "opacity: 1; transform: scale(1)"],
       [gone, "opacity: 1; transform: scale(1)", "out"],
       [gone + 300, "opacity: 0; transform: scale(1)"],
       [LOOP, "opacity: 0; transform: scale(1)"],
     ]);
+  /* the stamp comes down on the moving card at the top of its arc */
   const stamp = keyframes("hf-stamp", LOOP, [
-    [0, "opacity: 0; transform: scale(1.12)"],
-    [BEAT.stamped, "opacity: 0; transform: scale(1.12)", "out"],
-    [BEAT.settled, "opacity: 1; transform: scale(1)"],
+    [0, "opacity: 0; transform: scale(1.15)"],
+    [BEAT.stampFrom, "opacity: 0; transform: scale(1.15)", "out"],
+    [BEAT.stampTo, "opacity: 1; transform: scale(1)"],
     [LOOP, "opacity: 1; transform: scale(1)"],
   ]);
   const notice = keyframes("hf-notice", CYCLE, [
@@ -571,7 +588,7 @@ function sharedKeyframes(phoneScale: number, wideScale: number) {
     [0, "opacity: 1", "out"],
     [BEAT.onScreen, "opacity: 0"],
     [BEAT.lift, "opacity: 0", "out"],
-    [BEAT.lifted, "opacity: 1"],
+    [BEAT.lift + 700, "opacity: 1"],
     [CYCLE, "opacity: 1"],
   ]);
   /* the first three marks show for the first three cycles, the other three for the rest */
