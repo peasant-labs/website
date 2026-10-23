@@ -719,6 +719,12 @@ test("a sample session opens in the real transcript browser, in a wide window th
   for (const marker of fixture.session.markers) {
     await expect(viewer, `the transcript does not show ${marker}`).toContainText(marker);
   }
+  // the header names its publisher by handle, and its times read as recent work, never weeks old
+  await expect(viewer.locator(".txn-meta")).toContainText(fixture.session.author);
+  await expect(viewer.locator(".txn-meta")).not.toContainText("<USER>");
+  for (const time of await viewer.locator(".txn-turntime").allInnerTexts()) {
+    expect(time, "a turn's time reads as weeks old").not.toMatch(/\d+(d|w|mo|y) ago/);
+  }
 
   // the conversation has most of the window: the filters wait behind their rail's strip, which still opens them
   const grid = viewer.locator(".txn-body-grid");

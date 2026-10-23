@@ -48,6 +48,7 @@ export type LandingFixture = {
     label: string;
     title: string;
     sessionId: string;
+    author: string;
     tabs: string[];
     tour: { tool: string; marker: string };
     check: { name: string; summary: string };

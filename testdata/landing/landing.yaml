@@ -132,6 +132,8 @@ session:
   # the viewer names the sample by this short title; its id is shown nowhere
   title: fix the staging 403
   sessionId: sess_c41e07
+  # the author the header shows: the publisher's handle, not a redaction marker
+  author: "@ada"
   # the transcript browser's own tabs, as online's transcript page shows them
   tabs: [highlights, full trace, diffs, files, annotations]
   # the tour on first view: the tool call it opens, and the marker it rests on there

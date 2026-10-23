@@ -48,6 +48,31 @@ function useNear(ref: RefObject<Element | null>) {
   return near;
 }
 
+/* how long before the reader arrived the sample session ended, so its relative times read as today's work */
+const ENDED_AGO_MS = 50 * 60 * 1000;
+
+/* the sample, moved in time as a whole so it ended ENDED_AGO_MS before `now`; its own spacing is kept */
+function endedRecently(session: TranscriptWireInput, now: number): TranscriptWireInput {
+  const end = Date.parse(session.endTime ?? session.startTime ?? "");
+  if (Number.isNaN(end)) return session;
+  const offset = now - ENDED_AGO_MS - end;
+  const move = <T extends string | undefined>(time: T): T =>
+    (time ? new Date(Date.parse(time) + offset).toISOString() : time) as T;
+  const git = session.gitContext;
+  return {
+    ...session,
+    startTime: move(session.startTime),
+    endTime: move(session.endTime),
+    turns: session.turns ? session.turns.map((turn) => ({ ...turn, timestamp: move(turn.timestamp) })) : session.turns,
+    gitContext: git && {
+      ...git,
+      commits: git.commits?.map((commit) =>
+        "timestamp" in commit ? { ...commit, timestamp: move(commit.timestamp) } : commit,
+      ),
+    },
+  };
+}
+
 /* the viewer's tab union and open-tool map, named by the component rather than re-declared */
 type ViewerProps = Parameters<typeof TranscriptViewer>[0];
 type Tab = NonNullable<ViewerProps["activeTab"]>;
@@ -154,10 +179,12 @@ export function SessionViewer({
 }) {
   // The site owns the theme; the viewer follows it rather than shipping its own.
   const theme = useSyncExternalStore<Theme>(subscribeToTheme, currentTheme, () => "dark");
+  // the viewer is only ever drawn in the browser, so the reader's clock is the one its times are read against
+  const [now] = useState(() => Date.now());
   const viewModel = useMemo(() => {
-    const adapted = adaptTranscript(session);
+    const adapted = adaptTranscript(endedRecently(session, now));
     return { ...adapted, session: { ...adapted.session, title } };
-  }, [session, title]);
+  }, [session, title, now]);
   const rootRef = useRef<HTMLDivElement>(null);
   const pointerRef = useRef<HTMLDivElement>(null);
   const tourRef = useRef<Tour | null>(null);

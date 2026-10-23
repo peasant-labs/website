@@ -41,7 +41,8 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
   gitContext: {
     branch: "fix-staging-upload",
     remote: "git@github.com:example/shop.git",
-    user: "<USER>",
+    // the author is the publisher's handle, which is shown, not redacted; a made-up one for the sample
+    user: "@ada",
     workingDirectory: "/Users/<USER>/src/shop",
     commits: [
       {
