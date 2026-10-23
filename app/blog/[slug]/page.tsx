@@ -2,16 +2,10 @@ import { Art } from "@/components/art";
 import { formatPostDate, postBySlug, POSTS } from "@/lib/blog";
 import { metadataForRoute } from "@/lib/projects";
 import { LOGIN_URL } from "@/lib/site";
-import ReclaimingDataAutonomy from "@/content/blog/reclaiming-data-autonomy-as-a-peasant";
+import { POST_BODIES } from "@/content/blog";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { ComponentType } from "react";
-
-/* Every listed post has exactly one body; a slug without one is a 404. */
-const BODIES: Record<string, ComponentType> = {
-  "reclaiming-data-autonomy-as-a-peasant": ReclaimingDataAutonomy,
-};
 
 export const dynamicParams = false;
 
@@ -38,7 +32,7 @@ export async function generateMetadata({
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = postBySlug(slug);
-  const Body = post ? BODIES[post.slug] : undefined;
+  const Body = post ? POST_BODIES[post.slug]?.Body : undefined;
   if (!post || !Body) notFound();
 
   return (

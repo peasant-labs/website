@@ -40,8 +40,14 @@ export function Rich({ text }: { text: string }) {
         }
         const link = LINK.exec(part);
         if (link) {
+          const external = /^https?:/.test(link[2]);
           return (
-            <a key={index} className="dx-link" href={link[2]}>
+            <a
+              key={index}
+              className="dx-link"
+              href={link[2]}
+              {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            >
               {link[1]}
             </a>
           );

@@ -73,6 +73,7 @@ export const DOCS_HOME = {
 
   // scripts/install.sh header and platform checks; scripts/install.ps1 header and arch checks
   install: {
+    id: "install",
     title: "install",
     intro: "Peasant is one program for macOS and Linux, on Intel or Arm, and for Windows on x64.",
     platforms: [
@@ -94,6 +95,7 @@ export const DOCS_HOME = {
 
   // peasant docs/KICKSTART.md; internal/tui/kickstart
   kickstart: {
+    id: "kickstart",
     title: "set up with kickstart",
     command: "peasant kickstart",
     intro:
@@ -114,6 +116,7 @@ export const DOCS_HOME = {
   // peasant docs/cli/peasant_harvest.md; internal/config/config.go (Strike off by default);
   // internal/defaults/config.go (default folders); cmd/peasant/cmd_harvest.go (selection scope)
   record: {
+    id: "record",
     title: "record sessions",
     intro: [
       "`peasant harvest` finds the sessions your agents keep on this computer and indexes them. Kickstart runs it when you save. `peasant ingest` is the same command.",
@@ -136,6 +139,8 @@ export const DOCS_HOME = {
   // peasant cmd_login.go, cmd_logout.go, internal/auth (credentials.json, logout revokes the key);
   // local web VillageAccountRow (log out is local only); fairtrade SignIn; village settings (connections)
   signIn: {
+    id: "sign-in",
+    toc: "sign in",
     title: "sign in to peasant online",
     intro: "Sign in with GitHub:",
     command: "peasant village login",
@@ -150,6 +155,7 @@ export const DOCS_HOME = {
 
   // peasant-plugins README; peasant `open --help`; fairtrade Publish (the publish window)
   publish: {
+    id: "publish",
     title: "publish a session",
     before: [
       "Before you publish: [install peasant](#install), run [kickstart](#kickstart) and [sign in](#sign-in).",
@@ -209,6 +215,7 @@ export const DOCS_HOME = {
   // peasant `village auto --help`, `village hooks --help` and its subcommands; internal/autopublish
   // (hooks.yaml, paused rules); local web AutoPublishRules; fairtrade Publish; peasant-plugins (/peasant auto)
   autoPublish: {
+    id: "auto-publish",
     title: "publish automatically",
     intro: [
       "Automatic publishing sends a repository's sessions to your collectives when you push, or on each commit if its rule says so. They go redacted and private, with no license, and skip review.",
@@ -242,6 +249,7 @@ export const DOCS_HOME = {
 
   // local web map page and fairtrade CodeMap legend; peasant web/src/lib/glossary.ts
   codeMap: {
+    id: "code-map",
     title: "read the code map",
     intro: "The local web's map shows a project's code as boxes and lines.",
     legend: [
@@ -258,6 +266,7 @@ export const DOCS_HOME = {
 
   // fairtrade Changes (the local web's changes page)
   changes: {
+    id: "changes",
     title: "read changes",
     intro: "The local web's **changes** page draws a project's git history. Each line of work (a branch) is a lane, and each row is a commit.",
     legend: [
@@ -269,6 +278,7 @@ export const DOCS_HOME = {
 
   // peasant internal/ingest/adapter.go (the reader registry) and internal/config defaults
   agents: {
+    id: "agents",
     title: "agents",
     intro: "Peasant reads the sessions these coding agents keep on your computer:",
     list: [
@@ -284,6 +294,7 @@ export const DOCS_HOME = {
 
   // peasant docs/NETWORK.md; the redact engine's rules; internal/config/policy.go
   redaction: {
+    id: "redaction",
     title: "redaction",
     intro: [
       "Peasant redacts on your computer, before anything is uploaded.",
@@ -310,6 +321,7 @@ export const DOCS_HOME = {
 
   // village collective settings and handlers; peasant `village push --help`, `village auto --help`
   access: {
+    id: "access",
     title: "collectives and access",
     intro: "A collective is a group that can read the transcripts its members publish to it.",
     terms: [
@@ -356,6 +368,8 @@ export const DOCS_HOME = {
   // peasant docs/cli/peasant_prune.md, cmd_prune.go, internal/store/prune.go; docs/KICKSTART.md
   // (a selection never deletes); cmd_kickstart.go (--reset)
   prune: {
+    id: "prune",
+    toc: "remove sessions",
     title: "remove recorded sessions",
     intro: [
       "`peasant prune` permanently deletes sessions from this computer: their database rows and their files. It needs at least one filter and asks before it deletes.",
@@ -378,6 +392,7 @@ export const DOCS_HOME = {
   // peasant internal/defaults (config home, XDG_CONFIG_HOME), docs/cli/peasant.md (--config, --config-dir),
   // cmd_config.go, internal/api/settings_catalog.go (settings the web page leaves read-only)
   configuration: {
+    id: "configuration",
     title: "settings files",
     intro: "Peasant keeps its settings in `~/.config/peasant/`, or `$XDG_CONFIG_HOME/peasant/` when that is set:",
     files: [
@@ -397,6 +412,7 @@ export const DOCS_HOME = {
 
   // the Short line of each command in peasant docs/cli/*.md
   cli: {
+    id: "cli",
     title: "cli",
     intro: "These are the commands most people need. For any of them, run `peasant <command> --help`.",
     commands: [
@@ -424,20 +440,26 @@ export const DOCS_HOME = {
   },
 } as const;
 
-/** the overview's "on this page" list, in reading order */
-export const DOCS_HOME_TOC = [
-  { id: "install", label: "install" },
-  { id: "kickstart", label: "set up with kickstart" },
-  { id: "record", label: "record sessions" },
-  { id: "sign-in", label: "sign in" },
-  { id: "publish", label: "publish a session" },
-  { id: "auto-publish", label: "publish automatically" },
-  { id: "code-map", label: "read the code map" },
-  { id: "changes", label: "read changes" },
-  { id: "agents", label: "agents" },
-  { id: "redaction", label: "redaction" },
-  { id: "access", label: "collectives and access" },
-  { id: "prune", label: "remove sessions" },
-  { id: "configuration", label: "settings files" },
-  { id: "cli", label: "cli" },
+/** the overview's sections, in reading order: the page, its "on this page" list and search all follow it */
+export const DOCS_HOME_SECTIONS = [
+  DOCS_HOME.install,
+  DOCS_HOME.kickstart,
+  DOCS_HOME.record,
+  DOCS_HOME.signIn,
+  DOCS_HOME.publish,
+  DOCS_HOME.autoPublish,
+  DOCS_HOME.codeMap,
+  DOCS_HOME.changes,
+  DOCS_HOME.agents,
+  DOCS_HOME.redaction,
+  DOCS_HOME.access,
+  DOCS_HOME.prune,
+  DOCS_HOME.configuration,
+  DOCS_HOME.cli,
 ] as const;
+
+/** the overview's "on this page" list: a section's short label where it has one */
+export const DOCS_HOME_TOC = DOCS_HOME_SECTIONS.map((section) => ({
+  id: section.id,
+  label: "toc" in section ? section.toc : section.title,
+}));
