@@ -198,9 +198,10 @@
 
 /*
  * The hero's picture (components/landing/hero-flow.tsx). That file owns where
- * everything sits and when it moves; this owns how it looks: ink strokes, one
- * amber accent, no words. Sizes inside a card are in hundredths of the card,
- * so it reads the same at any scale.
+ * everything sits, how it is drawn and when it moves; this owns the inks: the
+ * pictures' own two, a near-black (lightened on the dark page) and amber, on
+ * the panel's surface. Drawings use the cell as their unit, so an outline is
+ * two pixels at every size: two thirds of a 3px cell, half of a 4px one.
  */
 .lp-hero-flow {
   margin-block-start: clamp(2.5rem, 5vw, 4rem);
@@ -209,31 +210,49 @@
 /*
  * The picture sits on a panel like the landing's other pictures: the raised
  * surface with a hairline, the scene centred with room on every side, and the
- * pause control in its lower corner, in line with the scene's right edge.
+ * pause control in its lower corner.
  */
 .hf-panel {
-  --hf-pad-block: 3.5rem;
-  --hf-pad-inline: clamp(1rem, 5vw, 3.5rem);
+  --hf-ink: var(--ink-strong);
+  --hf-pad-block: clamp(3.25rem, 5vw, 3.5rem);
 
   position: relative;
   box-sizing: border-box;
-  padding: var(--hf-pad-block) var(--hf-pad-inline);
+  display: grid;
+  justify-items: center;
+  padding: var(--hf-pad-block) var(--sp-4);
   border: var(--bd);
   background: var(--surface-2);
+}
+
+:root:not([data-theme="light"]) .hf-panel {
+  --hf-ink: var(--ink);
 }
 
 .hf {
   position: relative;
   container-type: inline-size;
-  width: 100%;
-  max-width: 24rem;
-  margin-inline: auto;
+  width: 300px;
+  max-width: 100%;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 53rem) {
   .hf {
-    max-width: 64rem;
+    width: 750px;
   }
+}
+
+@media (min-width: 75rem) {
+  .hf {
+    width: 1000px;
+  }
+}
+
+.hf-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .hf-stage {
@@ -249,46 +268,103 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  overflow: visible;
 }
 
-.hf-line,
-.hf-wire,
-.hf-ground {
+.hf-art,
+.hf-card-art,
+.hf-table,
+.hf-mesh,
+.hf-mask svg,
+.hf-stamp svg {
+  display: block;
+  overflow: visible;
+  shape-rendering: crispEdges;
+}
+
+.hf-fill {
+  fill: var(--surface-2);
+}
+
+.hf-ink {
+  fill: var(--hf-ink);
+}
+
+.hf-amber {
+  fill: var(--amber-fill);
+}
+
+.hf-out {
   fill: none;
-  vector-effect: non-scaling-stroke;
-  stroke-linecap: square;
+  stroke: var(--hf-ink);
+  stroke-width: 0.6667;
   stroke-linejoin: miter;
 }
 
-.hf-line {
-  stroke: var(--ink-2);
+/* the check pressed out of the stamp */
+.hf-knock {
+  fill: none;
+  stroke: var(--surface-2);
   stroke-width: 2;
+  stroke-linecap: square;
+  shape-rendering: geometricPrecision;
 }
 
-.hf-ground {
-  stroke: var(--rule-strong);
-  stroke-width: 1;
+.hf-tone-light {
+  fill: url(#hf-light-3);
 }
 
-/* the people at the stack are filled with the page, so one standing in front covers one behind */
-.hf-line.hf-person {
-  fill: var(--canvas);
+.hf-tone-mid {
+  fill: url(#hf-mid-3);
 }
 
-/* the person who notices a card land: their head fills amber, then lets go */
+.hf-tone-dark {
+  fill: url(#hf-dark-3);
+}
+
+.hf-tone-amber {
+  fill: url(#hf-amber-3);
+}
+
+@media (min-width: 75rem) {
+  .hf-out {
+    stroke-width: 0.5;
+  }
+
+  .hf-knock {
+    stroke-width: 1.5;
+  }
+
+  .hf-tone-light {
+    fill: url(#hf-light-4);
+  }
+
+  .hf-tone-mid {
+    fill: url(#hf-mid-4);
+  }
+
+  .hf-tone-dark {
+    fill: url(#hf-dark-4);
+  }
+
+  .hf-tone-amber {
+    fill: url(#hf-amber-4);
+  }
+}
+
+/* the person who lights up as a card lands */
 .hf-notice {
-  fill: var(--amber-fill);
   opacity: 0;
 }
 
-.hf-mark {
+.hf-mark,
+.hf-card-mark {
   display: grid;
   place-items: center;
-  color: var(--ink-2);
+  color: var(--hf-ink);
 }
 
-.hf-mark .brand {
+.hf-mark .brand,
+.hf-card-mark .brand {
   width: 100%;
   height: 100%;
 }
@@ -301,88 +377,38 @@
 
 .hf-card {
   position: relative;
-  box-sizing: border-box;
-  container-type: inline-size;
-  border: 2px solid var(--ink-2);
-  background: var(--canvas);
 }
 
-.hf-card-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 7cqw;
+.hf-card-art {
+  width: 100%;
   height: 100%;
-  padding-inline: 10cqw;
-  color: var(--ink-2);
 }
 
-.hf-card-body > .brand {
-  flex: none;
-  width: 18cqw;
-  height: 18cqw;
-}
-
-.hf-bar {
-  display: block;
-  width: var(--w);
-  height: 6.5cqw;
-  background: var(--ink-4);
-}
-
-.hf-secret {
-  position: relative;
-  display: block;
-}
-
-.hf-secret .hf-bar {
-  background: var(--ink-2);
-}
-
-/* the secret, once the sieve has passed over it: an amber block over the line */
-.hf-mask {
-  position: absolute;
-  inset-block: -1.5cqw;
-  inset-inline-start: -2cqw;
-  width: calc(58% + 4cqw);
-  background: var(--amber-fill);
-}
-
-/* the stamp: a check pressed onto the card as it is published */
+.hf-card-mark,
+.hf-mask,
 .hf-stamp {
   position: absolute;
-  inset-block-start: 8cqw;
-  inset-inline-end: 9cqw;
-  width: 18cqw;
-  height: 18cqw;
-  color: var(--ink-strong);
-  stroke-width: 2.25;
 }
 
-/* the table the stack stands on, drawn over the cards that have sunk into it */
+.hf-mask svg,
+.hf-stamp svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* the table is drawn over the cards that have sunk into it, the sieve over the card passing through */
 .hf-table {
   z-index: 5;
-  box-sizing: border-box;
-  border: 2px solid var(--ink-2);
-  border-block-end: 0;
-  background: var(--canvas);
 }
 
-/* the sieve: a short mesh drawn over the card passing through it */
 .hf-mesh {
   z-index: 11;
-  overflow: visible;
-}
-
-.hf-wire {
-  stroke: var(--ink-3);
-  stroke-width: 1;
 }
 
 .hf-toggle {
   position: absolute;
   inset-block-end: calc((var(--hf-pad-block) - var(--target-comfortable)) / 2);
-  inset-inline-end: var(--hf-pad-inline);
+  inset-inline-end: var(--sp-2);
 }
 
 @media (prefers-reduced-motion: reduce) {
