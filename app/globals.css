@@ -321,6 +321,24 @@
     line-height: var(--lh-body);
   }
 
+  /* the owner's statement on /about: its lead line, then two paragraphs at a reading measure */
+  .pj-vision {
+    display: grid;
+    gap: var(--sp-4);
+    max-width: var(--measure-prose);
+    margin-block-start: var(--sp-6);
+    color: var(--ink-2);
+    font-size: var(--fs-md);
+    line-height: 1.65;
+  }
+
+  .pj-vision-line {
+    color: var(--ink-strong);
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
   .pj-product-name,
   .pj-user-content {
     color: var(--ink-strong);

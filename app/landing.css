@@ -2256,16 +2256,36 @@
   }
 }
 
+/* the words under the picture: the lead line, then why, at a reading measure, then its button */
+.lp-vision-words {
+  display: grid;
+  justify-items: start;
+  gap: var(--sp-4);
+  width: min(100%, 64ch);
+  text-align: start;
+}
+
 .lp-vision-line {
-  max-inline-size: 30ch;
   color: var(--ink-strong);
   font-family: var(--font-body);
-  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-size: clamp(1.375rem, 2.2vw, 1.875rem);
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1.3;
   word-spacing: normal;
   text-wrap: balance;
+}
+
+.lp-vision-story {
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.lp-vision-cta {
+  margin-block-start: var(--sp-4);
 }
 
 /*

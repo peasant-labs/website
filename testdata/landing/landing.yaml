@@ -140,8 +140,12 @@ session:
   check: { name: peasant / prompts, summary: 1 transcript traces 1 of 1 commits }
   # placeholders the redaction engine writes, visible in the transcript
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
+# the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:
   line: We are building a sustainable, respectful ecosystem where people have a stake in their data.
+  story:
+    - "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's asset."
+    - "We think the record of the work belongs to the people who did it. You keep it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use and no one can fence off again."
   cta: { label: about us, href: /about }
 docsNav:
   - { label: overview, href: /docs }

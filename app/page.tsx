@@ -117,17 +117,24 @@ export default function Home() {
               <div className="lp-vision-scene">
                 <Art art={VISION.art} className="lp-vision-art" />
               </div>
-              <p id="vision-line" className="lp-vision-line" data-fade>
-                {VISION.line}
-              </p>
-              <Link
-                className="btn btn-primary site-btn site-btn-xl"
-                href={VISION.cta.href}
-                data-fade
-                style={fade(1)}
-              >
-                {VISION.cta.label}
-              </Link>
+              <div className="lp-vision-words">
+                <p id="vision-line" className="lp-vision-line" data-fade>
+                  {VISION.line}
+                </p>
+                {VISION.story.map((paragraph) => (
+                  <p key={paragraph} className="lp-vision-story">
+                    {paragraph}
+                  </p>
+                ))}
+                <Link
+                  className="btn btn-primary site-btn site-btn-xl lp-vision-cta"
+                  href={VISION.cta.href}
+                  data-fade
+                  style={fade(1)}
+                >
+                  {VISION.cta.label}
+                </Link>
+              </div>
             </div>
           </div>
         </section>

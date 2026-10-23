@@ -361,6 +361,13 @@ test("the vision stands on its own grounded panel, and the landing ends on a cal
   });
   expect(ground).toEqual({ surface: true, border: "1px", line: "1px" });
   await expect(panel.locator("#vision-line")).toHaveText(fixture.vision.line);
+  // the owner's statement in full, word for word: the lead line, then two paragraphs at a reading measure
+  await expect(panel.locator(".lp-vision-story")).toHaveText(fixture.vision.story);
+  const measure = await panel
+    .locator(".lp-vision-story")
+    .first()
+    .evaluate((paragraph) => paragraph.getBoundingClientRect().width / parseFloat(getComputedStyle(paragraph).fontSize));
+  expect(measure).toBeLessThanOrEqual(40);
 
   // the close: its line at the section titles' size and two buttons of one height, beside a whole picture on a panel
   for (const width of [1440, 390]) {
@@ -411,6 +418,12 @@ test("the vision stands on its own grounded panel, and the landing ends on a cal
   // other pages keep the compact row, with no picture in it
   await page.goto("/about");
   await expect(page.locator("footer .site-foot-close-panel")).toHaveCount(0);
+});
+
+test("/about carries the owner's statement in full, word for word", async ({ page }) => {
+  await page.goto("/about");
+  const vision = page.locator(".pj-vision");
+  await expect(vision.locator("p")).toHaveText([fixture.vision.line, ...fixture.vision.story]);
 });
 
 test("whitespace, not rules, separates the sections, with generous room between them", async ({ page }) => {

@@ -1,4 +1,5 @@
 import { SiteShell } from "@/components/site-shell";
+import { VISION } from "@/lib/landing";
 import { metadataForRoute } from "@/lib/projects";
 import Link from "next/link";
 
@@ -26,9 +27,15 @@ export default function AboutPage() {
               your computer, and peasant online, where you publish the ones you choose for
               your team or a research group. both are open source under Apache-2.0.
             </p>
+            {/* why, in the owner's words: the same statement the landing ends on */}
+            <div className="pj-vision" data-reading-text>
+              <p className="pj-vision-line">{VISION.line}</p>
+              {VISION.story.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
             <p className="pj-lede" data-reading-text>
-              we think the people who do the work should have a stake in the data it
-              produces. the long version is{" "}
+              the long version is{" "}
               <Link className="site-link" href="/blog/reclaiming-data-autonomy-as-a-peasant">
                 the essay on the blog
               </Link>

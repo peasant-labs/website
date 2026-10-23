@@ -53,7 +53,7 @@ export type LandingFixture = {
     check: { name: string; summary: string };
     markers: string[];
   };
-  vision: { line: string; cta: Link };
+  vision: { line: string; story: string[]; cta: Link };
   docsNav: Link[];
   posts: Array<{ slug: string; title: string }>;
 };
