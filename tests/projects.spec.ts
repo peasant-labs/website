@@ -1991,6 +1991,8 @@ test("what-it-is answers in one paragraph and hands the cards to their own secti
   await expect(what.locator("h2")).toHaveText(fixture.catalog.whatTitle);
   // The cards moved out: this section is the sentence, not a choice between products.
   await expect(what.locator("[data-project-card]")).toHaveCount(0);
+  // and the sentence ends where it stops, never on a colon introducing nothing
+  await expect(what.locator("p")).not.toHaveText(/:\s*$/);
 
   const tools = page.locator("[data-tools]");
   /*

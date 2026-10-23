@@ -836,7 +836,7 @@ export const SUITE = {
   // The FAQ answers the licensing question in full. This paragraph only defines
   // the two tools and does not carry legal or availability qualifiers.
   whatIntro:
-    "peasant labs makes your coding agent sessions shareable only with people you trust, private, and searchable. it is made of two tools:",
+    "peasant labs makes your coding agent sessions shareable only with people you trust, private, and searchable. it is made of two tools, peasant and village.",
   /* Two lines: the section is what we make, then what that means. The break is
    * authored rather than left to wrapping — `white-space: pre-line` on the
    * heading keeps it wherever the line lands. */
