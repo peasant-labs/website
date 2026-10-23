@@ -20,10 +20,10 @@ export type LandingFixture = {
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };
+  agents: { label: string; names: string[] };
   sections: Array<{ id: string; heading: string }>;
   removed: string[];
   useCases: {
-    slideMs: number;
     captionMs: number;
     slides: Array<{
       id: string;
@@ -39,8 +39,18 @@ export type LandingFixture = {
     publishLabel: string;
     finals: Array<{ scene: string; texts: string[] }>;
   };
-  install: { platforms: Array<{ label: string; command: string }>; kickstart: string; guide: Link };
-  session: { label: string; sessionId: string; note: string; markers: string[] };
+  install: {
+    platforms: Array<{ label: string; command: string; prompt: string }>;
+    kickstart: string;
+    guide: Link;
+  };
+  session: {
+    label: string;
+    sessionId: string;
+    note: string;
+    markers: string[];
+    check: { name: string; summary: string };
+  };
   vision: { line: string; cta: Link };
   docsNav: Link[];
   posts: Array<{ slug: string; title: string }>;
@@ -68,9 +78,9 @@ export function loadLandingFixture(): LandingFixture {
   return root;
 }
 
-/* the slide the carousel shows: the others, and the copies at the track's ends, are inert */
-export function visibleSlide(page: Page) {
-  return page.locator('.uc-panel[data-active="true"]');
+/* one audience's card in the use cases */
+export function cardOf(page: Page, id: string) {
+  return page.locator(`[data-use-cases] [data-use-case="${id}"]`);
 }
 
 /** a phone, touch and all */

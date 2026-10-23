@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { loadLandingFixture, PHONE, visibleSlide } from "./landing-fixture";
+import { loadLandingFixture, PHONE, cardOf } from "./landing-fixture";
 
 const fixture = loadLandingFixture();
 
@@ -94,10 +94,14 @@ test("the hero buttons move to their sections, smoothly unless motion is reduced
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe("auto");
 });
 
-test("the install shell shows each platform's exact command, whole, and copies it", async ({ page }) => {
+test("the install terminal types each platform's exact command at its prompt, whole, and copies it", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const shell = page.locator("[data-install-shell]");
+  // the commands sit in a Terminal window, not in a box of the site's own
+  await expect(shell.locator(".mac-win-terminal .gs-lines")).toHaveCount(1);
 
   for (const platform of fixture.install.platforms) {
     const tab = shell.getByRole("tab", { name: platform.label });
@@ -107,12 +111,13 @@ test("the install shell shows each platform's exact command, whole, and copies i
     await expect(lines).toHaveCount(2);
     await expect(lines.nth(0).locator("[data-command]")).toHaveText(platform.command);
     await expect(lines.nth(1).locator("[data-command]")).toHaveText(fixture.install.kickstart);
+    await expect(lines.locator(".gs-prompt")).toHaveText([platform.prompt, platform.prompt]);
 
-    // Never cut off: the command wraps inside its line rather than overflowing it.
+    // Never cut off: the line wraps inside the window rather than overflowing it.
     const clipped = await lines
       .nth(0)
-      .locator("[data-command]")
-      .evaluate((code) => code.scrollWidth > code.clientWidth + 1);
+      .locator(".gs-text")
+      .evaluate((text) => text.scrollWidth > text.clientWidth + 1);
     expect(clipped, `${platform.label} command is cut off at 390`).toBe(false);
 
     await lines.nth(0).getByRole("button", { name: `copy ${platform.command}` }).click();
@@ -129,149 +134,163 @@ test("the install shell shows each platform's exact command, whole, and copies i
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
 });
 
-test("the use-case carousel: one slide per audience, labelled tabs, captions you can step through, and keys", async ({
+test("the use cases show all four audiences at once, each with its pictures, captions and one action", async ({
   page,
 }) => {
   await page.goto("/");
-  const carousel = page.locator("[data-use-cases]");
-  await expect(carousel).toHaveAttribute("aria-roledescription", "carousel");
-  const tabs = carousel.getByRole("tab");
-  await expect(tabs).toHaveText(fixture.useCases.slides.map((slide) => slide.label));
-  // every audience carries its icon, so the set reads at a glance
-  await expect(tabs.locator("svg.uc-tab-ic")).toHaveCount(fixture.useCases.slides.length);
-  // the arrows and their "n / 4" counter are gone: the tabs are the way between audiences
-  await expect(carousel.locator(".uc-arrows")).toHaveCount(0);
-  await expect(carousel.getByRole("button", { name: /use case$/ })).toHaveCount(0);
+  const uses = page.locator("[data-use-cases]");
+  // no carousel: nothing to page through, every audience is on the page
+  await expect(uses.getByRole("tab")).toHaveCount(0);
+  await expect(uses.locator("[aria-roledescription]")).toHaveCount(0);
+  await expect(uses.locator("h3")).toHaveText(fixture.useCases.slides.map((slide) => slide.label));
+  await expect(uses.locator("h3 svg")).toHaveCount(fixture.useCases.slides.length);
 
   for (const slide of fixture.useCases.slides) {
-    await carousel.getByRole("tab", { name: slide.label }).click();
-    const panel = visibleSlide(page);
-    await expect(panel).toHaveCount(1);
-    await expect(panel).toHaveAttribute("id", `uc-panel-${slide.id}`);
-    // one picture per slide (one per theme is in the DOM; one is shown)
-    await expect(panel.locator("img:visible")).toHaveCount(1);
-    await expect(panel.locator(".uc-cap-text")).toHaveText(slide.capabilities);
-    // the capabilities are a caption along the picture's panel, with one segment per capability to step to
-    await expect(panel.locator(".uc-figure .uc-caption")).toHaveCount(1);
-    await expect(panel.locator(".uc-caption a")).toHaveCount(0);
-    const segments = panel.locator(".uc-caption").getByRole("button");
+    const card = cardOf(page, slide.id);
+    await expect(card).toHaveAttribute("aria-labelledby", `uc-${slide.id}-title`);
+    await expect(card.locator(".uc-cap-text")).toHaveText(slide.capabilities);
+    // one segment per capability; choosing one shows its caption and its own picture
+    const segments = card.locator(".uc-caption").getByRole("button");
     await expect(segments).toHaveCount(slide.capabilities.length);
-    // each capability has its own picture, and the one shown follows the caption
-    const picture = panel.locator("img:visible");
+    const picture = card.locator("img:visible");
     const shows = (capIndex: number) => new RegExp(`^/art/${slide.pictures[capIndex]}-(light|dark)\\.png$`);
-    await segments.nth(2).click();
-    await expect(panel.locator('.uc-cap[data-on="true"] .uc-cap-text')).toHaveText([slide.capabilities[2]!]);
-    await expect(segments.nth(2)).toHaveAttribute("aria-current", "true");
-    await expect(picture).toHaveCount(1);
-    await expect(picture).toHaveAttribute("src", shows(2));
-    await segments.nth(0).click();
-    await expect(panel.locator('.uc-cap[data-on="true"] .uc-cap-text')).toHaveText([slide.capabilities[0]!]);
-    // the two cross-fade, then only the caption's own is left
-    await expect(picture).toHaveCount(1);
-    await expect(picture).toHaveAttribute("src", shows(0));
-    // beside the picture: the audience, its sentence, and one action
-    await expect(panel.locator(".uc-copy h3")).toHaveText(slide.label);
-    await expect(panel.locator(".uc-copy p")).toHaveText(slide.sentence);
-    const cta = panel.locator(".uc-copy").getByRole("link", { name: slide.cta.label, exact: true });
+    for (const capIndex of [2, 0]) {
+      await segments.nth(capIndex).click();
+      await expect(card.locator('.uc-cap[data-on="true"] .uc-cap-text')).toHaveText([slide.capabilities[capIndex]!]);
+      await expect(segments.nth(capIndex)).toHaveAttribute("aria-current", "true");
+      // the two cross-fade, then only the caption's own is left
+      await expect(picture).toHaveCount(1);
+      await expect(picture).toHaveAttribute("src", shows(capIndex));
+    }
+    await expect(card.locator(".uc-copy p")).toHaveText(slide.sentence);
+    const cta = card.locator(".uc-copy").getByRole("link", { name: slide.cta.label, exact: true });
     await expect(cta).toHaveAttribute("href", slide.cta.href);
   }
 
-  const first = fixture.useCases.slides[0]!;
-  const second = fixture.useCases.slides[1]!;
-  const last = fixture.useCases.slides.at(-1)!;
-  await carousel.getByRole("tab", { name: first.label }).focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(carousel.getByRole("tab", { name: second.label })).toBeFocused();
-  await expect(carousel.getByRole("tab", { name: second.label })).toHaveAttribute("aria-selected", "true");
-  await page.keyboard.press("End");
-  await expect(carousel.getByRole("tab", { name: last.label })).toHaveAttribute("aria-selected", "true");
-  await page.keyboard.press("Home");
-  await expect(carousel.getByRole("tab", { name: first.label })).toHaveAttribute("aria-selected", "true");
-
-  // the segments are reachable from the keyboard too
+  // the segments are reachable from the keyboard
+  await cardOf(page, fixture.useCases.slides[0]!.id).getByRole("button").first().focus();
   await page.keyboard.press("Tab");
-  await expect(visibleSlide(page).locator(".uc-caption").getByRole("button").first()).toBeFocused();
+  await expect(cardOf(page, fixture.useCases.slides[0]!.id).getByRole("button").nth(1)).toBeFocused();
 });
 
-test("the use-case stage sets the picture on its panel beside its copy, with every audience's tab in view above", async ({
+test("the use cases sit two by two with room around each picture, and one under another on a phone", async ({
   page,
 }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const geometry = await page.evaluate(() => {
-      const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
-      const tabs = [...document.querySelectorAll(".uc-tab")].map((tab) => tab.getBoundingClientRect());
-      const row = rect(".uc-tabs-row");
-      const figure = rect('.uc-panel[data-active="true"] .uc-figure');
-      const copy = rect('.uc-panel[data-active="true"] .uc-copy');
-      const stage = rect(".uc-stage");
-      const rows = new Set(tabs.map((tab) => Math.round(tab.top))).size;
-      const panel = getComputedStyle(document.querySelector('.uc-panel[data-active="true"] .uc-figure')!);
+      const cards = [...document.querySelectorAll(".uc-card")].map((card) => card.getBoundingClientRect());
+      const figure = document.querySelector(".uc-figure")!;
+      const panel = getComputedStyle(figure);
+      const art = document.querySelector(".uc-shot[data-on='true'] .uc-art")!.getBoundingClientRect();
+      const box = figure.getBoundingClientRect();
       return {
-        rows,
-        allInView: tabs.every((tab) => tab.left >= row.left - 1 && tab.right <= row.right + 1),
-        tabsAbove: tabs.every((tab) => tab.bottom <= stage.top + 1),
-        // the picture sits on a surface of its own, not on the page
+        columns: new Set(cards.map((card) => Math.round(card.left))).size,
+        // the second column sits lower than the first, so the four read as a rhythm
+        secondLower: cards[1]!.top > cards[0]!.top + 1,
+        // the picture sits on a surface of its own, with no border boxing it in
         panelGround: panel.backgroundColor !== getComputedStyle(document.body).backgroundColor,
-        figureLeftAtTabs: Math.abs(figure.left - tabs[0]!.left) < 1,
-        copyBeside: copy.left >= figure.right - 1,
-        copyBelow: copy.top >= figure.bottom - 1,
+        panelBorder: panel.borderTopWidth,
+        roomBeside: Math.min(art.left - box.left, box.right - art.right),
         pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
-    expect(geometry.rows, `tabs are not ${width === 1440 ? "one row" : "two by two"} at ${width}`).toBe(
-      width === 1440 ? 1 : 2,
+    expect(geometry.columns, `use cases are not ${width === 1440 ? "two" : "one"} across at ${width}`).toBe(
+      width === 1440 ? 2 : 1,
     );
-    expect(geometry.allInView, `a tab is out of view at ${width}`).toBe(true);
-    expect(geometry.tabsAbove, `tabs are not above the stage at ${width}`).toBe(true);
+    if (width === 1440) expect(geometry.secondLower, "the second column is not set lower").toBe(true);
     expect(geometry.panelGround, `the picture has no panel of its own at ${width}`).toBe(true);
-    expect(geometry.figureLeftAtTabs, `the picture's panel does not line up with the tabs at ${width}`).toBe(true);
+    expect(geometry.panelBorder, `the picture's panel is boxed in at ${width}`).toBe("0px");
+    expect(geometry.roomBeside, `the picture is crowded against its panel at ${width}`).toBeGreaterThanOrEqual(
+      width === 1440 ? 48 : 16,
+    );
     expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
-    if (width === 1440) expect(geometry.copyBeside, "copy is not beside the picture").toBe(true);
-    else expect(geometry.copyBelow, "copy is not under the picture on a phone").toBe(true);
   }
 });
 
-test("captions fade through one capability at a time, hold on hover, and stand still under reduced motion", async ({
+test("each audience cycles on its own clock, a quarter apart, holds on hover, and stands still under reduced motion", async ({
   page,
 }) => {
   await page.goto("/");
-  const carousel = page.locator("[data-use-cases]");
-  await carousel.scrollIntoViewIfNeeded();
-  const slide = fixture.useCases.slides[0]!;
-  const on = carousel.locator('.uc-panel[data-active="true"] .uc-cap[data-on="true"] .uc-cap-text');
-  const fill = carousel.locator('.uc-panel[data-active="true"] .uc-seg-fill');
+  const uses = page.locator("[data-use-cases]");
+  const slides = fixture.useCases.slides;
+  const first = cardOf(page, slides[0]!.id);
+  const fill = first.locator(".uc-seg-fill");
 
-  await expect(on).toHaveText([slide.capabilities[0]!]);
-  await page.mouse.move(0, 0);
-  // each capability lasts as long as its segment takes to fill
+  // off screen every clock holds at its start; each lasts as long as its segment takes to fill,
+  // and the four start a quarter of that apart
+  await expect(first).toHaveAttribute("data-playing", "false");
   expect(await fill.evaluate((bar) => getComputedStyle(bar).animationDuration)).toBe(
     `${fixture.useCases.captionMs / 1000}s`,
   );
-  await fill.dispatchEvent("animationend");
-  await expect(on).toHaveText([slide.capabilities[1]!]);
+  const delays = await uses
+    .locator(".uc-seg-fill")
+    .evaluateAll((bars) => bars.map((bar) => getComputedStyle(bar).animationDelay));
+  expect(delays).toEqual(slides.map((_, order) => `${(-order * fixture.useCases.captionMs) / 4 / 1000}s`));
 
-  // hovering holds both clocks where they are
-  await carousel.locator(".uc-stage").hover();
-  await expect(carousel).toHaveAttribute("data-playing", "false");
-  expect(await fill.evaluate((bar) => getComputedStyle(bar).animationPlayState)).toBe("paused");
-  expect(
-    await carousel.locator(".uc-progress").evaluate((bar) => getComputedStyle(bar).animationPlayState),
-  ).toBe("paused");
-  await expect(on).toHaveText([slide.capabilities[1]!]);
+  await uses.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  await expect(first).toHaveAttribute("data-playing", "true");
+
+  const on = first.locator('.uc-cap[data-on="true"] .uc-cap-text');
+  await expect(on).toHaveText([slides[0]!.capabilities[0]!]);
+  await fill.dispatchEvent("animationend");
+  await expect(on).toHaveText([slides[0]!.capabilities[1]!]);
+  // after the third it comes back to the first
+  await first.locator(".uc-seg-fill").dispatchEvent("animationend");
+  await first.locator(".uc-seg-fill").dispatchEvent("animationend");
+  await expect(on).toHaveText([slides[0]!.capabilities[0]!]);
+
+  // hovering one card holds its clock where it is; its neighbours carry on
+  await first.locator(".uc-figure").hover();
+  await expect(first).toHaveAttribute("data-playing", "false");
+  expect(await first.locator(".uc-seg-fill").evaluate((bar) => getComputedStyle(bar).animationPlayState)).toBe(
+    "paused",
+  );
+  await expect(cardOf(page, slides[1]!.id)).toHaveAttribute("data-playing", "true");
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const caps = page.locator('.uc-panel[data-active="true"] .uc-cap');
-  await expect(caps.locator(".uc-cap-text")).toHaveText(slide.capabilities);
-  expect(await caps.evaluateAll((items) => items.map((item) => getComputedStyle(item).opacity))).toEqual([
-    "1",
-    "1",
-    "1",
-  ]);
+  for (const slide of slides) {
+    const caps = cardOf(page, slide.id).locator(".uc-cap");
+    await expect(caps.locator(".uc-cap-text")).toHaveText(slide.capabilities);
+    expect(await caps.evaluateAll((items) => items.map((item) => getComputedStyle(item).opacity))).toEqual([
+      "1",
+      "1",
+      "1",
+    ]);
+  }
   // with nothing cycling there is nothing to step through
-  await expect(page.locator('.uc-panel[data-active="true"] .uc-seg')).toHaveCount(0);
+  await expect(uses.locator(".uc-seg")).toHaveCount(0);
+});
+
+test("whitespace, not rules, separates the sections, with generous room between them", async ({ page }) => {
+  for (const [width, least] of [
+    [1440, 160],
+    [390, 96],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const rhythm = await page.evaluate(() => {
+      // how it works holds its own screen, so the rhythm is read where two padded sections meet
+      const ids = ["install", "session"];
+      return ids.map((id) => {
+        const section = document.getElementById(id)!;
+        const next = section.nextElementSibling as HTMLElement;
+        const style = getComputedStyle(section);
+        return {
+          id,
+          border: style.borderBottomWidth,
+          room: parseFloat(style.paddingBottom) + parseFloat(getComputedStyle(next).paddingTop),
+        };
+      });
+    });
+    for (const { id, border, room } of rhythm) {
+      expect(border, `a rule runs under #${id} at ${width}`).toBe("0px");
+      expect(room, `too little room after #${id} at ${width}`).toBeGreaterThanOrEqual(least);
+    }
+  }
 });
 
 test("how it works: three steps, each with its scene; choosing one scrolls to it", async ({ page }) => {
@@ -386,6 +405,11 @@ test("a sample session opens in fairtrade's viewer, labelled as sample, with red
   await expect(demo.locator("img")).toHaveCount(0);
   await expect(demo).toContainText(fixture.session.sessionId);
   await expect(section.locator(".lp-note")).toHaveText(fixture.session.note);
+  // on top, the pull request's check in village's own words; behind, Claude Code, hidden from assistive technology
+  await expect(section.locator(".lp-check-name")).toHaveText(fixture.session.check.name);
+  await expect(section.locator(".lp-check-summary")).toHaveText(fixture.session.check.summary);
+  await expect(section.locator(".lp-windows-term")).toHaveAttribute("aria-hidden", "true");
+  await expect(section.locator(".lp-windows-term .mac-win-terminal")).toBeVisible();
   // it is shown in a browser window, at the address a published transcript has
   const browser = section.locator(".mac-win-browser");
   await expect(browser.locator(".mac-lights")).toBeVisible();

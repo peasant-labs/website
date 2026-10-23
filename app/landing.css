@@ -6,7 +6,6 @@
 /* ---------- landing ---------- */
 
 @media (prefers-reduced-motion: no-preference) {
-  .uc-tab,
   .gs-copy,
   .gs-os-tab,
   .hw-step,
@@ -23,7 +22,6 @@
     transition: transform var(--dur-2) var(--ease-out);
   }
 
-  .uc-tab:active,
   .uc-seg:active,
   .gs-copy:active,
   .hw-replay:active {
@@ -35,12 +33,17 @@
   outline: none;
 }
 
+/*
+ * The page breathes: about 200px between sections on a wide screen and about
+ * 100px on a phone, and whitespace alone separates them; no rule runs between.
+ */
 .lp-sec {
-  padding-block: clamp(5rem, 9vw, 8rem);
-  border-bottom: var(--bd);
+  padding-block: clamp(3rem, 7.5vw, 7.5rem);
 }
 
-.lp-stack > h2 {
+.lp-stack > h2,
+.lp-install-head > h2,
+.lp-session-head > h2 {
   color: var(--ink-strong);
   font-family: var(--font-display);
   font-size: clamp(1.875rem, 3.4vw, 2.75rem);
@@ -51,7 +54,79 @@
 
 .lp-stack {
   display: grid;
-  gap: clamp(2rem, 4vw, 3.5rem);
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+/* the agents peasant reads, drifting under the hero and fading out at both edges */
+.lp-agents {
+  overflow: hidden;
+  padding-block: var(--sp-4);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+
+.lp-agents-track {
+  display: flex;
+  width: max-content;
+}
+
+.lp-agents-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  margin: 0;
+  padding: 0 clamp(2.5rem, 5vw, 4.5rem) 0 0;
+  list-style: none;
+}
+
+.lp-agent {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-md);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.lp-agent .brand {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--ink-strong);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lp-agents[data-static="false"] .lp-agents-track {
+    animation: lp-agents 48s linear infinite;
+  }
+
+  .lp-agents[data-playing="false"] .lp-agents-track,
+  .lp-agents:hover .lp-agents-track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes lp-agents {
+  to {
+    transform: translate3d(-25%, 0, 0);
+  }
+}
+
+/* reduced motion: one still row, wrapped and centred */
+.lp-agents[data-static="true"] {
+  mask-image: none;
+}
+
+.lp-agents[data-static="true"] .lp-agents-track {
+  width: auto;
+  justify-content: center;
+}
+
+.lp-agents[data-static="true"] .lp-agents-row {
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: var(--sp-4);
+  padding-inline: var(--gutter);
 }
 
 /* hero */
@@ -300,171 +375,53 @@
 
 /* use cases */
 
+/*
+ * All four audiences at once: two by two on a wide screen, the second column
+ * set lower so the four read as a rhythm rather than a table; one under
+ * another on a phone. Whitespace separates them; no card has a border.
+ */
 .uc {
   display: grid;
-  gap: var(--sp-6);
+  gap: clamp(4rem, 8vw, 7rem) clamp(2.5rem, 6vw, 5rem);
   min-width: 0;
 }
 
-/*
- * The four audiences side by side, each a labelled tab with its icon over its
- * own track, so the whole set reads at a glance; two by two on a phone. The
- * chosen tab's track fills with the time left on its slide.
- */
-.uc-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--sp-3) var(--sp-5);
-}
-
-.uc-tab {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  min-width: 0;
-  min-height: 3.5rem;
-  padding: var(--sp-3) var(--sp-2) calc(var(--sp-3) + 3px) 0;
-  border: 0;
-  background: transparent;
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-md);
-  font-weight: 700;
-  letter-spacing: 0;
-  text-align: start;
-  white-space: nowrap;
-  cursor: pointer;
-  box-shadow: inset 0 -3px 0 var(--rule);
-}
-
-.uc-tab-ic {
-  flex: none;
-  width: 1.375rem;
-  height: 1.375rem;
-  color: var(--ink-4);
-  transition: color var(--dur-2) ease;
-}
-
-.uc-tab-label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.uc-tab[aria-selected="true"] {
-  color: var(--ink-strong);
-  box-shadow: inset 0 -3px 0 var(--amber);
-}
-
-.uc-tab[aria-selected="true"] .uc-tab-ic {
-  color: var(--amber);
-}
-
-/* while the carousel plays, the chosen tab's track fills with the time left on the slide */
-.uc[data-playing] .uc-tab[aria-selected="true"]:has(.uc-progress) {
-  box-shadow: inset 0 -3px 0 var(--rule-strong);
-}
-
-.uc-progress,
-.uc-seg-fill {
-  position: absolute;
-  transform: scaleX(0);
-  transform-origin: left center;
-  animation-name: uc-progress;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-
-.uc-progress {
-  inset-inline: 0;
-  inset-block-end: 0;
-  height: 3px;
-  background: var(--amber);
-}
-
-.uc[data-playing="false"] :is(.uc-progress, .uc-seg-fill) {
-  animation-play-state: paused;
-}
-
-@keyframes uc-progress {
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@media (max-width: 47.99rem) {
-  .uc-tabs {
+@media (min-width: 48rem) {
+  .uc {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--sp-2) var(--sp-4);
+    align-items: start;
   }
 
-  .uc-tab {
-    min-height: 3rem;
-    font-size: var(--fs-body);
-  }
-
-  .uc-tab-ic {
-    width: var(--ic-lg);
-    height: var(--ic-lg);
+  .uc-card:nth-child(even) {
+    margin-block-start: clamp(4rem, 9vw, 8rem);
   }
 }
 
-.hw-count {
-  min-width: 5ch;
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
-  text-align: center;
-}
-
-/* the stage: a window onto a track of slides, moved by transform alone */
-.uc-stage {
-  min-width: 0;
-  overflow: hidden;
-  touch-action: pan-y;
-}
-
-.uc-track {
-  display: flex;
-  width: 100%;
-}
-
-/* a slide: the picture on the left, the audience's sentence and action on the right */
-.uc-panel {
+.uc-card {
   display: grid;
-  flex: 0 0 100%;
   gap: var(--sp-6);
-  align-items: center;
   min-width: 0;
 }
 
-@media (min-width: 60rem) {
-  .uc-panel {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: var(--sp-8);
-  }
-}
-
-/* the picture on its own panel, so it sits square with the copy instead of floating on the page */
+/* the picture on its own page-colour panel, with room on every side, and its caption at the foot */
 .uc-figure {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+  display: grid;
+  gap: var(--sp-5);
   margin: 0;
-  border: var(--bd);
+  padding: clamp(2rem, 4.5vw, 3.5rem) clamp(1.25rem, 3vw, 2.5rem) clamp(0.75rem, 1.5vw, 1.25rem);
   background: var(--surface-2);
 }
 
 /*
  * One picture per capability, stacked in one place. The caption's own fades in
  * as the caption moves on, and the one it replaces fades out and then leaves
- * the accessibility tree. Under reduced motion the swap is instant.
+ * the accessibility tree. The pictures are drawn on an 8px grid at 704 by 528
+ * and show at three eighths or a half of that, so every cell lands on whole
+ * pixels.
  */
 .uc-arts {
   display: grid;
+  justify-items: center;
 }
 
 .uc-shot {
@@ -472,8 +429,8 @@
   opacity: 0;
   visibility: hidden;
   transition:
-    opacity 400ms var(--ease-out),
-    visibility 0s linear 400ms;
+    opacity 600ms var(--ease-out),
+    visibility 0s linear 600ms;
 }
 
 .uc-shot[data-on="true"] {
@@ -489,60 +446,21 @@
 }
 
 .uc-art {
-  padding: clamp(var(--sp-4), 3vw, var(--sp-7));
-}
-
-.uc-art .art-img {
-  width: auto;
+  width: 264px;
   max-width: 100%;
-  max-height: 22rem;
-  margin-inline: auto;
 }
 
-.uc-copy {
-  display: grid;
-  gap: var(--sp-4);
-  justify-items: start;
-  align-content: center;
+@media (min-width: 72rem) {
+  .uc-art {
+    width: 352px;
+  }
 }
 
-.uc-copy h3 {
-  color: var(--ink-strong);
-  font-family: var(--font-display);
-  font-size: var(--fs-xl);
-  font-weight: 700;
-  line-height: 1.15;
-}
-
-.uc-copy p {
-  color: var(--ink-2);
-  font-size: var(--fs-md);
-  line-height: 1.55;
-}
-
-.uc-cta {
-  margin-block-start: var(--sp-2);
-}
-
-/*
- * The caption: an ink bar along the panel's foot, the capability on the left
- * and its three segments on the right. The icon and the filled segments take
- * the amber that reads on that ink in each theme.
- */
 .uc-caption {
-  --chip-accent: var(--amber-dim);
-
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  min-height: 3.25rem;
-  padding: 0 var(--sp-2) 0 var(--sp-4);
-  background: var(--ink-strong);
-  color: var(--canvas);
-}
-
-:root[data-theme="light"] .uc-caption {
-  --chip-accent: var(--amber-fill);
+  min-height: var(--target-comfortable);
 }
 
 .uc-caps {
@@ -559,12 +477,11 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding-block: 10px;
+  color: var(--ink-strong);
   font-family: var(--font-mono);
   font-size: var(--fs-body);
-  font-weight: 700;
   letter-spacing: 0;
-  line-height: 1.3;
+  line-height: 1.35;
   opacity: 0;
   transition: opacity 400ms var(--ease-out);
 }
@@ -577,11 +494,10 @@
   flex: none;
   width: var(--ic-lg);
   height: var(--ic-lg);
-  color: var(--chip-accent);
+  color: var(--amber);
 }
 
 .uc-cap-text {
-  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -589,12 +505,13 @@
 .uc-segs {
   display: flex;
   flex: none;
+  margin-inline-end: calc(-1 * var(--sp-2));
 }
 
 .uc-seg {
   display: grid;
   place-items: center;
-  width: 2.25rem;
+  width: 2rem;
   height: var(--target-comfortable);
   padding: 0;
   border: 0;
@@ -605,68 +522,127 @@
 .uc-seg-track {
   position: relative;
   display: block;
-  width: 1.5rem;
+  width: 1.25rem;
   height: 3px;
   overflow: hidden;
-  background: color-mix(in srgb, var(--canvas) 34%, transparent);
+  background: var(--rule);
   transition: background-color var(--dur-2) ease;
 }
 
 .uc-seg[data-state="done"] .uc-seg-track {
-  background: var(--chip-accent);
-}
-
-.uc-seg[data-state="on"] .uc-seg-track {
-  background: color-mix(in srgb, var(--canvas) 58%, transparent);
+  background: var(--ink-4);
 }
 
 .uc-seg-fill {
+  position: absolute;
   inset: 0;
-  background: var(--chip-accent);
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation-name: uc-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+.uc-card[data-playing="false"] .uc-seg-fill {
+  animation-play-state: paused;
+}
+
+@keyframes uc-fill {
+  to {
+    transform: scaleX(1);
+  }
 }
 
 .uc-seg:focus-visible {
-  outline: var(--focus-ring-width) solid var(--canvas);
-  outline-offset: -6px;
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: -8px;
 }
 
-/* reduced motion: the three capabilities stand as a plain list under the picture */
-.uc-caption[data-static="true"] {
-  --chip-accent: var(--amber);
-
-  display: block;
-  padding: var(--sp-4) var(--sp-5);
-  border-top: var(--bd);
-  background: transparent;
-  color: var(--ink-strong);
-}
-
+/* reduced motion: the three capabilities stand as a list under the picture */
 .uc-caption[data-static="true"] .uc-caps {
   gap: var(--sp-2);
 }
 
 .uc-caption[data-static="true"] .uc-cap {
   grid-area: auto;
-  padding-block: 0;
   opacity: 1;
 }
 
+/* under the panel: the audience, its sentence and its one action */
+.uc-copy {
+  display: grid;
+  gap: var(--sp-3);
+  justify-items: start;
+}
+
+.uc-copy h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  color: var(--ink-strong);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.uc-ic {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--amber);
+}
+
+.uc-copy p {
+  max-inline-size: 44ch;
+  color: var(--ink-3);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+}
+
+.uc-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--target-comfortable);
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+.uc-cta svg {
+  width: var(--ic-md);
+  height: var(--ic-md);
+  transition: transform var(--dur-2) var(--ease-out);
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .uc-tab:hover {
-    color: var(--ink-strong);
-  }
-
-  .uc-tab:hover .uc-tab-ic {
-    color: var(--ink-2);
-  }
-
-  .uc-tab[aria-selected="true"]:hover .uc-tab-ic {
-    color: var(--amber);
-  }
-
   .uc-seg:hover .uc-seg-track {
-    background: color-mix(in srgb, var(--canvas) 72%, transparent);
+    background: var(--rule-strong);
   }
+
+  .uc-cta:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .uc-cta:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+.hw-count {
+  min-width: 5ch;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-align: center;
 }
 
 /* how it works */
@@ -1616,107 +1592,151 @@
 
 /* get started */
 
-.lp-install-body {
+/* the heading and the docs link beside a Terminal window on a wide screen; above it on a narrow one */
+.lp-install {
   display: grid;
-  gap: var(--sp-4);
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+@media (min-width: 64rem) {
+  .lp-install {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 46rem);
+    align-items: start;
+    gap: clamp(3rem, 6vw, 6rem);
+  }
+}
+
+.lp-install-head {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--sp-5);
 }
 
 .lp-install-guide {
   display: inline-flex;
   align-items: center;
   min-height: var(--target-comfortable);
-  justify-self: start;
   font-family: var(--font-mono);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-body);
   letter-spacing: 0;
 }
 
-.gs-shell {
-  background: var(--term-bg);
-  color: var(--term-ink);
-  border: 1px solid var(--term-rule);
+.gs {
+  display: grid;
+  gap: var(--sp-4);
+  min-width: 0;
 }
 
 .gs-os {
   display: flex;
   flex-wrap: wrap;
-  border-bottom: 1px solid var(--term-rule);
+  gap: var(--sp-2);
 }
 
 .gs-os-tab {
-  min-height: 3rem;
-  padding: 0 var(--sp-5);
+  min-height: var(--target-comfortable);
+  padding: 0 var(--sp-3);
   border: 0;
   background: transparent;
-  color: var(--term-dim);
+  color: var(--ink-3);
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
   font-weight: 600;
   letter-spacing: 0;
   cursor: pointer;
-  box-shadow: inset 0 -3px 0 transparent;
+  box-shadow: inset 0 -2px 0 transparent;
 }
 
 .gs-os-tab[aria-selected="true"] {
-  color: var(--term-ink);
-  box-shadow: inset 0 -3px 0 var(--term-accent);
+  color: var(--ink-strong);
+  box-shadow: inset 0 -2px 0 var(--amber);
 }
 
-.gs-os-tab:focus-visible,
-.gs-copy:focus-visible {
-  outline-color: var(--term-accent);
-  outline-offset: -3px;
+.gs-window {
+  min-width: 0;
 }
 
+.gs-term .mac-body {
+  padding: 20px 22px 28px;
+}
+
+/* Terminal's default profile: the system monospace at 14px, the prompt dimmed */
 .gs-lines {
+  display: grid;
+  gap: var(--sp-3);
   margin: 0;
   padding: 0;
   list-style: none;
+  font-family: var(--mac-mono);
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 1.6;
 }
 
 .gs-line {
-  display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--sp-3) var(--sp-4);
-  padding: 22px var(--sp-5);
-  border-bottom: 1px solid var(--term-rule);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
 }
 
-.gs-line:last-child {
-  border-bottom: 0;
-}
-
-.gs-n {
-  color: var(--term-accent);
-  font-family: var(--font-mono);
-  font-size: 1.125rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.gs-shell .gs-cmd {
+.gs-text {
+  flex: 1 1 auto;
   min-width: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--term-ink);
-  font-family: var(--font-mono);
-  font-size: clamp(1rem, 1.4vw, 1.1875rem);
-  line-height: 1.45;
+  padding-block: 5px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
+.gs-prompt {
+  color: var(--mac-term-dim);
+}
+
+.gs-cmd {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mac-term-ink);
+  font: inherit;
+}
+
+.gs-caret {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.15em;
+  margin-inline-start: 2px;
+  vertical-align: -0.2em;
+  background: var(--mac-term-cursor);
+}
+
+/* typing: only each character's opacity changes, one keystroke apart, so the line never reflows */
+.gs-window[data-typing="wait"] :is(.gs-ch, .gs-caret),
+.gs-window[data-typing="run"] :is(.gs-ch, .gs-caret) {
+  opacity: 0;
+}
+
+.gs-window[data-typing="run"] :is(.gs-ch, .gs-caret) {
+  animation: gs-key 1ms linear forwards;
+  animation-delay: calc(var(--gs-from) + var(--i) * var(--gs-key));
+}
+
+@keyframes gs-key {
+  to {
+    opacity: 1;
+  }
+}
+
+/* copy is ours, not Terminal's: the site's mono, drawn in the terminal's own ink */
 .gs-copy {
   display: inline-flex;
+  flex: none;
   align-items: center;
   gap: var(--sp-2);
-  min-height: var(--target-comfortable);
-  padding: 0 var(--sp-4);
-  border: 1px solid var(--term-dim);
+  min-height: 2.25rem;
+  padding: 0 var(--sp-3);
+  border: 1px solid color-mix(in srgb, var(--mac-term-ink) 28%, transparent);
   background: transparent;
-  color: var(--term-ink);
+  color: var(--mac-term-ink);
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
   font-weight: 600;
@@ -1725,33 +1745,75 @@
 }
 
 .gs-copy svg {
-  width: var(--ic-md);
-  height: var(--ic-md);
+  width: var(--ic-sm);
+  height: var(--ic-sm);
+}
+
+.gs-os-tab:focus-visible,
+.gs-copy:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .gs-copy:hover {
-    border-color: var(--term-ink);
+    border-color: var(--mac-term-ink);
   }
 
   .gs-os-tab:hover {
-    color: var(--term-ink);
+    color: var(--ink-strong);
   }
 }
 
 @media (max-width: 39.99rem) {
-  .gs-line {
-    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
-    padding: var(--sp-4);
-    gap: var(--sp-3);
+  .gs-term .mac-body {
+    padding: 16px 14px 20px;
   }
 
+  .gs-lines {
+    font-size: 13px;
+  }
+
+  /* on a phone copy keeps its icon and its name for assistive technology only */
   .gs-copy {
-    padding: 0 var(--sp-3);
+    padding: 0 var(--sp-2);
+  }
+
+  .gs-copy span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 
 /* a published session */
+
+.lp-session {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.lp-session-head {
+  display: grid;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .lp-session-head {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+    align-items: end;
+    gap: var(--sp-8);
+  }
+}
+
+.lp-note {
+  max-inline-size: 46ch;
+  color: var(--ink-3);
+}
 
 /*
  * The viewer sits in a browser window and keeps one height whatever it shows:
@@ -1780,41 +1842,158 @@
   border: 0;
 }
 
-.lp-note {
+/*
+ * Three windows, fanned: Claude Code behind and to the left, the transcript in
+ * front, the pull request's check on top at the lower left. A phone keeps the
+ * transcript and the check, one under the other.
+ */
+.lp-windows {
+  position: relative;
+  min-width: 0;
+}
+
+.lp-windows-term {
+  display: none;
+}
+
+.lp-windows-front {
+  position: relative;
+  z-index: 1;
+}
+
+.lp-check {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  width: fit-content;
+  max-width: 100%;
+  margin-block-start: var(--sp-5);
+  padding: var(--sp-4) var(--sp-5);
+  border: var(--bd-strong);
+  background: var(--canvas);
+  box-shadow: var(--overlay-shadow);
+}
+
+.lp-check-ic {
+  flex: none;
+  width: var(--ic-lg);
+  height: var(--ic-lg);
+  margin-block-start: 2px;
+  color: var(--success);
+}
+
+.lp-check-text {
+  display: grid;
+  gap: 2px;
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
+
+.lp-check-name {
+  color: var(--ink-strong);
+  font-size: var(--fs-body);
+  font-weight: 700;
+}
+
+.lp-check-summary {
   color: var(--ink-3);
+  font-size: var(--fs-sm);
+}
+
+@media (min-width: 64rem) {
+  .lp-windows {
+    padding-block-start: clamp(3rem, 5vw, 4.5rem);
+  }
+
+  .lp-windows-term {
+    position: absolute;
+    z-index: 0;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    display: block;
+    width: 46%;
+  }
+
+  .lp-windows-term .mac-win {
+    height: 24rem;
+  }
+
+  .lp-windows-reply {
+    grid-template-columns: 2ch minmax(0, 1fr);
+    padding-inline-start: 0;
+  }
+
+  .lp-windows-front {
+    margin-inline-start: 20%;
+  }
+
+  .lp-check {
+    position: absolute;
+    inset-block-end: clamp(3rem, 6vw, 5rem);
+    inset-inline-start: 3%;
+    margin: 0;
+  }
+}
+
+/* the first time they come into view, the back window and the check fan out from behind the front one */
+@media (prefers-reduced-motion: no-preference) {
+  .lp-windows-term,
+  .lp-check {
+    transition:
+      transform 1000ms var(--ease-spring),
+      opacity 600ms var(--ease-out);
+  }
+
+  .lp-check {
+    transition-delay: 240ms;
+  }
+
+  .js-reveal .lp-windows[data-fanned="false"] .lp-windows-term {
+    opacity: 0;
+    transform: translate3d(28%, 2.5rem, 0) scale(0.94);
+  }
+
+  .js-reveal .lp-windows[data-fanned="false"] .lp-check {
+    opacity: 0;
+    transform: translate3d(0, 1.5rem, 0);
+  }
 }
 
 /* vision */
 
 /*
- * The statement and its button beside the picture on a wide screen; on a
- * narrow one the picture comes first, then the statement, then the button.
+ * The statement large across the page, then its button, with the picture in
+ * the margin beside the button on a wide screen and under it on a narrow one.
  *
  * The picture is drawn on an 8px cell grid at 1200 by 512. It shows whole, at
  * a half (600px) or a quarter (300px) of that, which on a 2x or 3x screen
  * lands every cell on whole device pixels.
  */
-.lp-vision {
-  border-bottom: 0;
-}
-
 .lp-vision-inner {
   display: grid;
-  justify-items: center;
-  gap: clamp(2rem, 5vw, 3rem);
-  text-align: center;
-}
-
-.lp-vision-copy {
-  display: grid;
-  justify-items: center;
+  justify-items: start;
   gap: var(--sp-6);
 }
 
+.lp-vision-line {
+  max-inline-size: 22ch;
+  color: var(--ink-strong);
+  font-family: var(--font-body);
+  font-size: clamp(2rem, 4.4vw, 3.75rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+  word-spacing: normal;
+  text-wrap: balance;
+}
+
 .lp-vision-art {
-  order: -1;
+  justify-self: center;
   width: 300px;
   max-width: 100%;
+  margin-block-start: var(--sp-6);
 }
 
 @media (min-width: 48rem) {
@@ -1826,29 +2005,30 @@
 @media (min-width: 64rem) {
   .lp-vision-inner {
     grid-template-columns: minmax(0, 1fr) 600px;
-    align-items: center;
-    justify-items: start;
-    gap: var(--sp-8);
-    text-align: start;
+    align-items: end;
+    gap: var(--sp-7) var(--sp-8);
   }
 
-  .lp-vision-copy {
-    justify-items: start;
+  .lp-vision-line {
+    grid-column: 1 / -1;
+  }
+
+  .lp-vision-cta {
+    grid-row: 2;
+    grid-column: 1;
+    align-self: start;
   }
 
   .lp-vision-art {
-    order: 0;
+    grid-row: 2;
+    grid-column: 2;
+    margin: 0;
   }
 }
 
-.lp-vision-line {
-  max-inline-size: 30ch;
-  color: var(--ink-strong);
-  font-family: var(--font-body);
-  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
-  font-weight: 700;
-  letter-spacing: 0;
-  line-height: 1.3;
-  word-spacing: normal;
-  text-wrap: balance;
+@media (prefers-reduced-motion: reduce) {
+  .gs-window[data-typing] :is(.gs-ch, .gs-caret) {
+    opacity: 1;
+    animation: none;
+  }
 }

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loadLandingFixture, PHONE, visibleSlide } from "./landing-fixture";
+import { loadLandingFixture, PHONE } from "./landing-fixture";
 
 const fixture = loadLandingFixture();
 
@@ -72,58 +72,87 @@ test("on a wide screen the header steps away while reading down and never offers
   await expect(header.getByRole("button", { name: "open the menu" })).toBeHidden();
 });
 
-test("the carousel plays on its own and loops forward without rewinding", async ({ page }) => {
+test("the agents drift past under the hero, hold when hovered, and stand still for reduced motion", async ({
+  page,
+}) => {
   await page.goto("/");
-  const carousel = page.locator("[data-use-cases]");
-  await carousel.scrollIntoViewIfNeeded();
-  await page.mouse.move(0, 0);
-  const slides = fixture.useCases.slides;
-  const progress = carousel.locator(".uc-progress");
-  await expect(progress).toHaveCount(1);
-  expect(await progress.evaluate((bar) => getComputedStyle(bar).animationDuration)).toBe(
-    `${fixture.useCases.slideMs / 1000}s`,
-  );
+  const band = page.locator("[data-agents]");
+  // one row is the list a screen reader hears, each name led by its mark; the loop's copies are hidden
+  const list = band.getByRole("list", { name: fixture.agents.label });
+  await expect(list.getByRole("listitem")).toHaveText(fixture.agents.names);
+  await expect(list.locator("svg.brand")).toHaveCount(fixture.agents.names.length);
+  await expect(band.locator('ul[aria-hidden="true"]')).toHaveCount(3);
 
-  // the slide's time running out moves it on; from the last it goes forward onto the first
-  await carousel.getByRole("tab", { name: slides.at(-1)!.label }).click();
+  const track = band.locator(".lp-agents-track");
+  await band.scrollIntoViewIfNeeded();
+  await expect(band).toHaveAttribute("data-playing", "true");
+  expect(await track.evaluate((element) => getComputedStyle(element).animationName)).toBe("lp-agents");
+  expect(await track.evaluate((element) => getComputedStyle(element).animationPlayState)).toBe("running");
+  await band.hover();
+  expect(await track.evaluate((element) => getComputedStyle(element).animationPlayState)).toBe("paused");
+  // off screen it holds as well
   await page.mouse.move(0, 0);
-  await carousel.locator(".uc-progress").dispatchEvent("animationend");
-  await expect(carousel.getByRole("tab", { name: slides[0]!.label })).toHaveAttribute("aria-selected", "true");
-  await expect(visibleSlide(page)).toHaveAttribute("id", `uc-panel-${slides[0]!.id}`);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect(band).toHaveAttribute("data-playing", "false");
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await expect(page.locator("[data-use-cases] .uc-progress")).toHaveCount(0);
+  await expect(band.locator("ul")).toHaveCount(1);
+  expect(await track.evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
 });
 
-test("on touch the carousel follows the finger: a flick or a long drag moves a slide, a short one springs back", async ({ browser }) => {
-  const context = await browser.newContext(PHONE);
-  const page = await context.newPage();
+test("the install commands type in once when the terminal comes into view, and show whole without motion", async ({
+  page,
+}) => {
   await page.goto("/");
-  const stage = page.locator(".uc-stage");
-  await stage.scrollIntoViewIfNeeded();
-  // a drag that pauses before letting go carries no flick; one that lets go moving does
-  const swipe = async (dx: number, { flick }: { flick: boolean }) => {
-    const box = (await stage.boundingBox())!;
-    const y = box.y + box.height / 3;
-    const x0 = box.x + box.width * (dx < 0 ? 0.8 : 0.2);
-    const base = { pointerType: "touch", pointerId: 7, isPrimary: true, clientY: y };
-    await stage.dispatchEvent("pointerdown", { ...base, clientX: x0 });
-    for (let index = 1; index <= 4; index += 1) {
-      if (!flick) await page.waitForTimeout(60);
-      await stage.dispatchEvent("pointermove", { ...base, clientX: x0 + (dx * index) / 4 });
-    }
-    if (!flick) await page.waitForTimeout(150);
-    await stage.dispatchEvent("pointerup", { ...base, clientX: x0 + dx });
-  };
-  const tabs = page.locator("[data-use-cases]").getByRole("tab");
-  await swipe(-30, { flick: false });
-  await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
-  await swipe(-40, { flick: true });
-  await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
-  await swipe(200, { flick: false });
-  await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
-  await context.close();
+  const terminal = page.locator(".gs-window");
+  const characters = terminal.locator(".gs-line").first().locator(".gs-ch");
+  // below the fold the commands wait, hidden, to be typed
+  await expect(terminal).toHaveAttribute("data-typing", "wait");
+  expect(await characters.first().evaluate((character) => getComputedStyle(character).opacity)).toBe("0");
+
+  await terminal.scrollIntoViewIfNeeded();
+  await expect(terminal).toHaveAttribute("data-typing", "run");
+  // one keystroke after another: each character waits a little longer than the one before
+  const delays = await characters.evaluateAll((items) =>
+    items.slice(0, 3).map((item) => parseFloat(getComputedStyle(item).animationDelay)),
+  );
+  expect(delays[1]!).toBeGreaterThan(delays[0]!);
+  expect(delays[2]!).toBeGreaterThan(delays[1]!);
+  await expect(terminal).toHaveAttribute("data-typing", "done", { timeout: 6000 });
+  expect(await characters.last().evaluate((character) => getComputedStyle(character).opacity)).toBe("1");
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  expect(await terminal.getAttribute("data-typing")).toBeNull();
+  expect(await characters.first().evaluate((character) => getComputedStyle(character).opacity)).toBe("1");
+});
+
+test("the session's windows fan out from one stack the first time they come into view", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const windows = page.locator(".lp-windows");
+  const back = windows.locator(".lp-windows-term");
+  await expect(windows).toHaveAttribute("data-fanned", "false");
+  expect(await back.evaluate((element) => getComputedStyle(element).opacity)).toBe("0");
+
+  await windows.scrollIntoViewIfNeeded();
+  await expect(windows).toHaveAttribute("data-fanned", "true");
+  // they settle where they rest: the back window to the left of the front one, the check over its corner
+  await expect
+    .poll(() => back.evaluate((element) => getComputedStyle(element).transform))
+    .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+  const layout = await windows.evaluate((group) => {
+    const rect = (selector: string) => group.querySelector(selector)!.getBoundingClientRect();
+    return { back: rect(".lp-windows-term"), front: rect(".lp-windows-front"), check: rect(".lp-check") };
+  });
+  expect(layout.back.left).toBeLessThan(layout.front.left);
+  expect(layout.check.left).toBeLessThan(layout.front.left);
+  expect(layout.check.right).toBeGreaterThan(layout.front.left);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  expect(await back.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
 });
 
 test("the transcript viewer reflows at phone and tablet widths and drops keyboard hints on touch", async ({

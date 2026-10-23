@@ -1,8 +1,10 @@
 import { Art } from "@/components/art";
+import { AgentMarquee } from "@/components/landing/agent-marquee";
 import { GetStarted } from "@/components/landing/get-started";
 import { HeroFlow } from "@/components/landing/hero-flow";
 import { LandingIcon } from "@/components/landing/icons";
 import { HowItWorks } from "@/components/landing/how-it-works";
+import { SessionWindows } from "@/components/landing/session-windows";
 import { UseCases } from "@/components/landing/use-cases";
 import { SafariWindow } from "@/components/mac";
 import { SiteShell } from "@/components/site-shell";
@@ -64,6 +66,8 @@ export default function Home() {
           </div>
         </section>
 
+        <AgentMarquee />
+
         <section id="uses" className="lp-sec" aria-labelledby="uses-title">
           <div className="site-wrap lp-stack">
             <h2 id="uses-title" data-fade>
@@ -78,50 +82,52 @@ export default function Home() {
         </section>
 
         <section id="install" className="lp-sec" aria-labelledby="install-title">
-          <div className="site-wrap lp-stack lp-install">
-            <h2 id="install-title" data-fade>
-              {INSTALL.title}
-            </h2>
-            <div className="lp-install-body">
-              <GetStarted />
+          <div className="site-wrap lp-install">
+            <div className="lp-install-head">
+              <h2 id="install-title" data-fade>
+                {INSTALL.title}
+              </h2>
               <Link className="site-link lp-install-guide" href={INSTALL.guide.href}>
                 {INSTALL.guide.label}
               </Link>
             </div>
+            <GetStarted />
           </div>
         </section>
 
         <section id="session" className="lp-sec" aria-labelledby="session-title">
-          <div className="site-wrap lp-stack lp-session">
-            <h2 id="session-title" data-fade>
-              {SESSION.title}
-            </h2>
-            <SafariWindow
-              url={`${SESSION.host}/transcripts/${SAMPLE_SESSION.id}`}
-              secure
-              className="lp-session-win"
-            >
-              <TranscriptDemo label={SESSION.label} session={SAMPLE_SESSION} />
-            </SafariWindow>
-            <p className="lp-note">{SESSION.note}</p>
+          <div className="site-wrap lp-session">
+            <div className="lp-session-head">
+              <h2 id="session-title" data-fade>
+                {SESSION.title}
+              </h2>
+              <p className="lp-note">{SESSION.note}</p>
+            </div>
+            <SessionWindows>
+              <SafariWindow
+                url={`${SESSION.host}/transcripts/${SAMPLE_SESSION.id}`}
+                secure
+                className="lp-session-win"
+              >
+                <TranscriptDemo label={SESSION.label} session={SAMPLE_SESSION} />
+              </SafariWindow>
+            </SessionWindows>
           </div>
         </section>
 
         <section className="lp-sec lp-vision" aria-labelledby="vision-line">
           <div className="site-wrap lp-vision-inner">
-            <div className="lp-vision-copy">
-              <p id="vision-line" className="lp-vision-line" data-fade>
-                {VISION.line}
-              </p>
-              <Link
-                className="btn btn-primary site-btn site-btn-xl"
-                href={VISION.cta.href}
-                data-fade
-                style={fade(1)}
-              >
-                {VISION.cta.label}
-              </Link>
-            </div>
+            <p id="vision-line" className="lp-vision-line" data-fade>
+              {VISION.line}
+            </p>
+            <Link
+              className="btn btn-primary site-btn site-btn-xl lp-vision-cta"
+              href={VISION.cta.href}
+              data-fade
+              style={fade(1)}
+            >
+              {VISION.cta.label}
+            </Link>
             <Art art={VISION.art} className="lp-vision-art" />
           </div>
         </section>

@@ -62,6 +62,22 @@ export const HERO = {
   },
 } as const;
 
+/*
+ * The band under the hero: the harnesses peasant reads, each led by its mark.
+ * The names are the products' own; the list is what peasant ingests today.
+ */
+export const AGENTS = {
+  label: "works with",
+  list: [
+    { mark: "claude", name: "Claude Code" },
+    { mark: "codex", name: "Codex" },
+    { mark: "cursor", name: "Cursor" },
+    { mark: "opencode", name: "OpenCode" },
+    { mark: "pi", name: "Pi" },
+    { mark: "strike", name: "Strike" },
+  ],
+} as const;
+
 export type UseCaseCta = Readonly<{ label: string; href: string }>;
 
 /** a drawn icon beside an audience, a capability or a step; components/landing/icons maps each to a lucide mark */
@@ -115,9 +131,8 @@ function capabilityArt(name: string, alt: string): Art {
  */
 export const USE_CASES = {
   title: "find your use case",
-  /* how long a slide stays before the carousel moves on, and each capability within it */
-  slideMs: 6000,
-  captionMs: 2000,
+  /* how long each capability, and its picture, shows before its audience moves on to the next */
+  captionMs: 3600,
   slides: [
     {
       id: "researchers",
@@ -257,27 +272,44 @@ export const HOW = {
 export const INSTALL = {
   title: "get started in two commands",
   guide: { label: "read our docs", href: "/docs" },
+  /* each platform's commands are typed at its own shell's prompt, in a Terminal window titled for that shell */
   platforms: [
     {
       id: "unix",
       label: "macos and linux",
       command: "curl -fsSL https://peasantlabs.org/install | bash",
+      title: "you — -zsh — 80×24",
+      prompt: "you@macbook ~ %",
     },
     {
       id: "windows",
       label: "windows",
       command: "irm https://peasantlabs.org/install.ps1 | iex",
+      title: "you — pwsh — 80×24",
+      prompt: "PS C:\\Users\\you>",
     },
   ],
   kickstart: "peasant kickstart",
 } as const;
 
+/*
+ * Three windows, one session: Claude Code where it was recorded, the published
+ * transcript in front, and the pull request's check. The check's name and
+ * summary are village's own (backend/internal/digest/render.go), for this
+ * sample's one transcript and its one commit.
+ */
 export const SESSION = {
   title: "what a reviewer reads",
   /* the address bar of the browser the viewer is shown in: where a published transcript lives */
   host: "village.peasantlabs.org",
   label: "sample session in the transcript viewer",
   note: "Sample session, not a real record. Values peasant redacted show as markers like <EMAIL>.",
+  terminal: "shop — claude — 80×24",
+  check: {
+    label: "the pull request's peasant check",
+    name: "peasant / prompts",
+    summary: "1 transcript traces 1 of 1 commits",
+  },
 } as const;
 
 export const VISION = {

@@ -38,6 +38,10 @@ hero:
     play: play the animation
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
+# the band under the hero: the harnesses peasant reads, each led by its mark
+agents:
+  label: works with
+  names: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
 # the sections after the hero, in reading order: id and heading
 sections:
   - { id: uses, heading: find your use case }
@@ -54,9 +58,9 @@ removed:
   - they see how it is used
   - discord
   - data commons built by commoners
+# every audience shows at once; each cycles its own three capabilities, captionMs apiece
 useCases:
-  slideMs: 6000
-  captionMs: 2000
+  captionMs: 3600
   slides:
     - id: researchers
       label: researchers
@@ -100,11 +104,11 @@ how:
     - { scene: record, texts: ["you@macbook shop % claude", "Welcome to Claude Code!", "> /peasant", 'peasant: opened "Uploads to staging fail with a 403 since this morning" · not published', "Uploads to staging fail with a 403 since this morning", "not published"] }
     - { scene: review, texts: ["3 matches", "<AWS_ACCESS_KEY>", "<EMAIL>", "/Users/<USER>/src/shop/.env"] }
     - { scene: publish, texts: ["published to eval-crowd", "eval-crowd"] }
-# the commands as scripts/install.sh and scripts/install.ps1 document themselves
+# the commands as scripts/install.sh and scripts/install.ps1 document themselves, typed at each shell's prompt
 install:
   platforms:
-    - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash" }
-    - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex" }
+    - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash", prompt: "you@macbook ~ %" }
+    - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex", prompt: 'PS C:\Users\you>' }
   kickstart: peasant kickstart
   guide: { label: read our docs, href: /docs }
 session:
@@ -113,6 +117,8 @@ session:
   note: Sample session, not a real record. Values peasant redacted show as markers like <EMAIL>.
   # placeholders the redaction engine writes, visible in the opening view or the full trace
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
+  # the pull request's check, in village's own words (backend/internal/digest/render.go) for one transcript and one commit
+  check: { name: peasant / prompts, summary: 1 transcript traces 1 of 1 commits }
 vision:
   line: We are building a sustainable, respectful ecosystem where people have a stake in their data.
   cta: { label: about us, href: /about }

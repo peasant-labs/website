@@ -1,10 +1,27 @@
 "use client";
 
+import { TerminalWindow } from "@/components/mac";
 import { INSTALL } from "@/lib/landing";
+import { REVEAL_CLASS } from "@/lib/theme";
 import { Check, Copy } from "@peasant-labs/fairtrade/icons";
-import { useEffect, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+  type KeyboardEvent,
+} from "react";
 
 type PlatformId = (typeof INSTALL.platforms)[number]["id"];
+/* one keystroke, and the pause before the second command */
+const KEY_MS = 32;
+const BETWEEN_MS = 520;
+/* the longest the typing can take, whichever platform is showing */
+const LONGEST_MS =
+  Math.max(...INSTALL.platforms.map((item) => item.command.length)) * KEY_MS +
+  BETWEEN_MS +
+  INSTALL.kickstart.length * KEY_MS;
 
 const noSubscription = () => () => {};
 
@@ -13,17 +30,54 @@ function detectPlatform(): PlatformId {
 }
 
 /**
- * The two commands: install for the reader's system, then kickstart. A Windows
- * visitor lands on the PowerShell line; everyone else on the shell one. The
- * command text wraps rather than scrolling, so the whole line is always on
- * screen; copy takes the exact command either way.
+ * The two commands, typed into a Terminal window at the shell's prompt:
+ * install for the reader's system, then kickstart. A Windows visitor lands on
+ * the PowerShell line; everyone else on the shell one.
+ *
+ * The commands type themselves once, the first time the window comes into
+ * view; only each character's opacity changes, so nothing reflows while they
+ * type. A window already on screen when the page opens, and every window under
+ * reduced motion, shows them whole. The text wraps rather than scrolling, so
+ * the whole line is always on screen; copy takes the exact command either way.
  */
 export function GetStarted() {
   const detected = useSyncExternalStore(noSubscription, detectPlatform, () => "unix" as const);
   const [chosen, setPlatform] = useState<PlatformId | null>(null);
   const platform = chosen ?? detected;
-
   const install = INSTALL.platforms.find((item) => item.id === platform)!;
+
+  const windowRef = useRef<HTMLDivElement>(null);
+  const firstMs = install.command.length * KEY_MS;
+
+  /*
+   * The typing is the window's own state, kept on its element rather than in
+   * React: the server and a reader without motion get the commands whole, and
+   * the window only hides them, to type them, when it starts below the fold.
+   */
+  useEffect(() => {
+    const element = windowRef.current;
+    if (!element || !document.documentElement.classList.contains(REVEAL_CLASS)) return;
+    const box = element.getBoundingClientRect();
+    if (box.top < window.innerHeight && box.bottom > 0) return;
+    element.dataset.typing = "wait";
+    let timer = 0;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        observer.disconnect();
+        element.dataset.typing = "run";
+        timer = window.setTimeout(() => {
+          element.dataset.typing = "done";
+        }, LONGEST_MS + 200);
+      },
+      { threshold: 0.5 },
+    );
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timer);
+    };
+  }, []);
 
   function onKey(event: KeyboardEvent<HTMLDivElement>) {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
@@ -42,7 +96,7 @@ export function GetStarted() {
   }
 
   return (
-    <div className="gs-shell" data-install-shell>
+    <div className="gs" data-install-shell>
       <div className="gs-os" role="tablist" aria-label="operating system" onKeyDown={onKey}>
         {INSTALL.platforms.map((item) => (
           <button
@@ -60,17 +114,41 @@ export function GetStarted() {
           </button>
         ))}
       </div>
-      <div id="os-commands" role="tabpanel" aria-labelledby={`os-tab-${platform}`}>
-        <ol className="gs-lines">
-          <CommandLine key={install.command} n={1} command={install.command} />
-          <CommandLine n={2} command={INSTALL.kickstart} />
-        </ol>
+      <div
+        ref={windowRef}
+        className="gs-window"
+        style={{ "--gs-key": `${KEY_MS}ms` } as CSSProperties}
+      >
+        <TerminalWindow title={install.title} className="gs-term">
+          <div id="os-commands" role="tabpanel" aria-labelledby={`os-tab-${platform}`}>
+            <ol className="gs-lines">
+              <CommandLine key={install.command} prompt={install.prompt} command={install.command} from={0} />
+              <CommandLine
+                prompt={install.prompt}
+                command={INSTALL.kickstart}
+                from={firstMs + BETWEEN_MS}
+                last
+              />
+            </ol>
+          </div>
+        </TerminalWindow>
       </div>
     </div>
   );
 }
 
-function CommandLine({ n, command }: { n: number; command: string }) {
+function CommandLine({
+  prompt,
+  command,
+  from,
+  last = false,
+}: {
+  prompt: string;
+  command: string;
+  /** when this line starts typing, after the window comes into view */
+  from: number;
+  last?: boolean;
+}) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -80,13 +158,23 @@ function CommandLine({ n, command }: { n: number; command: string }) {
   }, [copied]);
 
   return (
-    <li className="gs-line">
-      <span className="gs-n" aria-hidden="true">
-        {n}
+    <li className="gs-line" style={{ "--gs-from": `${from}ms` } as CSSProperties}>
+      {/* the prompt and the command flow as one terminal line, wrapping together */}
+      <span className="gs-text">
+        <span className="gs-prompt" aria-hidden="true">
+          {prompt}{" "}
+        </span>
+        <code className="gs-cmd" data-command>
+          {[...command].map((character, index) => (
+            <span key={index} className="gs-ch" style={{ "--i": index } as CSSProperties}>
+              {character}
+            </span>
+          ))}
+        </code>
+        {last ? (
+          <span className="gs-caret" style={{ "--i": command.length } as CSSProperties} aria-hidden="true" />
+        ) : null}
       </span>
-      <code className="gs-cmd" data-command>
-        {command}
-      </code>
       <button
         type="button"
         className="gs-copy"
