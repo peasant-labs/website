@@ -108,12 +108,14 @@ install:
   kickstart: peasant kickstart
   guide: { label: read our docs, href: /docs }
 session:
-  label: sample session in the transcript viewer
-  # the viewer names the sample by this short title; its id is shown nowhere
+  label: a sample session, beat by beat
+  # the reel names the sample by this short title; its id is shown nowhere
   title: fix the staging 403
+  # the reel's beats, as their segments name them, in order
+  beats: [the prompt, a tool call, the change, the outcome]
   sessionId: sess_c41e07
   note: Sample session, not a real record. Values peasant redacted show as markers like <EMAIL>.
-  # placeholders the redaction engine writes, visible in the opening view or the full trace
+  # placeholders the redaction engine writes, visible in the reel's beats
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
 vision:
   line: We are building a sustainable, respectful ecosystem where people have a stake in their data.

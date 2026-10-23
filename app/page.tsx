@@ -5,10 +5,10 @@ import { HeroFlow } from "@/components/landing/hero-flow";
 import { LandingIcon } from "@/components/landing/icons";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { SessionStage } from "@/components/landing/session-stage";
+import { TranscriptReel } from "@/components/landing/transcript-reel";
 import { UseCases } from "@/components/landing/use-cases";
 import { SafariWindow } from "@/components/mac";
 import { SiteShell } from "@/components/site-shell";
-import { TranscriptDemo } from "@/components/transcript-demo";
 import { HERO, HOW, INSTALL, SESSION, VISION } from "@/lib/landing";
 import { SAMPLE_SESSION } from "@/lib/sample-session";
 import { site } from "@/lib/site";
@@ -102,12 +102,11 @@ export default function Home() {
             </div>
             <SessionStage>
               <SafariWindow secure className="lp-session-win">
-                <TranscriptDemo
+                <TranscriptReel
                   label={SESSION.label}
                   session={SAMPLE_SESSION}
                   title={SESSION.sessionTitle}
-                  breadcrumb={false}
-                  crossfade
+                  beats={SESSION.reel}
                 />
               </SafariWindow>
             </SessionStage>

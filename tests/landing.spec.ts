@@ -459,23 +459,56 @@ test("under reduced motion the steps stack, each scene on its finished frame, wi
   ).toBe(0);
 });
 
-test("a sample session opens in fairtrade's viewer, labelled as sample, with redaction markers", async ({
-  page,
-}) => {
+test("a sample session plays as a reel of its beats, read by fairtrade's own transcript parts", async ({ page }) => {
   await page.goto("/");
   const section = page.locator("#session");
-  const demo = section.locator("[data-transcript-demo]");
-  await expect(demo).toHaveAttribute("aria-label", fixture.session.label);
-  await expect(demo.locator(".txn-app")).toHaveCount(1);
-  await expect(demo.locator("img")).toHaveCount(0);
-  // the session goes by its short title, with no crumb trail and no session id
-  await expect(demo.locator(".txn-title")).toHaveText(fixture.session.title);
-  await expect(demo).not.toContainText(fixture.session.sessionId);
+  const reel = section.locator("[data-reel]");
+  await expect(reel).toHaveAttribute("aria-label", fixture.session.label);
+  await expect(reel).toHaveAttribute("aria-roledescription", "carousel");
+  // the session goes by its short title, with no crumb trail, no session id, and nothing to operate
+  await expect(reel.locator(".reel-title")).toHaveText(fixture.session.title);
+  await expect(section).not.toContainText(fixture.session.sessionId);
+  await expect(section.getByRole("tab")).toHaveCount(0);
+  await expect(section.locator(".txn-app, .txn-crumb")).toHaveCount(0);
   await expect(section.locator(".lp-note")).toHaveText(fixture.session.note);
   // one window, nothing stacked behind or over it
   await expect(section.locator(".mac-win")).toHaveCount(1);
-  // it is shown in a browser window whose address field carries the padlock and no address
+  // the values peasant redacted show as their markers
+  for (const marker of fixture.session.markers) {
+    await expect(reel, `the reel does not show ${marker}`).toContainText(marker);
+  }
+
+  // one segment per beat; each can be chosen, and the window keeps its height whichever is shown
   const browser = section.locator(".mac-win-browser");
+  const segments = reel.locator(".reel-segs").getByRole("button");
+  await expect(segments).toHaveCount(fixture.session.beats.length);
+  const height = () => browser.evaluate((window) => window.getBoundingClientRect().height);
+  const before = await height();
+  const stage = reel.locator(".reel-stage");
+  const descriptions = new Set<string | null>();
+  for (const [index, beat] of fixture.session.beats.entries()) {
+    await segments.nth(index).click();
+    await expect(segments.nth(index)).toHaveAttribute("aria-label", `show ${beat}`);
+    await expect(segments.nth(index)).toHaveAttribute("aria-current", "true");
+    await expect(reel.locator('.reel-beat[data-on="true"]')).toHaveCount(1);
+    descriptions.add(await stage.getAttribute("aria-label"));
+    expect(await height()).toBe(before);
+  }
+  // the stage is one picture to assistive technology, described by the beat at hand
+  expect(descriptions.size).toBe(fixture.session.beats.length);
+
+  // it plays on its own: a beat's time running out moves the reel on; hovering holds it
+  await segments.nth(0).click();
+  await page.mouse.move(0, 0);
+  await reel.locator(".reel-seg-fill").dispatchEvent("animationend");
+  await expect(segments.nth(1)).toHaveAttribute("aria-current", "true");
+  await stage.hover();
+  await expect(reel).toHaveAttribute("data-playing", "false");
+  expect(await reel.locator(".reel-seg-fill").evaluate((bar) => getComputedStyle(bar).animationPlayState)).toBe(
+    "paused",
+  );
+
+  // it is shown in a browser window whose address field carries the padlock and no address
   await expect(browser.locator(".mac-lights")).toBeVisible();
   await expect(browser.locator(".mac-address-lock")).toBeVisible();
   await expect(browser.locator(".mac-address-text")).toHaveText("");
@@ -487,14 +520,10 @@ test("a sample session opens in fairtrade's viewer, labelled as sample, with red
       .evaluateAll((lights) => lights.map((light) => getComputedStyle(light).backgroundColor)),
   ).toEqual(["rgb(255, 95, 87)", "rgb(254, 188, 46)", "rgb(40, 200, 64)"]);
 
-  const height = () => browser.evaluate((window) => window.getBoundingClientRect().height);
-  const before = await height();
-  await demo.getByRole("tab", { name: /^full trace/ }).click();
-  for (const marker of fixture.session.markers) {
-    await expect(demo, `the viewer does not show ${marker}`).toContainText(marker);
-  }
-  // switching what it shows never changes its height
-  expect(await height()).toBe(before);
+  // under reduced motion nothing plays on its own
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(page.locator("#session .reel-seg-fill")).toHaveCount(0);
 });
 
 test("the theme follows the system until the reader chooses one", async ({ page }) => {
