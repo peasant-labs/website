@@ -13,7 +13,7 @@ import { OnThisPage } from "@/components/docs/on-this-page";
 import { RedactionLabel } from "@/components/docs/redaction-label";
 import { Rich } from "@/components/docs/rich-text";
 import { BrandMark } from "@/components/fairtrade-client";
-import { DOCS_HOME, DOCS_HOME_TOC, DOCS_START } from "@/lib/docs-content";
+import { DOCS_HOME, DOCS_HOME_TOC, DOCS_NEXT, DOCS_START } from "@/lib/docs-content";
 import { metadataForRoute } from "@/lib/projects";
 import Link from "next/link";
 
@@ -24,9 +24,9 @@ export const metadata = metadataForRoute({
 });
 
 /**
- * The docs overview: the starting points first, then the reference a
- * first-time reader needs in order — install, set up, publish — and the facts
- * behind it, with "on this page" beside it on a wide screen.
+ * The docs overview: install and set up first, then the guides and the
+ * sections most people look for, then the reference a first-time reader needs
+ * in order, with "on this page" beside it on a wide screen.
  * Every command and claim here is checked against the peasant and village
  * sources; see lib/docs-content.ts.
  */
@@ -48,25 +48,6 @@ export default function DocsHome() {
     <main id="content" className="dx-page" tabIndex={-1}>
       <DocHead title={DOCS_HOME.title} lede={DOCS_HOME.lede} />
       <DocJump items={DOCS_HOME_TOC} />
-
-      <section className="dx-start" aria-labelledby="guides">
-        <h2 id="guides" className="dx-start-title">
-          start here
-        </h2>
-        <div className="dx-guides">
-          {DOCS_START.map((guide) => (
-            <Link key={guide.id} className="dx-guide" href={guide.href}>
-              <Art art={guide.art} className="dx-pic dx-guide-art" />
-              <span className="dx-guide-text">
-                <span className="dx-guide-title">{guide.title}</span>
-                <span className="dx-guide-desc">
-                  <Rich text={guide.summary} />
-                </span>
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
 
       <div className="dx-columns">
         <div className="dx-article">
@@ -95,6 +76,23 @@ export default function DocsHome() {
             <DocNote>
               <Rich text={kickstart.never} />
             </DocNote>
+          </section>
+
+          <section className="dx-sec" id={DOCS_NEXT.id} aria-labelledby={`${DOCS_NEXT.id}-title`}>
+            <h2 id={`${DOCS_NEXT.id}-title`}>{DOCS_NEXT.title}</h2>
+            <div className="dx-guides">
+              {DOCS_START.map((guide) => (
+                <Link key={guide.id} className="dx-guide" href={guide.href}>
+                  <Art art={guide.art} className="dx-pic dx-guide-art" />
+                  <span className="dx-guide-text">
+                    <span className="dx-guide-title">{guide.title}</span>
+                    <span className="dx-guide-desc">
+                      <Rich text={guide.summary} />
+                    </span>
+                  </span>
+                </Link>
+              ))}
+            </div>
           </section>
 
           <section className="dx-sec" id={record.id} aria-labelledby={`${record.id}-title`}>

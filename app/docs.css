@@ -116,10 +116,15 @@
   background: var(--surface-2);
 }
 
+/*
+ * Drawn smooth: every docs picture shows at well under half its drawn size,
+ * where square-pixel scaling would turn the dither into a blocky moiré.
+ */
 .dx-pic .art-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  image-rendering: auto;
 }
 
 /* ---------- header ---------- */
@@ -138,6 +143,7 @@
 
 .dx-head h1,
 .bx-title {
+  text-wrap: balance;
   color: var(--ink-strong);
   font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 2.75rem);
@@ -147,6 +153,7 @@
 }
 
 .dx-lede {
+  text-wrap: pretty;
   max-inline-size: var(--dx-col);
   color: var(--ink-2);
   font-size: var(--fs-md);
@@ -301,8 +308,7 @@
   scroll-margin-top: var(--sp-5);
 }
 
-.dx-sec > h2,
-.dx-start-title {
+.dx-sec > h2 {
   padding-block-end: var(--sp-3);
   border-bottom: var(--bd);
   color: var(--ink-strong);
@@ -314,6 +320,7 @@
 }
 
 .dx-sec > h3 {
+  text-wrap: balance;
   color: var(--ink-strong);
   font-family: var(--font-display);
   font-size: var(--fs-lg);
@@ -347,6 +354,7 @@
 
 :is(.dx-sec, .dx-step-body, .dx-note) p,
 :is(.dx-list, .dx-bullets) li,
+.dx-terms dd,
 .dx-defs dd,
 .dx-ref dd,
 .dx-guide-desc {
@@ -354,6 +362,7 @@
   color: var(--ink);
   letter-spacing: var(--tracking-prose);
   word-spacing: var(--word-spacing-prose);
+  text-wrap: pretty;
 }
 
 /* a link in running text: ink with a dotted underline at rest, solid on hover and focus */
@@ -374,7 +383,8 @@
 }
 
 /* inline code: never below the 16px floor, and a short token never splits across lines */
-.dx-page :is(p, li, dd, .dx-guide-desc) > code {
+.dx-page :is(p, li, dd, .dx-guide-desc) > code,
+.dx-page .dx-nowrap > code {
   padding: 0 0.25em;
   background: var(--surface-2);
   font-family: var(--font-mono);
@@ -392,45 +402,59 @@
 
 /* ---------- lists ---------- */
 
-.dx-list,
 .dx-bullets {
   display: grid;
   gap: var(--sp-3);
   padding-inline-start: 1.5em;
-}
-
-/* room for a two-digit mono number, so the markers stay inside the column */
-.dx-list {
-  padding-inline-start: 2.5em;
-  list-style: decimal;
-}
-
-.dx-bullets {
   list-style: disc;
 }
 
-.dx-list li::marker {
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+.dx-bullets li {
+  padding-inline-start: var(--sp-1);
 }
 
 .dx-bullets li::marker {
   color: var(--ink-3);
 }
 
-.dx-list li,
-.dx-bullets li {
-  padding-inline-start: var(--sp-1);
+/*
+ * A procedure is one bounded block: numbered rows under a hairline frame, the
+ * number in a column of its own, so a step and the commands under it read as
+ * one unit.
+ */
+.dx-list {
+  padding: 0;
+  border: var(--bd);
+  list-style: none;
+  counter-reset: dx-step;
 }
 
-/* a numbered step that carries commands: the steps need more room between them */
-.dx-list:has(.dx-cmds),
-.dx-bullets:has(.dx-cmd) {
-  gap: var(--sp-5);
+.dx-list > li {
+  position: relative;
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) calc(var(--sp-4) + 1.75rem + var(--sp-3));
+  counter-increment: dx-step;
 }
 
-:is(.dx-list, .dx-bullets) li > :is(.dx-cmds, .dx-cmd) {
+.dx-list > li + li {
+  border-top: var(--bd);
+}
+
+.dx-list > li::before {
+  content: counter(dx-step);
+  position: absolute;
+  inset-block-start: var(--sp-3);
+  inset-inline-start: var(--sp-4);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.dx-list > li > :is(.dx-cmds, .dx-cmd) {
+  margin-block-start: var(--sp-3);
+}
+
+.dx-bullets li > :is(.dx-cmds, .dx-cmd) {
   margin-block-start: var(--sp-3);
 }
 
@@ -463,9 +487,9 @@
     display: none;
   }
 
-  /* and a command inside a numbered step takes the column's full width */
-  .dx-list li > .dx-cmds {
-    margin-inline-start: calc(-2.5em - var(--sp-1));
+  /* and a command inside a numbered step takes the row's full width */
+  .dx-list > li > :is(.dx-cmds, .dx-cmd) {
+    margin-inline-start: calc(-1.75rem - var(--sp-3));
   }
 
   .dx-bullets li > :is(.dx-cmds, .dx-cmd) {
@@ -532,16 +556,47 @@
   color: var(--ink-strong);
 }
 
-/* ---------- definitions and the command reference ---------- */
+/* ---------- terms, definitions and the command reference ---------- */
 
-.dx-defs {
+/*
+ * A term table: each term and its meaning on one row under a hairline frame,
+ * the two columns lined up once there is room for them, stacked on a phone.
+ * Flags, roles, files, redaction categories and the cli reference all use it.
+ */
+.dx-terms,
+.dx-defs,
+.dx-ref {
   display: grid;
-  gap: var(--sp-6);
+  border: var(--bd);
 }
 
-.dx-defs > div {
+:is(.dx-terms, .dx-defs, .dx-ref) > div {
   display: grid;
-  gap: var(--sp-2);
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+:is(.dx-terms, .dx-defs, .dx-ref) > div + div {
+  border-top: var(--bd);
+}
+
+:is(.dx-terms, .dx-defs, .dx-ref) dd {
+  margin: 0;
+}
+
+.dx-terms dt,
+.dx-ref dt {
+  color: var(--ink-strong);
+  overflow-wrap: anywhere;
+}
+
+.dx-terms dt code,
+.dx-ref dt code {
+  padding: 0;
+  background: none;
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
 }
 
 .dx-defs dt {
@@ -551,13 +606,26 @@
   gap: var(--sp-2);
   color: var(--ink-strong);
   font-family: var(--font-mono);
-  font-size: var(--fs-md);
+  font-size: var(--fs-body);
   font-weight: 700;
   letter-spacing: 0;
 }
 
-.dx-defs dd {
-  margin: 0;
+:is(.dx-terms, .dx-ref) dd {
+  font-size: var(--fs-body);
+}
+
+/* a table inside a definition reads as plain rows, without a second frame */
+.dx-defs dd :is(.dx-terms, .dx-list) {
+  border: 0;
+}
+
+.dx-defs dd .dx-terms > div {
+  padding: var(--sp-1) 0;
+}
+
+.dx-defs dd .dx-terms > div + div {
+  border-top: 0;
 }
 
 .dx-defs dd > .dx-bullets {
@@ -573,40 +641,26 @@
   font-weight: 600;
 }
 
-/* every command on its own row; the two columns line up once there is room for them */
-.dx-ref {
-  display: grid;
-  border-top: var(--bd);
-}
-
-.dx-ref > div {
-  display: grid;
-  gap: var(--sp-1);
-  padding-block: var(--sp-3);
-  border-bottom: var(--bd);
-}
-
-.dx-ref dt code {
-  color: var(--ink-strong);
-  font-family: var(--font-mono);
-  font-size: var(--fs-body);
-}
-
-.dx-ref dd {
-  margin: 0;
-  font-size: var(--fs-body);
-}
-
 @container dx-page (min-width: 36rem) {
+  .dx-terms,
+  .dx-defs,
   .dx-ref {
-    grid-template-columns: minmax(0, 15.5rem) minmax(0, 1fr);
+    grid-template-columns: fit-content(15.5rem) minmax(0, 1fr);
   }
 
-  .dx-ref > div {
+  :is(.dx-terms, .dx-defs, .dx-ref) > div {
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
     gap: var(--sp-1) var(--sp-6);
     align-items: baseline;
+  }
+
+  .dx-defs dd :is(.dx-terms, .dx-ref) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dx-defs dd :is(.dx-terms, .dx-ref) > div {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -642,80 +696,87 @@
   letter-spacing: 0;
 }
 
-/* ---------- the overview's starting points ---------- */
+/* ---------- the overview's next steps ---------- */
 
 /*
- * A row with a small picture on a phone; two by two, then four across, with
- * the picture on top once there is room. Never three and one.
+ * Each card is one bordered link: its picture panel at the top, then the title
+ * and the text on the card's own padding. Two across in the reading column,
+ * the same height in a row; a compact row with a small picture on a phone.
+ * Never three and one.
  */
-.dx-start {
-  display: grid;
-  gap: var(--sp-5);
-  max-width: calc(var(--dx-col) + var(--sp-8) + var(--dx-aside));
-}
-
 .dx-guides {
   display: grid;
-  gap: var(--sp-5);
+  gap: var(--sp-4);
   grid-template-columns: minmax(0, 1fr);
 }
 
 .dx-guide {
   display: grid;
   grid-template-columns: 7.5rem minmax(0, 1fr);
-  gap: var(--sp-4);
-  align-items: center;
+  align-items: stretch;
+  border: var(--bd);
+  background: var(--surface);
   color: inherit;
   text-decoration: none;
 }
 
-/* a phone-sized thumbnail is drawn smooth: scaled this far down, square pixels drop the thin strokes */
-.dx-guide .dx-pic .art-img {
-  image-rendering: auto;
+/* on a phone the picture fills the row's height beside the text, at no fixed shape */
+.dx-guide .dx-pic {
+  aspect-ratio: auto;
+  min-height: 5.5rem;
+  border: 0;
+  border-inline-end: var(--bd);
 }
 
 .dx-guide-text {
   display: grid;
   gap: var(--sp-1);
+  align-content: start;
+  padding: var(--sp-3) var(--sp-4);
 }
 
 .dx-guide-title {
   color: var(--ink-strong);
   font-family: var(--font-mono);
-  font-size: var(--fs-md);
+  font-size: var(--fs-body);
   font-weight: 700;
   line-height: 1.4;
   letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .dx-guide-desc {
   color: var(--ink-2);
   font-size: var(--fs-body);
   line-height: 1.5;
+  text-wrap: pretty;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dx-guide:hover {
+    border-color: var(--rule-strong);
+  }
 }
 
 @container dx-page (min-width: 34rem) {
   .dx-guides {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--sp-6) var(--sp-5);
-  }
-
-  .dx-guide .dx-pic .art-img {
-    image-rendering: pixelated;
   }
 
   .dx-guide {
     grid-template-columns: minmax(0, 1fr);
-    align-items: start;
-    align-content: start;
-    gap: var(--sp-3);
+    grid-template-rows: auto 1fr;
   }
 
-}
+  .dx-guide .dx-pic {
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+    border-inline-end: 0;
+    border-block-end: var(--bd);
+  }
 
-@container dx-page (min-width: 56rem) {
-  .dx-guides {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .dx-guide-text {
+    padding: var(--sp-4);
   }
 }
 
@@ -812,6 +873,7 @@
 }
 
 .bx-post-title {
+  text-wrap: balance;
   color: var(--ink-strong);
   font-family: var(--font-display);
   font-size: var(--fs-lg);
@@ -822,6 +884,7 @@
 
 .bx-post-desc {
   color: var(--ink-3);
+  text-wrap: pretty;
 }
 
 .bx-essay {
@@ -855,6 +918,7 @@
 .bx-body p,
 .bx-body li {
   color: var(--ink);
+  text-wrap: pretty;
 }
 
 .bx-body li {
@@ -1046,4 +1110,9 @@
   .dx-search-close {
     display: inline-flex;
   }
+}
+
+/* a span and the punctuation after it stay on one line */
+.dx-nowrap {
+  white-space: nowrap;
 }

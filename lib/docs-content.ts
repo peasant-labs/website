@@ -42,7 +42,7 @@ export const DOCS_GUIDES = [
   },
 ] as const;
 
-/** the overview's starting points: the two guides, and the two sections most people look for first */
+/** the overview's next steps: the two guides, and the two sections most people look for */
 export const DOCS_START = [
   {
     id: "publish",
@@ -458,8 +458,11 @@ export const DOCS_HOME_SECTIONS = [
   DOCS_HOME.cli,
 ] as const;
 
-/** the overview's "on this page" list: a section's short label where it has one */
-export const DOCS_HOME_TOC = DOCS_HOME_SECTIONS.map((section) => ({
-  id: section.id,
-  label: "toc" in section ? section.toc : section.title,
-}));
+/** the overview's cards to the guides and the sections most people look for, after install and set up */
+export const DOCS_NEXT = { id: "guides", title: "next steps" } as const;
+
+/** the overview's "on this page" list, in page order: a section's short label where it has one */
+export const DOCS_HOME_TOC = DOCS_HOME_SECTIONS.flatMap((section) => [
+  { id: section.id, label: "toc" in section ? section.toc : section.title },
+  ...(section.id === "kickstart" ? [{ id: DOCS_NEXT.id, label: DOCS_NEXT.title }] : []),
+]);

@@ -102,8 +102,34 @@ export function DocJump({ items }: { items: readonly { id: string; label: string
   );
 }
 
-/** A list of short lines: numbered when the order is the point, bulleted otherwise. */
+/* "`--flag`: what it does" or "**Name**: what it is": a term, then its meaning */
+const TERM = /^((?:`[^`]+`|\*\*[^*]+\*\*)[^:]*?): (.+)$/;
+
+const sentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
+/**
+ * A list of short lines: numbered rows when the order is the point. When every
+ * line names a term and its meaning, it is a two-column table of terms;
+ * otherwise plain bullets.
+ */
 export function DocList({ items, ordered = false }: { items: readonly string[]; ordered?: boolean }) {
+  const terms = ordered ? null : items.map((item) => TERM.exec(item));
+  if (terms && terms.every(Boolean)) {
+    return (
+      <dl className="dx-terms">
+        {terms.map((match) => (
+          <div key={match![1]}>
+            <dt>
+              <Rich text={match![1]} />
+            </dt>
+            <dd>
+              <Rich text={sentence(match![2]!)} />
+            </dd>
+          </div>
+        ))}
+      </dl>
+    );
+  }
   const Tag = ordered ? "ol" : "ul";
   return (
     <Tag className={ordered ? "dx-list" : "dx-bullets"}>
