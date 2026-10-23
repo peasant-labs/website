@@ -3,8 +3,8 @@ import { metadataForRoute } from "@/lib/projects";
 import Link from "next/link";
 
 export const metadata = metadataForRoute({
-  title: "about | peasant labs",
-  description: "who peasant labs is and what the tools are for.",
+  title: "about | peasant",
+  description: "who we are and what peasant is for.",
   canonical: "/about",
 });
 
@@ -22,8 +22,8 @@ export default function AboutPage() {
               about
             </h1>
             <p className="pj-lede" data-reading-text>
-              peasant labs builds the tools for keeping the sessions your coding agents
-              leave behind, and for publishing only the ones you choose. the full account
+              we build peasant: the tools for keeping the sessions your coding agents leave
+              behind, and for publishing only the ones you choose. the full account
               of why is in{" "}
               <Link className="site-link" href="/blog/reclaiming-data-autonomy-as-a-peasant">
                 the essay on the blog

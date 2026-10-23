@@ -8,7 +8,7 @@ import { metadataForRoute } from "@/lib/projects";
 import Link from "next/link";
 
 export const metadata = metadataForRoute({
-  title: "docs | peasant labs",
+  title: "docs | peasant",
   description: DOCS_HOME.lede,
   canonical: "/docs",
 });

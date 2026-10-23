@@ -9,7 +9,7 @@ import Link from "next/link";
 const LEDE = "Essays on who owns the data that agent work produces.";
 
 export const metadata = metadataForRoute({
-  title: "blog | peasant labs",
+  title: "blog | peasant",
   description: LEDE,
   canonical: "/blog",
 });

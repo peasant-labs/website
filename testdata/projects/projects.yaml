@@ -27,33 +27,33 @@ site:
       path: /
       h1: data commons built by commoners
       metadata:
-        title: "peasant labs: data commons built by commoners"
+        title: "peasant: data commons built by commoners"
         description: Record, publish, and share agent sessions with people you trust.
         canonical: https://peasantlabs.org
         openGraph:
-          title: "peasant labs: data commons built by commoners"
+          title: "peasant: data commons built by commoners"
           description: Record, publish, and share agent sessions with people you trust.
           url: https://peasantlabs.org
           type: website
         twitter:
           card: summary_large_image
-          title: "peasant labs: data commons built by commoners"
+          title: "peasant: data commons built by commoners"
           description: Record, publish, and share agent sessions with people you trust.
     - id: projects
       path: /projects
       h1: a commons for AI coding transcripts
       metadata:
-        title: projects | peasant labs
+        title: projects | peasant
         description: peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.
         canonical: https://peasantlabs.org/projects
         openGraph:
-          title: projects | peasant labs
+          title: projects | peasant
           description: peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.
           url: https://peasantlabs.org/projects
           type: website
         twitter:
           card: summary_large_image
-          title: projects | peasant labs
+          title: projects | peasant
           description: peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.
     - id: peasant
       path: /projects/peasant
@@ -91,113 +91,113 @@ site:
       path: /docs
       h1: docs
       metadata:
-        title: docs | peasant labs
+        title: docs | peasant
         description: Install peasant, publish a session, then pick a guide.
         canonical: https://peasantlabs.org/docs
         openGraph:
-          title: docs | peasant labs
+          title: docs | peasant
           description: Install peasant, publish a session, then pick a guide.
           url: https://peasantlabs.org/docs
           type: website
         twitter:
           card: summary_large_image
-          title: docs | peasant labs
+          title: docs | peasant
           description: Install peasant, publish a session, then pick a guide.
     - id: guide-evals
       path: /docs/guides/evals
       h1: run an agent eval
       metadata:
-        title: run an agent eval | peasant labs docs
+        title: run an agent eval | peasant docs
         description: Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.
         canonical: https://peasantlabs.org/docs/guides/evals
         openGraph:
-          title: run an agent eval | peasant labs docs
+          title: run an agent eval | peasant docs
           description: Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.
           url: https://peasantlabs.org/docs/guides/evals
           type: website
         twitter:
           card: summary_large_image
-          title: run an agent eval | peasant labs docs
+          title: run an agent eval | peasant docs
           description: Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.
     - id: guide-reviews
       path: /docs/guides/reviews
       h1: review pull requests
       metadata:
-        title: review pull requests | peasant labs docs
+        title: review pull requests | peasant docs
         description: Show reviewers the agent sessions behind a change, right from the pull request.
         canonical: https://peasantlabs.org/docs/guides/reviews
         openGraph:
-          title: review pull requests | peasant labs docs
+          title: review pull requests | peasant docs
           description: Show reviewers the agent sessions behind a change, right from the pull request.
           url: https://peasantlabs.org/docs/guides/reviews
           type: website
         twitter:
           card: summary_large_image
-          title: review pull requests | peasant labs docs
+          title: review pull requests | peasant docs
           description: Show reviewers the agent sessions behind a change, right from the pull request.
     - id: blog
       path: /blog
       h1: blog
       metadata:
-        title: blog | peasant labs
+        title: blog | peasant
         description: Essays on who owns the data that agent work produces.
         canonical: https://peasantlabs.org/blog
         openGraph:
-          title: blog | peasant labs
+          title: blog | peasant
           description: Essays on who owns the data that agent work produces.
           url: https://peasantlabs.org/blog
           type: website
         twitter:
           card: summary_large_image
-          title: blog | peasant labs
+          title: blog | peasant
           description: Essays on who owns the data that agent work produces.
     - id: post-reclaiming
       path: /blog/reclaiming-data-autonomy-as-a-peasant
       h1: Reclaiming Data Autonomy as a Peasant
       metadata:
-        title: Reclaiming Data Autonomy as a Peasant | peasant labs
+        title: Reclaiming Data Autonomy as a Peasant | peasant
         description: We are developing the suite of tools required to safely share and manage access to transcripts produced by coding agent sessions.
         canonical: https://peasantlabs.org/blog/reclaiming-data-autonomy-as-a-peasant
         openGraph:
-          title: Reclaiming Data Autonomy as a Peasant | peasant labs
+          title: Reclaiming Data Autonomy as a Peasant | peasant
           description: We are developing the suite of tools required to safely share and manage access to transcripts produced by coding agent sessions.
           url: https://peasantlabs.org/blog/reclaiming-data-autonomy-as-a-peasant
           type: article
         twitter:
           card: summary_large_image
-          title: Reclaiming Data Autonomy as a Peasant | peasant labs
+          title: Reclaiming Data Autonomy as a Peasant | peasant
           description: We are developing the suite of tools required to safely share and manage access to transcripts produced by coding agent sessions.
     - id: about
       path: /about
       h1: about
       metadata:
-        title: about | peasant labs
-        description: who peasant labs is and what the tools are for.
+        title: about | peasant
+        description: who we are and what peasant is for.
         canonical: https://peasantlabs.org/about
         openGraph:
-          title: about | peasant labs
-          description: who peasant labs is and what the tools are for.
+          title: about | peasant
+          description: who we are and what peasant is for.
           url: https://peasantlabs.org/about
           type: website
         twitter:
           card: summary_large_image
-          title: about | peasant labs
-          description: who peasant labs is and what the tools are for.
+          title: about | peasant
+          description: who we are and what peasant is for.
     - id: contact
       path: /contact
       h1: contact
       metadata:
-        title: contact | peasant labs
+        title: contact | peasant
         description: leave an email — one message when the work is published.
         canonical: https://peasantlabs.org/contact
         openGraph:
-          title: contact | peasant labs
+          title: contact | peasant
           description: leave an email — one message when the work is published.
           url: https://peasantlabs.org/contact
           type: website
         twitter:
           card: summary_large_image
-          title: contact | peasant labs
+          title: contact | peasant
           description: leave an email — one message when the work is published.
   sitemap:
     - https://peasantlabs.org
@@ -223,9 +223,9 @@ catalog:
       target: /projects/village
       action: explore village
       kind: open-source
-  # "what is peasant labs?" is the one-paragraph answer and carries no cards;
+  # "what is peasant?" is the one-paragraph answer and carries no cards;
   # the cards have a section of their own immediately before the comparison.
-  whatTitle: what is peasant labs?
+  whatTitle: what is peasant?
   # two authored lines: the break is a real newline in the DOM, rendered by CSS
   # rather than left to wherever the column happens to wrap.
   cardsTitle: "our projects,\nlocal and open-source"
@@ -451,8 +451,8 @@ evidence:
     internalProvenance: Complete official Entire capability corpus
 comparison:
   title: how it compares to similar tools
-  intro: here is what peasant labs does next to the closest public tools in this space, checked against their public docs and our own source.
-  bundleDefinition: peasant labs means peasant, village, and the schema they share. the other column covers similar tools and the documentation they publish.
+  intro: here is what peasant does next to the closest public tools in this space, checked against their public docs and our own source.
+  bundleDefinition: peasant here means both tools, peasant on your computer and village online, and the schema they share. the other column covers similar tools and the documentation they publish.
   meaningNote: a dash means we did not find it in those tools' public docs. it does not mean they cannot do it.
   rows:
     - id: keep-it-local

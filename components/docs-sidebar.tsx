@@ -91,7 +91,7 @@ export function DocsSidebar() {
       groups={groups}
       currentId={currentDocsItem(pathname) ?? undefined}
       homeHref="/"
-      brand="peasant labs"
+      brand="peasant"
       label="docs"
       LinkComponent={Link}
       accountSlot={

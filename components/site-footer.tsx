@@ -9,7 +9,7 @@ export function SiteFooter() {
       <div className="site-wrap site-foot-inner">
         <Link className="site-brand site-foot-brand" href="/">
           <Mark className="site-brand-mark" />
-          peasant labs
+          peasant
         </Link>
         <nav className="site-foot-nav" aria-label="footer">
           {FOOTER_NAV.map((item) =>

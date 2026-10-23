@@ -4,9 +4,9 @@
  * shared link card and the embedded text never drift apart.
  */
 export const site = {
-  name: "peasant labs",
+  name: "peasant",
   url: "https://peasantlabs.org",
-  title: "peasant labs: data commons built by commoners",
+  title: "peasant: data commons built by commoners",
   description: "Record, publish, and share agent sessions with people you trust.",
   /* the short line used on social cards */
   tagline: "Record, publish, and share agent sessions with people you trust.",

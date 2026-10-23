@@ -28,7 +28,7 @@ export async function generateMetadata({
   const post = postBySlug(slug);
   if (!post) return {};
   const metadata = metadataForRoute({
-    title: `${post.title} | peasant labs`,
+    title: `${post.title} | peasant`,
     description: post.description,
     canonical: `/blog/${post.slug}`,
   });
@@ -51,7 +51,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         </nav>
         <h1 className="bx-title">{post.title}</h1>
         <p className="bx-meta">
-          peasant labs · <time dateTime={post.published}>{formatPostDate(post.published)}</time>
+          peasant · <time dateTime={post.published}>{formatPostDate(post.published)}</time>
         </p>
         <Art art={post.art} className="bx-figure" />
         <div className="bx-body prose">

@@ -274,7 +274,7 @@ function ComparisonTable() {
         data-table-scroll
         data-contained-overflow
         role="region"
-        aria-label="peasant labs and similar tools comparison"
+        aria-label="peasant and similar tools comparison"
         tabIndex={0}
       >
         {/* No caption: the section heading names the table for assistive tech. */}
@@ -285,7 +285,7 @@ function ComparisonTable() {
                 what you can do
               </th>
               <th className="tbl-th" scope="col">
-                peasant labs
+                peasant
               </th>
               <th className="tbl-th" scope="col">
                 similar tools

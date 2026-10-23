@@ -21,7 +21,6 @@ export const metadata: Metadata = {
   authors: [{ name: site.name }],
   keywords: [
     "peasantlabs",
-    "peasant labs",
     "peasant",
     "village",
     "agent sessions",

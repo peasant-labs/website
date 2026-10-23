@@ -3,7 +3,7 @@ import { SiteShell } from "@/components/site-shell";
 import { metadataForRoute } from "@/lib/projects";
 
 export const metadata = metadataForRoute({
-  title: "contact | peasant labs",
+  title: "contact | peasant",
   description: "leave an email — one message when the work is published.",
   canonical: "/contact",
 });

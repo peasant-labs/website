@@ -9,7 +9,7 @@ const LEDE =
   "Collect real coding-agent sessions from many people into one collective, redacted on each computer, then pull the approved set to yours.";
 
 export const metadata = metadataForRoute({
-  title: "run an agent eval | peasant labs docs",
+  title: "run an agent eval | peasant docs",
   description: LEDE,
   canonical: GUIDE.href,
 });

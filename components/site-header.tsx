@@ -148,7 +148,7 @@ export function SiteHeader() {
       <div className="site-wrap site-bar-inner">
         <Link className="site-brand" href="/">
           <Mark className="site-brand-mark" />
-          peasant labs
+          peasant
         </Link>
         <SiteNav />
         <div className="site-bar-actions">

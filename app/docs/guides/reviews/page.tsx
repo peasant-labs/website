@@ -8,7 +8,7 @@ const GUIDE = DOCS_GUIDES.find((guide) => guide.id === "reviews")!;
 const LEDE = "Show reviewers the agent sessions behind a change, right from the pull request.";
 
 export const metadata = metadataForRoute({
-  title: "review pull requests | peasant labs docs",
+  title: "review pull requests | peasant docs",
   description: LEDE,
   canonical: GUIDE.href,
 });

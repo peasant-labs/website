@@ -92,7 +92,7 @@ export default async function Image() {
             <path d="M9 15l-4-3" />
             <path d="M9 15l4-3" />
           </svg>
-          <div style={{ fontSize: 30, fontWeight: 700, color: C.primary }}>peasant labs</div>
+          <div style={{ fontSize: 30, fontWeight: 700, color: C.primary }}>peasant</div>
         </div>
 
         {/* the pitch */}

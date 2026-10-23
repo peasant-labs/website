@@ -1,5 +1,5 @@
 /**
- * the peasant labs mark — a wheat stalk. the same geometry as app/icon.svg
+ * the peasant mark — a wheat stalk. the same geometry as app/icon.svg
  * (the favicon), so brand and tab icon stay in lockstep.
  *
  * decorative by default (aria-hidden); the surrounding link/heading

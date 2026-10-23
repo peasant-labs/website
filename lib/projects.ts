@@ -2,7 +2,7 @@ import type { RedactionCategory } from "@peasant-labs/fairtrade/ui";
 import type { Metadata } from "next";
 
 export const SITE_URL = "https://peasantlabs.org" as const;
-export const SITE_NAME = "peasant labs" as const;
+export const SITE_NAME = "peasant" as const;
 
 export type ProjectSlug = "peasant" | "village";
 export type Three<T> = readonly [T, T, T];
@@ -808,7 +808,7 @@ export type SuiteQuestion = Readonly<{
 
 export const SUITE = {
   metadata: {
-    title: "projects | peasant labs",
+    title: "projects | peasant",
     description:
       "peasant keeps the sessions your coding agents leave behind on your own machine. village is where you publish the ones worth sharing.",
     canonical: "/projects",
@@ -832,11 +832,11 @@ export const SUITE = {
   install: {
     command: "curl -fsSL https://peasantlabs.org/install | bash",
   },
-  whatTitle: "what is peasant labs?",
+  whatTitle: "what is peasant?",
   // The FAQ answers the licensing question in full. This paragraph only defines
   // the two tools and does not carry legal or availability qualifiers.
   whatIntro:
-    "peasant labs makes your coding agent sessions shareable only with people you trust, private, and searchable. it is made of two tools, peasant and village.",
+    "peasant makes your coding agent sessions shareable only with people you trust, private, and searchable. it is made of two tools: peasant on your computer, and village online.",
   /* Two lines: the section is what we make, then what that means. The break is
    * authored rather than left to wrapping — `white-space: pre-line` on the
    * heading keeps it wherever the line lands. */
@@ -1248,9 +1248,9 @@ export const COMPARISON_MARKS = {
 export const COMPARISON = {
   title: "how it compares to similar tools",
   intro:
-    "here is what peasant labs does next to the closest public tools in this space, checked against their public docs and our own source.",
+    "here is what peasant does next to the closest public tools in this space, checked against their public docs and our own source.",
   bundleDefinition:
-    "peasant labs means peasant, village, and the schema they share. the other column covers similar tools and the documentation they publish.",
+    "peasant here means both tools, peasant on your computer and village online, and the schema they share. the other column covers similar tools and the documentation they publish.",
   meaningNote:
     "a dash means we did not find it in those tools' public docs. it does not mean they cannot do it.",
   /*
