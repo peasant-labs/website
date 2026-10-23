@@ -307,10 +307,14 @@ test("on a phone the row steps one card at a time and rests with a whole card at
 test("every use-case headline keeps room for two lines, so the words under it line up across the row", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const tops = await page
+  // read unrounded: offsetTop rounds, so tops a sixteenth of a pixel apart can land either side of .5
+  const spread = await page
     .locator("[data-use-cases] .uc-card:not([aria-hidden]) .uc-cap-detail")
-    .evaluateAll((items) => new Set(items.map((item) => (item as HTMLElement).offsetTop)).size);
-  expect(tops).toBe(1);
+    .evaluateAll((items) => {
+      const tops = items.map((item) => item.getBoundingClientRect().top);
+      return Math.max(...tops) - Math.min(...tops);
+    });
+  expect(spread).toBeLessThan(1);
 });
 
 test("the row drifts on its own and loops, holds when hovered, and stands still and snaps under reduced motion", async ({
