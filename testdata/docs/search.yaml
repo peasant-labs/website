@@ -1,0 +1,15 @@
+# The docs search: what a reader types and where the first result must take
+# them. Each case names a section heading or words only that section holds.
+version: 1
+cases:
+  - { query: kickstart, href: "/docs#kickstart" }
+  - { query: invite by github username, href: "/docs/guides/evals#invite" }
+  - { query: prune, href: "/docs#prune" }
+  - { query: peasant attach, href: "/docs/guides/reviews#attach" }
+  - { query: sign out everywhere, href: "/docs#sign-in" }
+  - { query: walled gardens, href: "/blog/reclaiming-data-autonomy-as-a-peasant" }
+# every way to open search; each must put focus in the search field
+openers:
+  - { key: "Control+k" }
+  - { key: "Meta+k" }
+  - { key: "/" }

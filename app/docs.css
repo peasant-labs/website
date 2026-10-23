@@ -924,3 +924,126 @@
 .essay-problems li::marker {
   color: var(--amber);
 }
+
+/* ---------- docs search: fairtrade's command palette, with a snippet under each hit ---------- */
+
+.dx-search-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.dx-search .cp-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(40rem, 100%);
+  max-height: calc(100dvh - 12vh - var(--sp-5));
+}
+
+.dx-search .cp-results {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+}
+
+.dx-hit {
+  grid-template-columns: var(--sp-3) var(--ic-md) minmax(0, 1fr);
+  align-items: start;
+  padding-block: var(--sp-3);
+}
+
+.dx-hit > .lucide {
+  margin-block-start: 2px;
+}
+
+.dx-hit-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dx-hit-title {
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  overflow-wrap: anywhere;
+}
+
+/* the snippet is reading text: the proportional face at the 16px floor, two lines at most */
+.dx-hit-snip {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  letter-spacing: var(--tracking-prose);
+  word-spacing: var(--word-spacing-prose);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.dx-hit mark {
+  background: color-mix(in srgb, var(--amber) 24%, transparent);
+  color: var(--ink-strong);
+  font-weight: 700;
+}
+
+.dx-search-status {
+  padding: var(--sp-5) var(--sp-4);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+}
+
+.dx-search-close {
+  display: none;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--target-comfortable);
+  padding: 0 var(--sp-2);
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  cursor: pointer;
+}
+
+.dx-search-close .lucide {
+  width: var(--ic-md);
+  height: var(--ic-md);
+}
+
+/* on a phone, search is a full-screen sheet with its own close */
+@media (max-width: 47.99rem) {
+  .dx-search.cmdk {
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .dx-search .cp-panel {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+  }
+
+  .dx-search .cp-search {
+    height: auto;
+    min-height: var(--target-comfortable);
+  }
+
+  .dx-search-esc,
+  .dx-search .cp-keys {
+    display: none;
+  }
+
+  .dx-search-close {
+    display: inline-flex;
+  }
+}

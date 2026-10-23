@@ -1,11 +1,22 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parse } from "yaml";
+import { PHONE } from "./landing-fixture";
 
 type AnchorsFixture = { version: 1; pages: Array<{ path: string; ids: string[] }> };
+type SearchFixture = {
+  version: 1;
+  cases: Array<{ query: string; href: string }>;
+  openers: Array<{ key: string }>;
+};
 
 const anchors = parse(readFileSync(resolve("testdata/docs/anchors.yaml"), "utf8")) as AnchorsFixture;
+const search = parse(readFileSync(resolve("testdata/docs/search.yaml"), "utf8")) as SearchFixture;
+const landing = parse(readFileSync(resolve("testdata/landing/landing.yaml"), "utf8")) as {
+  posts: Array<{ slug: string }>;
+};
 
 test("every docs address the apps link to still lands on its section", async ({ page }) => {
   for (const { path, ids } of anchors.pages) {
@@ -14,4 +25,78 @@ test("every docs address the apps link to still lands on its section", async ({ 
       await expect(page.locator(`[id="${id}"]`), `${path}#${id} is gone`).toHaveCount(1);
     }
   }
+});
+
+test("the search index holds every docs page, every linked section and every post", async ({ request }) => {
+  const response = await request.get("/docs/search-index.json");
+  expect(response.status()).toBe(200);
+  const index = (await response.json()) as { docs: Array<{ href: string; text: string }> };
+  const hrefs = new Set(index.docs.map((doc) => doc.href));
+  for (const { path, ids } of anchors.pages) {
+    expect(hrefs.has(path), `${path} is not indexed`).toBe(true);
+    for (const id of ids) expect(hrefs.has(`${path}#${id}`), `${path}#${id} is not indexed`).toBe(true);
+  }
+  for (const post of landing.posts) expect(hrefs.has(`/blog/${post.slug}`), `${post.slug} is not indexed`).toBe(true);
+  for (const doc of index.docs) expect(doc.text.length, `${doc.href} is indexed empty`).toBeGreaterThan(0);
+});
+
+test("every shortcut opens search with the field focused, and esc gives focus back", async ({ page }) => {
+  await page.goto("/docs/guides/evals");
+  for (const { key } of search.openers) {
+    await page.locator("main h1").click();
+    await page.keyboard.press(key);
+    const field = page.getByRole("combobox", { name: "search the docs and blog" });
+    await expect(field, `${key} did not open search`).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(field).toHaveCount(0);
+  }
+  const trigger = page.getByRole("complementary", { name: "docs" }).getByRole("button", { name: /search/ });
+  await trigger.click();
+  await expect(page.getByRole("dialog", { name: "search the docs and blog" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(trigger).toBeFocused();
+});
+
+test("a search for a section lands on that section", async ({ page }) => {
+  for (const { query, href } of search.cases) {
+    await page.goto("/docs");
+    await page.keyboard.press("Control+k");
+    await page.getByRole("combobox").fill(query);
+    const first = page.getByRole("option").first();
+    await expect(first, `"${query}" has no result`).toBeVisible();
+    await expect(first).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL((url) => `${url.pathname}${url.hash}` === href);
+    const [, id] = href.split("#");
+    if (id) await expect(page.locator(`[id="${id}"]`)).toBeInViewport();
+  }
+});
+
+test("a search with no match names the query", async ({ page }) => {
+  await page.goto("/docs");
+  await page.keyboard.press("Control+k");
+  await page.getByRole("combobox").fill("zzqqzz");
+  await expect(page.locator(".cp-empty")).toContainText("zzqqzz");
+  const accessibility = await new AxeBuilder({ page }).include(".dx-search").analyze();
+  expect(accessibility.violations).toEqual([]);
+});
+
+test("on a phone search opens from the drawer as a full-screen sheet", async ({ browser }) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
+  await page.goto("/docs");
+  await page.getByRole("button", { name: "open the menu" }).tap();
+  await page.getByRole("button", { name: /search/ }).tap();
+  const panel = page.getByRole("dialog", { name: "search the docs and blog" });
+  await expect(panel).toBeVisible();
+  // full width once the opening motion settles
+  const viewport = page.viewportSize()!;
+  await expect.poll(async () => (await panel.boundingBox())?.width).toBe(viewport.width);
+  await page.getByRole("combobox").fill("prune");
+  await expect(page.getByRole("option").first()).toContainText("remove recorded sessions");
+  const accessibility = await new AxeBuilder({ page }).include(".dx-search").analyze();
+  expect(accessibility.violations).toEqual([]);
+  await page.getByRole("button", { name: "close" }).tap();
+  await expect(panel).toHaveCount(0);
+  await context.close();
 });
