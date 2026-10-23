@@ -351,9 +351,9 @@ export const VISION = {
   cta: { label: "about us", href: "/about" },
   art: art(
     "vision3",
-    "two peasants carrying a basket of grain between them, its rim in amber, in front of a cottage, with a wheat sheaf beside them",
-    880,
-    880,
+    "a cottage beside two peasants who carry one basket of grain between them, the basket in amber",
+    840,
+    360,
   ),
 } as const;
 
