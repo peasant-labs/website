@@ -7,6 +7,14 @@ header:
     - { label: docs, href: /docs }
     - { label: blog, href: /blog }
   login: { label: log in, href: https://village.peasantlabs.org/login }
+  # the phone menu, in order, then its actions
+  menu:
+    - { label: docs, href: /docs }
+    - { label: blog, href: /blog }
+    - { label: projects, href: /projects }
+    - { label: about, href: /about }
+    - { label: contact, href: /contact }
+  install: { label: install now, href: "/#install" }
 footer:
   - { label: docs, href: /docs }
   - { label: blog, href: /blog }
@@ -34,7 +42,8 @@ removed:
   - they see how it is used
   - discord
 useCases:
-  captionMs: 3500
+  slideMs: 6000
+  captionMs: 2000
   slides:
     - id: researchers
       label: researchers
@@ -64,8 +73,12 @@ how:
       body: Before anything leaves, peasant hides secrets, personal details, file paths and internal names, and shows you exactly what it hid.
     - title: publish
       body: Share transcripts for code review, radical openness, or transparent research processes.
-  consent: share it (redacted)
   publishLabel: publish
+  # what each scene shows on its finished frame, read from the real components
+  finals:
+    - { scene: record, texts: ["Uploads to staging fail with a 403 since this morning", "just now", 'peasant: opened "Uploads to staging fail with a 403 since this morning" · not published'] }
+    - { scene: review, texts: ["3 matches", "<AWS_ACCESS_KEY>", "<EMAIL>", "/Users/<USER>/src/shop/.env"] }
+    - { scene: publish, texts: ["published to eval-crowd", "eval-crowd"] }
 # the commands as scripts/install.sh and scripts/install.ps1 document themselves
 install:
   platforms:

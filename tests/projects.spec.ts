@@ -1853,7 +1853,7 @@ test("the transcript viewer mounts the real component over demo data", async ({ 
 
   // It follows the site theme rather than shipping its own.
   await expect(app).toHaveAttribute("data-theme", "dark");
-  await page.locator("[data-theme-toggle]").click();
+  await page.locator("[data-theme-toggle]").first().click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(app).toHaveAttribute("data-theme", "light");
 
@@ -2245,7 +2245,7 @@ test("skip navigation, route focus, theme persistence, and command copy work by 
   await page.keyboard.press("Enter");
   await expect(page.locator("main#content")).toBeFocused();
 
-  const themeToggle = page.locator("[data-theme-toggle]");
+  const themeToggle = page.locator("[data-theme-toggle]").first();
   await themeToggle.focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");

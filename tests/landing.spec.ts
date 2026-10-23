@@ -1,53 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { parse } from "yaml";
+import { expect, test } from "@playwright/test";
+import { loadLandingFixture, PHONE, visibleSlide } from "./landing-fixture";
 
-type Link = { label: string; href: string };
-
-type LandingFixture = {
-  version: 1;
-  header: { nav: Link[]; login: Link };
-  footer: Link[];
-  hero: {
-    title: string;
-    lede: string;
-    primary: { label: string; target: string };
-    secondary: { label: string; target: string };
-  };
-  sections: Array<{ id: string; heading: string }>;
-  removed: string[];
-  useCases: {
-    captionMs: number;
-    slides: Array<{ id: string; label: string; sentence: string; capabilities: string[]; cta: Link }>;
-  };
-  how: { steps: Array<{ title: string; body: string }>; consent: string; publishLabel: string };
-  install: { platforms: Array<{ label: string; command: string }>; kickstart: string; guide: Link };
-  session: { label: string; sessionId: string; note: string; markers: string[] };
-  vision: { line: string; cta: Link };
-  docsNav: Link[];
-  posts: Array<{ slug: string; title: string }>;
-};
-
-function loadFixture(): LandingFixture {
-  const root = parse(readFileSync(resolve("testdata/landing/landing.yaml"), "utf8")) as LandingFixture;
-  if (root?.version !== 1) {
-    throw new Error("testdata/landing/landing.yaml: expected version 1; update the loader with the fixture.");
-  }
-  for (const slide of root.useCases.slides) {
-    if (slide.capabilities.length !== 3) {
-      throw new Error(`useCases.slides.${slide.id}: a slide carries exactly three capabilities.`);
-    }
-  }
-  return root;
-}
-
-const fixture = loadFixture();
-
-async function visibleSlide(page: Page) {
-  return page.locator(".uc-panel:not([hidden])");
-}
+const fixture = loadLandingFixture();
 
 test("the landing reads in order and carries none of the removed sections", async ({ page }) => {
   const response = await page.goto("/");
@@ -153,7 +108,7 @@ test("the use-case carousel: one slide per audience, tabs, arrows and keys", asy
 
   for (const slide of fixture.useCases.slides) {
     await carousel.getByRole("tab", { name: slide.label }).click();
-    const panel = await visibleSlide(page);
+    const panel = visibleSlide(page);
     await expect(panel).toHaveCount(1);
     await expect(panel).toHaveAttribute("id", `uc-panel-${slide.id}`);
     // one picture per slide (one per theme is in the DOM; one is shown)
@@ -194,8 +149,8 @@ test("the use-case stage sets the picture beside its copy, with the tabs in one 
     const geometry = await page.evaluate(() => {
       const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
       const tabs = [...document.querySelectorAll(".uc-tab")].map((tab) => tab.getBoundingClientRect());
-      const figure = rect(".uc-panel:not([hidden]) .uc-figure");
-      const copy = rect(".uc-panel:not([hidden]) .uc-copy");
+      const figure = rect('.uc-panel[data-active="true"] .uc-figure');
+      const copy = rect('.uc-panel[data-active="true"] .uc-copy');
       const stage = rect(".uc-stage");
       const arrows = rect(".uc-arrows");
       return {
@@ -224,7 +179,7 @@ test("captions fade through one capability at a time, hold on hover, and stand s
   const carousel = page.locator("[data-use-cases]");
   await carousel.scrollIntoViewIfNeeded();
   const slide = fixture.useCases.slides[0]!;
-  const on = carousel.locator('.uc-panel:not([hidden]) .uc-cap[data-on="true"] .uc-cap-text');
+  const on = carousel.locator('.uc-panel[data-active="true"] .uc-cap[data-on="true"] .uc-cap-text');
 
   await expect(on).toHaveText([slide.capabilities[0]!]);
   await page.mouse.move(0, 0);
@@ -237,7 +192,7 @@ test("captions fade through one capability at a time, hold on hover, and stand s
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const caps = page.locator(".uc-panel:not([hidden]) .uc-cap");
+  const caps = page.locator('.uc-panel[data-active="true"] .uc-cap');
   await expect(caps.locator(".uc-cap-text")).toHaveText(slide.capabilities);
   expect(await caps.evaluateAll((items) => items.map((item) => getComputedStyle(item).opacity))).toEqual([
     "1",
@@ -246,7 +201,8 @@ test("captions fade through one capability at a time, hold on hover, and stand s
   ]);
 });
 
-test("how it works: three steps, each with its scene, and a consent line that reads right", async ({ page }) => {
+test("how it works: three steps, each with its scene; choosing one scrolls to it", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const steps = page.locator(".hw-step");
   await expect(steps.locator(".hw-step-title")).toHaveText(fixture.how.steps.map((step) => step.title));
@@ -255,82 +211,78 @@ test("how it works: three steps, each with its scene, and a consent line that re
     await steps.nth(index).click();
     await expect(steps.nth(index)).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator(".hw-step-body:visible")).toHaveText(step.body);
-    const scene = page.locator(".hw-scene");
-    await expect(scene).toHaveAttribute("role", "img");
-    expect((await scene.getAttribute("aria-label"))?.length ?? 0).toBeGreaterThan(20);
+    // the section is held while it is read: the window stays on screen
+    await expect(page.locator(".hw-window")).toBeInViewport();
+    const view = page.locator(".hw-scroll .hw-view");
+    await expect(view).toHaveAttribute("role", "img");
+    expect((await view.getAttribute("aria-label"))?.length ?? 0).toBeGreaterThan(20);
+    // the scene is fairtrade's components on a screen nobody can tab into
+    await expect(view.locator(".scn-screen")).toHaveAttribute("inert", "");
   }
 
-  await expect(page.locator(".hw-cons")).toHaveText(fixture.how.consent);
-  for (const width of [1440, 390]) {
-    await page.setViewportSize({ width, height: 900 });
-    const label = page.locator(".hw-pub");
-    await expect(label).toHaveText(fixture.how.publishLabel);
-    const fits = await label.evaluate((element) => ({
-      nowrap: getComputedStyle(element).whiteSpace === "nowrap",
-      inside: element.scrollWidth <= element.clientWidth + 1,
-    }));
-    expect(fits, `the publish label wraps or overflows at ${width}`).toEqual({ nowrap: true, inside: true });
-  }
+  // the publish action in the scene keeps its label on one line
+  const label = page.locator('.hw-view[data-scene="publish"] [data-focus="publish"]');
+  await expect(label).toHaveText(new RegExp(`^(${fixture.how.publishLabel}|done)$`));
+  expect(await label.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
 });
 
-test("under reduced motion every scene rests on its finished frame, with no cursor", async ({ page }) => {
+test("scrolling walks the held section through steps 1, 2 and 3, then lets the page go on", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
+  const steps = page.locator(".hw-step");
+  for (const [index, offset] of [0.2, 1.2, 2.2].entries()) {
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * offset);
+    await expect(steps.nth(index)).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator(".hw-window")).toBeInViewport();
+  }
+  // after the third step the section lets go and the next one arrives
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + 900 * 3.2);
+  await expect(page.locator("#install h2")).toBeInViewport();
+});
+
+test("on a phone the scene window holds under the header while the steps scroll beneath it", async ({
+  browser,
+}) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
+  await page.goto("/");
+  const flow = page.locator(".hw-flow-step");
+  await expect(flow).toHaveCount(fixture.how.steps.length);
+  for (const index of [0, 1, 2]) {
+    await flow.nth(index).evaluate((step) => step.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect(flow.nth(index)).toHaveAttribute("data-on", "true");
+    const held = await page.locator(".hw-side").evaluate((side) => {
+      const box = side.getBoundingClientRect();
+      const header = document.querySelector(".site-bar")!.getBoundingClientRect();
+      return Math.abs(box.top - header.bottom) < 2 && box.height < window.innerHeight * 0.6;
+    });
+    expect(held, `the window is not held under the header at step ${index + 1}`).toBe(true);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
+  await context.close();
+});
+
+test("under reduced motion the steps stack, each scene on its finished frame, with nothing moving", async ({
+  page,
+}) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  const steps = page.locator(".hw-step");
-
-  // Read straight away, and with the window off screen: there is nothing to wait for.
-  for (const [index] of fixture.how.steps.entries()) {
-    await steps.nth(index).click();
-    await page.evaluate(() => window.scrollTo(0, 0));
-    const frame = await page.locator(".hw-scene").evaluate((scene) => {
-      const style = (selector: string, pseudo?: string) => {
-        const element = scene.querySelector(selector);
-        return element ? getComputedStyle(element, pseudo ?? null) : null;
-      };
-      return {
-        animations: scene.getAnimations({ subtree: true }).length,
-        typedCovers: [...scene.querySelectorAll(".hw-typed")].map(
-          (typed) => getComputedStyle(typed, "::after").transform,
-        ),
-        lines: [...scene.querySelectorAll(".hw-term > div")].map((line) => getComputedStyle(line).opacity),
-        raw: [...scene.querySelectorAll(".hw-raw")].map((raw) => getComputedStyle(raw).opacity),
-        blocks: [...scene.querySelectorAll(".hw-lbl")].map((block) => getComputedStyle(block).opacity),
-        // the digit sitting in the counter's window
-        count: (() => {
-          const slot = scene.querySelector(".hw-cnt");
-          if (!slot) return null;
-          const top = slot.getBoundingClientRect().top;
-          const shown = [...slot.querySelectorAll(".hw-strip span")].find(
-            (digit) => Math.abs(digit.getBoundingClientRect().top - top) < 2,
-          );
-          return shown?.textContent ?? null;
-        })(),
-        chipSkin: style(".hw-chip", "::after")?.opacity ?? null,
-        boxSkin: style(".hw-box", "::after")?.opacity ?? null,
-        done: style(".hw-done")?.opacity ?? null,
-        cursor: style(".hw-cur-track")?.display ?? null,
-      };
-    });
-    expect(frame.animations, `scene ${index + 1} still animates`).toBe(0);
-    if (index === 0) {
-      // every line typed and shown
-      expect(frame.typedCovers.every((transform) => transform === "matrix(0, 0, 0, 1, 0, 0)")).toBe(true);
-      expect(frame.lines.every((opacity) => opacity === "1")).toBe(true);
-    }
-    if (index === 1) {
-      // the three values are hidden behind their blocks, and the count reads 3
-      expect(frame.raw).toEqual(["0", "0", "0"]);
-      expect(frame.blocks).toEqual(["1", "1", "1"]);
-      expect(frame.count).toBe("3");
-    }
-    if (index === 2) {
-      // the collective picked, the box ticked, the confirmation shown, no cursor
-      expect(frame.chipSkin).toBe("0");
-      expect(frame.boxSkin).toBe("0");
-      expect(frame.done).toBe("1");
-      expect(frame.cursor).toBe("none");
+  await expect(page.locator(".hw-scroll")).toHaveCount(0);
+  const views = page.locator(".hw-stacked .hw-view");
+  await expect(views).toHaveCount(fixture.how.finals.length);
+  for (const final of fixture.how.finals) {
+    const view = page.locator(`.hw-stacked .hw-view[data-scene="${final.scene}"]`);
+    for (const text of final.texts) {
+      await expect(view, `${final.scene} does not show ${text}`).toContainText(text);
     }
   }
+  await expect(page.locator(".hw-stacked .scn-cursor")).toHaveCount(0);
+  expect(
+    await page.locator(".hw-stacked").evaluate((section) => section.getAnimations({ subtree: true }).length),
+  ).toBe(0);
 });
 
 test("a sample session opens in fairtrade's viewer, labelled as sample, with redaction markers", async ({
@@ -377,10 +329,13 @@ test("the docs sidebar lists only destinations that exist and marks the page you
 }) => {
   await page.goto("/docs");
   const sidebar = page.getByRole("complementary", { name: "docs" });
-  const links = sidebar.locator(".dx-item");
+  const links = sidebar.locator("nav:not(.asb-apps) a.asb-item");
   expect(
     await links.evaluateAll((items) =>
-      items.map((item) => ({ label: item.textContent?.trim(), href: item.getAttribute("href") })),
+      items.map((item) => ({
+        label: item.querySelector(".asb-label")?.textContent?.trim(),
+        href: item.getAttribute("href"),
+      })),
     ),
   ).toEqual(fixture.docsNav);
 
@@ -396,21 +351,21 @@ test("the docs sidebar lists only destinations that exist and marks the page you
   for (const item of fixture.docsNav.filter((entry) => !entry.href.includes("#"))) {
     await page.goto(item.href);
     await expect(
-      page.getByRole("complementary", { name: "docs" }).locator('[aria-current="page"]'),
+      page.getByRole("complementary", { name: "docs" }).locator('nav:not(.asb-apps) [aria-current="page"]'),
     ).toHaveText(item.label);
   }
 });
 
-test("on a phone the docs sidebar folds into a menu that opens in place", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+test("on a phone the docs sidebar folds into fairtrade's top bar and drawer", async ({ browser }) => {
+  const context = await browser.newContext(PHONE);
+  const page = await context.newPage();
   await page.goto("/docs/guides/evals");
-  const menu = page.getByRole("button", { name: "open the docs menu" });
-  await expect(page.locator(".dx-item").first()).toBeHidden();
-  await menu.click();
-  await expect(page.getByRole("button", { name: "close the docs menu" })).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator(".dx-item").first()).toBeVisible();
+  await expect(page.locator(".asb-item").first()).toBeHidden();
+  await page.getByRole("button", { name: "open the menu" }).tap();
+  await expect(page.locator("nav:not(.asb-apps) a.asb-item").first()).toBeVisible();
   const accessibility = await new AxeBuilder({ page }).analyze();
   expect(accessibility.violations).toEqual([]);
+  await context.close();
 });
 
 test("the blog lists every post and each post renders under its own title", async ({ page }) => {
