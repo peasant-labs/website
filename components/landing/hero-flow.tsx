@@ -23,9 +23,9 @@ import { memo, useEffect, useRef, useState, type ReactNode } from "react";
  * never resets: a card lands on top, sinks one notch a cycle and slips behind
  * the base after four, and comes back out of the laptop on its next turn.
  *
- * The unit of every drawing is one grid cell, and the picture shows at widths
- * where a cell is a whole number of pixels: 3px on a phone and a wide screen,
- * 2px between. Glyph patterns tile from each drawing's own origin, so the
+ * The unit of every drawing is one grid cell: 3px on a phone and a wide
+ * screen, and between them as wide as the frame allows, from 2px to 3px.
+ * Glyph patterns tile from each drawing's own origin, so the
  * texture travels with a card instead of shimmering across it, and edges are
  * worked out here, cell by cell, so they step on the grid. A card moves on two
  * nested layers, across and down, each with its own curve, which bends its
@@ -689,9 +689,8 @@ const RESTING = [
 ].join("\n");
 
 /*
- * Three widths, each a whole number of pixels per cell: a phone shows its
- * layout 300px wide and a wide screen 999px wide, both at 3px a cell; between,
- * the wide layout shows 666px wide, at 2px.
+ * A phone shows its layout 300px wide, at 3px a cell; from a tablet up the
+ * wide layout fills its frame, up to 999px, also 3px a cell.
  */
 const STYLESHEET = [
   RESTING,

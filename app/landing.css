@@ -246,9 +246,7 @@
  * pictures' own: warm-grey dots and hairlines over the panel's surface, a
  * darker scatter on the ground, and amber.
  */
-/* the frame the picture sits in; the panel sizes its sides to it */
 .lp-hero-flow {
-  container-type: inline-size;
   margin-block-start: clamp(2.5rem, 5vw, 4rem);
 }
 
@@ -276,37 +274,15 @@
   max-width: 100%;
 }
 
+/*
+ * From a tablet up the stage fills the panel, which spans the frame on the
+ * page's one left edge, up to the wide layout's full size: the stage keeps its
+ * own air at every side, so the panel adds only a gutter.
+ */
 @media (min-width: 48rem) {
   .hf {
-    width: 666px;
-  }
-
-  /*
-   * Between a phone and a wide screen the stage is narrower than the frame,
-   * so the panel closes in on it: the same air at its sides as the stage
-   * keeps above and below the scene, 22 cells of 2px, or what the frame has
-   * room for on a tablet, never less than the phone's.
-   */
-  .hf-panel {
-    justify-self: center;
-    width: fit-content;
-    max-width: 100%;
-    margin-inline: auto;
-    padding-inline: max(var(--sp-4), min(44px, calc((100cqw - 668px) / 2)));
-  }
-}
-
-@media (min-width: 68.75rem) {
-  .hf {
-    width: 999px;
-  }
-
-  /* a wide screen's stage nearly fills the frame, so the panel spans it, on the page's one left edge */
-  .hf-panel {
-    justify-self: stretch;
-    width: auto;
-    margin-inline: 0;
-    padding-inline: var(--sp-4);
+    width: 100%;
+    max-width: 999px;
   }
 }
 
