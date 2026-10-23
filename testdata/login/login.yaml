@@ -1,0 +1,42 @@
+# The log-in dialog as a reader meets it, and where its github button sends
+# them for each address the online app can redirect a signed-out visitor to.
+# Authored independently of lib/site.ts: the page has to match this oracle.
+version: 1
+dialog:
+  title: log in to peasant
+  github: continue with github
+  terminal: "in the terminal: peasant village login"
+  privacy: { label: privacy notice, href: https://village.peasantlabs.org/privacy }
+# the online app's sign-in start; every case below is fulfilled locally, never fetched
+online: https://village.peasantlabs.org
+# the address the landing page is opened at, and the start address the github button must go to
+next:
+  - name: no next starts sign-in without one
+    address: /?login
+    start: https://village.peasantlabs.org/auth/start?provider=github
+  - name: a path on the online app is kept
+    address: /?login&next=%2Fcollectives%2Fabc
+    start: https://village.peasantlabs.org/auth/start?provider=github&next=%2Fcollectives%2Fabc
+  - name: a path with its own query is kept whole
+    address: /?login&next=%2Fcollectives%2Fabc%3Ftab%3Dsessions
+    start: https://village.peasantlabs.org/auth/start?provider=github&next=%2Fcollectives%2Fabc%3Ftab%3Dsessions
+  - name: a protocol-relative address to another host is dropped
+    address: /?login&next=//evil.example
+    start: https://village.peasantlabs.org/auth/start?provider=github
+  - name: an encoded protocol-relative address is dropped
+    address: /?login&next=%2F%2Fevil.example
+    start: https://village.peasantlabs.org/auth/start?provider=github
+  - name: a backslash address is dropped
+    address: /?login&next=%2F%5Cevil.example
+    start: https://village.peasantlabs.org/auth/start?provider=github
+  - name: an absolute url is dropped
+    address: /?login&next=https%3A%2F%2Fevil.example
+    start: https://village.peasantlabs.org/auth/start?provider=github
+  - name: a path with a control character is dropped
+    address: /?login&next=%2Fcollectives%0A%2Fabc
+    start: https://village.peasantlabs.org/auth/start?provider=github
+# the cases above that must never disappear from this file
+required:
+  - a path on the online app is kept
+  - a protocol-relative address to another host is dropped
+  - a backslash address is dropped
