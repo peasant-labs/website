@@ -313,7 +313,7 @@ export const INSTALL = {
  * one commit.
  */
 export const SESSION = {
-  title: "what a reviewer reads",
+  title: "we're setting a new standard for transcript sharing and viewing",
   /* the short title the reel shows for the sample, the way a curated page names a session */
   sessionTitle: "fix the staging 403",
   label: "a sample session",

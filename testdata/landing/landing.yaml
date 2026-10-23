@@ -47,7 +47,7 @@ sections:
   - { id: install, heading: get started in three commands }
   - { id: uses, heading: find your use case }
   - { id: how, heading: how it works }
-  - { id: session, heading: what a reviewer reads }
+  - { id: session, heading: "we're setting a new standard for transcript sharing and viewing" }
 # copy from earlier designs of the page that must not come back
 removed:
   - featured collectives
