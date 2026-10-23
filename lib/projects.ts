@@ -1,3 +1,4 @@
+import type { RedactionCategory } from "@peasant-labs/fairtrade/ui";
 import type { Metadata } from "next";
 
 export const SITE_URL = "https://peasantlabs.org" as const;
@@ -1167,7 +1168,8 @@ export type ComparisonRow = Readonly<{
 /** one flagged string in the redaction demo, before and after the rewrite. */
 export type RedactionMatch = Readonly<{
   id: string;
-  category: string;
+  /* one of the engine's closed set; fairtrade renders its label and fails closed on anything else */
+  category: RedactionCategory;
   confidence: number;
   secret: string;
   after: string;
@@ -1200,14 +1202,14 @@ export const REDACTION = {
   matches: [
     {
       id: "api-key",
-      category: "api-key",
+      category: "secrets",
       confidence: 0.98,
       secret: 'const BILLING_KEY = "sk_demo_000000000000000000example"',
       after: 'const BILLING_KEY = "sk_demo_••••••••••••••••••••••"',
     },
     {
       id: "email",
-      category: "email",
+      category: "pii",
       confidence: 0.91,
       secret: "// reported by alex.rivera@example.com on the 0.4 rollout",
       after: "// reported by ‹redacted-email› on the 0.4 rollout",
@@ -1215,7 +1217,7 @@ export const REDACTION = {
     },
     {
       id: "bearer-token",
-      category: "bearer-token",
+      category: "secrets",
       confidence: 0.87,
       secret: 'Authorization: "Bearer demo.example.token.value"',
       after: 'Authorization: "Bearer ‹redacted-token›"',

@@ -2157,3 +2157,19 @@
   }
 }
 
+/*
+ * fairtrade's table pins every first column at the sticky layer, unlayered, which
+ * flattens the comparison's own stacking. Restated here, unlayered and more
+ * specific: the corner over the header row over the capability column.
+ */
+.pj-comparison-table tbody tr > .pj-capability {
+  z-index: calc(var(--z-sticky) - 1);
+}
+
+.pj-comparison-table thead tr > .tbl-th {
+  z-index: var(--z-sticky);
+}
+
+.pj-comparison-table thead tr > .tbl-th:first-child {
+  z-index: calc(var(--z-sticky) + 1);
+}
