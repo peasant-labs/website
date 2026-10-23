@@ -140,21 +140,21 @@ export const USE_CASES = {
         {
           text: "build evals from real work",
           detail:
-            "Gather redacted transcripts of real coding work in a private collective, as source material for your evals.",
+            "Collect real coding sessions in a private group, secrets hidden, then download them to test agents.",
           icon: "check",
           art: capabilityArt("uc-balance", "a balance scale with an amber weight in its right pan"),
         },
         {
           text: "study how agents are used",
           detail:
-            "Read how people prompt, steer and correct their agents in the transcripts published to your collective.",
+            "Read how people actually talk to their agents and correct them, in sessions shared with your group.",
           icon: "chart",
           art: capabilityArt("uc-book", "an open book on a stand with an amber ribbon bookmark"),
         },
         {
           text: "run a class on agents",
           detail:
-            "Students publish their sessions to your class's collective, so you can see how each worked with an agent.",
+            "Students share their sessions with your class's group, so you can see how each worked with an agent.",
           icon: "class",
           art: capabilityArt("uc-slate", "a slate on an easel with an amber apple on its ledge"),
         },
@@ -169,21 +169,21 @@ export const USE_CASES = {
         {
           text: "review the work behind a diff",
           detail:
-            "Link the transcripts behind a pull request's commits, so reviewers in your collective read how it was made.",
+            "Attach the agent sessions behind your pull request, so your group can read how the change was made.",
           icon: "pull-request",
           art: capabilityArt("uc-lens", "an amber magnifying glass held up to a page"),
         },
         {
           text: "onboard from real history",
           detail:
-            "New teammates read the transcripts behind past pull requests to learn how and why the code got this way.",
+            "New teammates read the sessions behind past pull requests to learn why the code looks the way it does.",
           icon: "history",
           art: capabilityArt("uc-signpost", "a signpost with three arrows, the top one amber"),
         },
         {
           text: "learn from each other's prompts",
           detail:
-            "See how teammates prompt and steer their agents, and reuse what works.",
+            "Read what your teammates typed to their agents in the sessions they share, and reuse what works.",
           icon: "conversation",
           art: capabilityArt("uc-candles", "one candle leaning over to light another, both flames amber"),
         },
@@ -198,21 +198,21 @@ export const USE_CASES = {
         {
           text: "find any past session",
           detail:
-            "Peasant indexes sessions from the agents it supports on this computer, so you can search them and open one.",
+            "Search and open your past sessions from supported agents, all kept on your computer.",
           icon: "search",
           art: capabilityArt("uc-lantern", "a lantern with amber glass"),
         },
         {
           text: "explain a change in one comment",
           detail:
-            "Comment `/peasant attach` on a pull request, then confirm, to link your transcripts that match its commits.",
+            "Comment `/peasant attach` on your pull request, then confirm, to link your shared sessions behind its commits.",
           icon: "link",
           art: capabilityArt("uc-door", "an arched door with an amber note pinned to it"),
         },
         {
           text: "publish on every push",
           detail:
-            "Each time you push, a git hook publishes the repository's sessions, redacted, to the collectives you chose.",
+            "Turn it on once, and each push shares that project's sessions, secrets hidden, with your chosen groups.",
           icon: "send",
           art: capabilityArt("uc-bell", "an amber town crier's handbell"),
         },
@@ -227,21 +227,21 @@ export const USE_CASES = {
         {
           text: "keep agent data in-house",
           detail:
-            "Only your collective's members can read its transcripts, and joining can be limited to your GitHub org.",
+            "Only members of your group can read its sessions, and joining can be limited to your GitHub org.",
           icon: "lock",
           art: capabilityArt("uc-chest", "a closed chest with an amber padlock"),
         },
         {
           text: "see which commits agents wrote",
           detail:
-            "Peasant links a session to the commits made while it ran, so a change traces back to its transcript.",
+            "A session is linked to the commits its author made while it ran, so a change traces back to it.",
           icon: "code",
           art: capabilityArt("uc-scroll", "a written scroll with an amber wax seal"),
         },
         {
           text: "usage across teams",
           detail:
-            "A collective lists each transcript's contributor, agent and turns, with token and pull request totals.",
+            "Your group's page lists who shared what, with which agent, plus token and pull request totals.",
           icon: "chart",
           art: capabilityArt("uc-sacks", "three tied sacks rising in height like a bar chart, the tallest amber"),
         },
