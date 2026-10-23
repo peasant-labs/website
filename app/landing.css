@@ -942,26 +942,67 @@
     min-height: 13rem;
   }
 
+  /*
+   * From a tablet's width the header is taller, and it steps up out of view
+   * while reading down. The scene holds under it, so while the scene is held
+   * the header stays: its leaving would open a band above the scene, or a
+   * gap under it.
+   */
+  @media (min-width: 48rem) {
+    .hw-side {
+      inset-block-start: calc(4rem + 1px);
+    }
+
+    :root:has(.hw-scroll[data-holding="true"]) .site-bar[data-hidden="true"] {
+      transform: none;
+    }
+  }
+
+  /* replay sits on the scene's corner, so nothing stands between the scene and the step under it */
+  .hw-scroll .hw-window {
+    position: relative;
+  }
+
+  .hw-scroll .hw-foot {
+    position: absolute;
+    inset-block-end: 6px;
+    inset-inline-end: 6px;
+    margin: 0;
+  }
+
+  .hw-scroll .hw-replay {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-color: var(--rule);
+    background: color-mix(in srgb, var(--canvas) 88%, transparent);
+  }
+
+  /*
+   * The step texts run straight on under the held scene, with no height held
+   * for them: the current one reads just under the scene, the next one follows,
+   * and each slides up under the scene in turn.
+   */
   .hw-flow {
     display: grid;
+    gap: var(--sp-6);
     margin: 0;
-    padding-block: var(--sp-5) 30vh;
+    padding-block: var(--sp-2) var(--sp-6);
     list-style: none;
   }
 
   .hw-flow-step {
     display: grid;
     grid-template-columns: 2.75rem minmax(0, 1fr);
-    align-content: center;
     align-items: center;
     gap: var(--sp-2) var(--sp-3);
-    min-height: 55vh;
-    opacity: 0.4;
-    transition: opacity 320ms var(--ease-out);
   }
 
-  .hw-flow-step[data-on="true"] {
-    opacity: 1;
+  .hw-flow-step .hw-ic,
+  .hw-flow-step .hw-step-title,
+  .hw-flow-body {
+    transition:
+      color 320ms var(--ease-out),
+      border-color 320ms var(--ease-out);
   }
 
   .hw-flow-step[data-on="true"] .hw-ic {
@@ -969,18 +1010,19 @@
     color: var(--amber);
   }
 
-  .hw-flow-body {
-    grid-column: 1 / -1;
-  }
-
   .hw-flow-step[data-on="true"] .hw-step-title {
     color: var(--ink-strong);
   }
 
   .hw-flow-body {
-    color: var(--ink-2);
+    grid-column: 1 / -1;
+    color: var(--ink-3);
     font-size: 1.0625rem;
     line-height: 1.55;
+  }
+
+  .hw-flow-step[data-on="true"] .hw-flow-body {
+    color: var(--ink-2);
   }
 }
 

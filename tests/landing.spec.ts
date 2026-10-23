@@ -402,7 +402,7 @@ test("scrolling walks the held section through steps 1, 2 and 3, then lets the p
   await expect(page.locator("#install")).toBeInViewport();
 });
 
-test("on a phone the scene window holds under the header while the steps scroll beneath it", async ({
+test("on a phone the scene window holds under the header and each step reads right under it", async ({
   browser,
 }) => {
   const context = await browser.newContext(PHONE);
@@ -410,15 +410,30 @@ test("on a phone the scene window holds under the header while the steps scroll 
   await page.goto("/");
   const flow = page.locator(".hw-flow-step");
   await expect(flow).toHaveCount(fixture.how.steps.length);
+  // read down until the scene is held under the header: the first step is straight under it, with no band between
+  await page.locator(".hw-side").evaluate((side) => {
+    const header = document.querySelector(".site-bar")!.getBoundingClientRect();
+    window.scrollTo({ top: window.scrollY + side.getBoundingClientRect().top - header.bottom + 4, behavior: "instant" });
+  });
+  await expect(flow.nth(0)).toHaveAttribute("data-on", "true");
   for (const index of [0, 1, 2]) {
-    await flow.nth(index).evaluate((step) => step.scrollIntoView({ block: "center", behavior: "instant" }));
-    await expect(flow.nth(index)).toHaveAttribute("data-on", "true");
-    const held = await page.locator(".hw-side").evaluate((side) => {
-      const box = side.getBoundingClientRect();
-      const header = document.querySelector(".site-bar")!.getBoundingClientRect();
-      return Math.abs(box.top - header.bottom) < 2 && box.height < window.innerHeight * 0.6;
+    // bring each step up to the scene, the way reading down does
+    await flow.nth(index).evaluate((step) => {
+      const scene = document.querySelector(".hw-side .hw-view")!.getBoundingClientRect();
+      window.scrollTo({ top: window.scrollY + step.getBoundingClientRect().top - scene.bottom - 16, behavior: "instant" });
     });
-    expect(held, `the window is not held under the header at step ${index + 1}`).toBe(true);
+    await expect(flow.nth(index)).toHaveAttribute("data-on", "true");
+    const layout = await flow.nth(index).evaluate((step) => {
+      const side = document.querySelector(".hw-side")!.getBoundingClientRect();
+      const scene = document.querySelector(".hw-side .hw-view")!.getBoundingClientRect();
+      const header = document.querySelector(".site-bar")!.getBoundingClientRect();
+      return {
+        held: Math.abs(side.top - header.bottom) < 2 && side.height < window.innerHeight * 0.6,
+        gap: step.getBoundingClientRect().top - scene.bottom,
+      };
+    });
+    expect(layout.held, `the window is not held under the header at step ${index + 1}`).toBe(true);
+    expect(layout.gap, `step ${index + 1} does not read right under the scene`).toBeLessThanOrEqual(24);
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
   await context.close();

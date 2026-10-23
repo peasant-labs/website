@@ -11,6 +11,8 @@ import { RotateCcw } from "@peasant-labs/fairtrade/icons";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 const SCENES: readonly SceneDefinition[] = [RECORD_SCENE, REVIEW_SCENE, PUBLISH_SCENE];
+/* on a phone, how far under the held scene a step's top may be and still count as reached */
+const FLOW_REACH = 24;
 /* replay fades the scene all the way out before the fresh take fades in: the layer's fade is 420ms */
 const REWIND_MS = 440;
 const WIDE = "(min-width: 62.5rem)";
@@ -35,8 +37,10 @@ function subscribeToWide(onChange: () => void) {
  * starts its take from the first frame as it fades in, while the last one
  * fades out where it was, so a change of step never cuts.
  *
- * On a phone the scene window sticks under the header and the step texts
- * scroll beneath it, each taking over as it crosses the middle.
+ * On a phone the scene window sticks under the header and the step texts run
+ * straight on beneath it, with no room held between them: the current step is
+ * the last one whose top has reached the scene, so it always reads just under
+ * it.
  *
  * Under reduced motion nothing is held: the three steps stack, each beside its
  * scene at its finished frame.
@@ -57,19 +61,19 @@ export function HowItWorks({ title }: { title: string }) {
   const markRefs = useRef<(HTMLDivElement | null)[]>([]);
   const flowRefs = useRef<(HTMLLIElement | null)[]>([]);
   const windowRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const onScreen = useOnScreen(windowRef, 0.4);
 
   // The step whose marker (wide) or text (phone) holds the middle of the screen is the current one.
+  // Wide screens: the step whose marker holds the middle of the screen is the current one.
   useEffect(() => {
-    if (reduced) return;
-    const targets = (wide ? markRefs.current : flowRefs.current).filter(
-      (element): element is HTMLDivElement | HTMLLIElement => element !== null,
-    );
+    if (reduced || !wide) return;
+    const targets = markRefs.current.filter((element): element is HTMLDivElement => element !== null);
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          const index = targets.indexOf(entry.target as HTMLDivElement | HTMLLIElement);
+          const index = targets.indexOf(entry.target as HTMLDivElement);
           if (index >= 0) setActive(index);
         }
       },
@@ -77,6 +81,35 @@ export function HowItWorks({ title }: { title: string }) {
     );
     targets.forEach((target) => observer.observe(target));
     return () => observer.disconnect();
+  }, [reduced, wide]);
+
+  // Phones: the step texts run straight on under the held scene, and the current one is the last to reach it.
+  useEffect(() => {
+    if (reduced || wide) return;
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      const side = windowRef.current;
+      if (!side) return;
+      const scene = side.querySelector(".hw-view") ?? side;
+      const below = scene.getBoundingClientRect().bottom + FLOW_REACH;
+      const reached = flowRefs.current.filter((step) => step && step.getBoundingClientRect().top <= below).length;
+      setActive(Math.max(0, reached - 1));
+      // while the scene is held, the header that it sits under stays (see app/landing.css)
+      const holding = Math.abs(side.getBoundingClientRect().top - parseFloat(getComputedStyle(side).top)) < 1;
+      if (rootRef.current) rootRef.current.dataset.holding = holding ? "true" : "false";
+    };
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
   }, [reduced, wide]);
 
   function goTo(index: number) {
@@ -113,7 +146,7 @@ export function HowItWorks({ title }: { title: string }) {
   const current = HOW.steps[active]!;
 
   return (
-    <div className="hw hw-scroll" data-active={current.id}>
+    <div ref={rootRef} className="hw hw-scroll" data-active={current.id}>
       <div className="hw-pin">
         <div className="site-wrap hw-pin-inner">
           <h2 id="how-title" data-fade>
