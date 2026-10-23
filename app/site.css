@@ -1,0 +1,307 @@
+/*
+ * The marketing site's own frame: browser surfaces, header, footer, wrap, controls
+ * and the themed art. Every colour, face, size step and duration
+ * comes from fairtrade's tokens; this file only arranges them. It is unlayered
+ * and loads after fairtrade's component CSS, so its few deliberate overrides of
+ * a component (a taller button, a different press) win by source order.
+ */
+
+/* ---------- browser surfaces ---------- */
+
+:root {
+  scrollbar-color: var(--rule-strong) var(--canvas);
+  caret-color: var(--amber);
+
+  /*
+   * The terminal surface used by the install shell and the record scene. In the
+   * light theme it inverts to the strongest ink, the way a terminal reads on a
+   * light page; in the dark theme it stays dark and steps up one surface, so it
+   * never becomes a bright slab on a dark page. Aliases only, never new values.
+   */
+  --term-bg: var(--surface-2);
+  --term-ink: var(--ink-strong);
+  --term-dim: var(--ink-3);
+  --term-accent: var(--amber);
+  --term-rule: var(--rule-strong);
+}
+
+:root[data-theme="light"] {
+  --term-bg: var(--ink-strong);
+  --term-ink: var(--canvas);
+  --term-dim: color-mix(in srgb, var(--canvas) 72%, transparent);
+  --term-accent: var(--amber-fill);
+  --term-rule: color-mix(in srgb, var(--canvas) 24%, transparent);
+}
+
+::selection {
+  background: var(--amber);
+  color: var(--on-amber);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ---------- frame ---------- */
+
+.site-wrap {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 75rem;
+  margin-inline: auto;
+  padding-inline: var(--sp-6);
+}
+
+@media (max-width: 47.99rem) {
+  .site-wrap {
+    padding-inline: var(--sp-4);
+  }
+}
+
+.site-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+/* full width, then capped: a column flex item with auto margins would otherwise shrink to its content */
+.site-shell > main {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+.site-bar {
+  border-bottom: var(--bd);
+  background: var(--canvas);
+}
+
+.site-bar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-6);
+  min-height: 4rem;
+  padding-block: var(--sp-2);
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--target-comfortable);
+  margin-inline-end: auto;
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+.site-brand-mark {
+  flex: none;
+  width: 18px;
+  height: 22px;
+  color: var(--amber);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0 var(--sp-5);
+}
+
+.site-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-comfortable);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
+  text-decoration: none;
+  box-shadow: inset 0 -2px 0 transparent;
+}
+
+.site-nav-link[aria-current="page"] {
+  color: var(--ink-strong);
+  box-shadow: inset 0 -2px 0 var(--amber);
+}
+
+.site-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/*
+ * Phones: the mark, the theme control and sign-in hold the first row; the two
+ * sections drop to a row of their own rather than being hidden behind a menu.
+ */
+@media (max-width: 39.99rem) {
+  .site-nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+}
+
+.site-foot {
+  border-top: var(--bd);
+  padding-block: var(--sp-7);
+}
+
+.site-foot-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3) var(--sp-6);
+}
+
+.site-foot-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--sp-6);
+}
+
+.site-foot-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-comfortable);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+.site-link {
+  color: var(--amber);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+/* ---------- controls ---------- */
+
+.site-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--target-comfortable);
+  height: var(--target-comfortable);
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.site-icon-btn svg {
+  width: var(--ic-lg);
+  height: var(--ic-lg);
+}
+
+.site-icon-btn-boxed {
+  border-color: var(--rule-strong);
+  color: var(--ink-strong);
+}
+
+.site-icon-btn:disabled {
+  border-color: var(--rule);
+  color: var(--ink-4);
+  cursor: default;
+}
+
+/* fairtrade's .btn is a 36px control; a page-level action gets a full 44px target. */
+.btn.site-btn {
+  height: auto;
+  min-height: var(--target-comfortable);
+  padding-inline: var(--sp-4);
+  text-decoration: none;
+}
+
+.btn.site-btn-lg {
+  min-height: 48px;
+  padding-inline: var(--sp-5);
+  font-size: var(--fs-body);
+}
+
+.btn.site-btn-xl {
+  min-height: 52px;
+  padding-inline: var(--sp-6);
+  font-size: var(--fs-body);
+}
+
+.site-login .brand {
+  width: var(--ic-md);
+  height: var(--ic-md);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn.site-btn,
+  .site-icon-btn {
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      background-color var(--dur-2) ease,
+      border-color var(--dur-2) ease,
+      color var(--dur-2) ease,
+      box-shadow var(--dur-2) ease;
+  }
+
+  .btn.site-btn:active,
+  .site-icon-btn:not(:disabled):active {
+    transform: scale(0.97);
+  }
+}
+
+/* hover only where a pointer can actually hover */
+@media (hover: hover) and (pointer: fine) {
+  .site-nav-link:hover,
+  .site-foot-nav a:hover,
+  .site-brand:hover {
+    color: var(--ink-strong);
+  }
+
+  .site-icon-btn:not(:disabled):hover {
+    border-color: var(--rule-strong);
+    color: var(--ink-strong);
+  }
+
+  .site-icon-btn-boxed:not(:disabled):hover {
+    border-color: var(--ink-strong);
+  }
+
+  .site-link:hover {
+    text-decoration-style: solid;
+  }
+}
+
+/* the product pages share the frame's width, so their content lines up with the header */
+.site-shell .pj-main {
+  max-width: 75rem;
+}
+
+@media (max-width: 47.99rem) {
+  .site-shell .pj-main {
+    padding-inline: var(--sp-4);
+  }
+}
+
+/* ---------- art: one image per theme, no frame ---------- */
+
+.art {
+  display: block;
+  line-height: 0;
+}
+
+.art-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+:root[data-theme="light"] .art-dark,
+:root:not([data-theme="light"]) .art-light {
+  display: none;
+}

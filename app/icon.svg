@@ -1,10 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" rx="6" fill="#0c0c0e"/>
-  <g fill="none" stroke="#d4a843" stroke-width="2.1" stroke-linecap="round">
-    <path d="M16 27V8"/>
-    <path d="M16 21l-5.5-6"/>
-    <path d="M16 21l5.5-6"/>
-    <path d="M16 15l-5-5.5"/>
-    <path d="M16 15l5-5.5"/>
+  <rect width="32" height="32" fill="#070706"/>
+  <g transform="translate(5 3) scale(1.2222)" fill="none" stroke="#cba35c" stroke-width="1.8" stroke-linecap="square">
+    <path d="M9 21V3"/>
+    <path d="M9 7 5 4"/>
+    <path d="M9 7l4-3"/>
+    <path d="M9 11 5 8"/>
+    <path d="M9 11l4-3"/>
+    <path d="M9 15l-4-3"/>
+    <path d="M9 15l4-3"/>
   </g>
 </svg>

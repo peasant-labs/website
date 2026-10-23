@@ -25,120 +25,6 @@
   translate: 0;
 }
 
-/* The existing editorial keeps its legacy treatment without leaking a token fork into project routes. */
-.site-root:has(.home-page) {
-  background: #000000;
-}
-
-.home-page {
-  --bg-deep: #000000;
-  --bg-surface: #0a0a0c;
-  --bg-elevated: #131316;
-  --text-primary: #efece7;
-  --text-secondary: #c4bfb3;
-  --text-tertiary: #817d70;
-  --border-default: #2a2a2e;
-  --border-strong: #3e3e42;
-  --accent: #d4a843;
-  --green: #4ade80;
-  --red: #f87171;
-  background: var(--bg-deep);
-  color: var(--text-primary);
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.875rem;
-  line-height: 1.8;
-  letter-spacing: 0.005em;
-  -webkit-font-smoothing: antialiased;
-}
-
-.home-page,
-.home-page * {
-  font-size: 0.875rem;
-}
-
-.home-page h1,
-.home-page h2,
-.home-page h3 {
-  color: var(--text-primary);
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  line-height: inherit;
-  text-transform: none;
-}
-
-.home-page p,
-.home-page .prose {
-  max-inline-size: none;
-  letter-spacing: inherit;
-  word-spacing: normal;
-}
-
-.home-page section {
-  max-width: 84ch;
-  margin-inline: 0;
-  padding-inline: 0;
-}
-
-.home-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.home-projects-link,
-.home-page .link-accent {
-  color: color-mix(in srgb, var(--accent) 70%, var(--text-secondary));
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent);
-  text-underline-offset: 0.25rem;
-  transition:
-    color 180ms ease,
-    text-decoration-color 180ms ease,
-    text-shadow 180ms ease;
-}
-
-.home-projects-link:hover,
-.home-projects-link:focus-visible,
-.home-page .link-accent:hover,
-.home-page .link-accent:focus-visible {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
-  text-shadow: 0 0 0.625rem color-mix(in srgb, currentColor 45%, transparent);
-}
-
-.home-page ::selection {
-  background: var(--accent);
-  color: var(--bg-deep);
-}
-
-.home-page .measure {
-  max-width: 84ch;
-}
-
-.home-page .font-bold,
-.home-page strong,
-.home-page b,
-.home-page .glow {
-  text-shadow: 0 0 0.5rem color-mix(in srgb, currentColor 25%, transparent);
-}
-
-.home-page .glow-svg {
-  filter: drop-shadow(0 0 0.3125rem color-mix(in srgb, currentColor 30%, transparent));
-}
-
-.home-page :focus-visible {
-  outline: 0.125rem solid var(--accent);
-  outline-offset: 0.1875rem;
-}
-
-.home-page .hp {
-  position: absolute;
-  inset-inline-start: -9999px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
-
 @layer components {
   .project-shell {
     min-height: 100vh;
@@ -148,62 +34,6 @@
     font-family: var(--font-body);
     font-size: var(--fs-body);
     line-height: var(--lh-body);
-  }
-
-  .pj-header {
-    position: sticky;
-    inset-block-start: 0;
-    z-index: var(--z-nav);
-    border-bottom: var(--bd);
-    background: var(--nav-bg);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-  }
-
-  .pj-header-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--sp-4);
-    max-width: var(--maxw);
-    min-height: var(--nav-h);
-    margin-inline: auto;
-    padding-inline: var(--gutter);
-  }
-
-  .pj-brand {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--target-comfortable);
-    color: var(--ink-strong);
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    font-weight: 700;
-    text-transform: lowercase;
-  }
-
-  /*
-   * The header destinations. The items keep fairtrade's `.iu-subnav-item`
-   * chrome untouched — this rule only lays them out inside the header bar,
-   * which already owns the sticky edge and border the standalone `.iu-subnav`
-   * would otherwise duplicate.
-   */
-  .pj-nav {
-    display: flex;
-    flex: 1 1 auto;
-    align-items: center;
-    gap: var(--sp-1);
-    min-width: 0;
-  }
-
-  .pj-nav .iu-subnav-item {
-    display: inline-flex;
-    align-items: center;
-  }
-
-  /* contact is the last entry, and it sits at the far end of the bar. */
-  .pj-nav > :last-child {
-    margin-inline-start: auto;
   }
 
   .pj-main {
@@ -1402,33 +1232,7 @@
     }
   }
 
-  /*
-   * Narrow: the wordmark, four destinations, and the theme control cannot share
-   * one row without pushing the page into horizontal scroll. The nav takes a row
-   * of its own under them rather than being hidden — a link a reader cannot
-   * reach is worse than a taller header — and contact gives up its right edge
-   * along with the row it was anchored to.
-   */
-  @media (max-width: 47.99rem) {
-    .pj-header-inner {
-      flex-wrap: wrap;
-      row-gap: var(--sp-2);
-      padding-block: var(--sp-2);
-    }
-
-    .pj-nav {
-      order: 1;
-      flex-basis: 100%;
-      flex-wrap: wrap;
-    }
-
-    .pj-nav > :last-child {
-      margin-inline-start: 0;
-    }
-  }
-
   @media (max-width: 30rem) {
-    .pj-header-inner,
     .pj-main {
       padding-inline: var(--sp-4);
     }
@@ -1458,8 +1262,7 @@
 
   @media (prefers-reduced-motion: no-preference) {
     .pj-project-card,
-    .pj-related .btn,
-    .pj-header .btn {
+    .pj-related .btn {
       transition:
         border-color var(--dur-1) var(--ease-standard),
         background var(--dur-1) var(--ease-standard),
@@ -1468,15 +1271,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .home-page *,
-  .home-page *::before,
-  .home-page *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
 
 /*
  * fairtrade's base sets `h1, h2, h3 { font-weight: 700 }`, but Tailwind's preflight ships

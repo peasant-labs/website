@@ -4,24 +4,31 @@
  * shared link card and the embedded text never drift apart.
  */
 export const site = {
-  name: "peasant",
+  name: "peasant labs",
   url: "https://peasantlabs.org",
-  title: "Reclaiming Data Autonomy as a Peasant",
-  description:
-    "an upcoming editorial on the quiet enclosure of the transcript commons, and why the harvest belongs to the hands that sowed it.",
-  /* the short, punchy line used on social cards */
-  tagline: "forthcoming — on the quiet enclosure of the transcript commons.",
+  title: "peasant labs: data commons built by commoners",
+  description: "Record, publish, and share agent sessions with people you trust.",
+  /* the short line used on social cards */
+  tagline: "Record, publish, and share agent sessions with people you trust.",
 } as const;
 
-/**
- * the header's destinations, in the order they are read. `contact` is last
- * because the header pushes the final entry to the right edge — it is the one
- * link a reader goes looking for rather than browses into.
- */
+/** where the hosted app signs people in; signed-out visitors of its home are sent here. */
+export const LOGIN_URL = "https://village.peasantlabs.org/login";
+
+export const GITHUB_URL = "https://github.com/peasant-labs";
+
+/** the header's destinations, in the order they are read. */
 export const SITE_NAV = [
-  { id: "home", label: "home", href: "/" },
+  { id: "docs", label: "docs", href: "/docs" },
   { id: "blog", label: "blog", href: "/blog" },
-  { id: "about", label: "about", href: "/about" },
+] as const;
+
+/** the footer's destinations. contact is last: it is the one link a reader goes looking for. */
+export const FOOTER_NAV = [
+  { id: "docs", label: "docs", href: "/docs" },
+  { id: "blog", label: "blog", href: "/blog" },
+  { id: "projects", label: "projects", href: "/projects" },
+  { id: "github", label: "github", href: GITHUB_URL },
   { id: "contact", label: "contact", href: "/contact" },
 ] as const;
 

@@ -1,40 +1,19 @@
 "use client";
 
-import { Button, CommandBlock } from "@peasant-labs/fairtrade/ui";
+import { CommandBlock } from "@peasant-labs/fairtrade/ui";
 import { usePathname } from "next/navigation";
-import {
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type ButtonHTMLAttributes,
-  type ComponentType,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 
-type Theme = "dark" | "light";
-
-const THEME_KEY = "peasant-labs-theme";
 const ROUTE_FOCUS_KEY = "peasant-labs-project-route-focus";
-const THEME_EVENT = "peasant-labs-theme-change";
 
-type InteractiveButtonProps = Parameters<typeof Button>[0] &
-  ButtonHTMLAttributes<HTMLButtonElement>;
-
-const InteractiveButton = Button as ComponentType<InteractiveButtonProps>;
-
-function subscribeToTheme(onStoreChange: () => void) {
-  window.addEventListener(THEME_EVENT, onStoreChange);
-  return () => window.removeEventListener(THEME_EVENT, onStoreChange);
-}
-
-function currentTheme(): Theme {
-  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
-}
-
-export function ProjectInteractions() {
+/**
+ * Moves focus to the page heading after a client-side move between the
+ * /projects routes, so a keyboard or screen-reader user lands on the new page
+ * rather than on the link they left. Renders nothing.
+ */
+export function ProjectRouteFocus() {
   const pathname = usePathname();
   const previousPath = useRef(pathname);
-  const theme = useSyncExternalStore(subscribeToTheme, currentTheme, () => "dark");
 
   useEffect(() => {
     const markProjectNavigation = (event: MouseEvent) => {
@@ -58,7 +37,11 @@ export function ProjectInteractions() {
         destination.origin === window.location.origin &&
         destination.pathname.startsWith("/projects")
       ) {
-        window.sessionStorage.setItem(ROUTE_FOCUS_KEY, "true");
+        try {
+          window.sessionStorage.setItem(ROUTE_FOCUS_KEY, "true");
+        } catch {
+          // Without storage the heading simply is not focused; navigation is unaffected.
+        }
       }
     };
 
@@ -69,36 +52,22 @@ export function ProjectInteractions() {
   useEffect(() => {
     const pathChanged = previousPath.current !== pathname;
     previousPath.current = pathname;
-    const navigationRequested =
-      window.sessionStorage.getItem(ROUTE_FOCUS_KEY) === "true";
+    let navigationRequested = false;
+    try {
+      navigationRequested = window.sessionStorage.getItem(ROUTE_FOCUS_KEY) === "true";
+      window.sessionStorage.removeItem(ROUTE_FOCUS_KEY);
+    } catch {
+      navigationRequested = false;
+    }
     if (!pathChanged && !navigationRequested) return;
 
-    window.sessionStorage.removeItem(ROUTE_FOCUS_KEY);
     const frame = window.requestAnimationFrame(() => {
       document.querySelector<HTMLElement>("#project-heading")?.focus();
     });
     return () => window.cancelAnimationFrame(frame);
   }, [pathname]);
 
-  const nextTheme = theme === "dark" ? "light" : "dark";
-
-  return (
-    <InteractiveButton
-      type="button"
-      variant="ghost"
-      size="sm"
-      pressed={theme === "light"}
-      data-theme-toggle
-      onClick={() => {
-        document.documentElement.dataset.theme = nextTheme;
-        window.localStorage.setItem(THEME_KEY, nextTheme);
-        window.dispatchEvent(new Event(THEME_EVENT));
-      }}
-      aria-label={`use ${nextTheme} theme`}
-    >
-      {nextTheme} theme
-    </InteractiveButton>
-  );
+  return null;
 }
 
 /**

@@ -1,5 +1,5 @@
 /**
- * the peasant mark — a wheat sheaf. identical geometry to app/icon.svg
+ * the peasant labs mark — a wheat stalk. the same geometry as app/icon.svg
  * (the favicon), so brand and tab icon stay in lockstep.
  *
  * decorative by default (aria-hidden); the surrounding link/heading
@@ -8,20 +8,22 @@
 export function Mark({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 32 32"
+      viewBox="0 0 18 22"
       className={className}
       fill="none"
       stroke="currentColor"
-      strokeWidth={2.1}
-      strokeLinecap="round"
+      strokeWidth={1.6}
+      strokeLinecap="square"
       aria-hidden="true"
       focusable="false"
     >
-      <path d="M16 27V8" />
-      <path d="M16 21l-5.5-6" />
-      <path d="M16 21l5.5-6" />
-      <path d="M16 15l-5-5.5" />
-      <path d="M16 15l5-5.5" />
+      <path d="M9 21V3" />
+      <path d="M9 7 5 4" />
+      <path d="M9 7l4-3" />
+      <path d="M9 11 5 8" />
+      <path d="M9 11l4-3" />
+      <path d="M9 15l-4-3" />
+      <path d="M9 15l4-3" />
     </svg>
   );
 }

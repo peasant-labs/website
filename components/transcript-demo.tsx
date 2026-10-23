@@ -1,10 +1,13 @@
 "use client";
 
 import { DEMO_SESSION } from "@/lib/demo-session";
-import { adaptTranscript, TranscriptViewer } from "@peasant-labs/fairtrade/ui";
+import { currentTheme, subscribeToTheme, type Theme } from "@/lib/theme";
+import {
+  adaptTranscript,
+  TranscriptViewer,
+  type TranscriptWireInput,
+} from "@peasant-labs/fairtrade/ui";
 import { useMemo, useState, useSyncExternalStore } from "react";
-
-const THEME_EVENT = "peasant-labs-theme-change";
 
 /**
  * The viewer opens on its own summary rather than the raw log. fairtrade
@@ -34,29 +37,26 @@ const READ_ONLY = {
 } as const;
 
 /* Label-only crumbs: a demo transcript has nowhere real to navigate to. */
-const BREADCRUMB = [
-  { label: "sessions" },
-  { label: "peasant" },
-  { label: DEMO_SESSION.id },
-];
-
-function subscribeToTheme(onStoreChange: () => void) {
-  window.addEventListener(THEME_EVENT, onStoreChange);
-  return () => window.removeEventListener(THEME_EVENT, onStoreChange);
+function breadcrumbFor(session: TranscriptWireInput) {
+  return [{ label: "sessions" }, { label: session.project ?? "peasant" }, { label: session.id }];
 }
 
-function currentTheme(): "dark" | "light" {
-  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
-}
-
-export function TranscriptDemo({ label }: { label: string }) {
+/**
+ * The real fairtrade viewer over a sample session. The session goes through
+ * `adaptTranscript`, the one wire-parse boundary, exactly as a published
+ * transcript would; nothing here re-implements the viewer.
+ */
+export function TranscriptDemo({
+  label,
+  session = DEMO_SESSION,
+}: {
+  label: string;
+  session?: TranscriptWireInput;
+}) {
   // The site owns the theme; the viewer follows it rather than shipping its own.
-  const theme = useSyncExternalStore<"dark" | "light">(
-    subscribeToTheme,
-    currentTheme,
-    () => "dark",
-  );
-  const viewModel = useMemo(() => adaptTranscript(DEMO_SESSION), []);
+  const theme = useSyncExternalStore<Theme>(subscribeToTheme, currentTheme, () => "dark");
+  const viewModel = useMemo(() => adaptTranscript(session), [session]);
+  const breadcrumb = useMemo(() => breadcrumbFor(session), [session]);
   const [activeTab, setActiveTab] = useState<Tab>(OPENING_TAB);
 
   return (
@@ -73,7 +73,7 @@ export function TranscriptDemo({ label }: { label: string }) {
         theme={theme}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        breadcrumb={BREADCRUMB}
+        breadcrumb={breadcrumb}
       />
     </div>
   );

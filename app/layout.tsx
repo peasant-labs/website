@@ -1,18 +1,14 @@
 import { site } from "@/lib/site";
+import { THEME_SCRIPT } from "@/lib/theme";
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono } from "next/font/google";
 import "@peasant-labs/fairtrade/tokens.css";
 import "@peasant-labs/fairtrade/base.css";
 import "@peasant-labs/fairtrade/components.css";
 import "./globals.css";
+import "./site.css";
 
 /* App Router mounts the canonical font stylesheet once from this root head. */
 /* eslint-disable @next/next/no-page-custom-font */
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   // resolves the generated og / twitter images to absolute urls
@@ -25,17 +21,17 @@ export const metadata: Metadata = {
     "peasantlabs",
     "peasant labs",
     "peasant",
+    "village",
+    "agent sessions",
     "agent transcripts",
-    "data sovereignty",
     "coding agents",
-    "attribution",
-    "the commons",
+    "data commons",
   ],
   alternates: { canonical: "/" },
   openGraph: {
     title: site.title,
     description: site.tagline,
-    type: "article",
+    type: "website",
     url: site.url,
     siteName: site.name,
     locale: "en_US",
@@ -58,20 +54,13 @@ export const viewport: Viewport = {
   colorScheme: "dark light",
 };
 
-const themeScript = `(function(){try{var theme=localStorage.getItem("peasant-labs-theme");if(theme==="dark"||theme==="light"){document.documentElement.dataset.theme=theme}}catch(_){}})();`;
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      data-theme="dark"
-      className={geistMono.variable}
-      suppressHydrationWarning
-    >
+    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -79,13 +68,10 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Atkinson+Hyperlegible+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
         />
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className="site-root">
-        <a
-          href="#content"
-          className="site-skip-link"
-        >
+        <a href="#content" className="site-skip-link">
           skip to content
         </a>
         {children}
