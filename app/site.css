@@ -326,16 +326,15 @@ html {
   }
 }
 
+/* whitespace, not rules, sets the footer apart: a section's room before the call to action */
 .site-foot {
-  border-top: var(--bd);
   padding-block-end: var(--sp-7);
 }
 
 /* the call to action every page ends with: one line, then install and the docs */
 .site-foot-cta-row {
   margin-block-end: var(--sp-7);
-  padding-block: clamp(3rem, 6vw, 4.5rem);
-  border-bottom: var(--bd);
+  padding-block: var(--site-sec-y);
 }
 
 .site-foot-cta {

@@ -2455,14 +2455,8 @@
  * smaller. A phone stacks them, picture first. Room above and below sets it
  * apart from the footer's links, with no rules.
  */
-.site-shell:has(> .lp) .site-foot,
-.site-shell:has(> .lp) .site-foot-cta-row {
-  border: 0;
-}
-
 .site-foot-close {
   margin-block-end: clamp(2.5rem, 6vw, 5rem);
-  padding-block: clamp(3rem, 7.5vw, 7.5rem);
 }
 
 .site-foot-close .site-foot-cta {

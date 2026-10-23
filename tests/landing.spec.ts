@@ -80,6 +80,15 @@ test("every page ends with the footer's call to action", async ({ page }) => {
       "href",
       cta.secondary.href,
     );
+    // whitespace, not rules, sets it apart from the page above and the footer's links below
+    const rules = await page.evaluate(() => {
+      const row = document.querySelector("footer [data-footer-cta]")!;
+      return [row.closest("footer")!, row].flatMap((element) => {
+        const style = getComputedStyle(element);
+        return [style.borderTopWidth, style.borderBottomWidth];
+      });
+    });
+    expect(rules, `a rule runs around the footer's call to action on ${path}`).toEqual(["0px", "0px", "0px", "0px"]);
   }
 
   // on the landing it is the only call to action after the vision, and install lands on the section
