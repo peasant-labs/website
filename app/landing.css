@@ -205,6 +205,22 @@
   margin-block-start: clamp(2.5rem, 5vw, 4rem);
 }
 
+/*
+ * The picture sits on a panel like the landing's other pictures: the raised
+ * surface with a hairline, the scene centred with room on every side, and the
+ * pause control in its lower corner, in line with the scene's right edge.
+ */
+.hf-panel {
+  --hf-pad-block: 3.5rem;
+  --hf-pad-inline: clamp(1rem, 5vw, 3.5rem);
+
+  position: relative;
+  box-sizing: border-box;
+  padding: var(--hf-pad-block) var(--hf-pad-inline);
+  border: var(--bd);
+  background: var(--surface-2);
+}
+
 .hf {
   position: relative;
   container-type: inline-size;
@@ -364,7 +380,8 @@
 
 .hf-toggle {
   position: absolute;
-  z-index: 12;
+  inset-block-end: calc((var(--hf-pad-block) - var(--target-comfortable)) / 2);
+  inset-inline-end: var(--hf-pad-inline);
 }
 
 @media (prefers-reduced-motion: reduce) {

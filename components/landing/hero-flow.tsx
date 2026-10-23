@@ -98,7 +98,7 @@ type Layout = Readonly<{
 }>;
 
 const PHONE: Layout = {
-  height: 172,
+  height: 159.5,
   ground: 158,
   screen: [20, 3, 60, 36],
   base: [4.5, 5],
@@ -123,7 +123,7 @@ const PHONE: Layout = {
 };
 
 const WIDE: Layout = {
-  height: 47,
+  height: 41.5,
   ground: 40,
   screen: [2.5, 21, 29, 16.5],
   base: [2.5, 2.4],
@@ -309,7 +309,6 @@ function layoutRules(layout: Layout, finished: (index: number) => { x: number; y
     `.hf-card { width: ${cq(w)}; height: ${cq(h)} }`,
     `.hf-mesh-${layout.travel} { left: ${cq(layout.sieve[0])}; top: ${cq(layout.sieve[1])}; width: ${cq(layout.sieve[2])}; height: ${cq(layout.sieve[3])} }`,
     `.hf-table { left: ${cq(layout.stack[0] - layout.table)}; top: ${cq(layout.stack[1])}; width: ${cq(w + 2 * layout.table)}; height: ${cq(layout.ground - layout.stack[1])} }`,
-    `.hf-toggle { left: calc(${cq(layout.people[layout.people.length - 1]![0] + layout.halfWidth)} - 44px); top: ${cq(layout.ground + 1)} }`,
     ...AGENTS.map((_, index) => {
       const at = finished(index);
       return `.hf-x${index} { transform: translateX(${cq(at.x - w / 2)}) }\n.hf-y${index} { transform: translateY(${cq(at.y - h / 2)}) }`;
@@ -548,42 +547,44 @@ export function HeroFlow() {
   }, []);
 
   return (
-    <div ref={ref} className="hf" data-paused={paused ? "true" : "false"}>
-      <style href="hero-flow" precedence="default">
-        {STYLESHEET}
-      </style>
-      <div className="hf-stage" role="img" aria-label={FLOW.label}>
-        <Scene layout={PHONE} className="hf-art-phone" />
-        <Scene layout={WIDE} className="hf-art-wide" />
+    <div className="hf-panel">
+      <div ref={ref} className="hf" data-paused={paused ? "true" : "false"}>
+        <style href="hero-flow" precedence="default">
+          {STYLESHEET}
+        </style>
+        <div className="hf-stage" role="img" aria-label={FLOW.label}>
+          <Scene layout={PHONE} className="hf-art-phone" />
+          <Scene layout={WIDE} className="hf-art-wide" />
 
-        {AGENTS.map((agent, index) => (
-          <span key={agent.mark} className={`hf-mark hf-m${index}`}>
-            <BrandMark name={agent.mark} />
-          </span>
-        ))}
+          {AGENTS.map((agent, index) => (
+            <span key={agent.mark} className={`hf-mark hf-m${index}`}>
+              <BrandMark name={agent.mark} />
+            </span>
+          ))}
 
-        {AGENTS.map((agent, index) => (
-          <div key={agent.mark} className={`hf-card-x hf-x${index}`}>
-            <div className={`hf-card-y hf-y${index}`}>
-              <div className={`hf-card hf-c${index}`}>
-                <div className="hf-card-body">
-                  <BrandMark name={agent.mark} />
-                  <i className="hf-bar" style={{ "--w": "80%" } as CSSProperties} />
-                  <span className="hf-secret">
-                    <i className="hf-bar" style={{ "--w": "58%" } as CSSProperties} />
-                    <i className={`hf-mask hf-k${index}`} />
-                  </span>
-                  <i className="hf-bar" style={{ "--w": "70%" } as CSSProperties} />
+          {AGENTS.map((agent, index) => (
+            <div key={agent.mark} className={`hf-card-x hf-x${index}`}>
+              <div className={`hf-card-y hf-y${index}`}>
+                <div className={`hf-card hf-c${index}`}>
+                  <div className="hf-card-body">
+                    <BrandMark name={agent.mark} />
+                    <i className="hf-bar" style={{ "--w": "80%" } as CSSProperties} />
+                    <span className="hf-secret">
+                      <i className="hf-bar" style={{ "--w": "58%" } as CSSProperties} />
+                      <i className={`hf-mask hf-k${index}`} />
+                    </span>
+                    <i className="hf-bar" style={{ "--w": "70%" } as CSSProperties} />
+                  </div>
+                  <BadgeCheck className={`hf-stamp hf-t${index}`} aria-hidden="true" focusable="false" />
                 </div>
-                <BadgeCheck className={`hf-stamp hf-t${index}`} aria-hidden="true" focusable="false" />
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        <span className="hf-table" />
-        <Mesh layout={PHONE} />
-        <Mesh layout={WIDE} />
+          <span className="hf-table" />
+          <Mesh layout={PHONE} />
+          <Mesh layout={WIDE} />
+        </div>
       </div>
       <button
         type="button"
