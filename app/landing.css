@@ -222,7 +222,7 @@
   margin-block-start: clamp(2.5rem, 5vw, 4rem);
 }
 
-/* the picture sits on a panel like the landing's other pictures, the scene centred with room on every side */
+/* the picture sits on a panel like the landing's other pictures; the stage holds the air above and below the scene, so the panel adds none */
 .hf-panel {
   --hf-ink: var(--ink-strong);
 
@@ -230,7 +230,7 @@
   box-sizing: border-box;
   display: grid;
   justify-items: center;
-  padding: clamp(2rem, 5vw, 3.5rem) var(--sp-4);
+  padding: 0 var(--sp-4);
   border: var(--bd);
   background: var(--surface-2);
 }
@@ -308,15 +308,6 @@
   opacity: 0.45;
 }
 
-/* the check pressed out of the stamp */
-.hf-knock {
-  fill: none;
-  stroke: var(--surface-2);
-  stroke-width: 1.4;
-  stroke-linecap: square;
-  shape-rendering: geometricPrecision;
-}
-
 /* each face's light, lit to deep: dots, plusses, checkers, solid squares */
 .hf-light-lit {
   fill: url(#hf-light);
@@ -353,11 +344,6 @@
 /* the scan line that runs down the laptop's screen */
 .hf-scan {
   z-index: 11;
-  opacity: 0;
-}
-
-/* the basket that lights up as a card lands */
-.hf-notice {
   opacity: 0;
 }
 

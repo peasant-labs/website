@@ -2,7 +2,7 @@
 
 import { BrandMark } from "@/components/fairtrade-client";
 import { HERO } from "@/lib/landing";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { memo, useEffect, useRef, useState, type ReactNode } from "react";
 
 /*
  * The hero's picture, told without words and drawn the way the site's
@@ -30,8 +30,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
  * worked out here, cell by cell, so they step on the grid. A card moves on two
  * nested layers, across and down, each with its own curve, which bends its
  * path. Only transform, opacity and clip-path move; z-index steps a card
- * behind the one that lands on it. The resting state is one finished frame,
- * and the loop is laid over it only when motion is allowed.
+ * back a level as the next one sets out. The resting state is one finished
+ * frame, and the loop is laid over it only when motion is allowed.
  */
 
 const FLOW = HERO.flow;
@@ -76,19 +76,18 @@ const CURVES = {
 } as const;
 type Curve = keyof typeof CURVES;
 
+/* a cell on the grid: its column and row */
 type Point = readonly [x: number, y: number];
 type Rect = readonly [x: number, y: number, w: number, h: number];
 
 /*
- * The three-quarter view: depth runs up and to the right, a little over half a
- * cell across and a third of a cell up for each cell of depth, so every box
- * shows a lit top, a front and a shaded side.
+ * The three-quarter view: depth runs up and to the right, two cells across
+ * for each cell up, so every receding edge steps evenly on the grid and every
+ * box shows a lit top, a front and a shaded side.
  */
-const DEPTH_X = 0.55;
-const DEPTH_Y = -0.35;
-const back = ([x, y]: Point, depth: number): Point => [x + DEPTH_X * depth, y + DEPTH_Y * depth];
+const back = ([x, y]: Point, steps: number): Point => [x + 2 * steps, y - steps];
 
-/** a card's drawing, in cells: its size, its mark, three lines (the middle one the secret), the amber block over it, the stamp */
+/** a card's drawing, in cells: its size, its mark, three lines (the middle one the secret), the amber block over it, the stamp and the check pressed into it */
 type CardPlan = Readonly<{
   w: number;
   h: number;
@@ -97,6 +96,7 @@ type CardPlan = Readonly<{
   line: number;
   mask: Rect;
   stamp: readonly [x: number, y: number, size: number];
+  check: readonly Point[];
 }>;
 
 const WIDE_CARD: CardPlan = {
@@ -109,26 +109,121 @@ const WIDE_CARD: CardPlan = {
     [7, 33, 37],
   ],
   line: 2,
-  mask: [5, 25, 35, 6],
-  stamp: [44, 4, 11],
+  mask: [5, 25, 36, 6],
+  stamp: [43, 4, 11],
+  check: [
+    [3, 5],
+    [5, 7],
+    [8, 4],
+  ],
 };
 
 const PHONE_CARD: CardPlan = {
-  w: 48,
-  h: 34,
-  mark: [5, 4, 9],
+  w: 30,
+  h: 22,
+  mark: [3, 3, 6],
   lines: [
-    [5, 17, 33],
-    [5, 22, 25],
-    [5, 27, 29],
+    [3, 11, 21],
+    [3, 14, 15],
+    [3, 17, 18],
   ],
   line: 1,
-  mask: [4, 21, 27, 4],
-  stamp: [35, 3, 10],
+  mask: [2, 13, 17, 3],
+  stamp: [21, 2, 7],
+  check: [
+    [2, 3],
+    [3, 4],
+    [5, 2],
+  ],
 };
 
-/** a person at the commons: where they stand, how tall, and what they hold */
-type Person = readonly [x: number, height: number, holds: "rake" | "basket" | null];
+/*
+ * A peasant, traced from the pictures' village, in cells from the middle of
+ * its hem: a peaked hat whose brim is wider than the shoulders, a head under
+ * it, shoulders, arms hanging at the sides and a robe that widens to the hem.
+ * The rake stands upright beside its holder, a hand on the handle; the
+ * basket rides at the other's hip.
+ */
+type Figure = Readonly<{
+  hat: readonly Point[];
+  body: readonly Point[];
+  arms: readonly (readonly Point[])[];
+  rake: Readonly<{ handle: readonly [Point, Point]; head: readonly [Point, Point]; teeth: readonly Point[]; hand: readonly [Point, Point] }>;
+  basket: readonly Point[];
+  handle: readonly Point[];
+}>;
+
+const WIDE_FIGURE: Figure = {
+  hat: [[0, -41], [8, -37], [8, -36], [-8, -36], [-8, -37]],
+  body: [[-2, -36], [2, -36], [2, -31], [4, -31], [5, -30], [5, -17], [7, 0], [-7, 0], [-5, -17], [-5, -30], [-4, -31], [-2, -31]],
+  arms: [
+    [[-3, -29], [-3, -17], [-5, -17]],
+    [[3, -29], [3, -17], [5, -17]],
+  ],
+  rake: {
+    handle: [[10, 0], [10, -46]],
+    head: [[7, -47], [13, -47]],
+    teeth: [[7, -48], [9, -48], [11, -48], [13, -48]],
+    hand: [[5, -18], [9, -18]],
+  },
+  basket: [[5, -16], [11, -16], [10, -11], [6, -11]],
+  handle: [[6, -17], [7, -18], [9, -18], [10, -17]],
+};
+
+const PHONE_FIGURE: Figure = {
+  hat: [[0, -23], [4, -21], [5, -20], [-5, -20], [-4, -21]],
+  body: [[-2, -20], [2, -20], [2, -17], [4, -16], [4, -9], [5, 0], [-5, 0], [-4, -9], [-4, -16], [-2, -17]],
+  arms: [
+    [[-2, -15], [-2, -9], [-4, -9]],
+    [[2, -15], [2, -9], [4, -9]],
+  ],
+  rake: {
+    handle: [[7, 0], [7, -28]],
+    head: [[5, -29], [9, -29]],
+    teeth: [[5, -30], [7, -30], [9, -30]],
+    hand: [[4, -10], [6, -10]],
+  },
+  basket: [[4, -8], [8, -8], [7, -4], [5, -4]],
+  handle: [[5, -9], [7, -9]],
+};
+
+/*
+ * A wheat sheaf, flat like the pictures': a bundle fanned at the top, where
+ * the ears are, pinched by a twine band and splayed at the foot, outlined like
+ * everything else, with its stalks drawn down it. In cells from the middle of
+ * its foot.
+ */
+type SheafPlan = Readonly<{
+  outline: readonly Point[];
+  band: Rect;
+  stalks: readonly (readonly [Point, Point])[];
+}>;
+
+const WIDE_SHEAF: SheafPlan = {
+  outline: [
+    [-2, -13], [-6, -19], [-6, -24], [-5, -22], [-3, -28], [-2, -25], [0, -29], [2, -25], [3, -28], [5, -22], [6, -24], [6, -19],
+    [2, -13], [2, -10], [5, 0], [-5, 0], [-2, -10],
+  ],
+  band: [-3, -12, 7, 2],
+  stalks: [
+    [[0, -13], [0, -27]],
+    [[-1, -15], [-3, -26]],
+    [[1, -15], [3, -26]],
+    [[0, -10], [0, -2]],
+  ],
+};
+
+const PHONE_SHEAF: SheafPlan = {
+  outline: [
+    [-1, -8], [-4, -11], [-4, -13], [-3, -12], [-2, -15], [-1, -13], [0, -16], [1, -13], [2, -15], [3, -12], [4, -13], [4, -11],
+    [1, -8], [1, -6], [2, 0], [-2, 0], [-1, -6],
+  ],
+  band: [-1, -7, 3, 1],
+  stalks: [[[0, -8], [0, -15]]],
+};
+
+/** a person at the commons: the column they stand on, and what they hold */
+type Person = readonly [x: number, holds: "rake" | "basket" | null];
 
 /** One layout, every measure in cells. */
 type Layout = Readonly<{
@@ -136,85 +231,118 @@ type Layout = Readonly<{
   width: number;
   height: number;
   card: CardPlan;
-  /** the front edge of the ground the commons stands on */
-  ground: number;
-  /** the laptop: the deck's front-left corner on its ground, its width, depth and thickness, and the screen's height and lean */
-  laptop: Readonly<{ x: number; ground: number; w: number; depth: number; deck: number; screen: number; lean: number }>;
-  /** the three marks on the screen, a centred group: the middle one's centre, the step between them and one size */
-  marks: readonly [x: number, y: number, step: number, size: number];
+  figure: Figure;
+  sheaf: SheafPlan;
+  /** the laptop: its deck's front-left cell, the row it stands on, its width, depth in steps and thickness, and its lid's height and bezel */
+  laptop: Readonly<{ x: number; ground: number; w: number; depth: number; deck: number; screen: number; bezel: number }>;
+  /** the three marks on the screen, a centred group: the step between them and their size */
+  marks: readonly [step: number, size: number];
   /** how small a card shows on the screen */
   onScreen: number;
-  /** centres: lifted out of the laptop, the top of its arc, stamped above the stack */
+  /** centres: lifted out of the laptop, the top of its arc, stamped just above the stack */
   lifted: Point;
   crest: Point;
   stamped: Point;
-  /** the stack: its cards' left edge, the base's top, the step between cards and the base's depth */
-  stack: readonly [left: number, baseTop: number, notch: number, depth: number];
-  /** the peasants at the commons, the one whose basket lights up, and the wheat sheaves: where and how tall */
+  /** the stack: its cards' left column, the row its base stands on, the base's height and depth, and the step between cards */
+  stack: Readonly<{ left: number; ground: number; base: number; depth: number; notch: number }>;
+  /** the commons: the row it stands on, the peasants, the one whose basket lights up, and the sheaves' columns */
+  commons: number;
   people: readonly Person[];
   noticer: number;
-  sheaves: readonly (readonly [x: number, height: number, ground: number])[];
+  sheaves: readonly number[];
+  /** how many rows of contact shadow lie under everything */
+  shadow: number;
 }>;
 
 /*
- * A wide screen: the laptop and the commons on one ground, the same margin
- * outside them, and the card's arc over the gap between them, the whole
- * picture centred in a stage a little wider than 16:9.
+ * A wide screen, a little over three times as wide as it is tall: three
+ * groups on one ground, the laptop, the stack and the commons, with the same
+ * gap between them and the same margin outside, and the same air above the
+ * scene as below it. The laptop is about one and a half cards wide; a
+ * peasant stands as tall as a card, and the wheat reaches their shoulders.
  */
 const WIDE: Layout = {
   name: "wide",
   width: 333,
-  height: 190,
+  height: 104,
   card: WIDE_CARD,
-  ground: 156,
-  laptop: { x: 12, ground: 156, w: 90, depth: 30, deck: 3, screen: 62, lean: 4 },
-  marks: [75.5, 112, 24, 16],
+  figure: WIDE_FIGURE,
+  sheaf: WIDE_SHEAF,
+  laptop: { x: 15, ground: 78, w: 80, depth: 8, deck: 3, screen: 46, bezel: 3 },
+  marks: [24, 16],
   onScreen: 0.85,
-  lifted: [75.5, 60],
-  crest: [118, 54],
-  stamped: [166, 68],
-  stack: [136, 146, 3, 6],
+  lifted: [88, 36],
+  crest: [124, 29],
+  stamped: [162, 35],
+  stack: { left: 132, ground: 78, base: 4, depth: 2, notch: 3 },
+  commons: 78,
   people: [
-    [234, 60, "rake"],
-    [264, 64, "basket"],
-    [298, 57, null],
+    [239, "rake"],
+    [265, "basket"],
+    [292, null],
   ],
   noticer: 1,
-  sheaves: [
-    [212, 28, 156],
-    [319, 28, 156],
-  ],
+  sheaves: [220, 311],
+  shadow: 3,
 };
 
 /*
- * A phone, at 4:5: the laptop above, and below it the peasants on the left and
- * the stack on the right, the card coming down from the screen onto it.
+ * A phone, at 4:5, in two tiers with the same air above and below: the
+ * laptop and the stack side by side on top, the commons centred under them.
  */
 const PHONE: Layout = {
   name: "phone",
   width: 100,
   height: 125,
   card: PHONE_CARD,
-  ground: 118,
-  laptop: { x: 6, ground: 46, w: 54, depth: 16, deck: 2, screen: 30, lean: 2 },
-  marks: [42, 23, 13, 9],
-  onScreen: 0.74,
-  lifted: [70, 52],
-  crest: [70, 50],
-  stamped: [70, 50],
-  stack: [46, 112, 3, 4],
+  figure: PHONE_FIGURE,
+  sheaf: PHONE_SHEAF,
+  laptop: { x: 5, ground: 55, w: 40, depth: 4, deck: 2, screen: 26, bezel: 2 },
+  marks: [11, 7],
+  onScreen: 0.85,
+  lifted: [42, 31],
+  crest: [58, 24],
+  stamped: [77, 29],
+  stack: { left: 62, ground: 55, base: 3, depth: 1, notch: 2 },
+  commons: 99,
   people: [
-    [10, 30, "rake"],
-    [24, 33, "basket"],
-    [37, 28, null],
+    [32, "rake"],
+    [50, "basket"],
+    [67, null],
   ],
   noticer: 1,
-  sheaves: [],
+  sheaves: [19, 80],
+  shadow: 2,
 };
+
+/* the laptop's screen: the lid standing on the deck's back edge, and the display inside its bezel */
+function screenOf(layout: Layout) {
+  const { x, ground, w, depth, deck, screen, bezel } = layout.laptop;
+  const deckTop = ground - deck + 1;
+  const [left, bottom] = back([x, deckTop], depth);
+  const lid: Rect = [left, bottom - screen + 1, w, screen];
+  const display: Rect = [left + bezel, lid[1] + bezel, w - 2 * bezel, screen - 2 * bezel];
+  return {
+    deckTop,
+    lid,
+    display,
+    left: display[0],
+    top: display[1],
+    right: display[0] + display[2],
+    bottom: display[1] + display[3],
+  };
+}
+
+/* the middle of the display, where the marks gather and a card comes up */
+function screenCentre(layout: Layout): Point {
+  const { left, top, right, bottom } = screenOf(layout);
+  return [(left + right) / 2, (top + bottom) / 2];
+}
 
 /* the centres of the three marks on the screen */
 const markCentres = (layout: Layout): Point[] => {
-  const [x, y, step] = layout.marks;
+  const [x, y] = screenCentre(layout);
+  const [step] = layout.marks;
   return [-1, 0, 1].map((offset) => [x + offset * step, y] as const);
 };
 
@@ -240,15 +368,18 @@ function curve(name: Curve) {
 
 type Track = readonly (readonly [ms: number, value: number, ease?: Curve])[];
 
+/** the row the stack's bottom card stands on: the front of the base's top */
+const baseTop = (layout: Layout) => layout.stack.ground - layout.stack.base + 1;
+
 /** the top of the stack's top card */
-const stackTop = (layout: Layout) => layout.stack[1] - layout.card.h - (DEPTH - 1) * layout.stack[2];
+const stackTop = (layout: Layout) => baseTop(layout) - layout.card.h - (DEPTH - 1) * layout.stack.notch;
 
 /** the card's centre across (0) or down (1), in cells, for a card that starts on one of the three marks */
 function track(layout: Layout, slot: number, axis: 0 | 1): Track {
   const from = markCentres(layout)[slot]![axis];
-  const screen = [layout.marks[0], layout.marks[1]][axis];
-  const [stackLeft, , notch] = layout.stack;
-  const rest = axis === 0 ? stackLeft + layout.card.w / 2 : stackTop(layout) + layout.card.h / 2;
+  const screen = screenCentre(layout)[axis];
+  const { left, notch } = layout.stack;
+  const rest = axis === 0 ? left + layout.card.w / 2 : stackTop(layout) + layout.card.h / 2;
   const sinks: [number, number, Curve?][] = [];
   if (axis === 1) {
     for (let depth = 1; depth <= DEPTH; depth += 1) {
@@ -281,24 +412,6 @@ function valueAt(stops: Track, ms: number) {
     }
   }
   return stops[stops.length - 1]![1];
-}
-
-/* the laptop's screen, as drawn: the panel and the display inside its bezel */
-function screenOf(layout: Layout) {
-  const { x, ground, w, depth, deck, screen, lean } = layout.laptop;
-  const deckTop = ground - deck;
-  const [blx, bly] = back([x, deckTop], depth);
-  const [brx, bry] = back([x + w, deckTop], depth);
-  const top = bly - screen;
-  const inset = layout.name === "wide" ? 4 : 2;
-  const face: Point[] = [[blx, bly], [brx, bry], [brx + lean, top], [blx + lean, top]];
-  const display: Point[] = [
-    [blx + inset, bly - inset * 0.8],
-    [brx - inset, bry - inset * 0.8],
-    [brx + lean - inset, top + inset],
-    [blx + lean + inset, top + inset],
-  ];
-  return { face, display, top: top + inset, bottom: bly - inset * 0.8, left: blx + lean + inset, right: brx - inset, deckTop };
 }
 
 /* ---------- the stylesheet ---------- */
@@ -343,9 +456,9 @@ function shiftStops(layout: Layout, stops: Track, axis: 0 | 1): Stop[] {
 function scanStops(layout: Layout): { scan: Stop[]; sweep: Stop[] } {
   const { top, bottom } = screenOf(layout);
   const cq = unit(layout);
-  const run = bottom - top;
+  const run = bottom - top - 1;
   const [, my, , mh] = layout.card.mask;
-  const cardTop = layout.marks[1] - (layout.card.h * layout.onScreen) / 2;
+  const cardTop = screenCentre(layout)[1] - (layout.card.h * layout.onScreen) / 2;
   const from = cardTop + my * layout.onScreen;
   const to = from + mh * layout.onScreen;
   const at = (y: number) => BEAT.scanFrom + ((y - top) / run) * (BEAT.scanTo - BEAT.scanFrom);
@@ -377,7 +490,7 @@ function finishedAt(layout: Layout) {
 
 function layoutRules(layout: Layout) {
   const cq = unit(layout);
-  const size = layout.marks[3];
+  const size = layout.marks[1];
   const half = size / 2;
   const at = finishedAt(layout);
   const { w, h } = layout.card;
@@ -391,7 +504,7 @@ function layoutRules(layout: Layout) {
     ),
     `.hf-card { width: ${cq(w)}; height: ${cq(h)} }`,
     `.hf-scan-${layout.name} { left: ${cq(left)}; top: ${cq(top)}; width: ${cq(right - left)}; height: ${cq(1)} }`,
-    `.hf-base-${layout.name} { left: ${cq(layout.stack[0] - 1)}; top: ${cq(layout.stack[1])}; width: ${cq(w + 2)}; height: ${cq(layout.ground - layout.stack[1])} }`,
+    `.hf-base-${layout.name} { left: ${cq(layout.stack.left - 1)}; top: ${cq(baseTop(layout))}; width: ${cq(w + 2)}; height: ${cq(layout.stack.base)} }`,
     ...AGENTS.map((_, index) => {
       const rest = at(index);
       return `.hf-x${index} { transform: translateX(${cq(rest.x - w / 2)}) }\n.hf-y${index} { transform: translateY(${cq(rest.y - h / 2)}) }`;
@@ -410,12 +523,18 @@ function layoutKeyframes(layout: Layout) {
 
 /* everything that moves the same way whatever the layout */
 function sharedKeyframes(phoneScale: number, wideScale: number) {
-  /* a card is drawn above the stack while it travels and lands, then steps behind each card that lands on it */
+  /*
+   * A card is drawn above everything while it travels and lands, steps back a
+   * level each time the next card sets out, so the one travelling is always in
+   * front, and slips behind the base as it sinks into it.
+   */
   const z: Stop[] = [[0, "z-index: 10"]];
   for (let depth = 1; depth <= DEPTH; depth += 1) {
-    z.push([depth * CYCLE + BEAT.roomFrom - 1, `z-index: ${depth === 1 ? 10 : 11 - depth}`]);
-    z.push([depth * CYCLE + BEAT.roomFrom, `z-index: ${depth === DEPTH ? 1 : 10 - depth}`]);
+    z.push([depth * CYCLE - 1, `z-index: ${11 - depth}`]);
+    z.push([depth * CYCLE, `z-index: ${10 - depth}`]);
   }
+  z.push([DEPTH * CYCLE + BEAT.roomFrom - 1, `z-index: ${10 - DEPTH}`]);
+  z.push([DEPTH * CYCLE + BEAT.roomFrom, "z-index: 1"]);
   z.push([LOOP, "z-index: 1"]);
 
   const gone = DEPTH * CYCLE + BEAT.roomTo;
@@ -576,75 +695,160 @@ function Glyphs() {
   );
 }
 
-/* ---------- edges, on the grid ---------- */
+/* ---------- cells ---------- */
 
-/** the cells a run of segments passes through, as one path of unit squares */
-function cellsAlong(points: readonly Point[], closed: boolean) {
-  const cells = new Set<string>();
-  const last = closed ? points.length : points.length - 1;
-  for (let index = 0; index < last; index += 1) {
-    const [x0, y0] = points[index]!;
-    const [x1, y1] = points[(index + 1) % points.length]!;
-    const steps = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) * 3));
-    for (let step = 0; step <= steps; step += 1) {
-      const t = step / steps;
-      const x = Math.min(Math.floor(x0 + (x1 - x0) * t), Math.ceil(Math.max(x0, x1)) - 1);
-      const y = Math.min(Math.floor(y0 + (y1 - y0) * t), Math.ceil(Math.max(y0, y1)) - 1);
-      cells.add(`${x},${y}`);
+/*
+ * Every drawing is cells. An outline's corners are cells and its edges run
+ * from cell to cell, stepping evenly, so a level or upright edge is one
+ * straight row or column and a slope a regular staircase; a face is every
+ * cell inside its outline, so its glyphs are never cut.
+ */
+type Cells = Set<string>;
+
+const cellKey = (x: number, y: number) => `${x},${y}`;
+
+/** the cells of a straight run from one cell to another */
+function run([x0, y0]: Point, [x1, y1]: Point, cells: Cells = new Set()) {
+  const dx = Math.abs(x1 - x0);
+  const dy = -Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  let error = dx + dy;
+  let x = x0;
+  let y = y0;
+  for (;;) {
+    cells.add(cellKey(x, y));
+    if (x === x1 && y === y1) return cells;
+    const twice = 2 * error;
+    if (twice >= dy) {
+      error += dy;
+      x += sx;
+    }
+    if (twice <= dx) {
+      error += dx;
+      y += sy;
     }
   }
-  return [...cells]
-    .map((cell) => {
-      const [x, y] = cell.split(",");
-      return `M${x} ${y}h1v1h-1z`;
-    })
-    .join("");
 }
 
-const edgeCells = (points: readonly Point[]) => cellsAlong(points, true);
+/** the cells along a closed outline */
+function outline(points: readonly Point[]) {
+  const cells: Cells = new Set();
+  points.forEach((point, index) => run(point, points[(index + 1) % points.length]!, cells));
+  return cells;
+}
+
+/** the cells inside a closed outline, the outline's own included */
+function inside(points: readonly Point[], edge: Cells) {
+  const cells: Cells = new Set(edge);
+  const rows = points.map(([, y]) => y);
+  for (let row = Math.min(...rows); row <= Math.max(...rows); row += 1) {
+    const crossings: number[] = [];
+    points.forEach(([x0, y0], index) => {
+      const [x1, y1] = points[(index + 1) % points.length]!;
+      if ((y0 <= row && row < y1) || (y1 <= row && row < y0)) crossings.push(x0 + ((row - y0) * (x1 - x0)) / (y1 - y0));
+    });
+    crossings.sort((a, b) => a - b);
+    for (let index = 0; index + 1 < crossings.length; index += 2) {
+      for (let x = Math.ceil(crossings[index]! - 1e-6); x <= Math.floor(crossings[index + 1]! + 1e-6); x += 1) {
+        cells.add(cellKey(x, row));
+      }
+    }
+  }
+  return cells;
+}
+
+/** cells as one path, each row's neighbours joined into one run */
+function cellPath(cells: Iterable<string>) {
+  const rows = new Map<number, number[]>();
+  for (const cell of cells) {
+    const [x, y] = cell.split(",").map(Number) as [number, number];
+    const row = rows.get(y);
+    if (row) row.push(x);
+    else rows.set(y, [x]);
+  }
+  let d = "";
+  for (const [y, xs] of [...rows].sort((a, b) => a[0] - b[0])) {
+    xs.sort((a, b) => a - b);
+    let start = xs[0]!;
+    let end = start;
+    for (const x of [...xs.slice(1), Number.POSITIVE_INFINITY]) {
+      if (x === end + 1) {
+        end = x;
+        continue;
+      }
+      d += `M${start} ${y}h${end - start + 1}v1h${start - end - 1}z`;
+      start = x;
+      end = x;
+    }
+  }
+  return d;
+}
+
+/** a rectangle of cells, as the corners of its outline */
+const corners = (x: number, y: number, w: number, h: number): Point[] => [
+  [x, y],
+  [x + w - 1, y],
+  [x + w - 1, y + h - 1],
+  [x, y + h - 1],
+];
+
+/** the shapes of a drawing moved to where it stands */
+const shift = (points: readonly Point[], dx: number, dy: number): Point[] => points.map(([x, y]) => [x + dx, y + dy]);
 
 /* ---------- the drawings ---------- */
 
 /* a face's light: lit faces the lightest glyphs, then mid, shade and deep */
 type Light = "lit" | "mid" | "shade" | "deep" | "amber";
 
-const toPath = (points: readonly Point[]) => `M${points.map(([x, y]) => `${n(x)} ${n(y)}`).join("L")}Z`;
-const rectPoints = (x: number, y: number, w: number, h: number): Point[] => [
-  [x, y],
-  [x + w, y],
-  [x + w, y + h],
-  [x, y + h],
-];
-function ellipsePoints(cx: number, cy: number, rx: number, ry: number, sides = 24): Point[] {
-  return Array.from({ length: sides }, (_, index) => {
-    const angle = (index / sides) * Math.PI * 2;
-    return [cx + Math.cos(angle) * rx, cy + Math.sin(angle) * ry] as const;
-  });
-}
-
-/** a closed face: filled with the panel to cover what is behind it, shaded with its glyphs, edged with squares */
-function Face({ points, light, edge = true }: { points: readonly Point[]; light: Light; edge?: boolean }) {
-  const d = toPath(points);
+/**
+ * A closed face: filled with the panel to cover what is behind it, shaded with
+ * its glyphs, and edged with one cell of ink. A face split down a column takes
+ * a second light on its right, the side turned from the light.
+ */
+function Face({ points, light, edge = true, split }: {
+  points: readonly Point[];
+  light: Light;
+  edge?: boolean;
+  split?: readonly [column: number, light: Light];
+}) {
+  const ring = outline(points);
+  const cells = inside(points, ring);
+  const left = split ? [...cells].filter((cell) => Number(cell.split(",")[0]) < split[0]) : cells;
+  const right = split ? [...cells].filter((cell) => Number(cell.split(",")[0]) >= split[0]) : [];
   return (
     <>
-      <path className="hf-fill" d={d} />
-      <path className={`hf-light-${light}`} d={d} />
-      {edge ? <path className="hf-ink" d={edgeCells(points)} /> : null}
+      <path className="hf-fill" d={cellPath(cells)} />
+      <path className={`hf-light-${light}`} d={cellPath(left)} />
+      {split ? <path className={`hf-light-${split[1]}`} d={cellPath(right)} /> : null}
+      {edge ? <path className="hf-ink" d={cellPath(ring)} /> : null}
     </>
   );
 }
 
-/** a contact shadow: glyphs thinning out from a darker core at the base */
-function Shadow({ cx, cy, rx, ry }: { cx: number; cy: number; rx: number; ry: number }) {
+/** runs of cells, in ink or, for a lighter line, in one face's glyphs */
+function Strokes({ runs, light }: { runs: readonly (readonly Point[])[]; light?: Light }) {
+  const cells: Cells = new Set();
+  for (const points of runs) points.slice(1).forEach((point, index) => run(points[index]!, point, cells));
+  return <path className={light ? `hf-light-${light}` : "hf-ink"} d={cellPath(cells)} />;
+}
+
+/**
+ * A contact shadow: the same rows under every object, glyphs thinning from
+ * plusses under its foot to dots, a little to the right, away from the light.
+ */
+function Shadow({ from, to, ground, rows }: { from: number; to: number; ground: number; rows: number }) {
+  const band = (row: number, start: number, end: number) => `M${start} ${row}h${end - start + 1}v1h${start - end - 1}z`;
+  const core = Array.from({ length: rows - 1 }, (_, index) => band(ground + 1 + index, from + index, to + 1 + index)).join("");
   return (
     <>
-      <path className="hf-tone-shade" d={toPath(ellipsePoints(cx, cy, rx, ry))} />
-      <path className="hf-tone-shade-core" d={toPath(ellipsePoints(cx - rx * 0.12, cy, rx * 0.66, ry * 0.6))} />
+      <path className="hf-tone-shade-core" d={core} />
+      <path className="hf-tone-shade" d={band(ground + rows, from + rows - 1, to + rows)} />
     </>
   );
 }
 
-/** A box in three-quarter view: its lit top, its shaded side and its front, from the front face's corner and size. */
+/** A box in three-quarter view, from its front face's top-left cell and size: its lit top, its shaded side and its front. */
 function Box({ x, y, w, h, depth, front = "mid", top = "lit", side = "shade" }: {
   x: number;
   y: number;
@@ -655,13 +859,13 @@ function Box({ x, y, w, h, depth, front = "mid", top = "lit", side = "shade" }: 
   top?: Light;
   side?: Light;
 }) {
-  const [bx, by] = back([x, y], depth);
-  const [rx, ry] = back([x + w, y], depth);
+  const right = x + w - 1;
+  const bottom = y + h - 1;
   return (
     <>
-      <Face points={[[x, y], [x + w, y], [rx, ry], [bx, by]]} light={top} />
-      <Face points={[[x + w, y], [rx, ry], [rx, ry + h], [x + w, y + h]]} light={side} />
-      <Face points={rectPoints(x, y, w, h)} light={front} />
+      <Face points={[[x, y], [right, y], back([right, y], depth), back([x, y], depth)]} light={top} />
+      <Face points={[[right, y], back([right, y], depth), back([right, bottom], depth), [right, bottom]]} light={side} />
+      <Face points={corners(x, y, w, h)} light={front} />
     </>
   );
 }
@@ -669,54 +873,24 @@ function Box({ x, y, w, h, depth, front = "mid", top = "lit", side = "shade" }: 
 /* which of the two layouts a drawing belongs to; the stylesheet shows one */
 const sizeClass = (layout: Layout) => `hf-${layout.name}`;
 
-/*
- * The peasants, traced from the pictures' village: a peaked hat with a brim on
- * a narrow neck, over a robe that widens to the hem, in units of the figure's
- * height from its peak (x) and from the ground (y). The basket rides at the
- * hip; the rake's handle runs from above the hat to the ground beside it.
- */
-const HAT: Point[] = [
-  [0, -1], [0.214, -0.85], [0.105, -0.782], [0.086, -0.763], [-0.087, -0.763], [-0.119, -0.788], [-0.215, -0.85],
-];
-const ROBE_LIT: Point[] = [
-  [0.0, -0.763], [0.03, 0], [-0.042, 0], [-0.074, -0.017], [-0.215, -0.051], [-0.187, -0.25], [-0.151, -0.545], [-0.119, -0.718], [-0.081, -0.744], [-0.087, -0.763],
-];
-const ROBE_SHADE: Point[] = [
-  [0.0, -0.763], [0.086, -0.763], [0.105, -0.735], [0.128, -0.699], [0.144, -0.538], [0.163, -0.41], [0.201, -0.286], [0.21, -0.214], [0.229, -0.119], [0.21, -0.096], [0.15, -0.026], [0.03, 0],
-];
-const BASKET: Point[] = [
-  [0.144, -0.526], [0.323, -0.517], [0.377, -0.471], [0.342, -0.333], [0.304, -0.29], [0.201, -0.286], [0.17, -0.41],
-];
-const RAKE_HANDLE: Point[] = [[0.18, -1.15], [0.205, -1.15], [0.385, -0.02], [0.36, -0.02]];
-const RAKE_HEAD: Point[] = [[-0.12, -1.19], [0.3, -1.15], [0.3, -1.125], [-0.12, -1.165]];
-
-function Peasant({ person: [x, height, holds], ground, lit }: { person: Person; ground: number; lit: boolean }) {
-  const place = (shape: readonly Point[]): Point[] => shape.map(([u, v]) => [x + u * height, ground + v * height] as const);
-  const hat = place(HAT);
-  const hatLit: Point[] = [hat[0]!, [x, hat[3]![1]], ...hat.slice(4)];
-  const hatShade: Point[] = [hat[0]!, ...hat.slice(1, 4), [x, hat[3]![1]]];
+function Peasant({ figure, person: [x, holds], ground, lit }: { figure: Figure; person: Person; ground: number; lit: boolean }) {
+  const place = (points: readonly Point[]) => shift(points, x, ground);
+  const { rake } = figure;
   return (
     <g>
-      <Shadow cx={x + height * 0.1} cy={ground + 0.6} rx={height * 0.3} ry={height * 0.05} />
       {holds === "rake" ? (
-        <>
-          <Face points={place(RAKE_HANDLE)} light="mid" />
-          <Face points={place(RAKE_HEAD)} light="shade" />
-        </>
+        <Strokes runs={[place(rake.handle), place(rake.head), place(rake.hand), ...rake.teeth.map((tooth) => place([tooth, tooth]))]} />
       ) : null}
-      <Face points={place(ROBE_LIT)} light="mid" edge={false} />
-      <Face points={place(ROBE_SHADE)} light="shade" edge={false} />
-      <path className="hf-ink" d={edgeCells(place([...ROBE_SHADE.slice(1, -1), ...ROBE_LIT.slice(2, -1)]))} />
-      <Face points={hatLit} light="lit" edge={false} />
-      <Face points={hatShade} light="shade" edge={false} />
-      <path className="hf-ink" d={edgeCells(hat)} />
+      <Face points={place(figure.body)} light="mid" split={[x, "shade"]} />
+      {figure.arms.length ? <Strokes runs={figure.arms.map(place)} /> : null}
+      <Face points={place(figure.hat)} light="lit" split={[x, "shade"]} />
       {holds === "basket" ? (
         <>
-          <Face points={place(BASKET)} light="mid" />
+          <Strokes runs={[place(figure.handle)]} />
+          <Face points={place(figure.basket)} light="mid" />
           {lit ? (
             <g className="hf-notice">
-              <path className="hf-light-amber" d={toPath(place(BASKET))} />
-              <path className="hf-ink" d={edgeCells(place(BASKET))} />
+              <Face points={place(figure.basket)} light="amber" />
             </g>
           ) : null}
         </>
@@ -725,91 +899,74 @@ function Peasant({ person: [x, height, holds], ground, lit }: { person: Person; 
   );
 }
 
-/**
- * A wheat sheaf, flat like the pictures': twenty stalks gathered by a twine
- * band, spread at the foot and fanned above, each with an ear drooping outward,
- * every stalk and ear a run of squares on the grid.
- */
-function Sheaf({ x, height, ground }: { x: number; height: number; ground: number }) {
-  const band = ground - height * 0.42;
-  const top = ground - height;
-  const strokes: Point[][] = [];
-  const count = 11;
-  for (let index = 0; index < count; index += 1) {
-    const t = index / (count - 1) - 0.5;
-    const lean = t < 0 ? -1 : 1;
-    const tipX = x + t * height * 0.72;
-    const tipY = top + t * t * height * 0.8;
-    strokes.push([
-      [x + t * height * 0.12, band],
-      [tipX, tipY],
-    ]);
-    // each ear droops away from the middle
-    strokes.push([
-      [tipX, tipY],
-      [tipX + lean * height * 0.05, tipY - height * 0.03],
-      [tipX + lean * height * 0.1, tipY + height * 0.02],
-    ]);
-    // every other stalk carries on below the band, splayed, so the butts stay apart
-    if (index % 2 === 0) strokes.push([[x + t * height * 0.12, band], [x + t * height * 0.56, ground - 0.5]]);
-  }
+function Sheaf({ plan, x, ground }: { plan: SheafPlan; x: number; ground: number }) {
+  const place = (points: readonly Point[]) => shift(points, x, ground);
+  const [bx, by, bw, bh] = plan.band;
   return (
     <g>
-      <Shadow cx={x + height * 0.12} cy={ground + 0.5} rx={height * 0.32} ry={height * 0.05} />
-      <path className="hf-ink" d={strokes.map((stroke) => cellsAlong(stroke, false)).join("")} />
-      <Face points={rectPoints(x - height * 0.08, band - 1, height * 0.16, 2)} light="deep" />
+      <Face points={place(plan.outline)} light="lit" split={[x, "mid"]} />
+      <Strokes runs={plan.stalks.map(place)} />
+      <Face points={place(corners(bx, by, bw, bh))} light="deep" />
     </g>
   );
 }
 
-/** The still parts: the ground's scatter, the laptop, the wheat and the peasants. */
-function Scene({ layout }: { layout: Layout }) {
-  const { x, ground: lg, w, depth, deck, lean } = layout.laptop;
-  const { face, display, deckTop } = screenOf(layout);
-  const [brx, bry] = face[1]!;
-  const screenTop = face[3]![1];
-  const [ex, ey] = back([0, 0], layout.name === "wide" ? 2.5 : 1.5);
+/** how far a figure reaches either side of its column, with what it holds */
+function reach(points: readonly Point[]) {
+  const xs = points.map(([px]) => px);
+  return [Math.min(...xs), Math.max(...xs)] as const;
+}
+
+/** The still parts: the ground's scatter, the laptop, the wheat and the peasants, each with its shadow. */
+const Scene = memo(function Scene({ layout }: { layout: Layout }) {
+  const { x, ground, w, depth, deck } = layout.laptop;
+  const { deckTop, lid, display } = screenOf(layout);
   const keys: Point[] = [
-    back([x + w * 0.1, deckTop], depth * 0.18),
-    back([x + w * 0.9, deckTop], depth * 0.18),
-    back([x + w * 0.9, deckTop], depth * 0.72),
-    back([x + w * 0.1, deckTop], depth * 0.72),
+    back([x + 7, deckTop], 1),
+    back([x + w - 8, deckTop], 1),
+    back([x + w - 8, deckTop], depth - 2),
+    back([x + 7, deckTop], depth - 2),
   ];
+  const [sheafFrom, sheafTo] = reach(layout.sheaf.outline);
+  const [bodyFrom, bodyTo] = reach(layout.figure.body);
   const people = layout.people
     .map((person, index) => ({ person, index }))
     .sort((a, b) => Number(a.index === layout.noticer) - Number(b.index === layout.noticer));
   return (
     <svg className={`hf-art ${sizeClass(layout)}`} viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true" focusable="false">
-      <path className="hf-tone-ground" d={toPath(rectPoints(0, 0, layout.width, layout.height))} />
-      <Shadow cx={x + w / 2 + depth * 0.4} cy={lg + 0.5} rx={w / 2 + depth * 0.35} ry={layout.name === "wide" ? 4.5 : 2.6} />
-      <Face points={[[brx, bry], [brx + ex, bry + ey], [brx + lean + ex, screenTop + ey], [brx + lean, screenTop]]} light="deep" />
-      <Face points={[face[3]!, face[2]!, [face[2]![0] + ex, screenTop + ey], [face[3]![0] + ex, screenTop + ey]]} light="mid" />
-      <Face points={face} light="shade" />
-      <Face points={display} light="lit" />
+      <path className="hf-tone-ground" d={`M0 0h${layout.width}v${layout.height}h${-layout.width}z`} />
+      <Shadow from={x} to={x + w + 1} ground={ground} rows={layout.shadow} />
+      {layout.sheaves.map((sx) => (
+        <Shadow key={sx} from={sx + sheafFrom} to={sx + sheafTo} ground={layout.commons} rows={layout.shadow} />
+      ))}
+      {layout.people.map(([px]) => (
+        <Shadow key={px} from={px + bodyFrom} to={px + bodyTo} ground={layout.commons} rows={layout.shadow} />
+      ))}
       <Box x={x} y={deckTop} w={w} h={deck} depth={depth} front="deep" top="mid" side="deep" />
       <Face points={keys} light="shade" />
-      {layout.sheaves.map(([sx, height, ground]) => (
-        <Sheaf key={sx} x={sx} height={height} ground={ground} />
+      <Box x={lid[0]} y={lid[1]} w={lid[2]} h={lid[3]} depth={1} front="mid" top="mid" side="deep" />
+      <Face points={corners(...display)} light="lit" />
+      {layout.sheaves.map((sx) => (
+        <Sheaf key={sx} plan={layout.sheaf} x={sx} ground={layout.commons} />
       ))}
       {people.map(({ person, index }) => (
-        <Peasant key={person[0]} person={person} ground={layout.ground} lit={index === layout.noticer} />
+        <Peasant key={person[0]} figure={layout.figure} person={person} ground={layout.commons} lit={index === layout.noticer} />
       ))}
     </svg>
   );
-}
+});
 
-/** The base the stack stands on: a low box as wide as the cards, drawn over the cards that have sunk into it. */
-function Base({ layout }: { layout: Layout }) {
+/** The base the stack stands on: a low box a cell wider than the cards each side, drawn over the cards that have sunk into it. */
+const Base = memo(function Base({ layout }: { layout: Layout }) {
   const w = layout.card.w + 2;
-  const h = layout.ground - layout.stack[1];
-  const depth = layout.stack[3];
+  const { base: h, depth } = layout.stack;
   return (
     <svg className={`hf-base hf-base-${layout.name} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
-      <Shadow cx={w / 2 + 4} cy={h + 0.5} rx={w / 2 + 7} ry={layout.name === "wide" ? 4.5 : 2.6} />
+      <Shadow from={0} to={w + 1} ground={h - 1} rows={layout.shadow} />
       <Box x={0} y={0} w={w} h={h} depth={depth} front="mid" top="lit" side="deep" />
     </svg>
   );
-}
+});
 
 /** The scan line that runs down the laptop's screen. */
 function Scan({ layout }: { layout: Layout }) {
@@ -826,8 +983,24 @@ function Scan({ layout }: { layout: Layout }) {
   );
 }
 
+/** a stamp's outline: a disc of cells, an octagon with its corners cut at forty-five degrees */
+function octagon(size: number): Point[] {
+  const last = size - 1;
+  const cut = Math.round(size * 0.3);
+  return [
+    [cut, 0],
+    [last - cut, 0],
+    [last, cut],
+    [last, last - cut],
+    [last - cut, last],
+    [cut, last],
+    [0, last - cut],
+    [0, cut],
+  ];
+}
+
 /** A card: a slab of paper with a lit top edge and a shaded side, its agent's mark, three lines, and the amber block and the stamp laid over it. */
-function CardArt({ plan, mark, index, className }: { plan: CardPlan; mark: string; index: number; className: string }) {
+const CardArt = memo(function CardArt({ plan, mark, index, className }: { plan: CardPlan; mark: string; index: number; className: string }) {
   const [markX, markY, markSize] = plan.mark;
   const [maskX, maskY, maskW, maskH] = plan.mask;
   const [stampX, stampY, stampSize] = plan.stamp;
@@ -837,35 +1010,31 @@ function CardArt({ plan, mark, index, className }: { plan: CardPlan; mark: strin
     width: `${(w / plan.w) * 100}%`,
     height: `${(h / plan.h) * 100}%`,
   });
-  const r = stampSize / 2;
-  const [dx, dy] = back([0, 0], plan.w > 50 ? 3 : 2);
+  const checkCells: Cells = new Set();
+  plan.check.slice(1).forEach((point, step) => run(plan.check[step]!, point, checkCells));
   return (
     <div className={`hf-card-face ${className}`}>
       <svg className="hf-card-art" viewBox={`0 0 ${plan.w} ${plan.h}`} aria-hidden="true" focusable="false">
-        <Face points={[[0, 0], [plan.w, 0], [plan.w + dx, dy], [dx, dy]]} light="mid" />
-        <Face points={[[plan.w, 0], [plan.w + dx, dy], [plan.w + dx, plan.h + dy], [plan.w, plan.h]]} light="shade" />
-        <Face points={rectPoints(0, 0, plan.w, plan.h)} light="lit" />
-        {plan.lines.map(([x, y, w]) => (
-          <path key={y} className="hf-ink" d={toPath(rectPoints(x, y, w, plan.line))} />
-        ))}
+        <Box x={0} y={0} w={plan.w} h={plan.h} depth={1} front="lit" top="mid" side="shade" />
+        <path className="hf-ink" d={plan.lines.map(([x, y, w]) => `M${x} ${y}h${w}v${plan.line}h${-w}z`).join("")} />
       </svg>
       <span className="hf-card-mark" style={box(markX, markY, markSize, markSize)}>
         <BrandMark name={mark} />
       </span>
       <span className={`hf-mask hf-k${index}`} style={box(maskX, maskY, maskW, maskH)}>
         <svg viewBox={`0 0 ${maskW} ${maskH}`} aria-hidden="true" focusable="false">
-          <Face points={rectPoints(0, 0, maskW, maskH)} light="amber" />
+          <Face points={corners(0, 0, maskW, maskH)} light="amber" />
         </svg>
       </span>
       <span className={`hf-stamp hf-t${index}`} style={box(stampX, stampY, stampSize, stampSize)}>
         <svg viewBox={`0 0 ${stampSize} ${stampSize}`} aria-hidden="true" focusable="false">
-          <Face points={ellipsePoints(r, r, r, r, 16)} light="deep" />
-          <path className="hf-knock" d={`M${r * 0.5} ${r}L${r * 0.85} ${r * 1.4}L${r * 1.5} ${r * 0.62}`} />
+          <path className="hf-ink" d={cellPath(inside(octagon(stampSize), outline(octagon(stampSize))))} />
+          <path className="hf-fill" d={cellPath(checkCells)} />
         </svg>
       </span>
     </div>
   );
-}
+});
 
 /**
  * The loop holds while the picture is off screen, while the tab is behind
