@@ -698,18 +698,21 @@
 /*
  * Held, how it works centres its title and its scene as one block in the
  * screen under the header, and brings at least --site-head-gap of its own
- * room above and below it on a wide window (--sp-3 on a phone). The section
- * before it gives up that much of its own padding, so the held screen sits as
- * far from its neighbours as any two sections do.
+ * room above and below it on a wide window (--sp-3 on a phone). On a wide
+ * window the sections on either side each give up half that, so the held
+ * screen sits as far from the one above as from the one below.
  */
-.lp-sec:has(+ .lp-how .hw-scroll) {
-  padding-block-end: calc(var(--site-sec-y) - var(--site-head-gap));
+@media (min-width: 62.5rem) {
+  .lp-sec:has(+ .lp-how .hw-scroll) {
+    padding-block-end: calc(var(--site-sec-y) - var(--site-head-gap) / 2);
+  }
+
+  .lp-how:has(.hw-scroll) + .lp-sec {
+    padding-block-start: calc(var(--site-sec-y) - var(--site-head-gap) / 2);
+  }
 }
 
 @media (max-width: 62.49rem) {
-  .lp-sec:has(+ .lp-how .hw-scroll) {
-    padding-block-end: var(--site-sec-y);
-  }
 
   .lp-how:has(.hw-scroll) {
     padding-block: calc(var(--site-sec-y) - var(--sp-3));
