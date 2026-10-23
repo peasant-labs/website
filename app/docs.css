@@ -38,7 +38,9 @@
   gap: 10px;
   min-height: 2.25rem;
   margin-inline-start: -1px;
-  padding: 0 var(--sp-4);
+  /* a label that wraps keeps the same room above and below as a one-line one */
+  padding: var(--sp-2) var(--sp-4);
+  line-height: 1.4;
   border-inline-start: var(--stroke-emphasis) solid transparent;
   color: var(--ink-2);
   font-family: var(--font-mono);
@@ -378,7 +380,7 @@
   grid-column: prose;
 }
 
-.dx-prose > :is(h2, .dx-list, .dx-bullets:has(.dx-cmd), .dx-note, .dx-pic, .essay-tldr, .dx-terms, .dx-defs, .dx-ref, .dx-guides, .dx-cmd, .dx-cmds, .dx-cmd-group, .dx-path, .dx-agents),
+.dx-prose > :is(h2, .dx-list, .dx-bullets:has(.dx-cmd), .dx-note, .dx-pic, .dx-terms, .dx-defs, .dx-ref, .dx-guides, .dx-cmd, .dx-cmds, .dx-cmd-group, .dx-path, .dx-agents),
 .dx-step > .dx-step-body {
   grid-column: wide;
 }
@@ -417,6 +419,17 @@
 
 .dx-prose > h2 + * {
   margin-block-start: var(--sp-5);
+}
+
+/* a post's parts stand as far apart as the docs' sections */
+.dx-prose > * + h2 {
+  margin-block-start: var(--sp-8);
+}
+
+@container dx-page (min-width: 58rem) {
+  .dx-prose > * + h2 {
+    margin-block-start: calc(var(--sp-8) + var(--sp-4));
+  }
 }
 
 .dx-prose > * + h3 {
@@ -945,54 +958,6 @@
 /* the blog lists its posts one to a row, each a docs card, so a picture shows at its full size */
 .bx-posts.dx-guides {
   grid-template-columns: minmax(0, 1fr);
-}
-
-/* the tldr is a framed block on the wide track; its words keep the prose measure */
-.essay-tldr {
-  border: var(--bd);
-  background: var(--surface);
-}
-
-.essay-tldr summary {
-  display: flex;
-  align-items: center;
-  min-height: var(--target-comfortable);
-  padding: 0 var(--card-pad);
-  color: var(--ink-strong);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  font-weight: 600;
-  letter-spacing: 0;
-  list-style: none;
-  cursor: pointer;
-}
-
-.essay-tldr summary::-webkit-details-marker {
-  display: none;
-}
-
-.essay-tldr > p {
-  padding: 0 var(--card-pad);
-}
-
-.essay-tldr > ol {
-  display: grid;
-  gap: var(--sp-3);
-  max-inline-size: var(--dx-col);
-  margin-block-start: var(--sp-4);
-  padding: 0 var(--card-pad) var(--card-pad) calc(var(--card-pad) + 1.5em);
-  list-style: decimal;
-}
-
-.essay-tldr li {
-  letter-spacing: var(--tracking-prose);
-  word-spacing: var(--word-spacing-prose);
-  text-wrap: pretty;
-}
-
-.essay-tldr li::marker {
-  color: var(--ink-3);
-  font-family: var(--font-mono);
 }
 
 /* a quote: a hairline on its left, the words in the secondary ink */

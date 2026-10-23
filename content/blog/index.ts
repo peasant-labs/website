@@ -1,6 +1,6 @@
 import type { TocItem } from "@/lib/docs-content";
 import type { ComponentType } from "react";
-import ReclaimingDataAutonomy, { ESSAY_TEXT } from "./reclaiming-data-autonomy-as-a-peasant";
+import ReclaimingDataAutonomy, { ESSAY_TEXT, ESSAY_TOC } from "./reclaiming-data-autonomy-as-a-peasant";
 
 /**
  * Every listed post's body, the words it shows for the docs search, and its
@@ -11,8 +11,7 @@ import ReclaimingDataAutonomy, { ESSAY_TEXT } from "./reclaiming-data-autonomy-a
 export const POST_BODIES: Readonly<
   Record<string, { Body: ComponentType; text: readonly string[]; toc: readonly TocItem[] }>
 > = {
-  // the essay runs as one piece with no headings
-  "reclaiming-data-autonomy-as-a-peasant": { Body: ReclaimingDataAutonomy, text: ESSAY_TEXT, toc: [] },
+  "reclaiming-data-autonomy-as-a-peasant": { Body: ReclaimingDataAutonomy, text: ESSAY_TEXT, toc: ESSAY_TOC },
 };
 
 /* a reader's pace for the reading-time estimate, in words a minute */
