@@ -10,8 +10,6 @@ import {
   GitPullRequest,
   GraduationCap,
   HistoryIcon,
-  Laptop,
-  Layers,
   Link as LinkIcon,
   Lock,
   MessageCircle,
@@ -20,6 +18,7 @@ import {
   ShieldCheck,
   SquareTerminal,
   Users,
+  Zap,
 } from "@peasant-labs/fairtrade/icons";
 import type { ComponentType, SVGProps } from "react";
 
@@ -42,9 +41,8 @@ const ICONS: Record<LandingIconName, ComponentType<SVGProps<SVGSVGElement>>> = {
   company: Building2,
   record: CircleDot,
   review: ShieldCheck,
-  laptop: Laptop,
   bot: Bot,
-  layers: Layers,
+  zap: Zap,
 };
 
 /** A landing icon, decorative: the words beside it carry the meaning. */

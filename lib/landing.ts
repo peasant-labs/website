@@ -21,21 +21,23 @@ function art(name: string, alt: string, width: number, height: number): Art {
 
 /*
  * The hero says the mission in the owner's words: the open-source commons for
- * agent transcripts. The tags name the four promises the product stands on by
- * what backs each one: sessions stay on the computer, peasant and village are
- * Apache-2.0, the same flow serves every harness peasant reads, and harvesting
- * skips sessions that have not changed. The lede claims that nothing leaves
- * until it is published, and that a contributor's handle shows on their
- * transcripts unless they turn that off.
+ * agent transcripts. Everything under it is in plain words. The tags name the
+ * four promises the product stands on: nothing leaves the computer until it is
+ * published, peasant and village are Apache-2.0, peasant reads six agents'
+ * sessions, and indexing skips sessions that have not changed. The lede says
+ * where the sessions come from (the agents write them, peasant gathers them),
+ * that secrets and personal details are hidden on the computer before a
+ * session is published, and that the person publishing picks who can read it:
+ * the collectives they choose, or everyone.
  */
 export const HERO = {
   title: "the open-source commons for agent transcripts",
-  lede: "Peasant keeps your coding agent sessions on your computer. When you publish one, it is redacted there first and shared under your handle, only with the collectives you pick.",
+  lede: "Peasant gathers the sessions your coding agents save on your computer. Before you publish one, Peasant hides its secrets and personal details. You choose who can read it.",
   pillars: [
-    { text: "local first", icon: "laptop" },
+    { text: "private until you publish", icon: "lock" },
     { text: "open source", icon: "code" },
-    { text: "agent-agnostic", icon: "bot" },
-    { text: "incremental indexing", icon: "layers" },
+    { text: "works with many agents", icon: "bot" },
+    { text: "fast indexing", icon: "zap" },
   ],
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
@@ -97,9 +99,8 @@ export type LandingIconName =
   | "company"
   | "record"
   | "review"
-  | "laptop"
   | "bot"
-  | "layers";
+  | "zap";
 
 /** a capability: its headline, one or two sentences on what it is, and its own picture, which shows while it does */
 export type Capability = Readonly<{ text: string; detail: string; icon: LandingIconName; art: Art }>;
