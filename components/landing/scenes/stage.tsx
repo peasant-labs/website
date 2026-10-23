@@ -11,6 +11,16 @@ import {
 
 /** The virtual screen every scene is laid out on, in CSS pixels, before the camera scales it: a Mac's desktop. */
 export const SCREEN = { width: 1120, height: 700 } as const;
+/*
+ * On a phone the scenes lay out on a smaller screen of the same shape as the
+ * phone's view, so the camera shows them near their own size and the words
+ * stay readable; the scene CSS reflows the windows for it ([data-compact]).
+ */
+const COMPACT = { width: 440, height: 358 } as const;
+/* a view narrower than this plays the compact screen */
+const COMPACT_BELOW = 560;
+
+type Screen = Readonly<{ width: number; height: number }>;
 
 /* moves across the screen, and the settle into a held framing */
 const EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)";
@@ -115,11 +125,34 @@ function keepInside(offset: number, view: number, screen: number) {
   return Math.min(0, Math.max(view - screen, offset));
 }
 
-function frameFor(box: Box, view: { w: number; h: number }, fill: number) {
-  const scale = Math.min((view.w * fill) / box.w, (view.h * fill) / box.h, MAX_ZOOM);
-  const x = keepInside(view.w / 2 - (box.x + box.w / 2) * scale, view.w, SCREEN.width * scale);
-  const y = keepInside(view.h / 2 - (box.y + box.h / 2) * scale, view.h, SCREEN.height * scale);
+function frameFor(box: Box, view: { w: number; h: number }, fill: number, screen: Screen, least = 0) {
+  const fit = Math.min((view.w * fill) / box.w, (view.h * fill) / box.h, MAX_ZOOM);
+  const scale = Math.max(fit, least);
+  // a box too tall to fit at the least scale is read from its top, the way a reader scrolls into it
+  const margin = (view.h * (1 - fill)) / 2;
+  const top = fit < least ? margin - box.y * scale : view.h / 2 - (box.y + box.h / 2) * scale;
+  const x = keepInside(view.w / 2 - (box.x + box.w / 2) * scale, view.w, screen.width * scale);
+  const y = keepInside(top, view.h, screen.height * scale);
   return `translate(${x}px, ${y}px) scale(${scale})`;
+}
+
+/* on the compact screen the camera never pulls back so far that a window's words drop below reading size */
+const COMPACT_LEAST = 0.82;
+
+/*
+ * A framing never shows a menu-bar word cut at its edge: an item the framing
+ * would cut fades out, and fades back in once a framing takes it in whole.
+ */
+function settleMenuBar(camera: HTMLElement, transform: string, view: { w: number; h: number }) {
+  const lens = new DOMMatrix(transform);
+  if (!lens.a) return;
+  const from = -lens.e / lens.a;
+  const to = (view.w - lens.e) / lens.a;
+  for (const item of camera.querySelectorAll<HTMLElement>(".mac-menubar > span:not(.mac-menu-end), .mac-menu-end > *")) {
+    const left = layoutOffset(item, camera).x;
+    const cut = left < from - 0.5 || left + item.offsetWidth > to + 0.5 ? "true" : "false";
+    if (item.dataset.cut !== cut) item.dataset.cut = cut;
+  }
 }
 
 /* the element a focus names: a name marked with data-focus, or a selector into a component's own markup */
@@ -131,11 +164,12 @@ function targetOf(screen: HTMLElement, focus: string) {
 
 /* where an element sits on the virtual screen, whatever the camera is doing right now */
 function boxOf(screen: HTMLElement, focus: string): Box {
-  if (focus === "all") return { x: 0, y: 0, w: SCREEN.width, h: SCREEN.height };
+  const whole = { x: 0, y: 0, w: screen.offsetWidth, h: screen.offsetHeight };
+  if (focus === "all") return whole;
   const target = targetOf(screen, focus);
-  if (!target) return { x: 0, y: 0, w: SCREEN.width, h: SCREEN.height };
+  if (!target) return whole;
   const screenBox = screen.getBoundingClientRect();
-  const scale = screenBox.width / SCREEN.width || 1;
+  const scale = screenBox.width / (screen.offsetWidth || 1) || 1;
   const box = target.getBoundingClientRect();
   return {
     x: (box.left - screenBox.left) / scale,
@@ -180,11 +214,24 @@ export function SceneStage({
   // A take starts the first time the scene can be seen; after that, it holds while it cannot be.
   const [started, setStarted] = useState(false);
   if (playing && !started && !reduced) setStarted(true);
+  const [compact, setCompact] = useState(false);
+  const screen: Screen = compact ? COMPACT : SCREEN;
+
+  // A phone's view plays the compact screen; measured before the first paint, and again on resize.
+  useLayoutEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    const measure = () => setCompact(view.clientWidth > 0 && view.clientWidth < COMPACT_BELOW);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(view);
+    return () => observer.disconnect();
+  }, []);
 
   const viewSize = useCallback(() => {
     const view = viewRef.current;
-    return { w: view?.clientWidth ?? SCREEN.width, h: view?.clientHeight ?? SCREEN.height };
-  }, []);
+    return { w: view?.clientWidth ?? screen.width, h: view?.clientHeight ?? screen.height };
+  }, [screen]);
 
   const frame = useCallback(
     (focus: string, fill: number, width?: number, cropBelow = Infinity) => {
@@ -193,10 +240,14 @@ export function SceneStage({
       const box = boxOf(camera, focus);
       const view = viewSize();
       const whole = Math.min((view.w * fill) / box.w, (view.h * fill) / box.h);
-      const crop = width !== undefined && box.w > width && whole < cropBelow;
-      return frameFor(crop ? { ...box, w: width } : box, view, fill);
+      // the compact screen is laid out to be read whole, so it never needs a row cropped to its start
+      const crop = !compact && width !== undefined && box.w > width && whole < cropBelow;
+      const least = compact && focus !== "all" ? COMPACT_LEAST : 0;
+      const to = frameFor(crop ? { ...box, w: width } : box, view, fill, screen, least);
+      settleMenuBar(camera, to, view);
+      return to;
     },
-    [viewSize],
+    [viewSize, compact, screen],
   );
 
   // The resting frame: reduced motion, before a take, and after any resize.
@@ -312,7 +363,12 @@ export function SceneStage({
 
     if (cursor && scene.cursor?.length) {
       // The pointer starts where the last take's pointer is, or where the last scene left it, and fades in there.
-      let here = scene.cursorFrom ?? [SCREEN.width * 0.82, SCREEN.height * 0.88];
+      // a scene's resting point is set on the full screen; the compact screen takes it in proportion
+      const from = scene.cursorFrom ?? [SCREEN.width * 0.82, SCREEN.height * 0.88];
+      let here: readonly [number, number] = [
+        (from[0] * screen.width) / SCREEN.width,
+        (from[1] * screen.height) / SCREEN.height,
+      ];
       const view = viewRef.current;
       const handed = lastPointer && view ? onScreenPoint(lastPointer.cursor, lastPointer.view) : null;
       if (handed) {
@@ -398,13 +454,18 @@ export function SceneStage({
       running.forEach((animation) => animation.cancel());
       camera.querySelectorAll<HTMLElement>("[data-hover]").forEach((element) => delete element.dataset.hover);
     };
-  }, [scene, started, reduced, frame]);
+  }, [scene, started, reduced, frame, screen]);
 
   const Render = scene.Render;
 
   return (
     <div className="scn-view" ref={viewRef}>
-      <div className="scn-camera" ref={cameraRef} style={{ width: SCREEN.width, height: SCREEN.height }}>
+      <div
+        className="scn-camera"
+        ref={cameraRef}
+        data-compact={compact ? "true" : undefined}
+        style={{ width: screen.width, height: screen.height }}
+      >
         <div className="scn-screen" ref={screenRef} inert aria-hidden="true">
           <Render phase={reduced ? scene.finalPhase : phase} />
         </div>
