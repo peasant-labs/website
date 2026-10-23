@@ -76,7 +76,7 @@ how:
   publishLabel: publish
   # what each scene shows on its finished frame, read from the real components
   finals:
-    - { scene: record, texts: ["Uploads to staging fail with a 403 since this morning", "just now", 'peasant: opened "Uploads to staging fail with a 403 since this morning" · not published'] }
+    - { scene: record, texts: ["/peasant", 'peasant: opened "Uploads to staging fail with a 403 since this morning" · not published', "Uploads to staging fail with a 403 since this morning", "not published"] }
     - { scene: review, texts: ["3 matches", "<AWS_ACCESS_KEY>", "<EMAIL>", "/Users/<USER>/src/shop/.env"] }
     - { scene: publish, texts: ["published to eval-crowd", "eval-crowd"] }
 # the commands as scripts/install.sh and scripts/install.ps1 document themselves

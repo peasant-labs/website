@@ -9,8 +9,8 @@ import {
   type ComponentType,
 } from "react";
 
-/** The virtual screen every scene is laid out on, in CSS pixels, before the camera scales it. */
-export const SCREEN = { width: 960, height: 600 } as const;
+/** The virtual screen every scene is laid out on, in CSS pixels, before the camera scales it: a Mac's desktop. */
+export const SCREEN = { width: 1120, height: 700 } as const;
 
 /* moves across the screen, and the settle into a held framing */
 const EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)";
@@ -42,8 +42,6 @@ export type CursorCue = Readonly<{ at: number; to: string; move: number; press?:
 
 export type SceneDefinition = Readonly<{
   id: string;
-  /** the window's title bar */
-  window: string;
   duration: number;
   /** the phase the scene rests on: its finished frame */
   finalPhase: number;

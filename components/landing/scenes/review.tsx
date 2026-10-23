@@ -1,6 +1,7 @@
 "use client";
 
-import { SAMPLE_MATCHES } from "@/components/landing/scenes/sample";
+import { MacDesktop, MacWindow } from "@/components/mac";
+import { SAMPLE_ID, SAMPLE_MATCHES } from "@/components/landing/scenes/sample";
 import type { SceneDefinition } from "@/components/landing/scenes/stage";
 import { RedactionReview } from "@peasant-labs/fairtrade/ui";
 
@@ -13,33 +14,36 @@ const SCAN = [
 const TOTAL = 12;
 
 /*
- * Review: fairtrade's redaction review, read-only, the way the publish window
- * shows what leaves the computer. The scan finds a key, an email and a home
+ * Review: fairtrade's redaction review, read-only, in the browser on the share
+ * page, the way it shows what leaves the computer. The scan finds a key, an email and a home
  * path; each is shown as found and as it will leave, with the engine's own
  * placeholder and category label, and the count of what is hidden on top.
  */
 function Review({ phase }: { phase: number }) {
   const step = SCAN[Math.min(phase, SCAN.length - 1)]!;
   return (
-    <div className="scn-app scn-review">
-      <div className="scn-panel" data-focus="review">
-        <p className="pub-section-title">what leaves your machine</p>
-        <RedactionReview
-          readOnly
-          level="standard"
-          availableLevels={["standard"]}
-          matches={SAMPLE_MATCHES.slice(0, step.found)}
-          scanned={step.scanned}
-          total={TOTAL}
-        />
-      </div>
-    </div>
+    <MacDesktop app="browser">
+      <MacWindow kind="browser" url={`localhost:8690/share/${SAMPLE_ID}`} className="scn-full-browser">
+        <div className="scn-review">
+          <div className="scn-panel" data-focus="review">
+            <p className="pub-section-title">what leaves your machine</p>
+            <RedactionReview
+              readOnly
+              level="standard"
+              availableLevels={["standard"]}
+              matches={SAMPLE_MATCHES.slice(0, step.found)}
+              scanned={step.scanned}
+              total={TOTAL}
+            />
+          </div>
+        </div>
+      </MacWindow>
+    </MacDesktop>
   );
 }
 
 export const REVIEW_SCENE: SceneDefinition = {
   id: "review",
-  window: "peasant on this computer",
   duration: 6800,
   finalPhase: 2,
   cues: [

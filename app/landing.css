@@ -536,50 +536,22 @@
   min-width: 0;
 }
 
-/* the window never grows taller than the held screen leaves room for */
+/* the screen never grows taller than the held section leaves room for */
 .hw-scroll .hw-window {
-  max-width: calc((100dvh - 19rem) * 1.6);
+  max-width: calc((100dvh - 17rem) * 1.6);
 }
 
-.hw-window {
-  border: var(--bd-strong);
-  background: var(--surface);
-}
-
-.hw-titlebar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-bottom: var(--bd-strong);
-  background: var(--surface-2);
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  letter-spacing: 0;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.hw-titlebar i {
-  display: block;
-  flex: none;
-  width: 10px;
-  height: 10px;
-  border: var(--bd-strong);
-}
-
-.hw-titlebar span {
-  margin-inline-start: 6px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
+/*
+ * The scene plays on a Mac's screen: the desktop, its menu bar and its windows
+ * are inside the scene, so the frame here is only the screen's edge, with a
+ * caption row under it.
+ */
 .hw-view {
   position: relative;
   overflow: hidden;
   aspect-ratio: 16 / 10;
-  background: var(--canvas);
+  border: var(--bd-strong);
+  background: var(--surface-2);
 }
 
 .hw-foot {
@@ -588,9 +560,7 @@
   justify-content: space-between;
   gap: var(--sp-3);
   min-height: var(--target-comfortable);
-  padding: 2px 6px 2px 14px;
-  border-top: var(--bd-strong);
-  background: var(--surface-2);
+  margin-inline-end: -10px;
 }
 
 .hw-footnote {
@@ -805,83 +775,202 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--canvas);
+  background: var(--surface-2);
   pointer-events: none;
   user-select: none;
 }
 
-.scn-app {
-  position: relative;
-  box-sizing: border-box;
-  height: 100%;
-  padding: 28px 32px;
-}
+/* ---------- a Mac, drawn in tokens: the desktop and its windows ---------- */
 
-.scn-page-head {
+.mac-desk {
   display: flex;
-  align-items: baseline;
-  gap: var(--sp-4);
-  margin-block-end: var(--sp-4);
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--amber) 16%, var(--surface-2)) 0%,
+      var(--surface-2) 52%,
+      color-mix(in srgb, var(--olive) 14%, var(--surface-2)) 100%
+    );
 }
 
-.scn-h {
+.mac-menubar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 20px;
+  height: 28px;
+  padding: 0 16px;
+  border-bottom: var(--bd);
+  background: color-mix(in srgb, var(--canvas) 82%, transparent);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.mac-menu-app {
   color: var(--ink-strong);
-  font-family: var(--font-display);
-  font-size: var(--fs-xl);
   font-weight: 700;
 }
 
-.scn-chrome {
+.mac-menu-end {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-inline-start: auto;
+}
+
+.mac-menu-end svg {
+  width: 15px;
+  height: 15px;
+}
+
+.mac-desk-area {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.mac-win {
+  --mac-shade: color-mix(in srgb, var(--canvas) 88%, transparent);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--bd-strong);
+  background: var(--canvas);
+  box-shadow: 0 18px 40px -16px var(--mac-shade);
+}
+
+:root[data-theme="light"] .mac-win {
+  --mac-shade: color-mix(in srgb, var(--ink-strong) 24%, transparent);
+}
+
+.mac-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 14px;
+  height: 40px;
+  padding: 0 14px;
+  border-bottom: var(--bd);
+  background: var(--surface-2);
   color: var(--ink-3);
   font-family: var(--font-mono);
-  font-size: var(--fs-sm);
+  font-size: 13px;
   letter-spacing: 0;
+  white-space: nowrap;
 }
 
-.scn-session {
-  display: grid;
-  gap: 2px;
+/* the three window buttons: close, minimise, zoom, in the theme's own red, amber and green */
+.mac-lights {
+  display: flex;
+  flex: none;
+  gap: 8px;
 }
 
-.scn-session-title {
-  color: var(--ink-strong);
-  font-family: var(--font-body);
+.mac-lights i {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--danger);
 }
 
-/* the session /peasant just recorded, marked where the scene puts it */
-.scn-table[data-fresh="true"] [data-focus="new-row"] {
-  box-shadow:
-    -12px 0 0 0 var(--surface),
-    -14px 0 0 0 var(--amber);
+.mac-lights i:nth-child(2) {
+  background: var(--warning);
 }
 
-/* Claude Code, where /peasant is typed: a terminal over the browser */
-.scn-term {
-  position: absolute;
-  inset-inline-end: 32px;
-  inset-block-end: 28px;
-  width: 560px;
-  border: 1px solid var(--term-rule);
+.mac-lights i:nth-child(3) {
+  background: var(--success);
+}
+
+.mac-title {
+  flex: 1;
+  min-width: 0;
+  margin-inline-end: 52px;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.mac-nav {
+  display: flex;
+  flex: none;
+  gap: 6px;
+  color: var(--ink-4);
+}
+
+.mac-nav svg,
+.mac-url svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.mac-url {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 36rem;
+  height: 28px;
+  margin-inline: auto;
+  padding: 0 10px;
+  border: var(--bd);
+  background: var(--canvas);
+  color: var(--ink-2);
+}
+
+.mac-url svg {
+  color: var(--ink-4);
+}
+
+.mac-url-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.mac-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.mac-win-terminal .mac-body {
   background: var(--term-bg);
   color: var(--term-ink);
-  font-family: var(--font-mono);
-  font-size: 15px;
-  letter-spacing: 0;
-  line-height: 1.5;
 }
 
-.scn-term-bar {
-  padding: 8px 14px;
-  border-bottom: 1px solid var(--term-rule);
-  color: var(--term-dim);
-  font-size: 13px;
+/* ---------- the scenes' windows ---------- */
+
+/* record: Claude Code in the terminal, then the browser on the session it opened */
+.scn-rec-term {
+  position: absolute;
+  inset-block-start: 76px;
+  inset-inline-start: 72px;
+  width: 640px;
+  height: 300px;
 }
 
 .scn-term-body {
   display: grid;
-  gap: 6px;
-  min-height: 7.5rem;
-  padding: 14px;
+  align-content: start;
+  gap: 8px;
+  height: 100%;
+  padding: 18px 20px;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 1.5;
 }
 
 .scn-term-body p {
@@ -904,6 +993,108 @@
   background: var(--term-ink);
 }
 
+.scn-rec-browser {
+  position: absolute;
+  inset-block-start: 40px;
+  inset-inline-start: 392px;
+  width: 680px;
+  height: 590px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scn-rec-browser {
+    transform-origin: 20% 10%;
+    animation: scn-open 420ms var(--ease-out) both;
+  }
+}
+
+@keyframes scn-open {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
+
+.scn-page {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  height: 100%;
+  padding: 22px 28px;
+}
+
+.scn-page-top {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+
+/* the session's own title: user content keeps its case */
+.scn-page-title {
+  color: var(--ink-strong);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+.scn-page-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.scn-turn {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: var(--bd);
+  background: var(--surface-2);
+}
+
+.scn-turn-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.scn-turn-who svg {
+  width: 14px;
+  height: 14px;
+}
+
+.scn-turn p {
+  max-inline-size: none;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* review and publish: one browser window across the desktop */
+.scn-full-browser {
+  position: absolute;
+  inset: 18px 28px 22px;
+}
+
+.scn-review {
+  height: 100%;
+  padding: 22px 28px;
+  overflow: hidden;
+}
+
 .scn-review .scn-panel {
   display: grid;
   gap: var(--sp-3);
@@ -914,10 +1105,17 @@
 .scn-publish {
   display: grid;
   place-items: center;
+  height: 100%;
+  background: color-mix(in srgb, var(--ink-strong) 6%, var(--canvas));
 }
 
 .scn-publish .scn-dialog {
   width: 640px;
+}
+
+/* the dialog names the session by its own title, which keeps its case */
+.scn-publish .dlg-head h3 {
+  text-transform: none;
 }
 
 .scn-cursor {

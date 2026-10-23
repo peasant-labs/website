@@ -218,12 +218,24 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
     expect((await view.getAttribute("aria-label"))?.length ?? 0).toBeGreaterThan(20);
     // the scene is fairtrade's components on a screen nobody can tab into
     await expect(view.locator(".scn-screen")).toHaveAttribute("inert", "");
+    // on a Mac: the menu bar, and windows with their three buttons
+    await expect(view.locator(".mac-menubar")).toHaveCount(1);
+    expect(await view.locator(".mac-win .mac-lights").count()).toBeGreaterThan(0);
+    // the camera carries the screen and the cursor, nothing drawn around a click
+    await expect(view.locator(".scn-camera > :not(.scn-screen, .scn-cursor)")).toHaveCount(0);
   }
+
 
   // the publish action in the scene keeps its label on one line
   const label = page.locator('.hw-view[data-scene="publish"] [data-focus="publish"]');
   await expect(label).toHaveText(new RegExp(`^(${fixture.how.publishLabel}|done)$`));
   expect(await label.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+
+  // the record scene is the terminal and the browser, not a list of other sessions behind
+  await steps.nth(0).click();
+  const record = page.locator('.hw-scroll .hw-view[data-scene="record"]');
+  await expect(record.locator(".mac-win-terminal")).toHaveCount(1);
+  await expect(record.locator("table")).toHaveCount(0);
 });
 
 test("scrolling walks the held section through steps 1, 2 and 3, then lets the page go on", async ({

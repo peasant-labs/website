@@ -131,9 +131,10 @@ export const HOW = {
     {
       id: "record",
       title: "record",
+      icon: "record",
       body: "Peasant indexes coding agent sessions on your computer. Type /peasant in your harness to open the session in the browser.",
       scene:
-        "in Claude Code, /peasant opens the session and peasant answers that it is not published; the sessions list on this computer then shows it at the top",
+        "in Claude Code in the terminal, /peasant opens the session and peasant answers that it is not published; the browser then comes forward on that session's page, with publish as its one action",
     },
     {
       id: "review",

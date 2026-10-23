@@ -216,12 +216,6 @@ function SceneWindow({
 }) {
   return (
     <div className="hw-window" id={reduced ? undefined : "hw-window"}>
-      <div className="hw-titlebar" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-        <span>{scene.window}</span>
-      </div>
       <div className="hw-view" role="img" aria-label={label} data-scene={scene.id}>
         <SceneStage scene={scene} playing={playing} reduced={reduced} />
       </div>
