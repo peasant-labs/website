@@ -2261,10 +2261,12 @@
  */
 .lp-windows {
   --lp-windows-x: clamp(1rem, 6vw, 5rem);
+  /* the room under the front window for the check that hangs from its corner */
+  --lp-check-room: 5.5rem;
 
   position: relative;
   min-width: 0;
-  padding-block: clamp(2.5rem, 6vw, 4.5rem) 0;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem) var(--lp-check-room);
   padding-inline-start: var(--lp-windows-x);
 }
 
@@ -2290,11 +2292,16 @@
   z-index: 1;
 }
 
-/* the check holds nothing to press, so a press on the window under its edge reaches the window */
+/*
+ * The check hangs from the front window's lower left corner: it crosses only
+ * the window's bottom edge, never its content, and the rest of it sits out to
+ * the left and below. It holds nothing to press, so a press under its edge
+ * reaches the window.
+ */
 .lp-check {
   position: absolute;
   z-index: 2;
-  inset-block-end: clamp(4rem, 7vw, 6rem);
+  inset-block-start: calc(100% - var(--lp-check-room) - 0.75rem);
   inset-inline-start: 0;
   pointer-events: none;
   display: flex;
@@ -2307,8 +2314,12 @@
   box-shadow: var(--overlay-shadow);
 }
 
-/* on a phone the check hangs just under the window, starting left of it, clear of the reel's controls */
+/* on a phone the check hangs just under the window, starting left of it, clear of the viewer's controls */
 @media (max-width: 47.99rem) {
+  .lp-windows {
+    --lp-check-room: 0px;
+  }
+
   .lp-check {
     position: relative;
     inset: auto;
