@@ -24,21 +24,45 @@ export const HERO = {
   lede: "Record, publish, and share agent sessions with people you trust.",
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
-  art: art("hero", "a dithered wheat field, one stalk lit amber among the rest", 1200, 512),
+  art: art("hero2", "five wheat sheaves in a row, the tallest in the middle in amber", 1200, 512),
 } as const;
 
 export type UseCaseCta = Readonly<{ label: string; href: string }>;
 
+/** the drawn icon beside a capability in the caption; the component maps each to a lucide mark */
+export type CapabilityIcon =
+  | "check"
+  | "chart"
+  | "class"
+  | "pull-request"
+  | "history"
+  | "conversation"
+  | "search"
+  | "link"
+  | "send"
+  | "lock"
+  | "code";
+
+export type Capability = Readonly<{ text: string; icon: CapabilityIcon }>;
+
 export type UseCase = Readonly<{
   id: string;
   label: string;
+  sentence: string;
   art: Art;
-  capabilities: readonly [string, string, string];
+  capabilities: readonly [Capability, Capability, Capability];
   cta: UseCaseCta;
 }>;
 
 const SIGN_UP: UseCaseCta = { label: "sign up free", href: LOGIN_URL };
 
+/*
+ * The sentences only claim what the product does today: collectives can be
+ * members-only and curated, pull requests link to their transcripts through
+ * village's check and comment, peasant reads six agents, a collective can admit
+ * by GitHub organization, peasant's redaction takes custom patterns, and
+ * village is open source and hosted at village.peasantlabs.org.
+ */
 export const USE_CASES = {
   title: "find your use case",
   /* how long each capability holds the caption before the next one fades in */
@@ -47,44 +71,51 @@ export const USE_CASES = {
     {
       id: "researchers",
       label: "researchers",
-      art: art("uc-researchers", "an open book with a quill resting on it", 704, 528),
+      sentence:
+        "Build evals and studies from real agent work, shared with consent. Start a private collective for your lab or class.",
+      art: art("uc-researchers", "an open book with a quill in an inkwell", 704, 528),
       capabilities: [
-        "build evals from real work",
-        "study how agents are used",
-        "run a class on agents",
+        { text: "build evals from real work", icon: "check" },
+        { text: "study how agents are used", icon: "chart" },
+        { text: "run a class on agents", icon: "class" },
       ],
       cta: SIGN_UP,
     },
     {
       id: "teams",
       label: "teams",
-      art: art("uc-teams", "a round table set with mugs", 704, 528),
+      sentence: "Read the sessions behind a pull request, redacted, one click from the diff.",
+      art: art("uc-teams", "a round table with three mugs", 704, 528),
       capabilities: [
-        "review the work behind a diff",
-        "onboard from real history",
-        "learn from each other's prompts",
+        { text: "review the work behind a diff", icon: "pull-request" },
+        { text: "onboard from real history", icon: "history" },
+        { text: "learn from each other's prompts", icon: "conversation" },
       ],
       cta: SIGN_UP,
     },
     {
       id: "developers",
       label: "developers",
+      sentence:
+        "Every session with your coding agent, searchable on your computer. Works with Claude Code, Codex, Cursor, OpenCode, Pi and Strike.",
       art: art("uc-developers", "an enchanted quill writing on a floating scroll", 704, 528),
       capabilities: [
-        "find any past session",
-        "explain a change in one comment",
-        "publish on every push",
+        { text: "find any past session", icon: "search" },
+        { text: "explain a change in one comment", icon: "link" },
+        { text: "publish on every push", icon: "send" },
       ],
       cta: { label: "install now", href: "#install" },
     },
     {
       id: "companies",
       label: "companies",
-      art: art("uc-companies", "a small stone castle", 704, 528),
+      sentence:
+        "Access can follow your GitHub organization, with redaction rules for your own names. Village is open source, and we host it for you.",
+      art: art("uc-companies", "a small two-tower castle with a padlocked gate", 704, 528),
       capabilities: [
-        "keep agent data in-house",
-        "see which commits agents wrote",
-        "usage across teams",
+        { text: "keep agent data in-house", icon: "lock" },
+        { text: "see which commits agents wrote", icon: "code" },
+        { text: "usage across teams", icon: "chart" },
       ],
       cta: { label: "talk to us", href: "/contact" },
     },
@@ -151,5 +182,10 @@ export const SESSION = {
 export const VISION = {
   line: "We are building a sustainable, respectful ecosystem where people have a stake in their data.",
   cta: { label: "about us", href: "/about" },
-  art: art("vision", "a small feudal village where peasants farm a shared field", 1200, 512),
+  art: art(
+    "vision2",
+    "three thatched cottages with three peasants and bundles of wheat between them",
+    1200,
+    512,
+  ),
 } as const;

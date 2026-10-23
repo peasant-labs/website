@@ -2,17 +2,66 @@
 
 import { Art } from "@/components/art";
 import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
-import { USE_CASES } from "@/lib/landing";
-import { ChevronLeft, ChevronRight } from "@peasant-labs/fairtrade/icons";
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { USE_CASES, type CapabilityIcon } from "@/lib/landing";
+import {
+  ChartNoAxesColumn,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Code,
+  GitPullRequest,
+  GraduationCap,
+  HistoryIcon,
+  Link as LinkIcon,
+  Lock,
+  MessageCircle,
+  Search,
+  Send,
+} from "@peasant-labs/fairtrade/icons";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type KeyboardEvent,
+  type PointerEvent,
+  type SVGProps,
+} from "react";
 
 const SLIDES = USE_CASES.slides;
+
+const CAPABILITY_ICONS: Record<CapabilityIcon, ComponentType<SVGProps<SVGSVGElement>>> = {
+  check: Check,
+  chart: ChartNoAxesColumn,
+  class: GraduationCap,
+  "pull-request": GitPullRequest,
+  history: HistoryIcon,
+  conversation: MessageCircle,
+  search: Search,
+  link: LinkIcon,
+  send: Send,
+  lock: Lock,
+  code: Code,
+};
 const SWIPE_MIN = 40;
 
+/*
+ * On a phone the tab row scrolls sideways. Bring the chosen tab into the row's
+ * view without moving the page, which scrollIntoView would do.
+ */
+function revealInRow(tab: HTMLElement) {
+  const row = tab.closest<HTMLElement>(".uc-tabs-row");
+  if (!row) return;
+  const tabBox = tab.getBoundingClientRect();
+  const rowBox = row.getBoundingClientRect();
+  if (tabBox.left < rowBox.left) row.scrollLeft -= rowBox.left - tabBox.left;
+  else if (tabBox.right > rowBox.right) row.scrollLeft += tabBox.right - rowBox.right;
+}
+
 /**
- * The use-case carousel: one slide per audience, one picture per slide, and the
- * slide's three capabilities as a caption on the picture that fades from one to
- * the next. The audiences are real tabs, so the carousel is reachable and
+ * The use-case carousel: one slide per audience, one picture per slide with the
+ * audience's sentence and action beside it, and the slide's three capabilities
+ * as a caption on the picture that fades from one to the next. The audiences are real tabs, so the carousel is reachable and
  * operable from the keyboard, and the arrows and a horizontal swipe move the
  * same selection.
  *
@@ -48,7 +97,9 @@ export function UseCases() {
       setIndex(target);
       setCaption(0);
     }
-    if (focus) tabRefs.current[target]?.focus();
+    const tab = tabRefs.current[target];
+    if (tab) revealInRow(tab);
+    if (focus) tab?.focus();
   }
 
   function onTabKey(event: KeyboardEvent<HTMLDivElement>) {
@@ -57,9 +108,7 @@ export function UseCases() {
     const from = focused >= 0 ? focused : index;
     const moves: Record<string, () => void> = {
       ArrowRight: () => select(from + 1, { focus: true, step: 1 }),
-      ArrowDown: () => select(from + 1, { focus: true, step: 1 }),
       ArrowLeft: () => select(from - 1, { focus: true, step: -1 }),
-      ArrowUp: () => select(from - 1, { focus: true, step: -1 }),
       Home: () => select(0, { focus: true }),
       End: () => select(SLIDES.length - 1, { focus: true }),
     };
@@ -93,20 +142,20 @@ export function UseCases() {
       role="region"
       aria-roledescription="carousel"
       aria-label="use cases"
-      onFocus={() => setHeld((current) => ({ ...current, focus: true }))}
+      // Keyboard focus holds the caption; a mouse click that leaves focus on a tab does not.
+      onFocus={(event) => {
+        if (event.target.matches(":focus-visible")) {
+          setHeld((current) => ({ ...current, focus: true }));
+        }
+      }}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
           setHeld((current) => ({ ...current, focus: false }));
         }
       }}
     >
-      <div className="uc-controls">
-        <div
-          className="uc-tabs"
-          role="tablist"
-          aria-label="audiences"
-          onKeyDown={onTabKey}
-        >
+      <div className="uc-tabs-row" data-contained-overflow>
+        <div className="uc-tabs" role="tablist" aria-label="audiences" onKeyDown={onTabKey}>
           {SLIDES.map((slide, slideIndex) => (
             <button
               key={slide.id}
@@ -125,29 +174,6 @@ export function UseCases() {
               {slide.label}
             </button>
           ))}
-        </div>
-        <div className="uc-arrows">
-          <button
-            type="button"
-            className="site-icon-btn site-icon-btn-boxed"
-            aria-label="previous use case"
-            aria-controls="uc-stage"
-            onClick={() => select(index - 1, { step: -1 })}
-          >
-            <ChevronLeft aria-hidden="true" focusable="false" />
-          </button>
-          <span className="uc-count" aria-hidden="true">
-            {index + 1} / {SLIDES.length}
-          </span>
-          <button
-            type="button"
-            className="site-icon-btn site-icon-btn-boxed"
-            aria-label="next use case"
-            aria-controls="uc-stage"
-            onClick={() => select(index + 1, { step: 1 })}
-          >
-            <ChevronRight aria-hidden="true" focusable="false" />
-          </button>
         </div>
       </div>
 
@@ -180,28 +206,63 @@ export function UseCases() {
                 <Art art={slide.art} className="uc-art" />
                 <figcaption className="uc-caption">
                   <ul className="uc-caps" data-static={reduced ? "true" : "false"}>
-                    {slide.capabilities.map((capability, capIndex) => (
-                      <li
-                        key={capability}
-                        className="uc-cap"
-                        data-on={reduced || (active && capIndex === caption) ? "true" : "false"}
-                      >
-                        {capability}
-                      </li>
-                    ))}
+                    {slide.capabilities.map((capability, capIndex) => {
+                      const Icon = CAPABILITY_ICONS[capability.icon];
+                      return (
+                        <li
+                          key={capability.text}
+                          className="uc-cap"
+                          data-on={reduced || (active && capIndex === caption) ? "true" : "false"}
+                        >
+                          <Icon className="uc-cap-ic" aria-hidden="true" focusable="false" />
+                          <span className="uc-cap-text">{capability.text}</span>
+                          <span className="uc-cap-n" aria-hidden="true">
+                            {capIndex + 1} / {slide.capabilities.length}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </figcaption>
               </figure>
-              <a
-                className="btn btn-primary site-btn site-btn-lg uc-cta"
-                href={slide.cta.href}
-                data-use-case-cta={slide.id}
-              >
-                {slide.cta.label}
-              </a>
+              <div className="uc-copy">
+                <h3>{slide.label}</h3>
+                <p>{slide.sentence}</p>
+                <a
+                  className="btn btn-primary site-btn site-btn-lg uc-cta"
+                  href={slide.cta.href}
+                  data-use-case-cta={slide.id}
+                >
+                  {slide.cta.label}
+                </a>
+              </div>
             </div>
           );
         })}
+      </div>
+
+      <div className="uc-arrows">
+        <button
+          type="button"
+          className="site-icon-btn site-icon-btn-boxed"
+          aria-label="previous use case"
+          aria-controls="uc-stage"
+          onClick={() => select(index - 1, { step: -1 })}
+        >
+          <ChevronLeft aria-hidden="true" focusable="false" />
+        </button>
+        <span className="uc-count" aria-hidden="true">
+          {index + 1} / {SLIDES.length}
+        </span>
+        <button
+          type="button"
+          className="site-icon-btn site-icon-btn-boxed"
+          aria-label="next use case"
+          aria-controls="uc-stage"
+          onClick={() => select(index + 1, { step: 1 })}
+        >
+          <ChevronRight aria-hidden="true" focusable="false" />
+        </button>
       </div>
     </div>
   );

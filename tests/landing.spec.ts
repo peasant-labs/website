@@ -20,7 +20,7 @@ type LandingFixture = {
   removed: string[];
   useCases: {
     captionMs: number;
-    slides: Array<{ id: string; label: string; capabilities: string[]; cta: Link }>;
+    slides: Array<{ id: string; label: string; sentence: string; capabilities: string[]; cta: Link }>;
   };
   how: { steps: Array<{ title: string; body: string }>; consent: string; publishLabel: string };
   install: { platforms: Array<{ label: string; command: string }>; kickstart: string; guide: Link };
@@ -158,10 +158,14 @@ test("the use-case carousel: one slide per audience, tabs, arrows and keys", asy
     await expect(panel).toHaveAttribute("id", `uc-panel-${slide.id}`);
     // one picture per slide (one per theme is in the DOM; one is shown)
     await expect(panel.locator("img:visible")).toHaveCount(1);
-    await expect(panel.locator(".uc-cap")).toHaveText(slide.capabilities);
-    // the capabilities are a caption, not controls
+    await expect(panel.locator(".uc-cap-text")).toHaveText(slide.capabilities);
+    // the capabilities are a caption on the picture, not controls
     await expect(panel.locator(".uc-caption button, .uc-caption a")).toHaveCount(0);
-    const cta = panel.getByRole("link", { name: slide.cta.label, exact: true });
+    await expect(panel.locator(".uc-figure .uc-caption")).toHaveCount(1);
+    // beside the picture: the audience, its sentence, and one action
+    await expect(panel.locator(".uc-copy h3")).toHaveText(slide.label);
+    await expect(panel.locator(".uc-copy p")).toHaveText(slide.sentence);
+    const cta = panel.locator(".uc-copy").getByRole("link", { name: slide.cta.label, exact: true });
     await expect(cta).toHaveAttribute("href", slide.cta.href);
   }
 
@@ -183,6 +187,35 @@ test("the use-case carousel: one slide per audience, tabs, arrows and keys", asy
   await expect(carousel.getByRole("tab", { name: first.label })).toHaveAttribute("aria-selected", "true");
 });
 
+test("the use-case stage sets the picture beside its copy, with the tabs in one row above", async ({ page }) => {
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const geometry = await page.evaluate(() => {
+      const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+      const tabs = [...document.querySelectorAll(".uc-tab")].map((tab) => tab.getBoundingClientRect());
+      const figure = rect(".uc-panel:not([hidden]) .uc-figure");
+      const copy = rect(".uc-panel:not([hidden]) .uc-copy");
+      const stage = rect(".uc-stage");
+      const arrows = rect(".uc-arrows");
+      return {
+        oneRow: tabs.every((tab) => Math.abs(tab.top - tabs[0]!.top) < 1),
+        tabsAbove: tabs.every((tab) => tab.bottom <= stage.top + 1),
+        copyBeside: copy.left >= figure.right - 1,
+        copyBelow: copy.top >= figure.bottom - 1,
+        arrowsBelow: arrows.top >= stage.bottom - 1,
+        pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+      };
+    });
+    expect(geometry.oneRow, `tabs wrap at ${width}`).toBe(true);
+    expect(geometry.tabsAbove, `tabs are not above the stage at ${width}`).toBe(true);
+    expect(geometry.arrowsBelow, `arrows are not under the stage at ${width}`).toBe(true);
+    expect(geometry.pageOverflow, `page overflows at ${width}`).toBe(false);
+    if (width === 1440) expect(geometry.copyBeside, "copy is not beside the picture").toBe(true);
+    else expect(geometry.copyBelow, "copy is not under the picture on a phone").toBe(true);
+  }
+});
+
 test("captions fade through one capability at a time, hold on hover, and stand still under reduced motion", async ({
   page,
 }) => {
@@ -191,7 +224,7 @@ test("captions fade through one capability at a time, hold on hover, and stand s
   const carousel = page.locator("[data-use-cases]");
   await carousel.scrollIntoViewIfNeeded();
   const slide = fixture.useCases.slides[0]!;
-  const on = carousel.locator('.uc-panel:not([hidden]) .uc-cap[data-on="true"]');
+  const on = carousel.locator('.uc-panel:not([hidden]) .uc-cap[data-on="true"] .uc-cap-text');
 
   await expect(on).toHaveText([slide.capabilities[0]!]);
   await page.mouse.move(0, 0);
@@ -205,7 +238,7 @@ test("captions fade through one capability at a time, hold on hover, and stand s
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const caps = page.locator(".uc-panel:not([hidden]) .uc-cap");
-  await expect(caps).toHaveText(slide.capabilities);
+  await expect(caps.locator(".uc-cap-text")).toHaveText(slide.capabilities);
   expect(await caps.evaluateAll((items) => items.map((item) => getComputedStyle(item).opacity))).toEqual([
     "1",
     "1",
