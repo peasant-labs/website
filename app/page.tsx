@@ -104,19 +104,21 @@ export default function Home() {
         </section>
 
         <section className="lp-sec lp-vision" aria-labelledby="vision-line">
-          <Art art={VISION.art} className="lp-vision-art" />
           <div className="site-wrap lp-vision-inner">
-            <p id="vision-line" className="lp-vision-line" data-fade>
-              {VISION.line}
-            </p>
-            <Link
-              className="btn btn-primary site-btn site-btn-xl"
-              href={VISION.cta.href}
-              data-fade
-              style={fade(1)}
-            >
-              {VISION.cta.label}
-            </Link>
+            <div className="lp-vision-copy">
+              <p id="vision-line" className="lp-vision-line" data-fade>
+                {VISION.line}
+              </p>
+              <Link
+                className="btn btn-primary site-btn site-btn-xl"
+                href={VISION.cta.href}
+                data-fade
+                style={fade(1)}
+              >
+                {VISION.cta.label}
+              </Link>
+            </div>
+            <Art art={VISION.art} className="lp-vision-art" />
           </div>
         </section>
       </main>

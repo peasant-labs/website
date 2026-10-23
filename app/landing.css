@@ -92,13 +92,6 @@
   margin-block-start: var(--sp-2);
 }
 
-.lp-vision-art {
-  box-sizing: border-box;
-  width: min(75rem, 100%);
-  margin-inline: auto;
-  overflow: hidden;
-}
-
 /* what the product stands on: four plain tags under the buttons */
 .lp-pillars {
   display: flex;
@@ -334,20 +327,6 @@
 @media (prefers-reduced-motion: reduce) {
   .hf-toggle {
     display: none;
-  }
-}
-
-/*
- * On a phone the wide art would shrink to a strip. It keeps a readable height
- * instead and shows its centre, cropped at the edges of the screen.
- */
-@media (max-width: 47.99rem) {
-  .lp-vision-art .art-img {
-    width: auto;
-    max-width: none;
-    height: 13.75rem;
-    margin-inline-start: 50%;
-    transform: translateX(-50%);
   }
 }
 
@@ -1809,19 +1788,59 @@
 
 /* vision */
 
+/*
+ * The statement and its button beside the picture on a wide screen; on a
+ * narrow one the picture comes first, then the statement, then the button.
+ *
+ * The picture is drawn on an 8px cell grid at 1200 by 512. It shows whole, at
+ * a half (600px) or a quarter (300px) of that, which on a 2x or 3x screen
+ * lands every cell on whole device pixels.
+ */
 .lp-vision {
   border-bottom: 0;
-  text-align: center;
-}
-
-.lp-vision-art {
-  margin-block-end: clamp(2rem, 4vw, 3rem);
 }
 
 .lp-vision-inner {
   display: grid;
   justify-items: center;
+  gap: clamp(2rem, 5vw, 3rem);
+  text-align: center;
+}
+
+.lp-vision-copy {
+  display: grid;
+  justify-items: center;
   gap: var(--sp-6);
+}
+
+.lp-vision-art {
+  order: -1;
+  width: 300px;
+  max-width: 100%;
+}
+
+@media (min-width: 48rem) {
+  .lp-vision-art {
+    width: 600px;
+  }
+}
+
+@media (min-width: 64rem) {
+  .lp-vision-inner {
+    grid-template-columns: minmax(0, 1fr) 600px;
+    align-items: center;
+    justify-items: start;
+    gap: var(--sp-8);
+    text-align: start;
+  }
+
+  .lp-vision-copy {
+    justify-items: start;
+  }
+
+  .lp-vision-art {
+    order: 0;
+  }
 }
 
 .lp-vision-line {
