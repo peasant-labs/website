@@ -1055,17 +1055,23 @@ test("the docs sidebar lists only destinations that exist and marks the page you
   }
 });
 
-test("on a phone the docs sidebar folds into fairtrade's top bar and drawer", async ({ browser }) => {
-  const context = await browser.newContext(PHONE);
-  const page = await context.newPage();
-  await page.goto("/docs/guides/evals");
-  await expect(page.locator(".asb-item").first()).toBeHidden();
-  await page.getByRole("button", { name: "open the menu" }).tap();
-  await expect(page.locator("nav:not(.asb-utils) a.asb-item").first()).toBeVisible();
-  const accessibility = await new AxeBuilder({ page }).analyze();
-  expect(accessibility.violations).toEqual([]);
-  await context.close();
-});
+for (const colorScheme of ["light", "dark"] as const) {
+  test(`on a phone the docs sidebar folds into fairtrade's top bar and drawer (${colorScheme})`, async ({ browser }) => {
+    const context = await browser.newContext({ ...PHONE, colorScheme });
+    const page = await context.newPage();
+    await page.goto("/docs/guides/evals");
+    await expect(page.locator(".asb-item").first()).toBeHidden();
+    await page.getByRole("button", { name: "open the menu" }).tap();
+    await expect(page.locator("nav:not(.asb-utils) a.asb-item").first()).toBeVisible();
+    // the drawer fades its rows in one after another, the footer last; contrast is read once they are all in
+    await expect
+      .poll(() => page.evaluate(() => document.querySelector(".asb")?.getAnimations({ subtree: true }).length))
+      .toBe(0);
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    expect(accessibility.violations).toEqual([]);
+    await context.close();
+  });
+}
 
 test("the docs starting points sit in full rows on a wide screen, with no card left alone", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
