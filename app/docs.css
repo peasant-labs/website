@@ -531,10 +531,29 @@
   overflow-wrap: break-word;
 }
 
-/* on a phone the copy button keeps its icon and name but drops the word, so a command keeps its flags whole */
+/*
+ * On a phone a command stays on one line and scrolls sideways inside its block
+ * (it takes focus while it scrolls), so nothing breaks mid-word. The copy
+ * button keeps its icon and name, drops the word, and is a full tap target.
+ */
 @container dx-page (max-width: 30rem) {
+  .dx-cmd .cli-cmd-line code {
+    white-space: pre;
+  }
+
   .dx-cmd .cli-copy-word {
     display: none;
+  }
+
+  .dx-cmd .cli-copy {
+    min-width: var(--target-comfortable);
+    min-height: var(--target-comfortable);
+  }
+
+  .dx-crumb a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target-comfortable);
   }
 
   /* and a command inside a numbered step takes the row's full width */

@@ -1,22 +1,13 @@
 import { Art } from "@/components/art";
 import { Rich } from "@/components/docs/rich-text";
-import { CommandBlock } from "@/components/fairtrade-client";
+import { DocCommand } from "@/components/docs/doc-command";
 import type { DocStep } from "@/lib/docs-content";
 import type { Art as ArtSource } from "@/lib/landing";
 import { ChevronDown, Info } from "@peasant-labs/fairtrade/icons";
 import { Fragment, type ReactNode } from "react";
 
-/**
- * A copyable command. A long one wraps inside its own line, so the copy button
- * stays put and nothing scrolls out of sight on a phone.
- */
-export function DocCommand({ command, label }: { command: string; label?: string }) {
-  return (
-    <div className="dx-cmd" data-contained-overflow>
-      <CommandBlock command={command} label={label ?? command} />
-    </div>
-  );
-}
+export { DocCommand };
+
 
 /** A command under a short lowercase caption that says what it is for. */
 export function DocCaptionedCommand({ caption, command }: { caption: string; command: string }) {
