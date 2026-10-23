@@ -73,7 +73,7 @@ site:
           description: peasant normalizes supported coding-agent sessions into a local project history for analysis, review, redaction, and explicit sharing.
     - id: village
       path: /projects/village
-      h1: a commons for selected agent work
+      h1: a shared home for the agent sessions people publish
       metadata:
         title: "peasant online: a governed commons for agent sessions"
         description: peasant online stores selected published session copies for governed discovery, collective access, licensing, audit history, and one-way pull.
@@ -188,17 +188,17 @@ site:
       h1: contact
       metadata:
         title: contact | peasant
-        description: leave an email — one message when the work is published.
+        description: leave your email and we will send you one message when it is ready.
         canonical: https://peasantlabs.org/contact
         openGraph:
           title: contact | peasant
-          description: leave an email — one message when the work is published.
+          description: leave your email and we will send you one message when it is ready.
           url: https://peasantlabs.org/contact
           type: website
         twitter:
           card: summary_large_image
           title: contact | peasant
-          description: leave an email — one message when the work is published.
+          description: leave your email and we will send you one message when it is ready.
   sitemap:
     - https://peasantlabs.org
     - https://peasantlabs.org/projects
@@ -246,13 +246,13 @@ install:
 # carries the command it runs, so there is no unsourced step and no screenshot
 # placeholder standing in for one.
 story:
-  title: install, share, and leverage your data
+  title: install, keep, and share your sessions
   stepsLabel: getting started, install to published copy
   steps:
     - { id: install, title: install, command: curl -fsSL https://peasantlabs.org/install | bash }
-    - { id: ingest, title: ingest your transcripts, command: peasant ingest }
-    - { id: open-the-dashboard, title: open the dashboard, command: peasant web start }
-    - { id: contribute-to-the-commons, title: contribute to the commons, command: peasant village push }
+    - { id: ingest, title: bring your sessions in, command: peasant ingest }
+    - { id: open-the-dashboard, title: open it in your browser, command: peasant web start }
+    - { id: contribute-to-the-commons, title: share one session, command: peasant village push }
 # the redaction panel runs on invented matches. no real key, address, or token
 # appears on the page, and the section says so above the panel.
 redaction:
@@ -301,10 +301,10 @@ peasant:
     backLabel: back
     copyAllLabel: copy all commands
     steps:
-      - { id: install, title: install, comment: "# one line, puts peasant on your PATH", command: curl -fsSL https://peasantlabs.org/install | bash }
+      - { id: install, title: install, comment: "# one line installs peasant", command: curl -fsSL https://peasantlabs.org/install | bash }
       - { id: set-up, title: set up, comment: "# choose which projects and sessions to keep", command: peasant kickstart }
       - { id: bring-work-in, title: bring your work in, comment: "# reads what your agents already saved", command: peasant ingest }
-      - { id: open-it, title: open it, comment: "# browse and search at localhost:8690", command: peasant web start }
+      - { id: open-it, title: open it, comment: "# opens your sessions in the browser", command: peasant web start }
       - { id: share-one, title: share one, comment: "# sends one copy to peasant online, only when you ask", command: peasant village push }
   uses:
     - { id: remember-why, title: you forgot how something got built }
@@ -319,7 +319,7 @@ peasant:
 village:
   route: /projects/village
   hero:
-    title: a commons for selected agent work
+    title: a shared home for the agent sessions people publish
   start:
     title: get started
     stepsLabel: setup steps
@@ -328,10 +328,10 @@ village:
     backLabel: back
     copyAllLabel: copy all commands
     steps:
-      - { id: install, title: install, comment: "# one line, puts peasant on your PATH", command: curl -fsSL https://peasantlabs.org/install | bash }
+      - { id: install, title: install, comment: "# one line installs peasant", command: curl -fsSL https://peasantlabs.org/install | bash }
       - { id: set-up, title: set up, comment: "# choose which projects and sessions to keep", command: peasant kickstart }
       - { id: bring-work-in, title: bring your work in, comment: "# reads what your agents already saved", command: peasant ingest }
-      - { id: open-it, title: open it, comment: "# browse and search at localhost:8690", command: peasant web start }
+      - { id: open-it, title: open it, comment: "# opens your sessions in the browser", command: peasant web start }
       - { id: share-one, title: share one, comment: "# sends one copy to peasant online, only when you ask", command: peasant village push }
   community:
     title: join your community
@@ -347,7 +347,7 @@ village:
     transcripts: "118"
     linked: linked
   governance:
-    title: making governance sane and transparent
+    title: who sees what, written down first
   related:
     - { id: all-projects, target: /projects }
     - { id: peasant, target: /projects/peasant }

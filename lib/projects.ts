@@ -837,14 +837,14 @@ export const SUITE = {
   // The FAQ answers the licensing question in full. This paragraph only defines
   // the two tools and does not carry legal or availability qualifiers.
   whatIntro:
-    "peasant makes your coding agent sessions shareable only with people you trust, private, and searchable. it is made of two tools: peasant on your computer, and peasant online.",
+    "peasant keeps your coding agent sessions private and searchable, and lets you share one with people you trust. it is two tools: peasant on your computer, and peasant online.",
   /* Two lines: the section is what we make, then what that means. The break is
    * authored rather than left to wrapping — `white-space: pre-line` on the
    * heading keeps it wherever the line lands. */
   cardsTitle: "our projects,\nlocal and open-source",
   cardsIntro: "peasant runs on your machine. peasant online is where published copies live.",
   story: {
-    title: "install, share, and leverage your data",
+    title: "install, keep, and share your sessions",
     situation:
       "install peasant, read back what your agents already saved, then publish only the session you choose. four commands, and everything before the last one stays on your machine.",
     stepsLabel: "getting started, install to published copy",
@@ -852,25 +852,25 @@ export const SUITE = {
       {
         id: "install",
         title: "install",
-        body: "one line, no account. puts the peasant binary on your PATH, and everything it does from here runs on this machine.",
+        body: "one line, no account. it installs peasant, and everything it does from here runs on your computer.",
         command: "curl -fsSL https://peasantlabs.org/install | bash",
       },
       {
         id: "ingest",
-        title: "ingest your transcripts",
-        body: "reads the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already saved on your disk, and records them locally.",
+        title: "bring your sessions in",
+        body: "reads the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already saved on your computer, and keeps them there.",
         command: "peasant ingest",
       },
       {
         id: "open-the-dashboard",
-        title: "open the dashboard",
-        body: "browse what was found, read any session back, and set what stays private before any of it leaves.",
+        title: "open it in your browser",
+        body: "look through what it found, read any session back, and choose what stays private before any of it leaves.",
         command: "peasant web start",
       },
       {
         id: "contribute-to-the-commons",
-        title: "contribute to the commons",
-        body: "sends the one session you approved to peasant online, with your redactions applied. the original stays local and nothing else goes with it.",
+        title: "share one session",
+        body: "sends the one session you approved to peasant online, with your private details hidden. the original stays on your computer and nothing else goes with it.",
         command: "peasant village push",
       },
     ] as Four<StoryStep>,
@@ -954,7 +954,7 @@ export const PROJECTS = {
     hero: {
       title: "keep your coding-agent transcripts. share the ones you choose.",
       body:
-        "peasant collects the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already save on your disk and keeps them in one place you can search and read back. nothing goes anywhere else unless you send it.",
+        "peasant gathers the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already save on your computer, in one place you can search and read back. nothing goes anywhere else unless you send it.",
     },
     start: {
       title: "get started",
@@ -969,7 +969,7 @@ export const PROJECTS = {
         {
           id: "install",
           title: "install",
-          comment: "# one line, puts peasant on your PATH",
+          comment: "# one line installs peasant",
           command: "curl -fsSL https://peasantlabs.org/install | bash",
         },
         {
@@ -987,7 +987,7 @@ export const PROJECTS = {
         {
           id: "open-it",
           title: "open it",
-          comment: "# browse and search at localhost:8690",
+          comment: "# opens your sessions in the browser",
           command: "peasant web start",
         },
         {
@@ -1060,9 +1060,9 @@ export const PROJECTS = {
       availability: "private contributor development",
     },
     hero: {
-      title: "a commons for selected agent work",
+      title: "a shared home for the agent sessions people publish",
       body:
-        "peasant online receives copies that a peasant user explicitly publishes, then applies discovery, collective access, optional reuse licensing, and governance history around those copies.",
+        "peasant online holds the sessions people choose to publish. a collective decides who can read them, each one can carry an open license for reuse, and every change to who can see what is kept on record.",
     },
     start: {
       title: "get started",
@@ -1078,7 +1078,7 @@ export const PROJECTS = {
         {
           id: "install",
           title: "install",
-          comment: "# one line, puts peasant on your PATH",
+          comment: "# one line installs peasant",
           command: "curl -fsSL https://peasantlabs.org/install | bash",
         },
         {
@@ -1096,7 +1096,7 @@ export const PROJECTS = {
         {
           id: "open-it",
           title: "open it",
-          comment: "# browse and search at localhost:8690",
+          comment: "# opens your sessions in the browser",
           command: "peasant web start",
         },
         {
@@ -1110,7 +1110,7 @@ export const PROJECTS = {
     community: {
       title: "join your community",
       body:
-        "collectives are where selected sessions live for a team. open an example of work people already share, then join when you are ready to contribute and learn from the same record.",
+        "a collective is a shared shelf of sessions for a team or a group. look at what one already shares, then join it when you want to add your own and learn from theirs.",
       joinLabel: "join collective",
     },
     example: {
@@ -1124,9 +1124,9 @@ export const PROJECTS = {
       linked: "linked",
     },
     governance: {
-      title: "making governance sane and transparent",
+      title: "who sees what, written down first",
       body:
-        "every join is a deliberate boundary crossing. owners see who is asking to participate so they can review membership and contributions; everyone else still sees you as anon. the terms are written out before you consent — no silent profile leaks, no mystery about who can see what.",
+        "when you ask to join, the owners see who you are so they can say yes; everyone else still sees you as anonymous. the terms are written out before you agree, so nothing about you is shared without you knowing.",
     },
     related: [
       {
@@ -1143,7 +1143,7 @@ export const PROJECTS = {
       },
       {
         id: "comparison",
-        label: "compare the operating models",
+        label: "compare with similar tools",
         href: "/projects#comparison",
         kind: "internal",
       },

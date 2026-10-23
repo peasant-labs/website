@@ -4,7 +4,7 @@ import { metadataForRoute } from "@/lib/projects";
 
 export const metadata = metadataForRoute({
   title: "contact | peasant",
-  description: "leave an email — one message when the work is published.",
+  description: "leave your email and we will send you one message when it is ready.",
   canonical: "/contact",
 });
 
@@ -18,7 +18,7 @@ export default function ContactPage() {
               contact
             </h1>
             <p className="pj-lede" data-reading-text>
-              leave an email — one message when the work is published.
+              leave your email and we will send you one message when it is ready.
             </p>
           </div>
         </header>

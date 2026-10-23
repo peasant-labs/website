@@ -283,11 +283,15 @@
   }
 
   @media (min-width: 48rem) {
-    /* the short copy sits level with the middle of the tall example card, not over an empty column */
+    /*
+     * The short join copy sits beside the example card and the card lies on its
+     * side, picture beside its words, so neither column stands half empty.
+     */
     .pj-village-join {
-      grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
       align-items: center;
     }
+
 
     .pj-village-governance {
       grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
@@ -2035,5 +2039,30 @@
   /* the contact form's field and button are full-size tap targets */
   .pj-contact-form :is(input, button) {
     min-height: var(--target-comfortable);
+  }
+}
+
+/*
+ * On a wide screen the example collective card lies on its side, its picture
+ * beside its words, so it stands about as tall as the join copy beside it.
+ * Unlayered, to win over fairtrade's unlayered card CSS.
+ */
+@media (min-width: 48rem) {
+  .pj-village-collective-card {
+    flex-direction: row;
+    max-inline-size: none;
+  }
+
+  .pj-village-collective-card .card-thumb {
+    flex: 0 0 40%;
+    aspect-ratio: auto;
+    max-height: none;
+    border-bottom: 0;
+    border-inline-end: var(--bd);
+  }
+
+  .pj-village-collective-card .card-body {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 }
