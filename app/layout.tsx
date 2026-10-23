@@ -1,6 +1,7 @@
 import { RevealOnView } from "@/components/reveal";
 import { ThemeSync } from "@/components/theme-toggle";
 import { site } from "@/lib/site";
+import { ONLINE_HINT_SCRIPT } from "@/lib/online-session";
 import { THEME_SCRIPT } from "@/lib/theme";
 import type { Metadata, Viewport } from "next";
 import "@peasant-labs/fairtrade/tokens.css";
@@ -70,6 +71,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Atkinson+Hyperlegible+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
         />
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: ONLINE_HINT_SCRIPT }} />
       </head>
       <body className="site-root">
         <a href="#content" className="site-skip-link">

@@ -7,6 +7,8 @@ export type LoginFixture = {
   dialog: { title: string; github: string; terminal: string; privacy: { label: string; href: string } };
   online: string;
   next: Array<{ name: string; address: string; start: string }>;
+  signedIn: { cookie: string; label: string; href: string };
+  header: Array<{ name: string; hint: string | null; address: string; shows: "log in" | "open online"; hintAfter: string | null }>;
   required: string[];
 };
 
@@ -16,7 +18,7 @@ export function loadLoginFixture(): LoginFixture {
   if (root?.version !== 1) {
     throw new Error("testdata/login/login.yaml: expected version 1; update the loader with the fixture.");
   }
-  const names = new Set(root.next.map((entry) => entry.name));
+  const names = new Set([...root.next, ...root.header].map((entry) => entry.name));
   for (const name of root.required) {
     if (!names.has(name)) throw new Error(`testdata/login/login.yaml: the required case "${name}" is missing.`);
   }

@@ -2,6 +2,7 @@
 
 import { BrandMark } from "@/components/fairtrade-client";
 import { LoginDialog, useLoginDialog } from "@/components/login-dialog";
+import { OnlineLink } from "@/components/online-link";
 import { Mark } from "@/components/mark";
 import { SiteNav } from "@/components/site-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -147,6 +148,7 @@ export function SiteHeader() {
             <BrandMark name="github" />
             log in
           </a>
+          <OnlineLink className="btn btn-secondary site-btn site-bar-wide" />
           <button
             ref={buttonRef}
             type="button"
@@ -210,6 +212,7 @@ export function SiteHeader() {
             <BrandMark name="github" />
             log in
           </a>
+          <OnlineLink className="btn btn-secondary site-btn" onClick={linkClosesMenu} />
         </div>
       </div>
       <LoginDialog open={login.open} next={login.next} onClose={login.close} returnFocusRef={login.returnFocusRef} />

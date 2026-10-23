@@ -517,6 +517,33 @@ html {
   }
 }
 
+/* ---------- signed in to online ---------- */
+
+/* the head script marks <html data-online> before the first paint, so exactly
+   one way in shows from the start: "log in", or "open online" for somebody the
+   online app's hint names. These rules only hide; each link keeps its own display. */
+:root[data-online="in"] .site-login {
+  display: none;
+}
+:root:not([data-online="in"]) .site-online {
+  display: none;
+}
+
+/* the person's initial, in a square of fixed size so filling it moves nothing */
+.site-online-av {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--ic-lg);
+  height: var(--ic-lg);
+  border: 1px solid var(--rule-strong);
+  background: var(--surface-2);
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: 1;
+}
+
 /* ---------- the log-in dialog ---------- */
 
 /* fairtrade's Dialog and SignInProviders draw it; the site only gives the one action the dialog's width and a full target */

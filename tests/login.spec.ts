@@ -134,3 +134,46 @@ test("any other link to the log-in address on the page opens it in place", async
   await expect(dialogOf(page)).toBeVisible();
   expect(new URL(page.url()).search).toBe("");
 });
+
+/* the header's way in, for a reader the online app's hint names or does not */
+for (const entry of fixture.header) {
+  for (const width of [1440, 390] as const) {
+    test(`the header: ${entry.name} (${width})`, async ({ browser, baseURL }) => {
+      const context = await browser.newContext(width === 390 ? PHONE : { viewport: { width, height: 900 } });
+      await answerOnline(context);
+      if (entry.hint !== null) {
+        await context.addCookies([{ name: fixture.signedIn.cookie, value: entry.hint, url: baseURL! }]);
+      }
+      const page = await context.newPage();
+      await page.goto(entry.address);
+      const signedIn = entry.shows === fixture.signedIn.label;
+      await expect(page.locator("html")).toHaveAttribute("data-online", signedIn ? "in" : "out");
+
+      // the docs carry their own sidebar; every other page the header (its menu sheet on a phone)
+      const docs = entry.address.startsWith("/docs");
+      let scope = docs ? page.locator(".asb") : page.locator(".site-bar");
+      if (!docs && width === 390) {
+        if (await dialogOf(page).isVisible()) await page.keyboard.press("Escape");
+        await page.locator(".site-bar").getByRole("button", { name: "open the menu" }).tap();
+        scope = page.locator("#site-sheet");
+      }
+      if (docs && width === 390) {
+        await page.locator(".asb-bar").getByRole("button", { name: "open the menu" }).tap();
+      }
+      const online = scope.locator(".site-online").filter({ visible: true });
+      const login = scope.getByRole("link", { name: "log in" });
+      if (signedIn) {
+        await expect(online).toHaveCount(1);
+        await expect(online).toHaveAttribute("href", fixture.signedIn.href);
+        await expect(online).toHaveAccessibleName(`${fixture.signedIn.label}, signed in as @${entry.hint}`);
+        await expect(login).toBeHidden();
+      } else {
+        await expect(online).toHaveCount(0);
+        await expect(login).toBeVisible();
+      }
+      const hint = (await context.cookies()).find((cookie) => cookie.name === fixture.signedIn.cookie);
+      expect(hint?.value ?? null).toBe(entry.hintAfter);
+      await context.close();
+    });
+  }
+}
