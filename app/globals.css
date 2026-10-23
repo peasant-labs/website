@@ -1724,8 +1724,9 @@
  * The active region is tinted with the active section's accent — the same
  * --mx-accent its section carries — so the two sides read as one selection.
  */
+/* a light wash: the line's own accent-coloured text has to stay at 4.5:1 on it */
 .mx-json-line[data-active="true"] {
-  background: color-mix(in srgb, var(--mx-accent, var(--amber)) 10%, transparent);
+  background: color-mix(in srgb, var(--mx-accent, var(--amber)) 7%, transparent);
   box-shadow: inset var(--stroke-emphasis) 0 0 0 var(--mx-accent, var(--amber));
 }
 

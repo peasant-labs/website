@@ -1,8 +1,8 @@
 "use client";
 
-import { Mark } from "@/components/mark";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { currentDocsItem, DOCS_NAV, type DocsIcon } from "@/lib/docs";
+import { LOGIN_URL } from "@/lib/site";
+import { applyTheme, currentTheme, subscribeToTheme, type Theme } from "@/lib/theme";
 import {
   BookOpen,
   Code,
@@ -12,17 +12,18 @@ import {
   FlaskConical,
   GitPullRequest,
   Lock,
-  Menu,
+  Moon,
   Plug,
   Send,
+  Sun,
   Terminal,
-  X,
 } from "@peasant-labs/fairtrade/icons";
+import { AppSidebar, APP_SIDEBAR_APPS, type AppSidebarGroup } from "@peasant-labs/fairtrade/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ComponentType, type SVGProps } from "react";
+import { useSyncExternalStore, type ComponentType } from "react";
 
-const ICONS: Record<DocsIcon, ComponentType<SVGProps<SVGSVGElement>>> = {
+const ICONS: Record<DocsIcon, ComponentType> = {
   overview: BookOpen,
   install: Download,
   kickstart: Terminal,
@@ -36,63 +37,68 @@ const ICONS: Record<DocsIcon, ComponentType<SVGProps<SVGSVGElement>>> = {
   blog: FileText,
 };
 
+/* where each app lives; the docs are this one */
+const APP_HREFS: Record<string, string> = {
+  online: "https://village.peasantlabs.org",
+  local: "http://localhost:8690",
+  docs: "/docs",
+};
+
+const APPS = APP_SIDEBAR_APPS.map((app) => ({ ...app, href: APP_HREFS[app.id] }));
+
 /**
- * The docs app's sidebar: the mark (home), the grouped destinations with the
- * current page marked, and the theme control at the foot. On a phone it folds
- * into a bar with a menu button that opens the same list in place.
+ * The docs app's sidebar: fairtrade's shared AppSidebar with the docs app
+ * current, the docs destinations grouped, the theme control, and sign-in on
+ * village where an app would show the account. fairtrade draws the phone top
+ * bar and drawer.
  */
 export function DocsSidebar() {
   const pathname = usePathname();
-  const current = currentDocsItem(pathname);
-  const [open, setOpen] = useState(false);
+  const theme = useSyncExternalStore<Theme>(subscribeToTheme, currentTheme, () => "dark");
+  const next: Theme = theme === "dark" ? "light" : "dark";
+
+  const groups: AppSidebarGroup[] = [
+    ...DOCS_NAV.map((group) => ({
+      id: group.id,
+      label: group.label ?? undefined,
+      ariaLabel: group.label ?? "more",
+      items: group.items.map((item) => ({
+        id: item.id,
+        label: item.label,
+        href: item.href,
+        icon: ICONS[item.icon],
+      })),
+    })),
+    {
+      id: "tools",
+      ariaLabel: "theme",
+      items: [
+        {
+          id: "theme",
+          label: `${next} mode`,
+          title: `use ${next} theme`,
+          icon: next === "light" ? Sun : Moon,
+          onSelect: () => applyTheme(next, { persist: true }),
+        },
+      ],
+    },
+  ];
 
   return (
-    <aside className="dx-side" aria-label="docs" data-open={open ? "true" : "false"}>
-      <div className="dx-top">
-        <Link className="site-brand dx-brand" href="/">
-          <Mark className="site-brand-mark" />
-          peasant labs
-        </Link>
-        <ThemeToggle className="dx-theme" />
-        <button
-          type="button"
-          className="site-icon-btn dx-menu"
-          aria-expanded={open}
-          aria-controls="dx-groups"
-          aria-label={open ? "close the docs menu" : "open the docs menu"}
-          onClick={() => setOpen((value) => !value)}
-        >
-          {open ? (
-            <X aria-hidden="true" focusable="false" />
-          ) : (
-            <Menu aria-hidden="true" focusable="false" />
-          )}
-        </button>
-      </div>
-      <div className="dx-groups" id="dx-groups">
-        {DOCS_NAV.map((group) => (
-          <nav key={group.id} className="dx-group" aria-label={group.label ?? "more"}>
-            {group.label ? <span className="dx-glabel">{group.label}</span> : null}
-            {group.items.map((item) => {
-              const Icon = ICONS[item.icon];
-              const on = item.id === current;
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className="dx-item"
-                  aria-current={on ? "page" : undefined}
-                  // picking a destination closes the phone menu
-                  onClick={() => setOpen(false)}
-                >
-                  <Icon className="dx-ic" aria-hidden="true" focusable="false" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        ))}
-      </div>
-    </aside>
+    <AppSidebar
+      app="docs"
+      apps={APPS}
+      groups={groups}
+      currentId={currentDocsItem(pathname) ?? undefined}
+      homeHref="/"
+      brand="peasant labs"
+      label="docs"
+      LinkComponent={Link}
+      accountSlot={
+        <a className="dx-login" href={LOGIN_URL}>
+          log in
+        </a>
+      }
+    />
   );
 }
