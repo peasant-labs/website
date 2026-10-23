@@ -2120,9 +2120,19 @@
   display: none;
 }
 
-/* with no trail beside it, the header's one action, replay, keeps to the right where a host's actions sit */
-.lp-viewer .txn-actions {
-  margin-inline-start: auto;
+/*
+ * The viewer's columns scroll down, never sideways: its hidden tooltips run
+ * past their column's edge, and without this a sideways swipe over the window
+ * slid the conversation and the filters out from under their own edges. A
+ * long line still scrolls inside its own code block.
+ */
+.lp-viewer :is(.txn-stream, .txn-rail-body) {
+  overflow-x: hidden;
+}
+
+/* the conversation has most of the window, so a turn's prose runs its width rather than wrapping early */
+.lp-viewer .txn-body > :is(.txn-md-prose, .txn-md-list, .txn-md-heading, .txn-md-blockquote) {
+  max-inline-size: none;
 }
 
 /* what the tour's pointer rests on, lit like a selection */
@@ -2175,11 +2185,6 @@
 
 .lp-viewer[data-touring="true"] .lp-tour-pointer {
   opacity: 1;
-}
-
-/* the viewer is focused when a replay starts, so the reader's place stays in the window; it draws no ring of its own */
-.lp-viewer:focus {
-  outline: none;
 }
 
 /* the first time they come into view, the back window and the check fan out from behind the front one */

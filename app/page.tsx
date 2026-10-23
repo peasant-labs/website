@@ -104,7 +104,6 @@ export default function Home() {
                   session={SAMPLE_SESSION}
                   title={SESSION.sessionTitle}
                   tour={SESSION.tour}
-                  replay={SESSION.replay}
                 />
               </SafariWindow>
             </SessionWindows>

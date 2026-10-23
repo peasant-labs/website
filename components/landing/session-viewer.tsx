@@ -4,9 +4,8 @@ import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
 import { textIn, Tour } from "@/components/landing/viewer-tour";
 import { MacPointer } from "@/components/mac";
 import { currentTheme, subscribeToTheme, type Theme } from "@/lib/theme";
-import { RotateCcw } from "@peasant-labs/fairtrade/icons";
 import { adaptTranscript, TranscriptViewer, type TranscriptWireInput } from "@peasant-labs/fairtrade/ui";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 
 /**
  * Every capability is off. This is a read-only demonstration, so the viewer must
@@ -24,8 +23,29 @@ const READ_ONLY = {
 /* no crumb trail: the sample has nowhere to navigate to, and its id is shown nowhere */
 const NO_CRUMBS: never[] = [];
 
-/* the browser draws the viewer itself: its relative times and counts are the reader's clock's and locale's, not the build's */
-const noChange = () => () => {};
+/*
+ * How far ahead of the screen the viewer is drawn: early enough to be ready
+ * before it is seen, late enough to cost nothing on the way down the page.
+ */
+const DRAW_AHEAD = "900px 0px";
+
+/* true from the first time the element comes within DRAW_AHEAD of the screen */
+function useNear(ref: RefObject<Element | null>) {
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || near) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) setNear(true);
+      },
+      { rootMargin: DRAW_AHEAD },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref, near]);
+  return near;
+}
 
 /* the reader's own input inside the window; any of it ends the tour */
 const TAKE_OVER = ["pointerdown", "wheel", "touchstart", "keydown"] as const;
@@ -92,43 +112,42 @@ async function walk(tour: Tour, root: HTMLElement, script: TourScript) {
   await tour.reveal(answer, 0.42);
   await tour.rest(answer, 2600);
 
-  await tour.vanish();
+  tour.vanish();
 }
 
 /**
  * The real transcript browser over the sample session, as online's transcript
  * page renders a published one: fairtrade's TranscriptViewer with its header,
- * tabs, turn list, filters, tool calls and diffs, and without the share tail
- * or the outcome chip. The session goes through `adaptTranscript`, the one
- * wire-parse boundary, under its short title. The viewer keeps the window's
- * height and scrolls inside it, and every part of it can be used.
+ * tabs, turn list, tool calls and diffs, and without the share tail or the
+ * outcome chip. The session goes through `adaptTranscript`, the one
+ * wire-parse boundary, under its short title. The filters open from their
+ * rail's strip, so the conversation has most of the window. The viewer keeps
+ * the window's height and scrolls inside it, and every part of it can be used.
+ * It is drawn as the section nears the screen, in the browser, so it costs
+ * nothing before then and its relative times are the reader's own.
  *
  * The first time it is well in view, a macOS pointer tours it: the prompt,
  * the tool call that read the credentials (opened, its key shown as its
  * marker), the change in the diffs, and the answer the session ended on. The
- * tour clicks the real controls. It holds while the window is off screen, and
- * ends for good the moment the reader presses, scrolls, touches or types in
- * the window; the replay icon in the viewer's header plays it again from the
- * start. Under reduced motion there is no tour and no replay: the browser is
- * simply there to use.
+ * tour clicks the real controls and has no controls of its own. It holds
+ * while the window is off screen. The reader's first press, scroll, touch or
+ * key in the window ends it for good; a tour that played to its end plays
+ * again, on a fresh browser, when the section comes back after leaving the
+ * screen. Under reduced motion there is no tour: the browser is simply there.
  */
 export function SessionViewer({
   session,
   title,
   label,
   tour: script,
-  replay,
 }: {
   session: TranscriptWireInput;
   title: string;
   label: string;
   tour: TourScript;
-  /** the replay icon's name */
-  replay: string;
 }) {
   // The site owns the theme; the viewer follows it rather than shipping its own.
   const theme = useSyncExternalStore<Theme>(subscribeToTheme, currentTheme, () => "dark");
-  const drawn = useSyncExternalStore(noChange, () => true, () => false);
   const viewModel = useMemo(() => {
     const adapted = adaptTranscript(session);
     return { ...adapted, session: { ...adapted.session, title } };
@@ -136,38 +155,73 @@ export function SessionViewer({
   const rootRef = useRef<HTMLDivElement>(null);
   const pointerRef = useRef<HTMLDivElement>(null);
   const tourRef = useRef<Tour | null>(null);
+  const interacted = useRef(false);
+  const away = useRef(false);
   const reduced = useReducedMotion();
-  const onScreen = useOnScreen(rootRef, 0.5);
-  // a take is one fresh viewer and one tour of it: replay starts the next
+  const near = useNear(rootRef);
+  const inView = useOnScreen(rootRef, 0.5);
+  // a take is one fresh viewer and one tour of it
   const [take, setTake] = useState(0);
   const [played, setPlayed] = useState(false);
-  if (!reduced && onScreen && !played) setPlayed(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  if (!reduced && near && inView && !played) setPlayed(true);
+
+  // The reader's own input in the window is theirs: it ends the tour, and no tour starts again after it.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const takeOver = (event: Event) => {
+      if (!event.isTrusted) return;
+      interacted.current = true;
+      tourRef.current?.stop();
+    };
+    for (const kind of TAKE_OVER) root.addEventListener(kind, takeOver, { capture: true, passive: true });
+    return () => {
+      for (const kind of TAKE_OVER) root.removeEventListener(kind, takeOver, { capture: true });
+    };
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
     const pointer = pointerRef.current;
-    if (reduced || !played || !root || !pointer) return;
+    if (reduced || !played || interacted.current || !root || !pointer) return;
     const tour = new Tour(root, pointer);
     tourRef.current = tour;
-    const takeOver = (event: Event) => {
-      if (event.isTrusted) tour.stop();
-    };
-    for (const kind of TAKE_OVER) root.addEventListener(kind, takeOver, { capture: true, passive: true });
     walk(tour, root, script)
       .catch(() => {})
       .finally(() => tour.stop());
     return () => {
-      for (const kind of TAKE_OVER) root.removeEventListener(kind, takeOver, { capture: true });
       tour.stop();
       tourRef.current = null;
     };
   }, [played, take, reduced, script]);
 
-  // Off screen, the tour holds where it is, and plays on when it is back in view.
+  // Off screen the tour holds where it is. Back in view it plays on, or, once it has played to its end and the
+  // section has left the screen and come back, it plays again on a fresh browser.
   useEffect(() => {
-    if (onScreen) tourRef.current?.resume();
-    else tourRef.current?.pause();
-  }, [onScreen]);
+    const element = rootRef.current;
+    if (!element) return;
+    // noted as it happens, not on a render, so a quick leave and return still counts
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry && !entry.isIntersecting) away.current = true;
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    const tour = tourRef.current;
+    if (!inView) {
+      tour?.pause();
+      return;
+    }
+    if (tour && !tour.over) tour.resume();
+    else if (tour && away.current && !interacted.current && !reduced) {
+      away.current = false;
+      setFiltersOpen(false);
+      setTake((value) => value + 1);
+    }
+    away.current = false;
+  }, [inView, reduced]);
 
   return (
     <div
@@ -177,9 +231,8 @@ export function SessionViewer({
       data-touring="false"
       role="group"
       aria-label={label}
-      tabIndex={-1}
     >
-      {drawn ? (
+      {near ? (
         <TranscriptViewer
           key={take}
           viewModel={viewModel}
@@ -188,23 +241,8 @@ export function SessionViewer({
           breadcrumb={NO_CRUMBS}
           showTail={false}
           showOutcome={false}
-          headerActions={
-            reduced ? undefined : (
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm btn-icon"
-                aria-label={replay}
-                onClick={() => {
-                  // a fresh viewer, back at its start, and the tour again; focus stays in the window
-                  setTake((value) => value + 1);
-                  setPlayed(true);
-                  rootRef.current?.focus({ preventScroll: true });
-                }}
-              >
-                <RotateCcw aria-hidden="true" focusable="false" />
-              </button>
-            )
-          }
+          rightRailOpen={filtersOpen}
+          onRightRailOpenChange={setFiltersOpen}
         />
       ) : null}
       {reduced ? null : <MacPointer ref={pointerRef} className="lp-tour-pointer" />}

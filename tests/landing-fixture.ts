@@ -50,7 +50,6 @@ export type LandingFixture = {
     sessionId: string;
     tabs: string[];
     tour: { tool: string; marker: string };
-    replay: string;
     check: { name: string; summary: string };
     markers: string[];
   };

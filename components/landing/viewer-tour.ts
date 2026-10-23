@@ -140,10 +140,10 @@ export class Tour {
     await this.hold(420);
   }
 
-  async vanish() {
+  /** The pointer fades out (its own transition), and the tour is over the moment it starts to. */
+  vanish() {
     light(undefined);
     this.root.dataset.touring = "false";
-    await this.hold(300);
   }
 
   /** Moves the pointer on a shallow arc to a control or a run of text, at a pace that grows with the distance. */

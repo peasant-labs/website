@@ -332,7 +332,6 @@ export const SESSION = {
     trace: "full trace",
     answer: "rotate it in the production account",
   },
-  replay: "replay tour",
   terminal: "shop — claude — 80×24",
   check: {
     label: "the pull request's peasant check",

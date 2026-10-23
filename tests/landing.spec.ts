@@ -642,8 +642,10 @@ test("a sample session opens in the real transcript browser, in a wide window th
   const section = page.locator("#session");
   const viewer = section.locator("[data-session-viewer]");
   await expect(viewer).toHaveAttribute("aria-label", fixture.session.label);
-  // the browser draws the viewer after the page hydrates, so its relative times can never break hydration
-  // (a broken one re-renders the document and drops the theme the head script set)
+  // the browser draws the viewer as the section nears the screen, after the page hydrates, so its relative times
+  // can never break hydration (a broken one re-renders the document and drops the theme the head script set)
+  await expect(viewer.locator(".txn-app")).toHaveCount(0);
+  await viewer.scrollIntoViewIfNeeded();
   await expect(viewer.locator(".txn-app")).toBeVisible();
   expect(errors).toEqual([]);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
@@ -662,6 +664,23 @@ test("a sample session opens in the real transcript browser, in a wide window th
   // the values peasant redacted show as their markers
   for (const marker of fixture.session.markers) {
     await expect(viewer, `the transcript does not show ${marker}`).toContainText(marker);
+  }
+
+  // the conversation has most of the window: the filters wait behind their rail's strip, which still opens them
+  const grid = viewer.locator(".txn-body-grid");
+  await expect(grid).toHaveAttribute("data-right-rail", "closed");
+  const share = await viewer.evaluate(
+    (element) => element.querySelector(".txn-stream")!.getBoundingClientRect().width / element.getBoundingClientRect().width,
+  );
+  expect(share, "the conversation's share of the window").toBeGreaterThanOrEqual(0.6);
+  await viewer.locator(".txn-rail-strip-right .txn-rail-reopen").click();
+  await expect(grid).not.toHaveAttribute("data-right-rail", "closed");
+  // nothing in it slides sideways out from under its column's edge
+  for (const column of [".txn-stream", ".txn-rail-right .txn-rail-body"]) {
+    const sideways = viewer.locator(column).first();
+    await sideways.hover();
+    await page.mouse.wheel(400, 0);
+    expect(await sideways.evaluate((element) => element.scrollLeft), `${column} slid sideways`).toBe(0);
   }
 
   // the browser's own tabs, each of which works, and the window keeps its height whichever is shown
@@ -720,29 +739,54 @@ test("on first view a pointer tours the transcript browser through its real cont
   const tab = (name: string) => viewer.getByRole("tab", { name: new RegExp(`^${name}`) });
   await expect(tab("diffs")).toHaveAttribute("aria-selected", "true", { timeout: 15_000 });
 
-  // the reader's first press ends it: the pointer goes, and the browser stays where the reader put it
-  await tab("files").click();
-  await expect(viewer).toHaveAttribute("data-touring", "false");
-  await page.waitForTimeout(2_000);
-  await expect(tab("files")).toHaveAttribute("aria-selected", "true");
+  // it has no controls of its own
+  await expect(viewer.getByRole("button", { name: /replay|pause|resume|play/ })).toHaveCount(0);
 
-  // replay plays it again from the start, on a fresh browser
-  await viewer.getByRole("button", { name: fixture.session.replay }).click();
+  // a tour that plays to its end plays again, on a fresh browser, when the section comes back after leaving the screen
+  await page.evaluate(async () => {
+    const root = document.querySelector<HTMLElement>("[data-session-viewer]")!;
+    for (let step = 0; step < 400 && root.dataset.touring === "true"; step += 1) {
+      for (const animation of document.getAnimations()) {
+        const end = animation.effect?.getComputedTiming().endTime;
+        if (animation.playState === "running" && Number.isFinite(Number(end))) animation.finish();
+      }
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    }
+  });
+  await expect(viewer).toHaveAttribute("data-touring", "false");
+  const leaveAndReturn = async () => {
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    await expect(viewer).not.toBeInViewport();
+    await page.waitForTimeout(300);
+    await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  };
+  await leaveAndReturn();
   await expect(viewer).toHaveAttribute("data-touring", "true", { timeout: 5_000 });
   await expect(tab("full trace")).toHaveAttribute("aria-selected", "true");
   await expect(env).toHaveAttribute("aria-expanded", "false");
-  // a scroll inside the window ends it too
+
+  // the reader's first press ends it for good: the browser stays where they put it, even after leaving and coming back
+  await tab("files").click();
+  await expect(viewer).toHaveAttribute("data-touring", "false");
+  await leaveAndReturn();
+  await page.waitForTimeout(2_000);
+  await expect(viewer).toHaveAttribute("data-touring", "false");
+  await expect(tab("files")).toHaveAttribute("aria-selected", "true");
+
+  // a scroll inside the window ends a tour too
+  await page.reload();
+  await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  await expect(viewer).toHaveAttribute("data-touring", "true", { timeout: 10_000 });
   const box = (await viewer.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.wheel(0, 120);
   await expect(viewer).toHaveAttribute("data-touring", "false");
 
-  // under reduced motion there is no tour and no replay
+  // under reduced motion there is no tour
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
   await expect(viewer.locator(".lp-tour-pointer")).toHaveCount(0);
-  await expect(viewer.getByRole("button", { name: fixture.session.replay })).toHaveCount(0);
   await page.waitForTimeout(1_500);
   await expect(viewer).toHaveAttribute("data-touring", "false");
 });
