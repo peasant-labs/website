@@ -132,6 +132,9 @@ session:
   sessionId: sess_c41e07
   # the transcript browser's own tabs, as online's transcript page shows them
   tabs: [highlights, full trace, diffs, files, annotations]
+  # the tour on first view: the tool call it opens, and the marker it rests on there
+  tour: { tool: .env, marker: "<AWS_ACCESS_KEY>" }
+  replay: replay tour
   # the pull request's check, in village's own words (backend/internal/digest/render.go) for one transcript and one commit
   check: { name: peasant / prompts, summary: 1 transcript traces 1 of 1 commits }
   # placeholders the redaction engine writes, visible in the transcript

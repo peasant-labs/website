@@ -635,6 +635,8 @@ test("under reduced motion the steps stack, each scene on its finished frame, wi
 test("a sample session opens in the real transcript browser, in a wide window that keeps its height", async ({
   page,
 }) => {
+  // the tour stays out of the way here: under reduced motion the browser is simply there to use
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const section = page.locator("#session");
   const viewer = section.locator("[data-session-viewer]");
@@ -689,6 +691,54 @@ test("a sample session opens in the real transcript browser, in a wide window th
       .locator(".mac-lights i")
       .evaluateAll((lights) => lights.map((light) => getComputedStyle(light).backgroundColor)),
   ).toEqual(["rgb(255, 95, 87)", "rgb(254, 188, 46)", "rgb(40, 200, 64)"]);
+});
+
+test("on first view a pointer tours the transcript browser through its real controls, until the reader takes over", async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await page.goto("/");
+  const viewer = page.locator("#session [data-session-viewer]");
+  const lit = () =>
+    page.evaluate(() => [...(CSS.highlights.get("tour-point") ?? [])].map(String).join("").trim());
+  await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+
+  // it plays on its own, with a pointer hidden from assistive technology
+  await expect(viewer).toHaveAttribute("data-touring", "true", { timeout: 10_000 });
+  await expect(viewer.locator(".lp-tour-pointer")).toHaveAttribute("aria-hidden", "true");
+  // it opens the tool call that read the credentials, and rests on the key's marker
+  const env = viewer.locator(".tc-head", { hasText: fixture.session.tour.tool }).first();
+  await expect(env).toHaveAttribute("aria-expanded", "true", { timeout: 15_000 });
+  await expect.poll(lit, { timeout: 10_000 }).toBe(fixture.session.tour.marker);
+  // then shows the change in the diffs
+  const tab = (name: string) => viewer.getByRole("tab", { name: new RegExp(`^${name}`) });
+  await expect(tab("diffs")).toHaveAttribute("aria-selected", "true", { timeout: 15_000 });
+
+  // the reader's first press ends it: the pointer goes, and the browser stays where the reader put it
+  await tab("files").click();
+  await expect(viewer).toHaveAttribute("data-touring", "false");
+  await page.waitForTimeout(2_000);
+  await expect(tab("files")).toHaveAttribute("aria-selected", "true");
+
+  // replay plays it again from the start, on a fresh browser
+  await viewer.getByRole("button", { name: fixture.session.replay }).click();
+  await expect(viewer).toHaveAttribute("data-touring", "true", { timeout: 5_000 });
+  await expect(tab("full trace")).toHaveAttribute("aria-selected", "true");
+  await expect(env).toHaveAttribute("aria-expanded", "false");
+  // a scroll inside the window ends it too
+  const box = (await viewer.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.wheel(0, 120);
+  await expect(viewer).toHaveAttribute("data-touring", "false");
+
+  // under reduced motion there is no tour and no replay
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  await expect(viewer.locator(".lp-tour-pointer")).toHaveCount(0);
+  await expect(viewer.getByRole("button", { name: fixture.session.replay })).toHaveCount(0);
+  await page.waitForTimeout(1_500);
+  await expect(viewer).toHaveAttribute("data-touring", "false");
 });
 
 test("the theme follows the system until the reader chooses one", async ({ page }) => {

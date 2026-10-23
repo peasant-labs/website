@@ -2181,6 +2181,11 @@
   display: none;
 }
 
+/* with no trail beside it, the header's one action, replay, keeps to the right where a host's actions sit */
+.lp-viewer .txn-actions {
+  margin-inline-start: auto;
+}
+
 /* what the tour's pointer rests on, lit like a selection */
 ::highlight(tour-point) {
   background-color: color-mix(in oklab, var(--amber) 32%, transparent);
@@ -2222,6 +2227,20 @@
     width: 19px;
     height: 19px;
   }
+}
+
+.lp-tour-pointer {
+  opacity: 0;
+  transition: opacity 240ms var(--ease-out);
+}
+
+.lp-viewer[data-touring="true"] .lp-tour-pointer {
+  opacity: 1;
+}
+
+/* the viewer is focused when a replay starts, so the reader's place stays in the window; it draws no ring of its own */
+.lp-viewer:focus {
+  outline: none;
 }
 
 /* the first time they come into view, the back window and the check fan out from behind the front one */

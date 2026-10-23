@@ -99,7 +99,13 @@ export default function Home() {
             </div>
             <SessionWindows>
               <SafariWindow secure className="lp-session-win">
-                <SessionViewer label={SESSION.label} session={SAMPLE_SESSION} title={SESSION.sessionTitle} />
+                <SessionViewer
+                  label={SESSION.label}
+                  session={SAMPLE_SESSION}
+                  title={SESSION.sessionTitle}
+                  tour={SESSION.tour}
+                  replay={SESSION.replay}
+                />
               </SafariWindow>
             </SessionWindows>
           </div>
