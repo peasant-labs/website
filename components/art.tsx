@@ -9,9 +9,10 @@ import Image from "next/image";
  * Both stay `loading="lazy"`, which is what keeps the hidden tone from being
  * fetched at all.
  *
- * The art is dithered pixel work on a transparent ground. It is served as-is
- * (no resampling) and scaled with nearest-neighbour so the dither stays crisp,
- * and it sits straight on the page with no frame.
+ * The art is a fine halftone dot screen on a transparent ground, drawn at twice
+ * the width and height given here so it stays sharp on high-density screens.
+ * It is served as-is (no resampling), scaled smoothly, and sits straight on the
+ * page with no frame.
  */
 export function Art({
   art,

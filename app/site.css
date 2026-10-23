@@ -637,11 +637,11 @@ html {
   line-height: 0;
 }
 
+/* the art is a fine dot screen drawn at twice its layout size, so it is scaled smoothly at every size */
 .art-img {
   display: block;
   width: 100%;
   height: auto;
-  image-rendering: pixelated;
 }
 
 :root[data-theme="light"] .art-dark,
