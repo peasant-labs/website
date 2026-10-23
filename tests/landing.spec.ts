@@ -702,6 +702,39 @@ test("how it works: three steps, each with its scene; choosing one scrolls to it
   await expect(record.locator("table")).toHaveCount(0);
 });
 
+test("held on a wide screen, the title and scene sit centred under the header", async ({ browser }) => {
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 1280, height: 720 },
+    { width: 1728, height: 1117 },
+  ]) {
+    const context = await browser.newContext({ viewport });
+    const page = await context.newPage();
+    await page.goto("/");
+    const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
+    // read down into it, the way the header steps away for a reader
+    await page.evaluate((y) => window.scrollTo({ top: y - 300, behavior: "instant" }), top);
+    await page.mouse.move(5, 5);
+    await page.mouse.wheel(0, 300);
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + viewport.height * 0.3);
+    await expect(page.locator(".hw-scroll")).toHaveAttribute("data-holding", "true");
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const header = document.querySelector(".site-bar")!.getBoundingClientRect();
+          const title = document.querySelector(".hw-scroll h2")!.getBoundingClientRect();
+          const scene = document.querySelector(".hw-scroll .hw-view")!.getBoundingClientRect();
+          const steps = document.querySelector(".hw-steps")!.getBoundingClientRect();
+          const above = title.top - header.bottom;
+          const below = window.innerHeight - Math.max(scene.bottom, steps.bottom);
+          return header.bottom > 0 && above > 0 && Math.abs(above - below) < 4;
+        }),
+      )
+      .toBe(true);
+    await context.close();
+  }
+});
+
 test("scrolling walks the held section through steps 1, 2 and 3, then lets the page go on", async ({
   page,
 }) => {
@@ -802,7 +835,7 @@ test("every word in a scene reads at a real size, on a wide screen and on a phon
   }
 });
 
-test("on a phone the scene holds under the header with the steps right under it, one open at a time", async ({
+test("on a phone the title, scene and steps hold centred under the header, one step open at a time", async ({
   browser,
 }) => {
   const context = await browser.newContext(PHONE);
@@ -822,17 +855,33 @@ test("on a phone the scene holds under the header with the steps right under it,
           .evaluateAll((parts) => parts.map((part) => part.getBoundingClientRect().height > 1)),
       )
       .toEqual(fixture.how.steps.map((_, at) => at === index));
+    // (measured once the fonts have set the title's height, which the block's centring reads)
+    await page.evaluate(() => document.fonts.ready);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const title = document.querySelector(".hw-scroll h2")!.getBoundingClientRect();
+          const list = document.querySelector(".hw-steps")!.getBoundingClientRect();
+          const header = document.querySelector(".site-bar")!.getBoundingClientRect();
+          return Math.abs(title.top - header.bottom - (window.innerHeight - list.bottom)) < 4;
+        }),
+      )
+      .toBe(true);
     const layout = await page.evaluate(() => {
+      const title = document.querySelector(".hw-scroll h2")!.getBoundingClientRect();
       const scene = document.querySelector(".hw-scroll .hw-view")!.getBoundingClientRect();
       const list = document.querySelector(".hw-steps")!.getBoundingClientRect();
       const header = document.querySelector(".site-bar")!.getBoundingClientRect();
       return {
-        held: Math.abs(scene.top - header.bottom) < 2,
+        above: title.top - header.bottom,
+        below: window.innerHeight - list.bottom,
         gap: list.top - scene.bottom,
         fits: list.bottom <= window.innerHeight,
       };
     });
-    expect(layout.held, `the scene is not held under the header at step ${index + 1}`).toBe(true);
+    // the block sits as far under the header as it ends above the screen's foot
+    expect(layout.above, `the title is under the header at step ${index + 1}`).toBeGreaterThanOrEqual(0);
+    expect(Math.abs(layout.above - layout.below), `the block is off centre at step ${index + 1}`).toBeLessThan(4);
     expect(layout.gap, `the steps do not sit right under the scene at step ${index + 1}`).toBeLessThanOrEqual(24);
     expect(layout.fits, `the steps run off the screen at step ${index + 1}`).toBe(true);
   }

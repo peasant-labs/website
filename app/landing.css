@@ -618,22 +618,23 @@
 }
 
 /*
- * Held on a wide window, how it works centres itself in a screen whose top
- * keeps 5rem clear for the header and whose foot keeps --sp-6, so it brings
- * its own room. The section before it gives up the difference, and the
- * held screen sits as far from its neighbours as any two sections do. On a
- * phone it holds at the top with only a few pixels of its own, so it takes
- * the rhythm itself.
+ * Held, how it works centres its title and its scene as one block in the
+ * screen under the header, and brings at least --site-head-gap of its own
+ * room above and below it on a wide window (--sp-3 on a phone). The section
+ * before it gives up that much of its own padding, so the held screen sits as
+ * far from its neighbours as any two sections do.
  */
-@media (min-width: 62.5rem) {
-  .lp-sec:has(+ .lp-how .hw-scroll) {
-    padding-block-end: calc(var(--site-sec-y) - var(--sp-7));
-  }
+.lp-sec:has(+ .lp-how .hw-scroll) {
+  padding-block-end: calc(var(--site-sec-y) - var(--site-head-gap));
 }
 
 @media (max-width: 62.49rem) {
+  .lp-sec:has(+ .lp-how .hw-scroll) {
+    padding-block-end: var(--site-sec-y);
+  }
+
   .lp-how:has(.hw-scroll) {
-    padding-block: calc(var(--site-sec-y) - var(--sp-2)) calc(var(--site-sec-y) - var(--sp-4));
+    padding-block: calc(var(--site-sec-y) - var(--sp-3));
   }
 }
 
@@ -667,28 +668,45 @@
 }
 
 /*
- * Wide screens: the section is three screens tall; its first child holds still
- * (sticky) while the page scrolls through it, and three markers, one screen
- * each, decide which step is current.
- */
-/*
  * The section is held for 1.2 screens of scroll, 0.4 of a screen per step:
  * enough for each step to read, short enough that a flick carries past it.
+ * Its first child holds still (sticky) under the header, which stays while
+ * the section is held, and fills the screen left under it: --hw-room.
  */
 .hw-scroll {
+  --hw-bar: calc(4rem + 1px);
+  --hw-room: calc(100vh - var(--hw-bar));
+
   position: relative;
   height: 220vh;
   height: 220dvh;
 }
 
+@supports (height: 100svh) {
+  .hw-scroll {
+    --hw-room: calc(100svh - var(--hw-bar));
+  }
+}
+
+/*
+ * The title and the scene are one block, centred in that room with at least
+ * --site-head-gap above and below; when the block is taller than the room,
+ * the scene shrinks to fit (.hw-window, below), so the title keeps its gap.
+ */
 .hw-pin {
   position: sticky;
-  inset-block-start: 0;
+  inset-block-start: var(--hw-bar);
   display: flex;
   align-items: center;
-  height: 100vh;
-  height: 100dvh;
-  padding-block: 5rem var(--sp-6);
+  box-sizing: border-box;
+  height: var(--hw-room);
+  padding-block: var(--site-head-gap);
+}
+
+@media (min-width: 48rem) {
+  :root:has(.hw-scroll[data-holding="true"]) .site-bar[data-hidden="true"] {
+    transform: none;
+  }
 }
 
 /* the held screen is bound by the window's height, so its title sits closer than other sections' (24px to 40px) */
@@ -807,9 +825,9 @@
   min-width: 0;
 }
 
-/* the screen never grows taller than the held section leaves room for */
+/* the scene is never taller than the room left by the title and the two gaps (it is 16 by 10) */
 .hw-scroll .hw-window {
-  max-width: calc((100dvh - 15rem) * 1.6);
+  max-width: calc((var(--hw-room) - 2 * var(--site-head-gap) - var(--hw-head-h, 6rem)) * 1.6);
 }
 
 /*
@@ -884,19 +902,23 @@
 
 
 /*
- * Phones and narrow windows hold the same way: the scene on top and the steps
- * right under it, 12px apart. The heading slides away under the header as the
- * section takes hold (the held block's top is the header's height less the
- * heading's, measured), so the scene sits flush under the header.
+ * Phones and narrow windows hold the same way: the title, then the scene, then
+ * the steps 12px under it, centred as one block in the room under the header.
+ * The scene's height gives way first, so the block fits a short screen; on a
+ * screen too short for even its smallest scene the block starts at the top.
  */
 @media (max-width: 62.49rem) {
-  .hw-pin {
+  .hw-scroll {
     --hw-bar: 3.5rem;
+    --hw-scene-h: max(13rem, min(46dvh - 6rem, var(--hw-room) - var(--hw-head-h, 4rem) - 2 * var(--sp-3) - 12px - var(--hw-steps-h, 21rem)));
+    --hw-free: calc(var(--hw-room) - var(--hw-head-h, 4rem) - 2 * var(--sp-3) - var(--hw-scene-h) - 12px - var(--hw-steps-h, 21rem));
+  }
 
-    inset-block-start: calc(var(--hw-bar) - var(--sp-2) - var(--hw-head-h, 0px));
+  .hw-pin {
+    inset-block-start: calc(var(--hw-bar) + max(0px, var(--hw-free) / 2));
     align-items: start;
     height: auto;
-    padding-block: var(--sp-2) var(--sp-4);
+    padding-block: var(--sp-3);
   }
 
   .hw-grid {
@@ -915,8 +937,7 @@
 
   .hw-scroll .hw-view {
     aspect-ratio: auto;
-    height: calc(46dvh - 6rem);
-    min-height: 13rem;
+    height: var(--hw-scene-h);
   }
 
   .hw-step {
@@ -926,20 +947,11 @@
   .hw-step-body {
     padding-inline-start: 0;
   }
+}
 
-  /*
-   * From a tablet's width the header is taller, and it steps up out of view
-   * while reading down. The section holds under it, so while it is held the
-   * header stays: its leaving would open a band above the scene.
-   */
-  @media (min-width: 48rem) {
-    .hw-pin {
-      --hw-bar: calc(4rem + 1px);
-    }
-
-    :root:has(.hw-scroll[data-holding="true"]) .site-bar[data-hidden="true"] {
-      transform: none;
-    }
+@media (min-width: 48rem) and (max-width: 62.49rem) {
+  .hw-scroll {
+    --hw-bar: calc(4rem + 1px);
   }
 }
 

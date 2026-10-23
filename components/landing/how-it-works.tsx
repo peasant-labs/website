@@ -71,8 +71,11 @@ export function HowItWorks({ title }: { title: string }) {
         const own = Math.min(1, Math.max(0, progress * SCENES.length - index));
         fill.style.transform = `scaleX(${own})`;
       });
-      // while the section is held, the header it sits under stays (see app/landing.css)
-      const holding = sectionHeld || (root.getBoundingClientRect().top <= 0 && progress < 1);
+      // from the moment the held block reaches the header until it lets go, the header stays (see app/landing.css)
+      const pin = root.querySelector<HTMLElement>(".hw-pin");
+      const reach = pin ? parseFloat(getComputedStyle(pin).top) || 0 : 0;
+      const box = root.getBoundingClientRect();
+      const holding = sectionHeld || (box.top <= reach + 1 && box.bottom > window.innerHeight);
       if (root.dataset.holding !== String(holding)) root.dataset.holding = String(holding);
     },
     !reduced,
