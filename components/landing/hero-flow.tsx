@@ -95,6 +95,7 @@ type Person = readonly [x: number, height: number];
 
 /** One layout, every measure in cells. */
 type Layout = Readonly<{
+  name: "phone" | "wide";
   width: number;
   height: number;
   ground: number;
@@ -108,7 +109,7 @@ type Layout = Readonly<{
   lifted: Point;
   atSieve: Point;
   stamped: Point;
-  /** a wide screen reads left to right; a phone top to bottom */
+  /** which way the card crosses the sieve */
   travel: "across" | "down";
   /** the sieve: a short framed mesh across the card's path */
   sieve: Rect;
@@ -126,6 +127,7 @@ type Layout = Readonly<{
  * standing in the gap, and the base under the stack is the cards' width.
  */
 const WIDE: Layout = {
+  name: "wide",
   width: 250,
   height: 156,
   ground: 122,
@@ -148,28 +150,32 @@ const WIDE: Layout = {
   halfWidth: 8,
 };
 
-/* a phone: the laptop on top, the sieve under it, the stack and the people on the ground */
+/*
+ * A phone, at 4:5: the laptop above the people on the left, the stack on the
+ * right, and the card crossing from one to the other through the sieve.
+ */
 const PHONE: Layout = {
+  name: "phone",
   width: 100,
-  height: 152,
-  ground: 145,
-  screen: [26, 6, 48, 26],
-  deck: [5, 4],
-  marks: [36, 50, 64].map((x) => [x, 19] as const),
-  mark: 10,
-  lifted: [50, 42],
-  atSieve: [50, 66],
-  stamped: [28, 80],
-  travel: "down",
-  sieve: [12, 70, 76, 4],
-  stack: [4, 140, 3],
+  height: 125,
+  ground: 120,
+  screen: [4, 8, 38, 22],
+  deck: [4, 4],
+  marks: [13, 23, 33].map((x) => [x, 19] as const),
+  mark: 8,
+  lifted: [25, 38],
+  atSieve: [49, 44],
+  stamped: [72, 52],
+  travel: "across",
+  sieve: [47, 24, 4, 40],
+  stack: [48, 115, 3],
   people: [
-    [63, 31],
-    [72, 35],
-    [81, 28],
-    [90, 33],
+    [10, 28],
+    [19, 33],
+    [28, 26],
+    [37, 31],
   ],
-  halfWidth: 6.5,
+  halfWidth: 6,
 };
 
 /* the person who lights up as each card lands: the tallest, nearest the stack */
@@ -320,8 +326,8 @@ function layoutRules(layout: Layout) {
         .map((index) => `.hf-m${index} { left: ${cq(x - half)}; top: ${cq(y - half)}; width: ${cq(layout.mark)}; height: ${cq(layout.mark)} }`),
     ),
     `.hf-card { width: ${cq(CARD.w)}; height: ${cq(CARD.h)} }`,
-    `.hf-mesh-${layout.travel} { left: ${cq(sx)}; top: ${cq(sy)}; width: ${cq(sw)}; height: ${cq(sh)} }`,
-    `.hf-base-${layout.travel} { left: ${cq(layout.stack[0] - 1)}; top: ${cq(layout.stack[1])}; width: ${cq(CARD.w + 4)}; height: ${cq(layout.ground - layout.stack[1])} }`,
+    `.hf-mesh-${layout.name} { left: ${cq(sx)}; top: ${cq(sy)}; width: ${cq(sw)}; height: ${cq(sh)} }`,
+    `.hf-base-${layout.name} { left: ${cq(layout.stack[0] - 1)}; top: ${cq(layout.stack[1])}; width: ${cq(CARD.w + 4)}; height: ${cq(layout.ground - layout.stack[1])} }`,
     ...AGENTS.map((_, index) => {
       const rest = at(index);
       return `.hf-x${index} { transform: translateX(${cq(rest.x - CARD.w / 2)}) }\n.hf-y${index} { transform: translateY(${cq(rest.y - CARD.h / 2)}) }`;
@@ -520,7 +526,7 @@ const ellipse = (cx: number, cy: number, rx: number, ry: number) =>
   `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
 
 /* which of the two layouts a drawing belongs to; the stylesheet shows one */
-const sizeClass = (layout: Layout) => (layout.travel === "across" ? "hf-wide" : "hf-phone");
+const sizeClass = (layout: Layout) => `hf-${layout.name}`;
 
 /** A person seen from the front, low-poly: a pointed hood over a body that widens to the ground. */
 function personFaces([x, height]: Person, halfWidth: number, ground: number) {
@@ -574,7 +580,7 @@ function Scene({ layout }: { layout: Layout }) {
     [sx + sw + 2, deckTop],
     [sx + sw, deckTop],
   ]);
-  const inset = layout.travel === "across" ? 3 : 2;
+  const inset = layout.name === "wide" ? 3 : 2;
   const peopleLeft = layout.people[0]![0] - halfWidth;
   const peopleRight = layout.people[layout.people.length - 1]![0] + halfWidth;
   const ordered = layout.people
@@ -583,7 +589,7 @@ function Scene({ layout }: { layout: Layout }) {
   return (
     <svg className={`hf-art ${sizeClass(layout)}`} viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true" focusable="false">
       <path className="hf-tone-ground" d={rect(0, 0, layout.width, layout.height)} />
-      <path className="hf-tone-shade" d={ellipse(sx + sw / 2 + 6, ground, sw / 2 + reach + 4, depth * 0.6)} />
+      <path className="hf-tone-shade" d={ellipse(sx + sw / 2 + 4, deckTop + depth, sw / 2 + reach + 3, depth * 0.6)} />
       <path className="hf-tone-shade" d={ellipse((peopleLeft + peopleRight) / 2 + 4, ground, (peopleRight - peopleLeft) / 2 + 4, depth * 0.6)} />
       <Face d={side} tone="dark" />
       <Face d={rect(sx, sy, sw, sh)} tone="mid" />
@@ -613,7 +619,7 @@ function Base({ layout }: { layout: Layout }) {
   const w = CARD.w + 4;
   const h = layout.ground - layout.stack[1];
   return (
-    <svg className={`hf-base hf-base-${layout.travel} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
+    <svg className={`hf-base hf-base-${layout.name} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
       <path className="hf-tone-shade" d={ellipse(w / 2 + 3, h, w / 2 + 2, 1.5)} />
       <Face d={rect(0, 0, w - 2, 2)} tone="light" />
       <Face d={rect(0, 2, w - 2, h - 2)} tone="mid" />
@@ -638,7 +644,7 @@ function Mesh({ layout }: { layout: Layout }) {
     );
   }
   return (
-    <svg className={`hf-mesh hf-mesh-${layout.travel} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
+    <svg className={`hf-mesh hf-mesh-${layout.name} ${sizeClass(layout)}`} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
       <path className="hf-tone-light" d={rect(0, 0, w, h)} />
       {wires}
       <path className="hf-out" d={rect(0, 0, w, h)} />
