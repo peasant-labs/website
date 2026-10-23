@@ -862,7 +862,9 @@ test("on a short phone the held block still fits under the header", async ({ bro
   await context.close();
 });
 
-test("held on a wide screen, the title and scene sit centred under the header", async ({ browser }) => {
+test("held on a wide screen, the block sits centred whether the header is away or back, and reading down never brings it back", async ({
+  browser,
+}) => {
   for (const viewport of [
     { width: 1440, height: 900 },
     { width: 1280, height: 720 },
@@ -871,26 +873,41 @@ test("held on a wide screen, the title and scene sit centred under the header", 
     const context = await browser.newContext({ viewport });
     const page = await context.newPage();
     await page.goto("/");
+    const header = page.locator(".site-bar");
     const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
-    // read down into it, the way the header steps away for a reader
-    await page.evaluate((y) => window.scrollTo({ top: y - 300, behavior: "instant" }), top);
+    const centred = () =>
+      page.evaluate(() => {
+        const bar = document.querySelector(".site-bar")!.getBoundingClientRect();
+        const title = document.querySelector(".hw-scroll h2")!.getBoundingClientRect();
+        const scene = document.querySelector(".hw-scroll .hw-view")!.getBoundingClientRect();
+        const steps = document.querySelector(".hw-steps")!.getBoundingClientRect();
+        const above = title.top - Math.max(0, bar.bottom);
+        const below = window.innerHeight - Math.max(scene.bottom, steps.bottom);
+        return above > 0 && Math.abs(above - below) < 4;
+      });
+    // read down into it and through it with the wheel, the way a reader does: the header steps away and stays away
+    // (wheel steps of 80px: five carry the reader from just above the section into its first step, three more stay within it)
+    await page.evaluate((y) => window.scrollTo({ top: y - 200, behavior: "instant" }), top);
     await page.mouse.move(5, 5);
-    await page.mouse.wheel(0, 300);
-    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + viewport.height * 0.3);
-    await expect(page.locator(".hw-scroll")).toHaveAttribute("data-holding", "true");
-    await expect
-      .poll(() =>
-        page.evaluate(() => {
-          const header = document.querySelector(".site-bar")!.getBoundingClientRect();
-          const title = document.querySelector(".hw-scroll h2")!.getBoundingClientRect();
-          const scene = document.querySelector(".hw-scroll .hw-view")!.getBoundingClientRect();
-          const steps = document.querySelector(".hw-steps")!.getBoundingClientRect();
-          const above = title.top - header.bottom;
-          const below = window.innerHeight - Math.max(scene.bottom, steps.bottom);
-          return header.bottom > 0 && above > 0 && Math.abs(above - below) < 4;
-        }),
-      )
-      .toBe(true);
+    for (let step = 0; step < 5; step += 1) {
+      await page.mouse.wheel(0, 80);
+      await page.waitForTimeout(40);
+    }
+    // away means out of view, not only marked as away
+    const outOfView = () => header.evaluate((bar) => bar.getBoundingClientRect().bottom <= 1);
+    await expect(header).toHaveAttribute("data-hidden", "true");
+    await expect.poll(outOfView).toBe(true);
+    await expect.poll(centred).toBe(true);
+    for (let step = 0; step < 3; step += 1) {
+      await page.mouse.wheel(0, 80);
+      await page.waitForTimeout(40);
+      await expect(header).toHaveAttribute("data-hidden", "true");
+      await expect.poll(outOfView).toBe(true);
+    }
+    // a little back up brings the header back, and the block comes down with it, centred under it
+    await page.mouse.wheel(0, -80);
+    await expect(header).toHaveAttribute("data-hidden", "false");
+    await expect.poll(centred).toBe(true);
     await context.close();
   }
 });

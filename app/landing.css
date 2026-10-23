@@ -740,8 +740,8 @@
 /*
  * The section is held for 1.2 screens of scroll, 0.4 of a screen per step:
  * enough for each step to read, short enough that a flick carries past it.
- * Its first child holds still (sticky) under the header, which stays while
- * the section is held, and fills the screen left under it: --hw-room.
+ * Its first child holds still (sticky) in the room under the header,
+ * --hw-room, and is sized for that room.
  */
 .hw-scroll {
   --hw-bar: calc(4rem + 1px);
@@ -773,9 +773,26 @@
   padding-block: var(--site-head-gap);
 }
 
+/*
+ * The header keeps its own manners: on a wide window it steps away while
+ * reading down and comes back on the way up. When it has stepped away, the
+ * held block rises by half its height, so it is centred in the whole screen,
+ * and comes back down with it, on the header's own curve; either way it has
+ * as much room above as below.
+ */
+.hw-pin-inner {
+  transform: translateY(0);
+}
+
 @media (min-width: 48rem) {
-  :root:has(.hw-scroll[data-holding="true"]) .site-bar[data-hidden="true"] {
-    transform: none;
+  :root:has(.site-bar[data-hidden="true"]) .hw-scroll .hw-pin-inner {
+    transform: translateY(calc(var(--hw-bar) / -2));
+  }
+}
+
+@media (min-width: 48rem) and (prefers-reduced-motion: no-preference) {
+  .hw-scroll .hw-pin-inner {
+    transition: transform var(--dur-3) var(--ease-out);
   }
 }
 

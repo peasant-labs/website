@@ -63,7 +63,7 @@ export function HowItWorks({ title }: { title: string }) {
   // The scroll through the held section is cut in thirds, one per step; the current step's third fills its own bar.
   useHeldProgress(
     rootRef,
-    (progress, sectionHeld) => {
+    (progress) => {
       setActive(Math.min(SCENES.length - 1, Math.floor(progress * SCENES.length)));
       const root = rootRef.current;
       if (!root) return;
@@ -71,12 +71,6 @@ export function HowItWorks({ title }: { title: string }) {
         const own = Math.min(1, Math.max(0, progress * SCENES.length - index));
         fill.style.transform = `scaleX(${own})`;
       });
-      // from the moment the held block reaches the header until it lets go, the header stays (see app/landing.css)
-      const pin = root.querySelector<HTMLElement>(".hw-pin");
-      const reach = pin ? parseFloat(getComputedStyle(pin).top) || 0 : 0;
-      const box = root.getBoundingClientRect();
-      const holding = sectionHeld || (box.top <= reach + 1 && box.bottom > window.innerHeight);
-      if (root.dataset.holding !== String(holding)) root.dataset.holding = String(holding);
     },
     !reduced,
   );
