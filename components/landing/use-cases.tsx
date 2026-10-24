@@ -36,6 +36,14 @@ const CARDS: readonly Card[] = [
 
 /* a drag shorter than this is a click */
 const DRAG_PX = 6;
+/*
+ * How a drag's last tenth of a second sets the glide after it, how fast a glide may start (in pixels a
+ * millisecond, so it carries on for a card or so at most), and how much of its speed it keeps each 60th
+ * of a second.
+ */
+const FLICK_MS = 100;
+const GLIDE_MAX = 3;
+const GLIDE_KEEP = 0.92;
 /* after a touch lets go, the row waits this long before it moves on its own again */
 const TOUCH_REST_MS = 2400;
 /* the drift picks up its speed over this long when it starts or comes back from a hold */
@@ -52,8 +60,10 @@ const EASE_IN_MS = 600;
  * of the cards follows the first, hidden from assistive technology and out of
  * the tab order, and the row steps back by one set, without motion, when it
  * reaches it. It holds while hovered, keyboard-focused, touched, off screen
- * or in a background tab. It is a real scroll area, so a finger swipes it, the
- * arrow keys move it once it has focus, and a mouse can drag it; the drift
+ * or in a background tab. It is a real scroll area, so a finger swipes it, a
+ * wheel or trackpad scrolls it, and the arrow keys move it once it has focus.
+ * A mouse drags it one to one from anywhere on a card, round the loop either
+ * way, and a flick glides on briefly after the button lets go. The drift
  * carries on from wherever it was left. Under a quiet line, a short mark moves
  * with the row through the whole loop: a reading, not a control.
  *
@@ -69,7 +79,8 @@ export function UseCases() {
   if (onScreen && !near) setNear(true);
   const reduced = useReducedMotion();
   const [held, setHeld] = useState({ hover: false, focus: false, touch: false, drag: false });
-  const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
+  const drag = useRef<{ x: number; left: number; moved: boolean; trail: { t: number; x: number }[] } | null>(null);
+  const glide = useRef(0);
   const restTimer = useRef(0);
   const playing = onScreen && !reduced && !held.hover && !held.focus && !held.touch && !held.drag;
 
@@ -77,6 +88,12 @@ export function UseCases() {
   function setWidth(row: HTMLElement) {
     const clone = row.querySelector<HTMLElement>("[data-clone]");
     return clone ? clone.offsetLeft - (row.firstElementChild as HTMLElement).offsetLeft : 0;
+  }
+
+  /* a place anywhere along the endless row, as the same place in the first set */
+  function round(row: HTMLElement, left: number) {
+    const set = setWidth(row);
+    return set ? ((left % set) + set) % set : left;
   }
 
   // The drift: a few pixels a second, once per frame, back a set at the seam. The row keeps its own
@@ -142,12 +159,44 @@ export function UseCases() {
     };
   }, []);
 
-  useEffect(() => () => window.clearTimeout(restTimer.current), []);
+  useEffect(
+    () => () => {
+      window.clearTimeout(restTimer.current);
+      cancelAnimationFrame(glide.current);
+    },
+    [],
+  );
+
+  // A drag, and the glide after it, is over: the row snaps again under reduced motion, standing on the
+  // nearest card, and it may drift once the pointer leaves.
+  function settle(row: HTMLElement) {
+    glide.current = 0;
+    if (reduced) {
+      const cards = row.querySelectorAll<HTMLElement>(".uc-card");
+      const pitch = cards[1]!.offsetLeft - cards[0]!.offsetLeft;
+      row.scrollLeft = Math.round(row.scrollLeft / pitch) * pitch;
+    }
+    delete row.dataset.dragging;
+    setHeld((value) => ({ ...value, drag: false }));
+  }
 
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
     if (event.pointerType === "mouse") {
       if (event.button !== 0) return;
-      drag.current = { x: event.clientX, left: event.currentTarget.scrollLeft, moved: false };
+      // no text selection, no picture or link dragged out of the page; a click still clicks
+      event.preventDefault();
+      const row = event.currentTarget;
+      // a press stops a glide where it is
+      if (glide.current) {
+        cancelAnimationFrame(glide.current);
+        settle(row);
+      }
+      drag.current = {
+        x: event.clientX,
+        left: row.scrollLeft,
+        moved: false,
+        trail: [{ t: event.timeStamp, x: event.clientX }],
+      };
       return;
     }
     window.clearTimeout(restTimer.current);
@@ -157,28 +206,52 @@ export function UseCases() {
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
     const current = drag.current;
     if (!current) return;
+    const row = event.currentTarget;
     const dx = event.clientX - current.x;
-    if (!current.moved && Math.abs(dx) < DRAG_PX) return;
     if (!current.moved) {
+      if (Math.abs(dx) < DRAG_PX) return;
       current.moved = true;
-      event.currentTarget.setPointerCapture(event.pointerId);
+      row.setPointerCapture(event.pointerId);
+      // set at once, not on the next render: snapping must be off before the first move lands
+      row.dataset.dragging = "";
       setHeld((value) => ({ ...value, drag: true }));
     }
-    event.currentTarget.scrollLeft = current.left - dx;
+    row.scrollLeft = round(row, current.left - dx);
+    current.trail = [...current.trail.filter((point) => event.timeStamp - point.t < FLICK_MS), { t: event.timeStamp, x: event.clientX }];
   }
 
   function endPointer(event: PointerEvent<HTMLDivElement>) {
     if (event.pointerType === "mouse") {
       const current = drag.current;
       drag.current = null;
-      if (current?.moved) {
-        // a drag is not a click on the card under the pointer
-        event.currentTarget.addEventListener("click", (click) => click.preventDefault(), {
-          capture: true,
-          once: true,
-        });
-        setHeld((value) => ({ ...value, drag: false }));
+      if (!current?.moved) return;
+      const row = event.currentTarget;
+      // a drag is not a click on the card under the pointer
+      const swallow = (click: MouseEvent) => click.preventDefault();
+      row.addEventListener("click", swallow, { capture: true, once: true });
+      window.setTimeout(() => row.removeEventListener("click", swallow, { capture: true }));
+      // a flick glides on, slowing to a stop; a drag that came to rest before letting go stays put
+      const recent = current.trail.filter((point) => event.timeStamp - point.t < FLICK_MS);
+      const first = recent[0];
+      const last = recent.at(-1);
+      const flick = first && last && last.t > first.t ? -(last.x - first.x) / (last.t - first.t) : 0;
+      let speed = Math.max(-GLIDE_MAX, Math.min(GLIDE_MAX, flick));
+      if (reduced || Math.abs(speed) < 0.1) {
+        settle(row);
+        return;
       }
+      let at = row.scrollLeft;
+      let then = performance.now();
+      const step = (now: number) => {
+        const dt = now - then;
+        then = now;
+        at = round(row, at + speed * dt);
+        row.scrollLeft = at;
+        speed *= GLIDE_KEEP ** (dt / (1000 / 60));
+        if (Math.abs(speed) > 0.02) glide.current = requestAnimationFrame(step);
+        else settle(row);
+      };
+      glide.current = requestAnimationFrame(step);
       return;
     }
     window.clearTimeout(restTimer.current);
@@ -241,7 +314,7 @@ export function UseCases() {
               data-use-case={clone ? undefined : card.id}
             >
               <figure className="uc-figure">
-                <Art art={card.art} className="uc-art" near={near} />
+                <Art art={card.art} className="uc-art" near={near} draggable={false} />
               </figure>
               <p className="uc-tag">
                 <LandingIcon name={card.icon} className="uc-ic" />

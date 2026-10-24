@@ -508,6 +508,21 @@
   }
 }
 
+/* while a mouse drags it: no snapping to fight the hand, no text selected, and the grabbing hand everywhere on it */
+.uc[data-dragging] {
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+.uc[data-dragging],
+.uc[data-dragging] * {
+  cursor: grabbing;
+}
+
+.uc img {
+  -webkit-user-drag: none;
+}
+
 /*
  * The drift glides past every card without settling. Under reduced motion the
  * row only moves by hand, and then it settles on a whole card.

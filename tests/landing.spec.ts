@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -580,6 +580,136 @@ test("the row drifts slowly and evenly without settling, loops without a seam, h
   await page.mouse.move(0, 0);
   await page.waitForTimeout(1500);
   expect(await row.evaluate((element) => element.scrollLeft)).toBe(0);
+});
+
+/* where the row stands, and where the line's mark stands along the line, as a share of it */
+async function rowAndMark(page: Page) {
+  return page.evaluate(() => {
+    const row = document.querySelector<HTMLElement>("[data-use-cases]")!;
+    const line = document.querySelector(".uc-progress")!.getBoundingClientRect();
+    const mark = document.querySelector(".uc-progress-mark")!.getBoundingClientRect();
+    const clone = row.querySelector<HTMLElement>("[data-clone]")!;
+    return {
+      left: row.scrollLeft,
+      mark: (mark.left - line.left) / line.width,
+      set: clone.offsetLeft - (row.firstElementChild as HTMLElement).offsetLeft,
+      selected: String(window.getSelection()),
+      dragging: row.hasAttribute("data-dragging"),
+    };
+  });
+}
+
+/* press, move the mouse by dx in even steps, and hold still before letting go unless it is a flick */
+async function dragBy(page: Page, x: number, y: number, dx: number, { flick = false } = {}) {
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  const steps = flick ? 5 : 15;
+  for (let index = 1; index <= steps; index += 1) {
+    await page.mouse.move(x + (dx * index) / steps, y);
+    if (!flick) await page.waitForTimeout(16);
+  }
+  // a flick lets go while still moving; read only after, so the release lands inside the flick
+  if (flick) {
+    await page.mouse.up();
+    return rowAndMark(page);
+  }
+  const during = await rowAndMark(page);
+  await page.waitForTimeout(200);
+  await page.mouse.up();
+  return during;
+}
+
+test("a mouse drags the row one to one from a picture or the words, round the loop either way, and the line moves with it", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  const card = row.locator(".uc-card:not([aria-hidden])").nth(1);
+  for (const part of [".uc-figure", ".uc-cap-detail"]) {
+    const box = (await card.locator(part).boundingBox())!;
+    const [x, y] = [box.x + box.width / 2, box.y + box.height / 2];
+    await page.mouse.move(x, y);
+    await expect(row).toHaveAttribute("data-playing", "false");
+    const before = await rowAndMark(page);
+    const during = await dragBy(page, x, y, -300);
+    expect(Math.abs(during.left - before.left - 300), `a drag from ${part} did not move the row with the hand`).toBeLessThan(4);
+    expect(during.dragging).toBe(true);
+    expect(during.mark - before.mark, `the line did not follow a drag from ${part}`).toBeCloseTo(300 / before.set, 2);
+    await page.waitForTimeout(400);
+    const after = await rowAndMark(page);
+    // a drag that came to rest before letting go stays where the hand left it, with nothing selected
+    expect(Math.abs(after.left - during.left)).toBeLessThan(2);
+    expect(after.selected).toBe("");
+    expect(after.dragging).toBe(false);
+  }
+
+  // dragged back past the first card, it comes round from the docs card's side, the line with it
+  await row.evaluate((element) => element.scrollTo({ left: 100, behavior: "instant" }));
+  const box = (await card.locator(".uc-figure").boundingBox())!;
+  const back = await dragBy(page, box.x + box.width / 2, box.y + box.height / 2, 300);
+  expect(Math.abs(back.left - (back.set - 200))).toBeLessThan(4);
+  expect(back.mark).toBeGreaterThan(0.9);
+
+  // a flick glides on after letting go, and comes to a stop
+  const flung = await dragBy(page, box.x + box.width / 2, box.y + box.height / 2, -200, { flick: true });
+  await page.waitForTimeout(1200);
+  const glided = await rowAndMark(page);
+  expect(glided.left - flung.left, "a flick did not glide on").toBeGreaterThan(20);
+  await page.waitForTimeout(400);
+  expect((await rowAndMark(page)).left).toBe(glided.left);
+});
+
+test("under reduced motion a drag still moves the row, then it stands on the nearest card, with no glide", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  const box = (await row.locator(".uc-card:not([aria-hidden])").nth(1).locator(".uc-figure").boundingBox())!;
+  const during = await dragBy(page, box.x + box.width / 2, box.y + box.height / 2, -300);
+  expect(Math.abs(during.left - 300)).toBeLessThan(4);
+  const pitch = await row.evaluate((element) => {
+    const cards = element.querySelectorAll<HTMLElement>(".uc-card");
+    return cards[1]!.offsetLeft - cards[0]!.offsetLeft;
+  });
+  await expect.poll(async () => (await rowAndMark(page)).left).toBe(pitch);
+  expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("x mandatory");
+});
+
+test("the wheel scrolls the row, and the line moves with it", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  await row.hover();
+  await expect(row).toHaveAttribute("data-playing", "false");
+  const before = await rowAndMark(page);
+  await page.mouse.wheel(300, 0);
+  await expect.poll(async () => (await rowAndMark(page)).left - before.left).toBeGreaterThan(290);
+  const after = await rowAndMark(page);
+  expect(after.mark - before.mark).toBeCloseTo((after.left - before.left) / before.set, 2);
+});
+
+test("a click that barely moves is still a click: the docs card opens the docs", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  await row.hover();
+  await row.evaluate((element) => {
+    const cards = [...element.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
+    element.scrollTo({ left: cards.at(-1)!.offsetLeft - cards[0]!.offsetLeft, behavior: "instant" });
+  });
+  const link = (await row.locator(".uc-cta").first().boundingBox())!;
+  await page.mouse.move(link.x + 20, link.y + link.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(link.x + 23, link.y + link.height / 2);
+  await page.mouse.up();
+  await expect(page).toHaveURL(new RegExp(`${fixture.useCases.more.cta.href}$`));
 });
 
 test("on a phone the row drifts too, holds under a finger, and moves on again after it lets go", async ({ browser }) => {

@@ -22,6 +22,7 @@ export function Art({
   className,
   important = false,
   near = false,
+  draggable,
 }: {
   art: ArtSource;
   className?: string;
@@ -29,6 +30,8 @@ export function Art({
   important?: boolean;
   /** in a scroll row that is about to show: load now, both tones, rather than as each card scrolls in */
   near?: boolean;
+  /** false where a drag moves something else, such as a row dragged by hand */
+  draggable?: boolean;
 }) {
   const common = {
     width: art.width,
@@ -36,6 +39,7 @@ export function Art({
     unoptimized: true,
     fetchPriority: important ? "high" : undefined,
     loading: near ? "eager" : "lazy",
+    draggable,
   } as const;
 
   return (
