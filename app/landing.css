@@ -1187,17 +1187,11 @@
  * --mac-u, so a small screen scales the whole chrome down in proportion.
  */
 
-/* the system face: the windows' chrome, and the thread on X, which a phone shows without a window around it */
-.mac-desk,
-.mac-win,
-.lp-x {
-  --mac-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
 .mac-desk,
 .mac-win {
   /* the dark appearance, with the site's dark theme */
   --mac-u: 1px;
+  --mac-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mac-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --mac-bar-bg: #2d2d2d;
   --mac-bar-rule: #0d0d0d;
@@ -1469,19 +1463,6 @@
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-}
-
-/* the page's icon, before its address, as Safari shows it */
-.mac-address-icon {
-  display: inline-flex;
-  vertical-align: -0.15em;
-  margin-inline-end: calc(5 * var(--mac-u));
-}
-
-.mac-address-icon svg {
-  width: calc(13 * var(--mac-u));
-  height: calc(13 * var(--mac-u));
-  color: var(--mac-field-ink);
 }
 
 .mac-body {
@@ -2429,33 +2410,20 @@
 /* a published session */
 
 /*
- * Four windows, layered back to front: Claude Code behind and up to the left,
- * the transcript in front and wide, the thread on X over the transcript's
- * lower right edge, and the pull request's check over its lower left edge.
- * From a tablet's width only: a phone shows a short slice of the session and
- * the thread without its window instead (.lp-phone and .lp-phone-x, below).
+ * Three windows, layered: Claude Code behind and up to the left, the transcript
+ * in front and wide, the pull request's check over the front window's lower
+ * left edge. From a tablet's width only: a phone shows a short slice of the
+ * session instead (.lp-phone, below).
  */
 .lp-windows {
   --lp-windows-x: clamp(1rem, 6vw, 5rem);
-  /* how far the thread stands out past the transcript's right edge */
-  --lp-windows-x-end: clamp(1rem, 4vw, 3.5rem);
-  /* the transcript window's body: one height whatever it shows (.lp-session-win, below) */
-  --lp-windows-body: clamp(32rem, 78svh, 48rem);
   /* the room under the front window for the check that hangs from its corner */
   --lp-check-room: 5.5rem;
-  /* how far up the transcript's body the thread over its lower right corner reaches */
-  --lp-windows-x-overlap: calc(0.3 * var(--lp-windows-body));
 
   position: relative;
   min-width: 0;
-  padding-block-start: clamp(2.5rem, 6vw, 4.5rem);
-  padding-inline: var(--lp-windows-x) var(--lp-windows-x-end);
-}
-
-/* the transcript and the check that hangs from it; it sets no layer of its own, so all four windows share one */
-.lp-windows-stage {
-  position: relative;
-  padding-block-end: var(--lp-check-room);
+  padding-block: clamp(2.5rem, 6vw, 4.5rem) var(--lp-check-room);
+  padding-inline-start: var(--lp-windows-x);
 }
 
 .lp-windows-term {
@@ -2488,15 +2456,14 @@
  */
 .lp-check {
   position: absolute;
-  z-index: 3;
+  z-index: 2;
   inset-block-start: calc(100% - var(--lp-check-room) - 0.75rem);
-  /* from the column's left edge, as wide as the column allows: the stage it hangs in is inset by the windows' offsets */
-  inset-inline-start: calc(-1 * var(--lp-windows-x));
+  inset-inline-start: 0;
   pointer-events: none;
   display: flex;
   align-items: flex-start;
   gap: var(--sp-3);
-  max-width: calc(100% + var(--lp-windows-x) + var(--lp-windows-x-end) - var(--sp-5));
+  max-width: calc(100% - var(--sp-5));
   padding: var(--sp-4) var(--sp-5);
   border: var(--bd-strong);
   background: var(--canvas);
@@ -2539,23 +2506,7 @@
  */
 .lp-session-win .mac-body {
   flex: none;
-  block-size: var(--lp-windows-body);
-}
-
-/*
- * The thread on X hangs from the transcript's lower right corner: its top
- * across the lowest part of the transcript, under the middle of the
- * filters' strip so their rail still opens and scrolls; its right edge out
- * past the transcript's on the column's edge; the rest of it below. It is in
- * the flow, so the section makes room for however tall it draws.
- */
-.lp-windows-x {
-  position: relative;
-  z-index: 2;
-  /* at a tablet's width it takes more of the row, so the card it carries still reads */
-  width: min(30rem, 60%);
-  margin-block-start: calc(-1 * (var(--lp-check-room) + var(--lp-windows-x-overlap)));
-  margin-inline: auto calc(-1 * var(--lp-windows-x-end));
+  block-size: clamp(32rem, 78svh, 48rem);
 }
 
 /*
@@ -2648,34 +2599,18 @@
   overflow-x: hidden;
 }
 
-/*
- * Where the windows stand, the thread covers the columns' lowest part, so a
- * control a keyboard moves to scrolls up clear of it rather than stopping
- * under it.
- */
-@media (min-width: 48rem) {
-  .lp-windows .lp-viewer :is(.txn-stream, .txn-rail-body) {
-    scroll-padding-block-end: var(--lp-windows-x-overlap);
-  }
-}
-
 /* the conversation has most of the window, so a turn's prose runs its width rather than wrapping early */
 .lp-viewer .txn-body > :is(.txn-md-prose, .txn-md-list, .txn-md-heading, .txn-md-blockquote) {
   max-inline-size: none;
 }
 
-/* the first time they come into view, the back window, the thread and the check fan out from behind the front one */
+/* the first time they come into view, the back window and the check fan out from behind the front one */
 @media (prefers-reduced-motion: no-preference) {
   .lp-windows-term,
-  .lp-windows-x,
   .lp-check {
     transition:
       transform 1000ms var(--ease-spring),
       opacity 600ms var(--ease-out);
-  }
-
-  .lp-windows-x {
-    transition-delay: 120ms;
   }
 
   .lp-check {
@@ -2687,339 +2622,9 @@
     transform: translate3d(18%, 2.5rem, 0) scale(0.94);
   }
 
-  .js-reveal .lp-windows[data-fanned="false"] .lp-windows-x {
-    opacity: 0;
-    transform: translate3d(-14%, -2.5rem, 0) scale(0.94);
-  }
-
   .js-reveal .lp-windows[data-fanned="false"] .lp-check {
     opacity: 0;
     transform: translate3d(0, 1.5rem, 0);
-  }
-}
-
-/*
- * A thread on X, drawn as X draws it in its dark appearance, in both of the
- * site's themes: it is a picture of X, so X's own colours, sizes and the
- * system face apply inside the window, not fairtrade's. Posts sit on a 40px
- * avatar column with X's 12px by 16px padding; a reply in the same
- * conversation hangs from a 2px line under the avatar before it.
- */
-.lp-x-win .mac-body {
-  background: #000000;
-}
-
-.lp-x {
-  --lp-x-ink: #e7e9ea;
-  --lp-x-ink-2: #71767b;
-  --lp-x-rule: #2f3336;
-  --lp-x-line: #333639;
-
-  background: #000000;
-  color: var(--lp-x-ink);
-  font-family: var(--mac-font);
-  font-size: 15px;
-  letter-spacing: normal;
-  line-height: 20px;
-  text-transform: none;
-  word-spacing: normal;
-}
-
-.lp-x-top {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 53px;
-  border-bottom: 1px solid var(--lp-x-rule);
-}
-
-.lp-x-logo {
-  width: 26px;
-  height: 26px;
-  color: var(--lp-x-ink);
-}
-
-.lp-x-post {
-  position: relative;
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  column-gap: 8px;
-  padding: 12px 16px;
-}
-
-/* a reply in the same conversation follows the line, with no rule between them */
-.lp-x-post[data-linked="true"] + .lp-x-post {
-  padding-block-start: 4px;
-}
-
-.lp-x-post:last-child {
-  border-bottom: 1px solid var(--lp-x-rule);
-}
-
-.lp-x-gutter {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.lp-x-avatar {
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.lp-x-avatar-mira {
-  background:
-    radial-gradient(circle at 50% 38%, #f3d2b8 0 22%, transparent 23%),
-    radial-gradient(circle at 50% 100%, #2b6f6a 0 45%, transparent 46%),
-    linear-gradient(160deg, #9fd4c9, #5b8fd6);
-}
-
-.lp-x-avatar-doofus {
-  background:
-    radial-gradient(circle at 38% 42%, #1b1b1b 0 6%, transparent 7%),
-    radial-gradient(circle at 62% 42%, #1b1b1b 0 6%, transparent 7%),
-    radial-gradient(circle at 50% 50%, #ffcf4a 0 40%, transparent 41%),
-    linear-gradient(200deg, #ff7a45, #c2185b);
-}
-
-.lp-x-line {
-  flex: 1;
-  width: 2px;
-  margin-block: 4px -12px;
-  background: var(--lp-x-line);
-}
-
-.lp-x-main {
-  min-width: 0;
-}
-
-.lp-x-head {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-  white-space: nowrap;
-}
-
-.lp-x-name {
-  overflow: hidden;
-  color: var(--lp-x-ink);
-  font-weight: 700;
-  text-overflow: ellipsis;
-}
-
-.lp-x-handle {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.lp-x-handle,
-.lp-x-sep,
-.lp-x-time {
-  color: var(--lp-x-ink-2);
-}
-
-.lp-x-sep,
-.lp-x-time {
-  flex: none;
-}
-
-/* the pause a screen reader makes between a handle and its time, where the eye has X's separator */
-.lp-x-pause {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-.lp-x-more {
-  display: flex;
-  flex: none;
-  margin-inline-start: auto;
-  color: var(--lp-x-ink-2);
-}
-
-.lp-x-more svg {
-  width: 18.75px;
-  height: 18.75px;
-}
-
-.lp-x-text {
-  margin-block-start: 2px;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-
-/* a post's picture or link card: X's rounded frame with its hairline */
-.lp-x-media,
-.lp-x-card {
-  margin-block-start: 12px;
-  overflow: hidden;
-  border: 1px solid var(--lp-x-rule);
-  border-radius: 16px;
-}
-
-/* the chart, as a quick plot draws one: a white page, a title, light grid lines, one colour of bar */
-.lp-x-chart {
-  padding: 14px 16px 12px;
-  background: #ffffff;
-  color: #1f1f1f;
-  font-size: 13px;
-  line-height: 16px;
-}
-
-.lp-x-chart-title {
-  margin-block-end: 8px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.lp-x-bars {
-  display: flex;
-  gap: 18px;
-  padding-inline: 6px;
-  background: repeating-linear-gradient(to top, #e4e4e4 0 1px, transparent 1px 25%) 0 0 / 100% 104px no-repeat;
-}
-
-.lp-x-bar {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: stretch;
-  min-width: 0;
-}
-
-.lp-x-bar-plot {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  height: 104px;
-  border-bottom: 1px solid #555555;
-}
-
-.lp-x-bar-value {
-  margin-block-end: 2px;
-  font-size: 12px;
-}
-
-.lp-x-bar-fill {
-  align-self: stretch;
-  height: calc(var(--lp-x-bar) * 0.84);
-  background: #4c72b0;
-}
-
-.lp-x-bar-label {
-  margin-block-start: 4px;
-  overflow: hidden;
-  font-size: 12px;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/*
- * The link card: fairtrade's card at its own 1200 by 600 pixels, scaled to
- * the frame's width, its hairline drawn over it so the frame stays exactly
- * 2:1. The frame is a size container, so the scale is its width over 1200
- * in CSS alone, right before any script runs. Nothing here styles what the
- * card draws inside itself.
- */
-.lp-x-card {
-  position: relative;
-  container-type: inline-size;
-  aspect-ratio: 2 / 1;
-  border: 0;
-  background: #0b0b0a;
-}
-
-.lp-x-card::after {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px var(--lp-x-rule);
-  content: "";
-  pointer-events: none;
-}
-
-.lp-x-card-scale {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  width: 1200px;
-  height: 600px;
-  /* the ratio of two lengths: atan2 then tan where a length cannot yet divide a length */
-  transform: scale(tan(atan2(100cqw, 1200px)));
-  transform: scale(calc(100cqw / 1200px));
-  transform-origin: 0 0;
-}
-
-.lp-x-from {
-  margin-block-start: 4px;
-  color: var(--lp-x-ink-2);
-  font-size: 13px;
-  line-height: 16px;
-}
-
-.lp-x-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 600px;
-  margin-block-start: 12px;
-  color: var(--lp-x-ink-2);
-  font-size: 13px;
-  line-height: 16px;
-}
-
-.lp-x-action,
-.lp-x-action-end {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.lp-x-action-end {
-  gap: 12px;
-}
-
-.lp-x-action svg {
-  width: 18.75px;
-  height: 18.75px;
-}
-
-/*
- * On a phone the thread follows the session's slice at the column's width,
- * with no window around it. The card leaves the avatar column and takes the
- * post's whole width, with X's narrower phone padding, so its prompt still
- * reads at a small phone's width.
- */
-.lp-phone-x {
-  display: none;
-}
-
-@media (max-width: 47.99rem) {
-  .lp-phone-x {
-    display: block;
-    min-width: 0;
-    margin-block-start: var(--sp-6);
-  }
-
-  .lp-phone-x .lp-x-post {
-    padding-inline: 12px;
-  }
-
-  .lp-phone-x :is(.lp-x-card, .lp-x-from) {
-    margin-inline-start: -48px;
-  }
-
-  /* out from the avatar column, the card starts below the avatar rather than over it */
-  .lp-phone-x .lp-x-card {
-    margin-block-start: 28px;
   }
 }
 

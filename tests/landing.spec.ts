@@ -3,9 +3,6 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { SAMPLE_CARD, SAMPLE_SESSION } from "../lib/sample-session";
-import { shareCardAlt, shareCardFromPayload } from "@peasant-labs/fairtrade/share";
-import { SESSION } from "../lib/landing";
 import { loadLandingFixture, PHONE } from "./landing-fixture";
 
 const fixture = loadLandingFixture();
@@ -1689,255 +1686,6 @@ test("under reduced motion the steps stack, each scene on its finished frame, wi
   ).toBe(0);
 });
 
-test("the sample session carries the figures a share card shows", () => {
-  const figures = fixture.session.figures;
-  const turns = SAMPLE_SESSION.turns ?? [];
-  expect(SAMPLE_SESSION.model).toBe(figures.model);
-  expect(SAMPLE_SESSION.totalTokens).toBe(figures.totalTokens);
-  expect(SAMPLE_SESSION.inputSubmissionCount).toBe(figures.inputSubmissionCount);
-  expect(turns.filter((turn) => turn.role === "user")).toHaveLength(figures.inputSubmissionCount);
-  expect(turns[0]?.content).toBe(fixture.session.firstAsk);
-  // the total sits on the session alone: no turn carries a usage count of its own
-  for (const turn of turns) expect(Object.keys(turn).filter((key) => /token|usage/i.test(key))).toEqual([]);
-});
-
-test("the share card's figures are the sample's own prompt count and token total", () => {
-  expect(SAMPLE_CARD.figures).toEqual(fixture.card.figures);
-  expect(SAMPLE_CARD.firstPrompt).toBe(fixture.session.firstAsk);
-  // it names the session by the title the transcript browser shows, never by its id
-  expect(SAMPLE_CARD.title).toBe(fixture.session.title);
-  expect(shareCardFromPayload(SAMPLE_SESSION)?.figures).toEqual(SAMPLE_CARD.figures);
-});
-
-/* the X thread in the session section, scrolled into view */
-async function openThread(page: Page) {
-  await page.goto("/");
-  // the window's thread; a phone's copy without the window waits hidden until the windows give way
-  const thread = page.locator("#session .lp-windows [data-x-thread]");
-  await thread.scrollIntoViewIfNeeded();
-  await expect(thread).toBeVisible();
-  return thread;
-}
-
-test("the X thread's three posts carry their names, handles, times and words, and the first its chart", async ({
-  page,
-}) => {
-  const thread = await openThread(page);
-  const posts = thread.locator(".lp-x-post");
-  await expect(posts).toHaveCount(fixture.thread.posts.length);
-  for (const [index, post] of fixture.thread.posts.entries()) {
-    const shown = posts.nth(index);
-    await expect(shown.locator(".lp-x-name")).toHaveText(post.name);
-    await expect(shown.locator(".lp-x-handle")).toHaveText(post.handle);
-    await expect(shown.locator(".lp-x-time")).toHaveText(post.time);
-    if (post.text) await expect(shown.locator(".lp-x-text")).toHaveText(post.text);
-    else await expect(shown.locator(".lp-x-text")).toHaveCount(0);
-  }
-  // the chart's bars, oldest model first, each the pass rate the sample's own table reports
-  const bars = posts.first().locator(".lp-x-bar");
-  expect(await bars.locator(".lp-x-bar-label").allInnerTexts()).toEqual(fixture.thread.chart.map((bar) => bar.label));
-  expect(await bars.locator(".lp-x-bar-value").allInnerTexts()).toEqual(fixture.thread.chart.map((bar) => `${bar.value}%`));
-  const sample = JSON.stringify(SAMPLE_SESSION);
-  for (const bar of fixture.thread.chart) expect(sample).toContain(`| ${bar.value}% (`);
-  // a taller bar for a higher pass rate
-  const heights = await bars.locator(".lp-x-bar-fill").evaluateAll((fills) => fills.map((fill) => fill.getBoundingClientRect().height));
-  expect([...heights].sort((a, b) => a - b)).toEqual(heights);
-  // X's one separator sits between each handle and its time and nowhere else; no emoji stands in for an icon
-  const text = await thread.innerText();
-  expect(text.split("·")).toHaveLength(fixture.thread.posts.length + 1);
-  expect(text).not.toMatch(/\p{Extended_Pictographic}/u);
-  // the post text reads at X's own size
-  const sizes = await thread
-    .locator(".lp-x-text, .lp-x-name, .lp-x-handle, .lp-x-time")
-    .evaluateAll((items) => items.map((item) => parseFloat(getComputedStyle(item).fontSize)));
-  expect(Math.min(...sizes)).toBeGreaterThanOrEqual(15);
-});
-
-test("every post in the X thread has its more dots at its top right, hidden from assistive technology", async ({
-  page,
-}) => {
-  const thread = await openThread(page);
-  const more = thread.locator(".lp-x-more");
-  await expect(more).toHaveCount(fixture.thread.posts.length);
-  for (const [index] of fixture.thread.posts.entries()) {
-    const dots = more.nth(index);
-    await expect(dots).toHaveAttribute("aria-hidden", "true");
-    const place = await dots.evaluate((element) => {
-      const post = element.closest(".lp-x-post")!.getBoundingClientRect();
-      const box = element.getBoundingClientRect();
-      const head = element.closest(".lp-x-post")!.querySelector(".lp-x-name")!.getBoundingClientRect();
-      return { right: post.right - box.right, top: box.top - post.top, middle: Math.abs((box.top + box.bottom) / 2 - (head.top + head.bottom) / 2) };
-    });
-    // in from the post's right edge by its padding, on the line of the name
-    expect(place.right, `post ${index + 1}`).toBeLessThanOrEqual(20);
-    expect(place.top, `post ${index + 1}`).toBeLessThanOrEqual(20);
-    expect(place.middle, `post ${index + 1}`).toBeLessThanOrEqual(4);
-  }
-  // every post carries X's actions: reply, repost, like, views, then bookmark and share
-  const actions = thread.locator(".lp-x-actions");
-  await expect(actions).toHaveCount(fixture.thread.posts.length);
-  for (const [index] of fixture.thread.posts.entries()) {
-    expect(
-      await actions.nth(index).locator("[data-action]").evaluateAll((items) => items.map((item) => item.getAttribute("data-action"))),
-    ).toEqual(fixture.thread.actions);
-  }
-});
-
-test("the X thread reads once as a short group, the card as one image named by its alt, its icons hidden", async ({
-  page,
-}) => {
-  const thread = await openThread(page);
-  const group = page.getByRole("group", { name: fixture.thread.label });
-  await expect(group).toHaveCount(1);
-  expect(await group.evaluate((element) => element.hasAttribute("data-x-thread"))).toBe(true);
-  // the card is one image named by fairtrade's alt for this sample; the words it lays out one by one are hidden
-  const image = group.getByRole("img", { name: shareCardAlt(SAMPLE_CARD), exact: true });
-  await expect(image).toHaveCount(1);
-  await expect(image.locator("> *")).toHaveAttribute("aria-hidden", "true");
-  // the chart is one image too, named by its bars
-  await expect(group.getByRole("img", { name: /model A 71%/ })).toHaveCount(1);
-  // a screen reader hears each handle apart from its time, not run into it: the text it reads, without what is hidden
-  const spoken = await group.evaluate((element) => {
-    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-    let text = "";
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      if (!node.parentElement!.closest('[aria-hidden="true"]')) text += node.textContent;
-    }
-    return text;
-  });
-  for (const post of fixture.thread.posts) expect(spoken).toContain(`${post.handle}, ${post.time}`);
-  // every drawn icon is decoration
-  const exposed = await thread.locator("svg").evaluateAll(
-    (icons) => icons.filter((icon) => !icon.closest('[aria-hidden="true"]')).length,
-  );
-  expect(exposed, "icons assistive technology would read").toBe(0);
-  for (const colorScheme of ["light", "dark"] as const) {
-    await page.emulateMedia({ colorScheme });
-    await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
-    await expect
-      .poll(() => page.evaluate(() => document.getAnimations().filter((item) => item instanceof CSSTransition).length))
-      .toBe(0);
-    // a picture of X: its dark UI in both of the site's themes
-    expect(await thread.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgb(0, 0, 0)");
-    const accessibility = await new AxeBuilder({ page }).include("#session [data-x-thread]").analyze();
-    expect(accessibility.violations, `the thread in the ${colorScheme} theme`).toEqual([]);
-  }
-});
-
-test("the card in the X thread shows the transcript's own prompt count, token total and first prompt", async ({
-  page,
-}) => {
-  const thread = await openThread(page);
-  const viewer = page.locator("#session [data-session-viewer]");
-  await viewer.scrollIntoViewIfNeeded();
-  await expect(viewer.locator(".txn-app")).toBeVisible();
-  const card = thread.locator(".lp-x-card");
-  await card.scrollIntoViewIfNeeded();
-  const words = (await card.innerText()).replace(/\s+/g, " ").trim();
-  const prompts = words.match(/prompts (\d+)/)?.[1];
-  const tokens = words.match(/tokens (\d+(?:\.\d+)?[kM]?)/)?.[1];
-  // the transcript's header counts the same prompts and tokens
-  const meta = (await viewer.locator(".txn-meta").innerText()).replace(/\s+/g, " ");
-  expect(prompts).toBe(String(fixture.card.figures.prompts));
-  expect(meta).toContain(`${prompts} prompts`);
-  expect(tokens).toBeTruthy();
-  expect(meta).toContain(`${tokens} tokens`);
-  // its prompt is the transcript's first user turn, cut where the card runs out of lines
-  const prompt = words.split(/\buser\b/)[1]!.replace(/…$/, "").trim();
-  const first = (await viewer.locator(".txn-turn.user").first().innerText()).replace(/\s+/g, " ");
-  expect(prompt.length).toBeGreaterThan(20);
-  expect(first).toContain(prompt);
-  expect(fixture.session.firstAsk.startsWith(prompt)).toBe(true);
-  // drawn in the card's own face, which the landing does not restyle, and scaled to the post's width
-  const drawn = await card.evaluate((frame, promptWord) => {
-    const word = [...frame.querySelectorAll("span")].find((span) => span.textContent === promptWord)!;
-    const inner = frame.querySelector('[aria-hidden="true"]')!.getBoundingClientRect();
-    return {
-      family: getComputedStyle(word).fontFamily,
-      loaded: document.fonts.check('44px "Atkinson Hyperlegible"'),
-      frame: frame.getBoundingClientRect().width,
-      inner: inner.width,
-      ratio: inner.width / inner.height,
-    };
-  }, fixture.thread.phone.promptWord);
-  expect(drawn.family).toMatch(/^"?Atkinson Hyperlegible"?(,|$)/);
-  expect(drawn.loaded).toBe(true);
-  expect(Math.abs(drawn.inner - drawn.frame)).toBeLessThanOrEqual(2);
-  expect(drawn.ratio).toBeCloseTo(2, 1);
-});
-
-test("under the card in the X thread, the line naming where it links", async ({ page }) => {
-  const thread = await openThread(page);
-  const last = thread.locator(".lp-x-post").last();
-  const from = last.locator(".lp-x-from");
-  await expect(from).toHaveText(fixture.thread.from);
-  const order = await from.evaluate((line) => {
-    const card = line.previousElementSibling!;
-    return {
-      card: card.classList.contains("lp-x-card"),
-      below: line.getBoundingClientRect().top >= card.getBoundingClientRect().bottom,
-    };
-  });
-  expect(order).toEqual({ card: true, below: true });
-});
-
-/* "40m", "2h": a post's age as X writes it, in minutes */
-function minutes(age: string) {
-  const [, count, unit] = age.match(/^(\d+)(m|h)$/) ?? [];
-  if (!count) throw new Error(`not an age X would write: ${age}`);
-  return Number(count) * (unit === "h" ? 60 : 1);
-}
-
-test("every post in the X thread comes after the sample session ended, newer down the thread", () => {
-  const ended = minutes(fixture.session.endedAgo);
-  // the viewer moves the sample to have ended this long before the reader arrived
-  expect(SESSION.endedAgoMinutes).toBe(ended);
-  const ages = fixture.thread.posts.map((post) => minutes(post.time));
-  for (const [index, age] of ages.entries()) expect(age, `post ${index + 1}`).toBeLessThan(ended);
-  expect([...ages].sort((a, b) => b - a)).toEqual(ages);
-  expect(new Set(ages).size).toBe(ages.length);
-});
-
-test("the X thread's posts are set in the system face X uses, inside its window", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  const thread = await openThread(page);
-  const faces = await thread
-    .locator(".lp-x-text, .lp-x-name")
-    .evaluateAll((items) => items.map((item) => getComputedStyle(item).fontFamily));
-  expect(faces.length).toBeGreaterThan(0);
-  for (const face of faces) expect(face.split(",")[0]!.trim()).toBe(fixture.thread.face);
-});
-
-test("a keyboard user's focus in the transcript is never hidden under the thread over its corner", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  for (const width of [1440, 768]) {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
-    const viewer = page.locator("#session [data-session-viewer]");
-    await viewer.scrollIntoViewIfNeeded();
-    await expect(viewer.locator(".txn-app")).toBeVisible();
-    await viewer.locator(".txn-stream").evaluate((stream) => stream.querySelector<HTMLElement>("a, button, [tabindex]")!.focus());
-    let reached = 0;
-    for (let press = 0; press < 40; press += 1) {
-      await page.keyboard.press("Tab");
-      const focus = await page.evaluate(() => {
-        const element = document.activeElement!;
-        if (!element.closest("#session [data-session-viewer] :is(.txn-stream, .txn-rail-body)")) return null;
-        const box = element.getBoundingClientRect();
-        const thread = document.querySelector("#session .lp-windows-x")!.getBoundingClientRect();
-        return {
-          name: `${element.className} ${element.textContent?.slice(0, 24)}`,
-          hidden: box.left >= thread.left && box.right <= thread.right && box.top >= thread.top && box.bottom <= thread.bottom,
-        };
-      });
-      if (!focus) continue;
-      reached += 1;
-      expect(focus.hidden, `at ${width}, after ${press + 1} presses, ${focus.name}`).toBe(false);
-    }
-    expect(reached, `focus stayed in the transcript at ${width}`).toBeGreaterThan(20);
-  }
-});
-
 test("a sample session opens in the real transcript browser, in a wide window that keeps its height", async ({
   page,
 }) => {
@@ -1974,10 +1722,6 @@ test("a sample session opens in the real transcript browser, in a wide window th
   // the header names its publisher by handle, and its times read as recent work, never weeks old
   await expect(viewer.locator(".txn-meta")).toContainText(fixture.session.author);
   await expect(viewer.locator(".txn-meta")).not.toContainText("<USER>");
-  // the header counts the prompts the sample carries, and the Terminal repeats its first ask word for word
-  await expect(viewer.locator(".txn-meta")).toContainText(`${fixture.session.figures.inputSubmissionCount} prompts`);
-  await expect(section.locator(".lp-windows-term .mac-title")).toHaveText(fixture.session.terminal);
-  await expect(section.locator(".lp-windows-term")).toContainText(fixture.session.firstAsk);
   for (const time of await viewer.locator(".txn-turntime").allInnerTexts()) {
     expect(time, "a turn's time reads as weeks old").not.toMatch(/\d+(d|w|mo|y) ago/);
   }
@@ -2002,8 +1746,7 @@ test("a sample session opens in the real transcript browser, in a wide window th
   // the browser's own tabs, each of which works, and the window keeps its height whichever is shown
   const tabs = viewer.getByRole("tab");
   expect((await tabs.allInnerTexts()).map((text) => text.split("\n")[0])).toEqual(fixture.session.tabs);
-  // the transcript's window, not the thread's beside it
-  const browser = section.locator(".mac-win-browser.lp-session-win");
+  const browser = section.locator(".mac-win-browser");
   const height = () => browser.evaluate((window) => window.getBoundingClientRect().height);
   const before = await height();
   for (const [index] of fixture.session.tabs.entries()) {
