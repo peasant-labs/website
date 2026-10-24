@@ -47,13 +47,13 @@ export function SessionWindows({ children }: { children: ReactNode }) {
       <div className="lp-windows-term" aria-hidden="true">
         <TerminalWindow title={SESSION.terminal} active={false}>
           <div className="cc">
-            <div>you@macbook shop % claude</div>
+            <div>you@macbook billing % claude</div>
             <div className="cc-welcome">
               <div>
                 <span className="cc-accent">✻</span> <b>Welcome to Claude Code!</b>
               </div>
               <div className="cc-gap" />
-              <div className="cc-dim">cwd: /Users/you/src/shop</div>
+              <div className="cc-dim">cwd: /Users/you/src/billing</div>
             </div>
             <div className="cc-out">
               <div className="cc-dim">&gt; {ASK_TEXT}</div>

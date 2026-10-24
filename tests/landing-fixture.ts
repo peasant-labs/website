@@ -55,6 +55,9 @@ export type LandingFixture = {
     title: string;
     sessionId: string;
     author: string;
+    terminal: string;
+    firstAsk: string;
+    figures: { model: string; inputSubmissionCount: number; totalTokens: number };
     phone: {
       widths: number[];
       prompt: string;

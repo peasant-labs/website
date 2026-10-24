@@ -3,6 +3,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { SAMPLE_SESSION } from "../lib/sample-session";
 import { loadLandingFixture, PHONE } from "./landing-fixture";
 
 const fixture = loadLandingFixture();
@@ -1686,6 +1687,18 @@ test("under reduced motion the steps stack, each scene on its finished frame, wi
   ).toBe(0);
 });
 
+test("the sample session carries the figures a share card shows", () => {
+  const figures = fixture.session.figures;
+  const turns = SAMPLE_SESSION.turns ?? [];
+  expect(SAMPLE_SESSION.model).toBe(figures.model);
+  expect(SAMPLE_SESSION.totalTokens).toBe(figures.totalTokens);
+  expect(SAMPLE_SESSION.inputSubmissionCount).toBe(figures.inputSubmissionCount);
+  expect(turns.filter((turn) => turn.role === "user")).toHaveLength(figures.inputSubmissionCount);
+  expect(turns[0]?.content).toBe(fixture.session.firstAsk);
+  // the total sits on the session alone: no turn carries a usage count of its own
+  for (const turn of turns) expect(Object.keys(turn).filter((key) => /token|usage/i.test(key))).toEqual([]);
+});
+
 test("a sample session opens in the real transcript browser, in a wide window that keeps its height", async ({
   page,
 }) => {
@@ -1722,6 +1735,10 @@ test("a sample session opens in the real transcript browser, in a wide window th
   // the header names its publisher by handle, and its times read as recent work, never weeks old
   await expect(viewer.locator(".txn-meta")).toContainText(fixture.session.author);
   await expect(viewer.locator(".txn-meta")).not.toContainText("<USER>");
+  // the header counts the prompts the sample carries, and the Terminal repeats its first ask word for word
+  await expect(viewer.locator(".txn-meta")).toContainText(`${fixture.session.figures.inputSubmissionCount} prompts`);
+  await expect(section.locator(".lp-windows-term .mac-title")).toHaveText(fixture.session.terminal);
+  await expect(section.locator(".lp-windows-term")).toContainText(fixture.session.firstAsk);
   for (const time of await viewer.locator(".txn-turntime").allInnerTexts()) {
     expect(time, "a turn's time reads as weeks old").not.toMatch(/\d+(d|w|mo|y) ago/);
   }

@@ -321,7 +321,7 @@ export const INSTALL = {
 export const SESSION = {
   title: "a new standard for transcript sharing, viewing, and attribution",
   /* the short title the transcript browser shows for the sample, the way a curated page names a session */
-  sessionTitle: "fix the staging 403",
+  sessionTitle: "rewrite billing retries",
   label: "a sample session",
   /*
    * On a phone, the session's slice instead of the windows: the prompt, the
@@ -329,7 +329,7 @@ export const SESSION = {
    * id), then the commit (lib/sample-session.ts).
    */
   phone: { prompt: 0, turn: 1, tool: "tc_read_env" },
-  terminal: "shop — claude — 80×24",
+  terminal: "billing — claude — 80×24",
   check: {
     label: "the pull request's peasant check",
     name: "peasant / prompts",
