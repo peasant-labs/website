@@ -6,7 +6,7 @@ import { metadataForRoute } from "@/lib/projects";
 import { FileText } from "@peasant-labs/fairtrade/icons";
 import Link from "next/link";
 
-const LEDE = "Essays on who owns the data that agent work produces.";
+const LEDE = "Essays about data labour.";
 
 export const metadata = metadataForRoute({
   title: "blog | peasant",
