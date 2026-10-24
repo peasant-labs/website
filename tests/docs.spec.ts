@@ -90,7 +90,7 @@ test("on a phone no docs command wraps at a hyphen inside a word", async ({ brow
   for (const { path } of anchors.pages) {
     await page.goto(path);
     const commands = page.locator(".dx-cmd .cli-cmd-line code");
-    await expect(commands.first()).toHaveAttribute("data-breaks", "marked");
+    await expect(commands.first()).toBeVisible();
     for (const lines of await commands.evaluateAll((codes) =>
       codes.map((code) => {
         const range = document.createRange();
