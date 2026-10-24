@@ -15,6 +15,7 @@ export type LandingFixture = {
     title: string;
     lede: string;
     pillars: string[];
+    tagRows: Array<{ width: number; rows: number[] }>;
     flow: { agents: string[] };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };

@@ -34,6 +34,41 @@ test("the landing reads in order and carries none of the removed sections", asyn
   }
 });
 
+test("the hero's tags sit in one row, two and two, or one column, and its lede ends on a full line", async ({ page }) => {
+  for (const { width, rows } of fixture.hero.tagRows) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const layout = await page.evaluate(() => {
+      const tags = [...document.querySelectorAll(".lp-pillars li")].map((tag) => tag.getBoundingClientRect());
+      const lines = new Map<number, number[]>();
+      for (const tag of tags) lines.set(Math.round(tag.top), [...(lines.get(Math.round(tag.top)) ?? []), tag.left]);
+      // the lede's lines, by where each of its characters sits
+      const lede = document.querySelector(".lp-lede")!;
+      const range = document.createRange();
+      const widths = new Map<number, [number, number]>();
+      const text = lede.firstChild as Text;
+      for (let index = 0; index < text.length; index += 1) {
+        range.setStart(text, index);
+        range.setEnd(text, index + 1);
+        const box = range.getBoundingClientRect();
+        const top = Math.round(box.top);
+        const [left, right] = widths.get(top) ?? [Infinity, -Infinity];
+        widths.set(top, [Math.min(left, box.left), Math.max(right, box.right)]);
+      }
+      const spans = [...widths.values()].map(([left, right]) => right - left);
+      return {
+        rows: [...lines.values()].map((lefts) => lefts.length),
+        // stacked tags share one left edge, so their icons stand in a line
+        column: [...lines.values()].every((lefts) => lefts.length === 1) ? new Set([...lines.values()].map(([left]) => Math.round(left!))).size : 1,
+        lastShare: spans.at(-1)! / Math.max(...spans),
+      };
+    });
+    expect(layout.rows, `the tags at ${width}`).toEqual(rows);
+    expect(layout.column, `the stacked tags do not share an edge at ${width}`).toBe(1);
+    expect(layout.lastShare, `the lede ends on a short line at ${width}`).toBeGreaterThan(0.5);
+  }
+});
+
 test("header and footer carry exactly the fixture destinations", async ({ page }) => {
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "site" }).getByRole("link");

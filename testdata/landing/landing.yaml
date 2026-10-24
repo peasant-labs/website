@@ -28,6 +28,13 @@ hero:
   title: the open-source commons for agent transcripts
   lede: Peasant gathers the sessions your coding agents save on your computer. Before you share one, Peasant hides its secrets and personal details.
   pillars: [permissioned sharing, open source, works with many agents, fast indexing]
+  # how the four tags sit at each width, as tags per line: one row, two and two, or one column; never a lone tag
+  # after a pair
+  tagRows:
+    - { width: 1440, rows: [4] }
+    - { width: 768, rows: [2, 2] }
+    - { width: 390, rows: [1, 1, 1, 1] }
+    - { width: 360, rows: [1, 1, 1, 1] }
   # the picture under the buttons shows no words; its accessible name names the agents peasant reads
   flow:
     agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]

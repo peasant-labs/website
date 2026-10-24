@@ -175,11 +175,12 @@
   text-wrap: balance;
 }
 
+/* balanced: two short sentences, so no line is left with a word or two */
 .lp-lede {
   max-inline-size: 48ch;
   color: var(--ink-2);
   font-size: clamp(1.125rem, 1.5vw, 1.25rem);
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 
 .lp-ctas {
@@ -221,6 +222,16 @@
   .lp-pillars {
     display: grid;
     grid-template-columns: repeat(2, auto);
+    justify-content: center;
+    justify-items: start;
+  }
+}
+
+/* a phone has no room for two and two, so they stand in one column, centred as a block, their icons in line */
+@media (max-width: 29.99rem) {
+  .lp-pillars {
+    display: grid;
+    grid-template-columns: auto;
     justify-content: center;
     justify-items: start;
   }
