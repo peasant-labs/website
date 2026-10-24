@@ -2429,9 +2429,10 @@
 /* a published session */
 
 /*
- * Four windows, layered back to front: Claude Code behind and up to the left,
- * the transcript in front and wide, the thread on X over the transcript's
- * lower right edge, and the pull request's check over its lower left edge.
+ * Three windows, layered back to front: Claude Code behind and up to the left,
+ * the transcript in front and wide, and the thread on X over the transcript's
+ * right side. The one last pointed at or focused comes to the front
+ * (data-front, components/landing/session-windows.tsx).
  * From a tablet's width only: a phone shows a short slice of the session and
  * the thread without its window instead (.lp-phone and .lp-phone-x, below).
  */
@@ -2441,21 +2442,13 @@
   --lp-windows-x-end: clamp(1rem, 4vw, 3.5rem);
   /* the transcript window's body: one height whatever it shows (.lp-session-win, below) */
   --lp-windows-body: clamp(32rem, 78svh, 48rem);
-  /* the room under the front window for the check that hangs from its corner */
-  --lp-check-room: 5.5rem;
-  /* how far up the transcript's body the thread over its lower right corner reaches */
-  --lp-windows-x-overlap: calc(0.3 * var(--lp-windows-body));
+  /* how far up the transcript's body the thread over its right side reaches: to the top of its filters' strip */
+  --lp-windows-x-overlap: calc(var(--lp-windows-body) - 12rem);
 
   position: relative;
   min-width: 0;
   padding-block-start: clamp(2.5rem, 6vw, 4.5rem);
   padding-inline: var(--lp-windows-x) var(--lp-windows-x-end);
-}
-
-/* the transcript and the check that hangs from it; it sets no layer of its own, so all four windows share one */
-.lp-windows-stage {
-  position: relative;
-  padding-block-end: var(--lp-check-room);
 }
 
 .lp-windows-term {
@@ -2480,56 +2473,8 @@
   z-index: 1;
 }
 
-/*
- * The check hangs from the front window's lower left corner: it crosses only
- * the window's bottom edge, never its content, and the rest of it sits out to
- * the left and below. It holds nothing to press, so a press under its edge
- * reaches the window.
- */
-.lp-check {
-  position: absolute;
-  z-index: 3;
-  inset-block-start: calc(100% - var(--lp-check-room) - 0.75rem);
-  /* from the column's left edge, as wide as the column allows: the stage it hangs in is inset by the windows' offsets */
-  inset-inline-start: calc(-1 * var(--lp-windows-x));
-  pointer-events: none;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-3);
-  max-width: calc(100% + var(--lp-windows-x) + var(--lp-windows-x-end) - var(--sp-5));
-  padding: var(--sp-4) var(--sp-5);
-  border: var(--bd-strong);
-  background: var(--canvas);
-  box-shadow: var(--overlay-shadow);
-}
 
-.lp-check-ic {
-  flex: none;
-  width: var(--ic-lg);
-  height: var(--ic-lg);
-  margin-block-start: 2px;
-  color: var(--success);
-}
 
-.lp-check-text {
-  display: grid;
-  gap: 2px;
-  font-family: var(--font-mono);
-  letter-spacing: 0;
-}
-
-.lp-check-name {
-  color: var(--ink-strong);
-  font-size: var(--fs-body);
-  font-weight: 700;
-}
-
-/* on a narrow card the summary splits in two even lines rather than leaving one word alone */
-.lp-check-summary {
-  color: var(--ink-3);
-  font-size: var(--fs-sm);
-  text-wrap: balance;
-}
 
 /*
  * The transcript browser sits in a browser window that keeps one height
@@ -2543,19 +2488,26 @@
 }
 
 /*
- * The thread on X hangs from the transcript's lower right corner: its top
- * across the lowest part of the transcript, under the middle of the
- * filters' strip so their rail still opens and scrolls; its right edge out
- * past the transcript's on the column's edge; the rest of it below. It is in
- * the flow, so the section makes room for however tall it draws.
+ * The thread on X stands over the transcript's right side: its top level with
+ * the top of the filters' strip, its right edge out past the transcript's on
+ * the column's edge, the rest of it below. Hovering or focusing the transcript
+ * brings it back in front, filters and all. It is in the flow, so the section
+ * makes room for however tall it draws.
  */
 .lp-windows-x {
   position: relative;
   z-index: 2;
   /* at a tablet's width it takes more of the row, so the card it carries still reads */
   width: min(30rem, 60%);
-  margin-block-start: calc(-1 * (var(--lp-check-room) + var(--lp-windows-x-overlap)));
+  margin-block-start: calc(-1 * var(--lp-windows-x-overlap));
   margin-inline: auto calc(-1 * var(--lp-windows-x-end));
+}
+
+/* the window last pointed at or focused stands in front of the other two */
+.lp-windows[data-front="term"] > .lp-windows-term,
+.lp-windows[data-front="front"] > .lp-windows-front,
+.lp-windows[data-front="x"] > .lp-windows-x {
+  z-index: 3;
 }
 
 /*
@@ -2648,27 +2600,15 @@
   overflow-x: hidden;
 }
 
-/*
- * Where the windows stand, the thread covers the columns' lowest part, so a
- * control a keyboard moves to scrolls up clear of it rather than stopping
- * under it.
- */
-@media (min-width: 48rem) {
-  .lp-windows .lp-viewer :is(.txn-stream, .txn-rail-body) {
-    scroll-padding-block-end: var(--lp-windows-x-overlap);
-  }
-}
-
 /* the conversation has most of the window, so a turn's prose runs its width rather than wrapping early */
 .lp-viewer .txn-body > :is(.txn-md-prose, .txn-md-list, .txn-md-heading, .txn-md-blockquote) {
   max-inline-size: none;
 }
 
-/* the first time they come into view, the back window, the thread and the check fan out from behind the front one */
+/* the first time they come into view, the back window and the thread fan out from behind the front one */
 @media (prefers-reduced-motion: no-preference) {
   .lp-windows-term,
-  .lp-windows-x,
-  .lp-check {
+  .lp-windows-x {
     transition:
       transform 1000ms var(--ease-spring),
       opacity 600ms var(--ease-out);
@@ -2676,10 +2616,6 @@
 
   .lp-windows-x {
     transition-delay: 120ms;
-  }
-
-  .lp-check {
-    transition-delay: 240ms;
   }
 
   .js-reveal .lp-windows[data-fanned="false"] .lp-windows-term {
@@ -2690,11 +2626,6 @@
   .js-reveal .lp-windows[data-fanned="false"] .lp-windows-x {
     opacity: 0;
     transform: translate3d(-14%, -2.5rem, 0) scale(0.94);
-  }
-
-  .js-reveal .lp-windows[data-fanned="false"] .lp-check {
-    opacity: 0;
-    transform: translate3d(0, 1.5rem, 0);
   }
 }
 

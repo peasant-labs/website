@@ -69,7 +69,6 @@ export type LandingFixture = {
       stat: string;
     };
     tabs: string[];
-    check: { name: string; summary: string };
     markers: string[];
   };
   card: { figures: { prompts: number; tokens: number } };

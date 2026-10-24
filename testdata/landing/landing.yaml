@@ -173,8 +173,6 @@ session:
   figures: { model: claude-opus-5-5, inputSubmissionCount: 5, totalTokens: 52600 }
   # the transcript browser's own tabs, as online's transcript page shows them
   tabs: [highlights, full trace, diffs, files, annotations]
-  # the pull request's check, in village's own words (backend/internal/digest/render.go) for one transcript and one commit
-  check: { name: peasant / prompts, summary: 1 transcript traces 1 of 1 commits }
   # placeholders the redaction engine writes, visible in the transcript
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
 # the share card the transcript's link preview shows, drawn by fairtrade from the sample: its figures are the

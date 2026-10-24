@@ -1908,7 +1908,7 @@ test("the X thread's posts are set in the system face X uses, inside its window"
   for (const face of faces) expect(face.split(",")[0]!.trim()).toBe(fixture.thread.face);
 });
 
-test("a keyboard user's focus in the transcript is never hidden under the thread over its corner", async ({ page }) => {
+test("a keyboard user's focus in the transcript is never hidden under the thread over it", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const width of [1440, 768]) {
     await page.setViewportSize({ width, height: 900 });
@@ -1923,11 +1923,12 @@ test("a keyboard user's focus in the transcript is never hidden under the thread
       const focus = await page.evaluate(() => {
         const element = document.activeElement!;
         if (!element.closest("#session [data-session-viewer] :is(.txn-stream, .txn-rail-body)")) return null;
+        // what draws at the focused control's centre is the control, never the thread over the transcript
         const box = element.getBoundingClientRect();
-        const thread = document.querySelector("#session .lp-windows-x")!.getBoundingClientRect();
+        const top = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
         return {
           name: `${element.className} ${element.textContent?.slice(0, 24)}`,
-          hidden: box.left >= thread.left && box.right <= thread.right && box.top >= thread.top && box.bottom <= thread.bottom,
+          hidden: !!top?.closest("#session .lp-windows-x"),
         };
       });
       if (!focus) continue;
@@ -1961,12 +1962,9 @@ test("a sample session opens in the real transcript browser, in a wide window th
   await expect(section.locator(".txn-crumb a, .txn-crumb li")).toHaveCount(0);
   // no explainer beside it: the markers in the transcript say what was redacted
   await expect(section.locator(".lp-note")).toHaveCount(0);
-  // behind it, Claude Code where the session was recorded, hidden from assistive technology;
-  // over its corner, the pull request's check in village's own words
+  // behind it, Claude Code where the session was recorded, hidden from assistive technology
   await expect(section.locator(".lp-windows-term")).toHaveAttribute("aria-hidden", "true");
   await expect(section.locator(".lp-windows-term .mac-win-terminal")).toBeVisible();
-  await expect(section.locator(".lp-check-name")).toHaveText(fixture.session.check.name);
-  await expect(section.locator(".lp-check-summary")).toHaveText(fixture.session.check.summary);
   // the values peasant redacted show as their markers
   for (const marker of fixture.session.markers) {
     await expect(viewer, `the transcript does not show ${marker}`).toContainText(marker);
@@ -1989,6 +1987,8 @@ test("a sample session opens in the real transcript browser, in a wide window th
     (element) => element.querySelector(".txn-stream")!.getBoundingClientRect().width / element.getBoundingClientRect().width,
   );
   expect(share, "the conversation's share of the window").toBeGreaterThanOrEqual(0.6);
+  // the thread stands over the strip until the reader points at the transcript, which brings it in front
+  await viewer.locator(".txn-stream").hover({ position: { x: 40, y: 40 } });
   await viewer.locator(".txn-rail-strip-right .txn-rail-reopen").click();
   await expect(grid).not.toHaveAttribute("data-right-rail", "closed");
   // nothing in it slides sideways out from under its column's edge

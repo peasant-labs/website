@@ -4,7 +4,6 @@ import { XThread } from "@/components/landing/x-thread";
 import { TerminalWindow } from "@/components/mac";
 import { SESSION } from "@/lib/landing";
 import { SAMPLE_SESSION } from "@/lib/sample-session";
-import { CircleCheck } from "@peasant-labs/fairtrade/icons";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /* the sample's first ask and the first thing the agent says back, as Claude Code shows them */
@@ -12,23 +11,33 @@ const [ASK, ANSWER] = SAMPLE_SESSION.turns ?? [];
 const ASK_TEXT = String(ASK?.content ?? "");
 const ANSWER_TEXT = String(ANSWER?.content ?? "").replace(/<thinking>[\s\S]*?<\/thinking>/g, "");
 
+/** The three windows, by the name each goes by in `data-front`. */
+type Window = "term" | "front" | "x";
+
 /**
- * One session in four windows: behind and up to the left, Claude Code in
+ * One session in three windows: behind and up to the left, Claude Code in
  * Terminal, where it was recorded; in front and wide, the published transcript
- * a reviewer reads (passed in); over its lower left edge, the pull request's
- * peasant check that links to it; over its lower right edge, the thread on X
- * where its author shared the link. Recorded, read, checked, shared. From a
- * tablet's width only: a phone shows a slice of the session and the thread
- * without windows instead.
+ * a reviewer reads (passed in); over its right side, the thread on X where its
+ * author shared the link. Recorded, read, shared. From a tablet's width only: a
+ * phone shows a slice of the session and the thread without windows instead.
+ *
+ * The window a pointer moves onto, or keyboard focus moves into, comes to the
+ * front and stays there until another one is chosen, as on a desktop. So focus
+ * is never hidden under another window.
  *
  * They fan out from one stack the first time the group comes into view; only
  * transform and opacity move. Without motion they are simply where they end.
  * The Terminal repeats what the transcript already says, so it is hidden from
- * assistive technology; the check and the thread are each read as a short group.
+ * assistive technology; the thread is read as a short group.
  */
 export function SessionWindows({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const [fanned, setFanned] = useState(false);
+  const [front, setFront] = useState<Window | null>(null);
+  const raise = (which: Window) => ({
+    onPointerEnter: () => setFront(which),
+    onFocus: () => setFront(which),
+  });
 
   // They fan out once, the first time a fifth of the group is on screen.
   useEffect(() => {
@@ -47,8 +56,8 @@ export function SessionWindows({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div ref={ref} className="lp-windows" data-fanned={fanned ? "true" : "false"}>
-      <div className="lp-windows-term" aria-hidden="true">
+    <div ref={ref} className="lp-windows" data-fanned={fanned ? "true" : "false"} data-front={front ?? undefined}>
+      <div className="lp-windows-term" aria-hidden="true" {...raise("term")}>
         <TerminalWindow title={SESSION.terminal} active={false}>
           <div className="cc">
             <div>you@macbook billing % claude</div>
@@ -73,17 +82,10 @@ export function SessionWindows({ children }: { children: ReactNode }) {
           </div>
         </TerminalWindow>
       </div>
-      <div className="lp-windows-stage">
-        <div className="lp-windows-front">{children}</div>
-        <div className="lp-check" role="group" aria-label={SESSION.check.label}>
-          <CircleCheck className="lp-check-ic" aria-hidden="true" focusable="false" />
-          <div className="lp-check-text">
-            <span className="lp-check-name">{SESSION.check.name}</span>
-            <span className="lp-check-summary">{SESSION.check.summary}</span>
-          </div>
-        </div>
+      <div className="lp-windows-front" {...raise("front")}>
+        {children}
       </div>
-      <div className="lp-windows-x">
+      <div className="lp-windows-x" {...raise("x")}>
         <XThread />
       </div>
     </div>

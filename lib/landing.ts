@@ -332,11 +332,6 @@ export const SESSION = {
    */
   phone: { prompt: 0, turn: 1, tool: "tc_read_env" },
   terminal: "billing — claude — 80×24",
-  check: {
-    label: "the pull request's peasant check",
-    name: "peasant / prompts",
-    summary: "1 transcript traces 1 of 1 commits",
-  },
 } as const;
 
 /*
