@@ -2410,20 +2410,31 @@
 /* a published session */
 
 /*
- * Three windows, layered: Claude Code behind and up to the left, the transcript
- * in front and wide, the pull request's check over the front window's lower
- * left edge. From a tablet's width only: a phone shows a short slice of the
- * session instead (.lp-phone, below).
+ * Four windows, layered back to front: Claude Code behind and up to the left,
+ * the transcript in front and wide, the thread on X over the transcript's
+ * lower right edge, and the pull request's check over its lower left edge.
+ * From a tablet's width only: a phone shows a short slice of the session and
+ * the thread without its window instead (.lp-phone and .lp-phone-x, below).
  */
 .lp-windows {
   --lp-windows-x: clamp(1rem, 6vw, 5rem);
+  /* how far the thread stands out past the transcript's right edge */
+  --lp-windows-x-end: clamp(1rem, 4vw, 3.5rem);
+  /* the transcript window's body: one height whatever it shows (.lp-session-win, below) */
+  --lp-windows-body: clamp(32rem, 78svh, 48rem);
   /* the room under the front window for the check that hangs from its corner */
   --lp-check-room: 5.5rem;
 
   position: relative;
   min-width: 0;
-  padding-block: clamp(2.5rem, 6vw, 4.5rem) var(--lp-check-room);
-  padding-inline-start: var(--lp-windows-x);
+  padding-block-start: clamp(2.5rem, 6vw, 4.5rem);
+  padding-inline: var(--lp-windows-x) var(--lp-windows-x-end);
+}
+
+/* the transcript and the check that hangs from it; it sets no layer of its own, so all four windows share one */
+.lp-windows-stage {
+  position: relative;
+  padding-block-end: var(--lp-check-room);
 }
 
 .lp-windows-term {
@@ -2456,14 +2467,15 @@
  */
 .lp-check {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   inset-block-start: calc(100% - var(--lp-check-room) - 0.75rem);
-  inset-inline-start: 0;
+  /* from the column's left edge, as wide as the column allows: the stage it hangs in is inset by the windows' offsets */
+  inset-inline-start: calc(-1 * var(--lp-windows-x));
   pointer-events: none;
   display: flex;
   align-items: flex-start;
   gap: var(--sp-3);
-  max-width: calc(100% - var(--sp-5));
+  max-width: calc(100% + var(--lp-windows-x) + var(--lp-windows-x-end) - var(--sp-5));
   padding: var(--sp-4) var(--sp-5);
   border: var(--bd-strong);
   background: var(--canvas);
@@ -2506,7 +2518,23 @@
  */
 .lp-session-win .mac-body {
   flex: none;
-  block-size: clamp(32rem, 78svh, 48rem);
+  block-size: var(--lp-windows-body);
+}
+
+/*
+ * The thread on X hangs from the transcript's lower right corner: its top
+ * across the lowest part of the transcript, under the middle of the
+ * filters' strip so their rail still opens and scrolls; its right edge out
+ * past the transcript's on the column's edge; the rest of it below. It is in
+ * the flow, so the section makes room for however tall it draws.
+ */
+.lp-windows-x {
+  position: relative;
+  z-index: 2;
+  /* at a tablet's width it takes more of the row, so the card it carries still reads */
+  width: min(30rem, 60%);
+  margin-block-start: calc(-1 * (var(--lp-check-room) + 0.3 * var(--lp-windows-body)));
+  margin-inline: auto calc(-1 * var(--lp-windows-x-end));
 }
 
 /*
@@ -2604,13 +2632,18 @@
   max-inline-size: none;
 }
 
-/* the first time they come into view, the back window and the check fan out from behind the front one */
+/* the first time they come into view, the back window, the thread and the check fan out from behind the front one */
 @media (prefers-reduced-motion: no-preference) {
   .lp-windows-term,
+  .lp-windows-x,
   .lp-check {
     transition:
       transform 1000ms var(--ease-spring),
       opacity 600ms var(--ease-out);
+  }
+
+  .lp-windows-x {
+    transition-delay: 120ms;
   }
 
   .lp-check {
@@ -2620,6 +2653,11 @@
   .js-reveal .lp-windows[data-fanned="false"] .lp-windows-term {
     opacity: 0;
     transform: translate3d(18%, 2.5rem, 0) scale(0.94);
+  }
+
+  .js-reveal .lp-windows[data-fanned="false"] .lp-windows-x {
+    opacity: 0;
+    transform: translate3d(-14%, -2.5rem, 0) scale(0.94);
   }
 
   .js-reveal .lp-windows[data-fanned="false"] .lp-check {
@@ -2857,10 +2895,13 @@
 /*
  * The link card: fairtrade's card at its own 1200 by 600 pixels, scaled to
  * the frame's width, its hairline drawn over it so the frame stays exactly
- * 2:1. Nothing here styles what the card draws inside itself.
+ * 2:1. The frame is a size container, so the scale is its width over 1200
+ * in CSS alone, right before any script runs. Nothing here styles what the
+ * card draws inside itself.
  */
 .lp-x-card {
   position: relative;
+  container-type: inline-size;
   aspect-ratio: 2 / 1;
   border: 0;
   background: #0b0b0a;
@@ -2881,7 +2922,9 @@
   inset-inline-start: 0;
   width: 1200px;
   height: 600px;
-  transform: scale(var(--lp-x-card-scale, 0.4));
+  /* the ratio of two lengths: atan2 then tan where a length cannot yet divide a length */
+  transform: scale(tan(atan2(100cqw, 1200px)));
+  transform: scale(calc(100cqw / 1200px));
   transform-origin: 0 0;
 }
 
@@ -2919,11 +2962,35 @@
   height: 18.75px;
 }
 
-/* until it takes its place among the windows, the thread stands under them at the right */
-.lp-session-x {
-  width: min(100%, 34rem);
-  margin-inline-start: auto;
-  margin-block-start: var(--sp-6);
+/*
+ * On a phone the thread follows the session's slice at the column's width,
+ * with no window around it. The card leaves the avatar column and takes the
+ * post's whole width, with X's narrower phone padding, so its prompt still
+ * reads at a small phone's width.
+ */
+.lp-phone-x {
+  display: none;
+}
+
+@media (max-width: 47.99rem) {
+  .lp-phone-x {
+    display: block;
+    min-width: 0;
+    margin-block-start: var(--sp-6);
+  }
+
+  .lp-phone-x .lp-x-post {
+    padding-inline: 12px;
+  }
+
+  .lp-phone-x :is(.lp-x-card, .lp-x-from) {
+    margin-inline-start: -48px;
+  }
+
+  /* out from the avatar column, the card starts below the avatar rather than over it */
+  .lp-phone-x .lp-x-card {
+    margin-block-start: 28px;
+  }
 }
 
 /* vision */

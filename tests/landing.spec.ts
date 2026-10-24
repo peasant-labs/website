@@ -1709,7 +1709,8 @@ test("the share card's figures are the sample's own prompt count and token total
 /* the X thread in the session section, scrolled into view */
 async function openThread(page: Page) {
   await page.goto("/");
-  const thread = page.locator("#session [data-x-thread]");
+  // the window's thread; a phone's copy without the window waits hidden until the windows give way
+  const thread = page.locator("#session .lp-windows [data-x-thread]");
   await thread.scrollIntoViewIfNeeded();
   await expect(thread).toBeVisible();
   return thread;

@@ -193,6 +193,9 @@ thread:
     - { label: model B, value: 83 }
     - { label: Opus 5.5, value: 94 }
   from: From village.peasantlabs.org
+  # on a phone the thread follows the session's slice at the column's width, with no window around it: its post text
+  # and the card's prompt, measured as drawn (the card's own size times its scale), stay readable at every phone width
+  phone: { postText: 12, cardPrompt: 11, promptWord: hey }
 # the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:
   line: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.

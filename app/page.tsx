@@ -108,7 +108,8 @@ export default function Home() {
                 {SESSION.title}
               </h2>
             </div>
-            {/* from a tablet's width, the windows; on a phone, a short slice of the session at the column's width */}
+            {/* from a tablet's width, the windows; on a phone, a short slice of the session and then the thread that
+                shared it, each at the column's width */}
             <div className="lp-session-body">
               <div className="lp-session-wide">
                 <SessionWindows>
@@ -120,9 +121,6 @@ export default function Home() {
                     />
                   </SafariWindow>
                 </SessionWindows>
-                <div className="lp-session-x">
-                  <XThread />
-                </div>
               </div>
               <SessionPhone
                 label={SESSION.label}
@@ -131,6 +129,7 @@ export default function Home() {
                 turn={SESSION.phone.turn}
                 tool={SESSION.phone.tool}
               />
+              <XThread chrome={false} className="lp-phone-x" />
             </div>
           </div>
         </section>

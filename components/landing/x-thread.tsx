@@ -13,37 +13,32 @@ import {
 import { SafariWindow } from "@/components/mac";
 import { THREAD } from "@/lib/landing";
 import { SAMPLE_SESSION } from "@/lib/sample-session";
-import { SHARE_CARD_WIDTH, ShareCard, shareCardAlt, shareCardFromPayload } from "@peasant-labs/fairtrade/share";
-import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { ShareCard, shareCardAlt, shareCardFromPayload } from "@peasant-labs/fairtrade/share";
+import type { CSSProperties, ReactNode } from "react";
 
-/* the card village would show for the sample's link: its figures and first prompt are the sample's own */
-const CARD = shareCardFromPayload(SAMPLE_SESSION);
+/*
+ * the card village would show for the sample's link: its figures and first prompt are the sample's own. A sample
+ * without a card would leave an image with no name, so the build fails rather than draw one.
+ */
+const CARD =
+  shareCardFromPayload(SAMPLE_SESSION) ??
+  (() => {
+    throw new Error("lib/sample-session: the sample yields no share card");
+  })();
 
 type Post = (typeof THREAD.posts)[number];
 
 /*
  * The link's card as X shows it: fairtrade's share card drawn at its own 1200
- * pixels and scaled to the post's width, in X's rounded media frame. It lays
- * out each word on its own, so it is read as one image named by its alt.
+ * pixels and scaled to the post's width, in X's rounded media frame. The
+ * scale is the frame's width in CSS, so it is right before any script runs.
+ * The card lays out each word on its own, so it is read as one image named
+ * by its alt.
  */
 function Card() {
-  const frame = useRef<HTMLDivElement>(null);
-  const inner = useRef<HTMLDivElement>(null);
-
-  // the card keeps its own layout at any width: only its scale follows the frame
-  useLayoutEffect(() => {
-    const element = frame.current;
-    if (!element) return;
-    const fit = () => inner.current?.style.setProperty("--lp-x-card-scale", String(element.clientWidth / SHARE_CARD_WIDTH));
-    fit();
-    const observer = new ResizeObserver(fit);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div ref={frame} className="lp-x-card" role="img" aria-label={CARD ? shareCardAlt(CARD) : undefined}>
-      <div ref={inner} className="lp-x-card-scale" aria-hidden="true">
+    <div className="lp-x-card" role="img" aria-label={shareCardAlt(CARD)}>
+      <div className="lp-x-card-scale" aria-hidden="true">
         <ShareCard card={CARD} />
       </div>
     </div>
@@ -123,24 +118,36 @@ function PostView({ post, linked, children }: { post: Post; linked: boolean; chi
  * the transcript's link card and the line naming where it links. It looks
  * exactly as X does, in X's dark appearance whatever the site's theme, except
  * that the logo is our P. It is read once, as a short group.
+ *
+ * Without `chrome`, the thread stands alone, with no window around it, as a
+ * phone shows it under the session's slice.
  */
-export function XThread({ className }: { className?: string }) {
+export function XThread({ className, chrome = true }: { className?: string; chrome?: boolean }) {
   const [benchmark, question, answer] = THREAD.posts;
+  const thread = (
+    <div
+      className={chrome || !className ? "lp-x" : `lp-x ${className}`}
+      data-x-thread
+      role="group"
+      aria-label={THREAD.label}
+    >
+      <div className="lp-x-top" aria-hidden="true">
+        <PLogo className="lp-x-logo" />
+      </div>
+      <PostView post={benchmark} linked>
+        <Chart />
+      </PostView>
+      <PostView post={question} linked />
+      <PostView post={answer} linked={false}>
+        <Card />
+        <div className="lp-x-from">{THREAD.from}</div>
+      </PostView>
+    </div>
+  );
+  if (!chrome) return thread;
   return (
     <SafariWindow className={`lp-x-win${className ? ` ${className}` : ""}`} favicon={<PLogo />}>
-      <div className="lp-x" data-x-thread role="group" aria-label={THREAD.label}>
-        <div className="lp-x-top" aria-hidden="true">
-          <PLogo className="lp-x-logo" />
-        </div>
-        <PostView post={benchmark} linked>
-          <Chart />
-        </PostView>
-        <PostView post={question} linked />
-        <PostView post={answer} linked={false}>
-          <Card />
-          <div className="lp-x-from">{THREAD.from}</div>
-        </PostView>
-      </div>
+      {thread}
     </SafariWindow>
   );
 }

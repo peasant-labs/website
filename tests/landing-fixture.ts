@@ -77,6 +77,7 @@ export type LandingFixture = {
     posts: Array<{ name: string; handle: string; time: string; text: string }>;
     chart: Array<{ label: string; value: number }>;
     from: string;
+    phone: { postText: number; cardPrompt: number; promptWord: string };
   };
   vision: { line: string; story: string[]; cta: Link };
   docsNav: Link[];
