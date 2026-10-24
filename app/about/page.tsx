@@ -33,7 +33,7 @@ export default function AboutPage() {
               <Link className="site-link" href="/blog">
                 our blog
               </Link>{" "}
-              for the long version.
+              for more thoughts.
             </p>
           </div>
         </header>
