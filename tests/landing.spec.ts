@@ -1142,9 +1142,102 @@ test("scrolling walks the held section through steps 1, 2 and 3, then lets the p
   await expect(page.locator("#session")).toBeInViewport();
 });
 
-test("a scene plays only while it can be seen, and holds where it is under the reader's pointer or focus", async ({
-  page,
+/* the current scene's frame: its round, where its camera and pointer are, and how far its screen has got */
+const sceneFrame = (page: Page) =>
+  page.evaluate(() => {
+    const layer = document.querySelector('.hw-scroll .hw-layer[data-on="true"]')!;
+    const camera = getComputedStyle(layer.querySelector(".scn-camera")!);
+    const cursor = layer.querySelector(".scn-cursor");
+    return [
+      layer.querySelector<HTMLElement>(".scn-view")!.dataset.round,
+      camera.transform,
+      camera.opacity,
+      cursor ? getComputedStyle(cursor).transform : "",
+      layer.querySelector(".scn-screen")!.innerHTML.length,
+    ].join(" | ");
+  });
+
+/*
+ * Rests on the current step for six seconds, sampling its scene's frame, and
+ * gives how many different frames each half of the rest showed. A take that
+ * played once and stood still on its last frame shows one in the second half.
+ */
+async function restOnStep(page: Page) {
+  const halves = [new Set<string>(), new Set<string>()];
+  const start = Date.now();
+  while (Date.now() - start < 6000) {
+    halves[Date.now() - start < 3000 ? 0 : 1]!.add(await sceneFrame(page));
+    await page.waitForTimeout(200);
+  }
+  return halves.map((half) => half.size);
+}
+
+test("each step's scene keeps playing while the reader rests on it, round after round, with a pointer on it or after a tap", async ({
+  browser,
 }) => {
+  test.setTimeout(120_000);
+  for (const [kind, options] of [
+    ["wide", { viewport: { width: 1440, height: 900 } }],
+    ["phone", PHONE],
+  ] as const) {
+    const context = await browser.newContext(options);
+    const page = await context.newPage();
+    await page.goto("/");
+    const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
+    const height = await page.evaluate(() => window.innerHeight);
+    const view = page.locator(".hw-scroll .hw-view");
+    const take = page.locator('.hw-scroll .hw-layer[data-on="true"] .scn-view');
+    for (const [index, step] of fixture.how.steps.entries()) {
+      // the middle of the step's third of the held scroll
+      await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), top + height * (0.2 + 0.4 * index));
+      await expect(page.locator(".hw-step").nth(index)).toHaveAttribute("aria-pressed", "true");
+      // a pointer resting on the screen, the way it rests while a reader scrolls, or a tap on it, never stops it
+      if (kind === "wide") await view.hover();
+      else await view.click();
+      await expect(take).toHaveAttribute("data-paused", "false");
+      const [first, second] = await restOnStep(page);
+      expect(first, `the ${step.title} scene stood still in a rest (${kind})`).toBeGreaterThan(1);
+      expect(second, `the ${step.title} scene froze after it first played (${kind})`).toBeGreaterThan(1);
+    }
+    // resting on past the end of its first round, the take starts over and keeps moving
+    const [first, second] = await restOnStep(page);
+    expect(first, `the last scene froze once it had played through (${kind})`).toBeGreaterThan(1);
+    expect(second, `the last scene froze once it had played through (${kind})`).toBeGreaterThan(1);
+    await expect(take).toHaveAttribute("data-round", /^[1-9]/);
+    await context.close();
+  }
+});
+
+test("the scene keeps playing after the header steps away and comes back", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const header = page.locator(".site-bar");
+  const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
+  // wheel into the first step the way a reader does: the header steps away
+  await page.evaluate((y) => window.scrollTo({ top: y - 200, behavior: "instant" }), top);
+  const box = (await page.locator(".hw-scroll .hw-view").boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  for (let step = 0; step < 6; step += 1) {
+    await page.mouse.wheel(0, 80);
+    await page.waitForTimeout(40);
+  }
+  await expect(header).toHaveAttribute("data-hidden", "true");
+  // a little back up brings it back, and on down it steps away again
+  await page.mouse.wheel(0, -80);
+  await expect(header).toHaveAttribute("data-hidden", "false");
+  const [back] = await restOnStep(page);
+  expect(back, "the scene stood still with the header back").toBeGreaterThan(1);
+  await page.mouse.wheel(0, 80);
+  await expect(header).toHaveAttribute("data-hidden", "true");
+  await expect(page.locator(".hw-step").first()).toHaveAttribute("aria-pressed", "true");
+  const take = page.locator('.hw-scroll .hw-layer[data-on="true"] .scn-view');
+  await expect(take).toHaveAttribute("data-paused", "false");
+  const [first, second] = await restOnStep(page);
+  expect(first, "the scene stood still after the header stepped away").toBeGreaterThan(1);
+  expect(second, "the scene froze after the header stepped away").toBeGreaterThan(1);
+});
+
+test("a scene plays only while it can be seen, and keyboard focus holds it where it is", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const top = await page.locator("#how").evaluate((section) => section.getBoundingClientRect().top + window.scrollY);
@@ -1155,27 +1248,22 @@ test("a scene plays only while it can be seen, and holds where it is under the r
   // the screen is one described image, and it takes focus so a keyboard can hold it
   await expect(view).toHaveAttribute("role", "img");
   await expect(view).toHaveAttribute("tabindex", "0");
-  const pointer = page.locator('.hw-layer[data-on="true"] .scn-cursor');
-  const where = () => pointer.evaluate((cursor) => cursor.style.transform + getComputedStyle(cursor).transform);
 
-  await view.hover();
+  // tabbing to it holds the take exactly where it is, and moving on lets it carry on
+  await page.locator(".hw-step").last().focus();
+  await page.keyboard.press("Tab");
+  await expect(view).toBeFocused();
   await expect(take).toHaveAttribute("data-paused", "true");
-  const held = await where();
+  const held = await sceneFrame(page);
   await page.waitForTimeout(900);
-  expect(await where(), "the take moved while the pointer held it").toBe(held);
-  await page.mouse.move(0, 0);
-  await expect(take).toHaveAttribute("data-paused", "false");
-
-  await view.focus();
-  await expect(take).toHaveAttribute("data-paused", "true");
-  await view.blur();
+  expect(await sceneFrame(page), "the take moved while the keyboard held it").toBe(held);
+  await page.keyboard.press("Shift+Tab");
   await expect(take).toHaveAttribute("data-paused", "false");
 
   // scrolled away, it holds too
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await expect(page.locator('.hw-layer[data-on="true"] .scn-view')).toHaveAttribute("data-paused", "true");
 });
-
 test("every word in a scene reads at a real size, on a wide screen and on a phone", async ({ browser }) => {
   for (const [kind, options] of [
     ["wide", { viewport: { width: 1440, height: 900 } }],

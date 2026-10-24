@@ -29,6 +29,16 @@ const EASE_SETTLE = "cubic-bezier(0.23, 1, 0.32, 1)";
 const EASE_GLIDE = "cubic-bezier(0.45, 0, 0.2, 1)";
 /* how long a part pushed along by new content takes to glide to its new place */
 const FLIP_MS = 360;
+/*
+ * A take loops while it plays: its finished frame rests a moment, then the
+ * screen dips out, the scene starts over out of sight, and the screen comes
+ * back in on its first frame, so the seam is a short fade, never a cut.
+ */
+const LOOP_REST = 1200;
+const DIP_OUT = 240;
+const DIP_IN = 360;
+/* how long a new round waits out of sight for its first frame to render before the camera frames it */
+const DIP_SETTLE = 80;
 
 /* where an element sits on the virtual screen by layout alone, whatever transforms are running */
 function layoutOffset(element: HTMLElement, screen: HTMLElement) {
@@ -220,6 +230,9 @@ function boxOf(screen: HTMLElement, focus: string): Box {
  * starts from wherever the camera is, so the take is one continuous shot.
  * The component text is DOM, so it stays sharp at every zoom.
  *
+ * The take loops while it plays: each round starts the scene over on a fresh
+ * mount of its screen, so every part is back in its first state.
+ *
  * Under reduced motion nothing moves: the scene renders its finished phase,
  * framed on its final focus. A new take is a new mount (the caller keys it).
  */
@@ -230,9 +243,9 @@ export function SceneStage({
 }: {
   scene: SceneDefinition;
   /**
-   * The take plays while this is true: it starts the first time the scene can
-   * be seen, and holds exactly where it is whenever it is false (off screen,
-   * or the reader's pointer or focus on it), then carries on.
+   * The take plays, looping, while this is true: it starts the first time the
+   * scene can be seen, and holds exactly where it is whenever it is false (off
+   * screen, or the reader's keyboard on it), then carries on.
    */
   playing: boolean;
   reduced: boolean;
@@ -245,6 +258,8 @@ export function SceneStage({
   const holdTake = useRef<((held: boolean) => void) | null>(null);
   const playingNow = useRef(playing);
   const [phase, setPhase] = useState(reduced ? scene.finalPhase : 0);
+  // each round of a looping take renders the scene on a fresh mount
+  const [round, setRound] = useState(0);
   // A take starts the first time the scene can be seen; after that, it holds while it cannot be.
   const [started, setStarted] = useState(false);
   if (playing && !started && !reduced) setStarted(true);
@@ -315,13 +330,14 @@ export function SceneStage({
   }, [rest, reduced, started, phase]);
 
   // A part marked data-flip that a beat pushes along glides from where it was (FLIP), so nothing jumps.
-  // A change of screen size is a new layout, not a move: it is recorded, never animated.
-  const flipLayout = useRef(compact);
+  // A change of screen size, or a new round, is a new layout, not a move: it is recorded, never animated.
+  const flipLayout = useRef(`${compact}/${round}`);
   useLayoutEffect(() => {
     const screen = screenRef.current;
     if (!screen) return;
-    const relaid = flipLayout.current !== compact;
-    flipLayout.current = compact;
+    const layout = `${compact}/${round}`;
+    const relaid = flipLayout.current !== layout;
+    flipLayout.current = layout;
     const now = new Map<string, { x: number; y: number }>();
     for (const element of screen.querySelectorAll<HTMLElement>("[data-flip]")) {
       const key = element.dataset.flip!;
@@ -335,7 +351,7 @@ export function SceneStage({
       );
     }
     flipFrom.current = now;
-  }, [phase, reduced, started, compact]);
+  }, [phase, reduced, started, compact, round]);
 
   // Hold the take, and the scene's own short animations, whenever it is not playing.
   useEffect(() => {
@@ -345,7 +361,7 @@ export function SceneStage({
     if (view) view.dataset.paused = String(!playing);
   }, [playing]);
 
-  // One take: the scene's beats, the camera moves and the cursor, on one clock.
+  // One take: the scene's beats, the camera moves and the cursor, on one clock, round after round.
   useEffect(() => {
     if (reduced || !started) return;
     const camera = cameraRef.current;
@@ -378,35 +394,30 @@ export function SceneStage({
       held = hold;
       running.forEach((animation) => (hold ? animation.pause() : animation.play()));
     };
+    /* an animation the take holds and cancels with it; `done` runs as it ends */
+    const play = (element: Element, keyframes: Keyframe[], options: KeyframeAnimationOptions, done?: () => void) => {
+      const animation = element.animate(keyframes, options);
+      running.add(animation);
+      animation.onfinish = () => {
+        done?.();
+        if (options.fill === "forwards") animation.cancel();
+        running.delete(animation);
+      };
+      if (held) animation.pause();
+      return animation;
+    };
 
-    for (const cue of scene.cues) at(cue.at, () => setPhase(cue.phase));
-
-    for (const shot of scene.shots) {
-      at(shot.at, () => {
-        const from = getComputedStyle(camera).transform;
-        const to = frame(shot.focus, shot.fill ?? 0.94, shot.width, shot.cropBelow);
-        const animation = camera.animate([{ transform: from }, { transform: to }], {
-          duration: shot.move,
-          easing: shot.ease === "settle" ? EASE_SETTLE : EASE_MOVE,
-          fill: "forwards",
-        });
-        running.add(animation);
-        animation.onfinish = () => {
-          camera.style.transform = to;
-          animation.cancel();
-          running.delete(animation);
-        };
-      });
-    }
-
-    if (cursor && scene.cursor?.length) {
-      // The pointer starts where the last take's pointer is, or where the last scene left it, and fades in there.
-      // a scene's resting point is set on the full screen; the compact screen takes it in proportion
-      const from = scene.cursorFrom ?? [SCREEN.width * 0.82, SCREEN.height * 0.88];
-      let here: readonly [number, number] = [
-        (from[0] * screen.width) / SCREEN.width,
-        (from[1] * screen.height) / SCREEN.height,
-      ];
+    // The pointer starts where the last take's pointer is, or where the last scene left it, and fades in there.
+    // a scene's resting point is set on the full screen; the compact screen takes it in proportion
+    const pointer = scene.cursor?.length ? cursor : null;
+    const resting = scene.cursorFrom ?? [SCREEN.width * 0.82, SCREEN.height * 0.88];
+    let here: readonly [number, number] = [
+      (resting[0] * screen.width) / SCREEN.width,
+      (resting[1] * screen.height) / SCREEN.height,
+    ];
+    let bend = 1;
+    let hovered: HTMLElement | null = null;
+    if (pointer) {
       const view = viewRef.current;
       const handed = lastPointer && view ? onScreenPoint(lastPointer.cursor, lastPointer.view) : null;
       if (handed) {
@@ -414,17 +425,32 @@ export function SceneStage({
         const point = lens.inverse().transformPoint(new DOMPoint(handed.x, handed.y));
         here = [point.x, point.y];
       }
-      if (view) lastPointer = { cursor, view };
-      let bend = 1;
-      cursor.style.transform = `translate(${here[0]}px, ${here[1]}px)`;
-      cursor.dataset.shape = "arrow";
-      const fadeIn = cursor.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: EASE_SETTLE });
-      running.add(fadeIn);
-      cursor.style.opacity = "1";
-      let hovered: HTMLElement | null = null;
+      if (view) lastPointer = { cursor: pointer, view };
+      pointer.style.transform = `translate(${here[0]}px, ${here[1]}px)`;
+      pointer.dataset.shape = "arrow";
+      play(pointer, [{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: EASE_SETTLE });
+      pointer.style.opacity = "1";
+    }
 
-      for (const cue of scene.cursor) {
-        at(cue.at, () => {
+    /* one round of the take from `start` on its clock; as it ends, the next one is set up */
+    const playRound = (start: number) => {
+      for (const cue of scene.cues) at(start + cue.at, () => setPhase(cue.phase));
+
+      for (const shot of scene.shots) {
+        at(start + shot.at, () => {
+          const from = getComputedStyle(camera).transform;
+          const to = frame(shot.focus, shot.fill ?? 0.94, shot.width, shot.cropBelow);
+          play(
+            camera,
+            [{ transform: from }, { transform: to }],
+            { duration: shot.move, easing: shot.ease === "settle" ? EASE_SETTLE : EASE_MOVE, fill: "forwards" },
+            () => (camera.style.transform = to),
+          );
+        });
+      }
+
+      for (const cue of pointer ? scene.cursor! : []) {
+        at(start + cue.at, () => {
           const target = targetOf(camera, cue.to);
           const box = scrollIntoPage(camera, cue.to, boxOf(camera, cue.to));
           const [ax, ay] = cue.aim ?? [0.5, 0.5];
@@ -451,16 +477,12 @@ export function SceneStage({
             hovered = null;
           }
           // leaving a text field, the I-beam turns back into the arrow a moment after setting off
-          if (cursor.dataset.shape !== "arrow" && cue.shape !== "ibeam") {
-            later(cue.move * 0.15, () => (cursor.dataset.shape = "arrow"));
+          if (pointer!.dataset.shape !== "arrow" && cue.shape !== "ibeam") {
+            later(cue.move * 0.15, () => (pointer!.dataset.shape = "arrow"));
           }
-          const travel = cursor.animate(frames, { duration: cue.move, easing: EASE_GLIDE, fill: "forwards" });
-          running.add(travel);
-          travel.onfinish = () => {
-            cursor.style.transform = frames.at(-1)!.transform;
-            travel.cancel();
-            running.delete(travel);
-            if (cue.shape === "ibeam") cursor.dataset.shape = "ibeam";
+          play(pointer!, frames, { duration: cue.move, easing: EASE_GLIDE, fill: "forwards" }, () => {
+            pointer!.style.transform = frames.at(-1)!.transform;
+            if (cue.shape === "ibeam") pointer!.dataset.shape = "ibeam";
             if (target) {
               target.dataset.hover = "true";
               hovered = target;
@@ -469,27 +491,57 @@ export function SceneStage({
             // after a short hover, a click: the pointer dips and the control gives way under it
             later(cue.hover ?? 200, () => {
               for (const [element, depth] of [
-                [cursor.querySelector<HTMLElement>(".scn-pointer"), 0.82],
+                [pointer!.querySelector<HTMLElement>(".scn-pointer"), 0.82],
                 [target, 0.97],
               ] as const) {
                 if (!element) continue;
-                const press = element.animate(
-                  [{ transform: "scale(1)" }, { transform: `scale(${depth})` }, { transform: "scale(1)" }],
-                  { duration: 240, easing: EASE_SETTLE },
-                );
-                running.add(press);
-                press.onfinish = () => running.delete(press);
+                play(element, [{ transform: "scale(1)" }, { transform: `scale(${depth})` }, { transform: "scale(1)" }], {
+                  duration: 240,
+                  easing: EASE_SETTLE,
+                });
               }
             });
-          };
+          });
         });
       }
-    }
+
+      // The finished frame rests; then the screen dips out, and the scene starts over out of sight.
+      // The pointer stays where the hand left it, and sets off from there in the next round.
+      const end = start + scene.duration + LOOP_REST;
+      at(end, () => {
+        camera.style.opacity = "0";
+        play(camera, [{ opacity: 1 }, { opacity: 0 }], { duration: DIP_OUT, easing: EASE_MOVE });
+      });
+      at(end + DIP_OUT, () => {
+        running.forEach((animation) => animation.cancel());
+        running.clear();
+        if (hovered) {
+          delete hovered.dataset.hover;
+          hovered = null;
+        }
+        if (pointer) {
+          pointer.style.transform = `translate(${here[0]}px, ${here[1]}px)`;
+          pointer.dataset.shape = "arrow";
+        }
+        setPhase(0);
+        setRound((value) => value + 1);
+      });
+      // once the first frame has rendered, the next round frames it and the screen comes back in
+      at(end + DIP_OUT + DIP_SETTLE, () => {
+        playRound(elapsed);
+        at(elapsed, () => {
+          camera.style.opacity = "";
+          play(camera, [{ opacity: 0 }, { opacity: 1 }], { duration: DIP_IN, easing: EASE_SETTLE });
+        });
+      });
+    };
+    playRound(0);
 
     return () => {
       window.cancelAnimationFrame(tick);
       holdTake.current = null;
       running.forEach((animation) => animation.cancel());
+      camera.style.opacity = "";
       camera.querySelectorAll<HTMLElement>("[data-hover]").forEach((element) => delete element.dataset.hover);
     };
   }, [scene, started, reduced, frame, screen]);
@@ -497,7 +549,7 @@ export function SceneStage({
   const Render = scene.Render;
 
   return (
-    <div className="scn-view" ref={viewRef}>
+    <div className="scn-view" ref={viewRef} data-round={round}>
       <div
         className="scn-camera"
         ref={cameraRef}
@@ -505,7 +557,7 @@ export function SceneStage({
         style={{ width: screen.width, height: screen.height }}
       >
         <div className="scn-screen" ref={screenRef} inert aria-hidden="true">
-          <Render phase={reduced ? scene.finalPhase : phase} />
+          <Render key={round} phase={reduced ? scene.finalPhase : phase} />
         </div>
         {scene.cursor?.length && !reduced ? (
           <div className="scn-cursor" ref={cursorRef} aria-hidden="true">

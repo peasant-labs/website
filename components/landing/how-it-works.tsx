@@ -21,10 +21,11 @@ const SCENES: readonly SceneDefinition[] = [RECORD_SCENE, REVIEW_SCENE, PUBLISH_
  * Choosing a step scrolls to it. So the held section never looks frozen, the
  * current step's bar, along its bottom rule, fills with its third.
  *
- * The scenes have no controls: a take plays only while its screen can be
- * seen, and holds where it is while the reader's pointer or keyboard focus is
- * on it. The screen is one image to assistive technology, described by the
- * step at hand, and it takes focus so a keyboard can hold it too.
+ * The scenes have no controls: the current step's take plays, round after
+ * round, while its screen can be seen, and a pointer resting on it or a tap
+ * on it never stops it. The screen is one image to assistive technology,
+ * described by the step at hand, and it takes keyboard focus, which holds the
+ * take where it is until the focus moves on.
  *
  * The steps show their titles; only the current one opens its description,
  * and the last one closes as it does, both on one height transition. The list
@@ -47,8 +48,8 @@ export function HowItWorks({ title }: { title: string }) {
   const [active, setActive] = useState(0);
   /* one take counter per scene: a scene starts a fresh take each time it becomes current, and on replay */
   const [takes, setTakes] = useState<readonly number[]>(() => SCENES.map(() => 0));
-  /* the reader's pointer or keyboard focus on the screen holds the take where it is */
-  const [held, setHeld] = useState({ hover: false, focus: false });
+  /* keyboard focus on the screen holds the take where it is; a click or a tap that focuses it does not */
+  const [held, setHeld] = useState(false);
   const [shown, setShown] = useState(active);
   if (shown !== active) {
     setShown(active);
@@ -181,14 +182,8 @@ export function HowItWorks({ title }: { title: string }) {
                   aria-label={current.scene}
                   data-scene={current.id}
                   tabIndex={0}
-                  onPointerEnter={(event) => {
-                    if (event.pointerType === "mouse") setHeld((value) => ({ ...value, hover: true }));
-                  }}
-                  onPointerLeave={(event) => {
-                    if (event.pointerType === "mouse") setHeld((value) => ({ ...value, hover: false }));
-                  }}
-                  onFocus={() => setHeld((value) => ({ ...value, focus: true }))}
-                  onBlur={() => setHeld((value) => ({ ...value, focus: false }))}
+                  onFocus={(event) => setHeld(event.currentTarget.matches(":focus-visible"))}
+                  onBlur={() => setHeld(false)}
                 >
                   {SCENES.map((scene, index) => (
                     <div
@@ -200,7 +195,7 @@ export function HowItWorks({ title }: { title: string }) {
                       <SceneStage
                         key={takes[index]}
                         scene={scene}
-                        playing={index === active && onScreen && !held.hover && !held.focus}
+                        playing={index === active && onScreen && !held}
                         reduced={false}
                       />
                     </div>
