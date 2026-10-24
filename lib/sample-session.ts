@@ -1,3 +1,5 @@
+import { SESSION } from "@/lib/landing";
+import { shareCardFromPayload } from "@peasant-labs/fairtrade/share";
 import type { TranscriptWireInput } from "@peasant-labs/fairtrade/ui";
 
 /**
@@ -278,3 +280,15 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
     },
   ],
 };
+
+/*
+ * The card village would show for the sample's link, named by the title the
+ * transcript browser shows for it: its figures and first prompt are the
+ * sample's own. A sample without a card would leave an image with no name, so
+ * the build fails rather than draw one.
+ */
+export const SAMPLE_CARD =
+  shareCardFromPayload({ ...SAMPLE_SESSION, title: SESSION.sessionTitle }) ??
+  (() => {
+    throw new Error("lib/sample-session: the sample yields no share card");
+  })();

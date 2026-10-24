@@ -12,19 +12,9 @@ import {
 } from "@/components/landing/x-icons";
 import { SafariWindow } from "@/components/mac";
 import { THREAD } from "@/lib/landing";
-import { SAMPLE_SESSION } from "@/lib/sample-session";
-import { ShareCard, shareCardAlt, shareCardFromPayload } from "@peasant-labs/fairtrade/share";
+import { SAMPLE_CARD as CARD } from "@/lib/sample-session";
+import { ShareCard, shareCardAlt } from "@peasant-labs/fairtrade/share";
 import type { CSSProperties, ReactNode } from "react";
-
-/*
- * the card village would show for the sample's link: its figures and first prompt are the sample's own. A sample
- * without a card would leave an image with no name, so the build fails rather than draw one.
- */
-const CARD =
-  shareCardFromPayload(SAMPLE_SESSION) ??
-  (() => {
-    throw new Error("lib/sample-session: the sample yields no share card");
-  })();
 
 type Post = (typeof THREAD.posts)[number];
 
@@ -87,6 +77,7 @@ function PostView({ post, linked, children }: { post: Post; linked: boolean; chi
         <div className="lp-x-head">
           <span className="lp-x-name">{post.name}</span>
           <span className="lp-x-handle">{post.handle}</span>
+          <span className="lp-x-pause">, </span>
           <span className="lp-x-sep" aria-hidden="true">
             ·
           </span>

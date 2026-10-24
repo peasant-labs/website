@@ -138,6 +138,8 @@ test("the session's four windows fan out from one stack once, the transcript wid
   // the windows stand from a tablet's width; a phone shows the session's slice instead (its own test)
   for (const width of [1440, 768]) {
     await page.setViewportSize({ width, height: 900 });
+    // one thread, in its window; the phone's copy without one stays hidden
+    await expect(page.locator("#session [data-x-thread]").filter({ visible: true }), `at ${width}`).toHaveCount(1);
     const layout = await windows.evaluate((group) => {
       const rect = (selector: string) => group.querySelector(selector)!.getBoundingClientRect();
       const column = group.parentElement!;
@@ -319,11 +321,14 @@ test("on a phone the shared thread follows the slice at the column's width, read
           // the card is drawn at its own 1200 pixels and scaled: what a reader sees is the size times the scale
           cardPrompt: parseFloat(getComputedStyle(prompt).fontSize) * (drawn.width / 1200),
           cardInside: drawn.left >= box.left - 1 && drawn.right <= box.right + 1,
+          // X's system face, though no window around it sets one
+          face: getComputedStyle(element.querySelector(".lp-x-text")!).fontFamily.split(",")[0]!.trim(),
           // out of the avatar column, it never runs over the avatar above it
           clearOfAvatar: drawn.top >= card.closest(".lp-x-post")!.querySelector(".lp-x-avatar")!.getBoundingClientRect().bottom,
         };
       }, fixture.thread.phone.promptWord);
       expect(layout, at).toMatchObject({ page: 0, left: 0, right: 0, below: true, windowed: false, cardInside: true, clearOfAvatar: true });
+      expect(layout.face, `the post text's face ${at}`).toBe(fixture.thread.face);
       // a picture of X: its dark UI whatever the site's theme
       expect(layout.background, at).toBe("rgb(0, 0, 0)");
       expect(layout.postText, `post text ${at}`).toBeGreaterThanOrEqual(fixture.thread.phone.postText);

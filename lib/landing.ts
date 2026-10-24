@@ -322,6 +322,8 @@ export const SESSION = {
   title: "a new standard for transcript sharing, viewing, and attribution",
   /* the short title the transcript browser shows for the sample, the way a curated page names a session */
   sessionTitle: "rewrite billing retries",
+  /* how long before the reader arrived the sample ended, so its relative times read as today's work */
+  endedAgoMinutes: 50,
   label: "a sample session",
   /*
    * On a phone, the session's slice instead of the windows: the prompt, the
@@ -342,30 +344,32 @@ export const SESSION = {
  * of the sample's three models, a reply asks for the prompt, and her answer is
  * only the transcript's link preview. The chart's bars are the pass rates in
  * the sample's own results table (lib/sample-session.ts), oldest model first.
- * Counts are as X shows them: none beside an action nobody took.
+ * Counts are as X shows them: none beside an action nobody took. Each time is
+ * the post's age, newer down the thread, and every post comes after the
+ * sample ended (SESSION.endedAgoMinutes).
  */
 export const THREAD = {
   /* how assistive technology names the whole thread */
-  label: "a reply sharing the transcript",
+  label: "a thread on X sharing the transcript",
   posts: [
     {
       name: "mira",
       handle: "@mira_builds",
-      time: "2h",
+      time: "40m",
       text: "I ran some experiments with the new Opus 5.5. here's how it did vs the last two models",
       counts: { reply: "24", repost: "31", like: "412", views: "18K" },
     },
     {
       name: "doofus",
       handle: "@doofuslord69",
-      time: "1h",
+      time: "25m",
       text: "wat prompt did u use",
       counts: { reply: "1", repost: "", like: "57", views: "3.2K" },
     },
     {
       name: "mira",
       handle: "@mira_builds",
-      time: "58m",
+      time: "18m",
       text: "",
       counts: { reply: "3", repost: "9", like: "96", views: "2.4K" },
     },

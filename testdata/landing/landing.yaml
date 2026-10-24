@@ -154,6 +154,8 @@ session:
   sessionId: sess_8d3f52
   # the author the header shows: the publisher's handle, not a redaction marker
   author: "@mira_builds"
+  # how long before the reader arrived the sample ended: every post in the thread comes after it
+  endedAgo: 50m
   # on a phone, the slice shown instead of the windows: the prompt, the redacted line of the .env it read, and the commit
   phone:
     widths: [360, 390]
@@ -180,13 +182,18 @@ session:
 card:
   figures: { prompts: 5, tokens: 52600 }
 # the X thread beside the windows: mira's benchmark, a reply asking for the prompt, and her answer, which is only
-# the transcript's link preview; it is read as one short group
+# the transcript's link preview; it is read as one short group. Each post's time is its age, after the session ended
+# and newer down the thread
 thread:
-  label: a reply sharing the transcript
+  label: a thread on X sharing the transcript
   posts:
-    - { name: mira, handle: "@mira_builds", time: 2h, text: "I ran some experiments with the new Opus 5.5. here's how it did vs the last two models" }
-    - { name: doofus, handle: "@doofuslord69", time: 1h, text: wat prompt did u use }
-    - { name: mira, handle: "@mira_builds", time: 58m, text: "" }
+    - { name: mira, handle: "@mira_builds", time: 40m, text: "I ran some experiments with the new Opus 5.5. here's how it did vs the last two models" }
+    - { name: doofus, handle: "@doofuslord69", time: 25m, text: wat prompt did u use }
+    - { name: mira, handle: "@mira_builds", time: 18m, text: "" }
+  # X's actions under every post, in X's order
+  actions: [reply, repost, like, views, bookmark, share]
+  # the system face X's posts are set in, at the head of the thread's computed font stack, with or without a window
+  face: -apple-system
   # the bars of the first post's chart, oldest model first: each value is that model's pass rate in the sample's table
   chart:
     - { label: model A, value: 71 }
@@ -194,7 +201,8 @@ thread:
     - { label: Opus 5.5, value: 94 }
   from: From village.peasantlabs.org
   # on a phone the thread follows the session's slice at the column's width, with no window around it: its post text
-  # and the card's prompt, measured as drawn (the card's own size times its scale), stay readable at every phone width
+  # and the card's prompt, measured as drawn (the card's own size times its scale), stay readable at the phone widths
+  # the session tests (session.phone.widths)
   phone: { postText: 12, cardPrompt: 11, promptWord: hey }
 # the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:

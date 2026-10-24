@@ -3,8 +3,9 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { SAMPLE_SESSION } from "../lib/sample-session";
+import { SAMPLE_CARD, SAMPLE_SESSION } from "../lib/sample-session";
 import { shareCardAlt, shareCardFromPayload } from "@peasant-labs/fairtrade/share";
+import { SESSION } from "../lib/landing";
 import { loadLandingFixture, PHONE } from "./landing-fixture";
 
 const fixture = loadLandingFixture();
@@ -1701,9 +1702,11 @@ test("the sample session carries the figures a share card shows", () => {
 });
 
 test("the share card's figures are the sample's own prompt count and token total", () => {
-  const card = shareCardFromPayload(SAMPLE_SESSION);
-  expect(card?.figures).toEqual(fixture.card.figures);
-  expect(card?.firstPrompt).toBe(fixture.session.firstAsk);
+  expect(SAMPLE_CARD.figures).toEqual(fixture.card.figures);
+  expect(SAMPLE_CARD.firstPrompt).toBe(fixture.session.firstAsk);
+  // it names the session by the title the transcript browser shows, never by its id
+  expect(SAMPLE_CARD.title).toBe(fixture.session.title);
+  expect(shareCardFromPayload(SAMPLE_SESSION)?.figures).toEqual(SAMPLE_CARD.figures);
 });
 
 /* the X thread in the session section, scrolled into view */
@@ -1776,7 +1779,7 @@ test("every post in the X thread has its more dots at its top right, hidden from
   for (const [index] of fixture.thread.posts.entries()) {
     expect(
       await actions.nth(index).locator("[data-action]").evaluateAll((items) => items.map((item) => item.getAttribute("data-action"))),
-    ).toEqual(["reply", "repost", "like", "views", "bookmark", "share"]);
+    ).toEqual(fixture.thread.actions);
   }
 });
 
@@ -1788,12 +1791,21 @@ test("the X thread reads once as a short group, the card as one image named by i
   await expect(group).toHaveCount(1);
   expect(await group.evaluate((element) => element.hasAttribute("data-x-thread"))).toBe(true);
   // the card is one image named by fairtrade's alt for this sample; the words it lays out one by one are hidden
-  const card = shareCardFromPayload(SAMPLE_SESSION)!;
-  const image = group.getByRole("img", { name: shareCardAlt(card), exact: true });
+  const image = group.getByRole("img", { name: shareCardAlt(SAMPLE_CARD), exact: true });
   await expect(image).toHaveCount(1);
   await expect(image.locator("> *")).toHaveAttribute("aria-hidden", "true");
   // the chart is one image too, named by its bars
   await expect(group.getByRole("img", { name: /model A 71%/ })).toHaveCount(1);
+  // a screen reader hears each handle apart from its time, not run into it: the text it reads, without what is hidden
+  const spoken = await group.evaluate((element) => {
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    let text = "";
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (!node.parentElement!.closest('[aria-hidden="true"]')) text += node.textContent;
+    }
+    return text;
+  });
+  for (const post of fixture.thread.posts) expect(spoken).toContain(`${post.handle}, ${post.time}`);
   // every drawn icon is decoration
   const exposed = await thread.locator("svg").evaluateAll(
     (icons) => icons.filter((icon) => !icon.closest('[aria-hidden="true"]')).length,
@@ -1837,8 +1849,8 @@ test("the card in the X thread shows the transcript's own prompt count, token to
   expect(first).toContain(prompt);
   expect(fixture.session.firstAsk.startsWith(prompt)).toBe(true);
   // drawn in the card's own face, which the landing does not restyle, and scaled to the post's width
-  const drawn = await card.evaluate((frame) => {
-    const word = [...frame.querySelectorAll("span")].find((span) => span.textContent === "billing")!;
+  const drawn = await card.evaluate((frame, promptWord) => {
+    const word = [...frame.querySelectorAll("span")].find((span) => span.textContent === promptWord)!;
     const inner = frame.querySelector('[aria-hidden="true"]')!.getBoundingClientRect();
     return {
       family: getComputedStyle(word).fontFamily,
@@ -1847,7 +1859,7 @@ test("the card in the X thread shows the transcript's own prompt count, token to
       inner: inner.width,
       ratio: inner.width / inner.height,
     };
-  });
+  }, fixture.thread.phone.promptWord);
   expect(drawn.family).toMatch(/^"?Atkinson Hyperlegible"?(,|$)/);
   expect(drawn.loaded).toBe(true);
   expect(Math.abs(drawn.inner - drawn.frame)).toBeLessThanOrEqual(2);
@@ -1867,6 +1879,63 @@ test("under the card in the X thread, the line naming where it links", async ({ 
     };
   });
   expect(order).toEqual({ card: true, below: true });
+});
+
+/* "40m", "2h": a post's age as X writes it, in minutes */
+function minutes(age: string) {
+  const [, count, unit] = age.match(/^(\d+)(m|h)$/) ?? [];
+  if (!count) throw new Error(`not an age X would write: ${age}`);
+  return Number(count) * (unit === "h" ? 60 : 1);
+}
+
+test("every post in the X thread comes after the sample session ended, newer down the thread", () => {
+  const ended = minutes(fixture.session.endedAgo);
+  // the viewer moves the sample to have ended this long before the reader arrived
+  expect(SESSION.endedAgoMinutes).toBe(ended);
+  const ages = fixture.thread.posts.map((post) => minutes(post.time));
+  for (const [index, age] of ages.entries()) expect(age, `post ${index + 1}`).toBeLessThan(ended);
+  expect([...ages].sort((a, b) => b - a)).toEqual(ages);
+  expect(new Set(ages).size).toBe(ages.length);
+});
+
+test("the X thread's posts are set in the system face X uses, inside its window", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const thread = await openThread(page);
+  const faces = await thread
+    .locator(".lp-x-text, .lp-x-name")
+    .evaluateAll((items) => items.map((item) => getComputedStyle(item).fontFamily));
+  expect(faces.length).toBeGreaterThan(0);
+  for (const face of faces) expect(face.split(",")[0]!.trim()).toBe(fixture.thread.face);
+});
+
+test("a keyboard user's focus in the transcript is never hidden under the thread over its corner", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of [1440, 768]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const viewer = page.locator("#session [data-session-viewer]");
+    await viewer.scrollIntoViewIfNeeded();
+    await expect(viewer.locator(".txn-app")).toBeVisible();
+    await viewer.locator(".txn-stream").evaluate((stream) => stream.querySelector<HTMLElement>("a, button, [tabindex]")!.focus());
+    let reached = 0;
+    for (let press = 0; press < 40; press += 1) {
+      await page.keyboard.press("Tab");
+      const focus = await page.evaluate(() => {
+        const element = document.activeElement!;
+        if (!element.closest("#session [data-session-viewer] :is(.txn-stream, .txn-rail-body)")) return null;
+        const box = element.getBoundingClientRect();
+        const thread = document.querySelector("#session .lp-windows-x")!.getBoundingClientRect();
+        return {
+          name: `${element.className} ${element.textContent?.slice(0, 24)}`,
+          hidden: box.left >= thread.left && box.right <= thread.right && box.top >= thread.top && box.bottom <= thread.bottom,
+        };
+      });
+      if (!focus) continue;
+      reached += 1;
+      expect(focus.hidden, `at ${width}, after ${press + 1} presses, ${focus.name}`).toBe(false);
+    }
+    expect(reached, `focus stayed in the transcript at ${width}`).toBeGreaterThan(20);
+  }
 });
 
 test("a sample session opens in the real transcript browser, in a wide window that keeps its height", async ({

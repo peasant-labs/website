@@ -1187,11 +1187,17 @@
  * --mac-u, so a small screen scales the whole chrome down in proportion.
  */
 
+/* the system face: the windows' chrome, and the thread on X, which a phone shows without a window around it */
+.mac-desk,
+.mac-win,
+.lp-x {
+  --mac-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 .mac-desk,
 .mac-win {
   /* the dark appearance, with the site's dark theme */
   --mac-u: 1px;
-  --mac-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mac-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --mac-bar-bg: #2d2d2d;
   --mac-bar-rule: #0d0d0d;
@@ -1463,6 +1469,19 @@
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
+}
+
+/* the page's icon, before its address, as Safari shows it */
+.mac-address-icon {
+  display: inline-flex;
+  vertical-align: -0.15em;
+  margin-inline-end: calc(5 * var(--mac-u));
+}
+
+.mac-address-icon svg {
+  width: calc(13 * var(--mac-u));
+  height: calc(13 * var(--mac-u));
+  color: var(--mac-field-ink);
 }
 
 .mac-body {
@@ -2424,6 +2443,8 @@
   --lp-windows-body: clamp(32rem, 78svh, 48rem);
   /* the room under the front window for the check that hangs from its corner */
   --lp-check-room: 5.5rem;
+  /* how far up the transcript's body the thread over its lower right corner reaches */
+  --lp-windows-x-overlap: calc(0.3 * var(--lp-windows-body));
 
   position: relative;
   min-width: 0;
@@ -2533,7 +2554,7 @@
   z-index: 2;
   /* at a tablet's width it takes more of the row, so the card it carries still reads */
   width: min(30rem, 60%);
-  margin-block-start: calc(-1 * (var(--lp-check-room) + 0.3 * var(--lp-windows-body)));
+  margin-block-start: calc(-1 * (var(--lp-check-room) + var(--lp-windows-x-overlap)));
   margin-inline: auto calc(-1 * var(--lp-windows-x-end));
 }
 
@@ -2627,6 +2648,17 @@
   overflow-x: hidden;
 }
 
+/*
+ * Where the windows stand, the thread covers the columns' lowest part, so a
+ * control a keyboard moves to scrolls up clear of it rather than stopping
+ * under it.
+ */
+@media (min-width: 48rem) {
+  .lp-windows .lp-viewer :is(.txn-stream, .txn-rail-body) {
+    scroll-padding-block-end: var(--lp-windows-x-overlap);
+  }
+}
+
 /* the conversation has most of the window, so a turn's prose runs its width rather than wrapping early */
 .lp-viewer .txn-body > :is(.txn-md-prose, .txn-md-list, .txn-md-heading, .txn-md-blockquote) {
   max-inline-size: none;
@@ -2673,18 +2705,6 @@
  * avatar column with X's 12px by 16px padding; a reply in the same
  * conversation hangs from a 2px line under the avatar before it.
  */
-.mac-address-icon {
-  display: inline-flex;
-  vertical-align: -0.15em;
-  margin-inline-end: calc(5 * var(--mac-u));
-}
-
-.mac-address-icon svg {
-  width: calc(13 * var(--mac-u));
-  height: calc(13 * var(--mac-u));
-  color: var(--mac-field-ink);
-}
-
 .lp-x-win .mac-body {
   background: #000000;
 }
@@ -2804,6 +2824,16 @@
 .lp-x-sep,
 .lp-x-time {
   flex: none;
+}
+
+/* the pause a screen reader makes between a handle and its time, where the eye has X's separator */
+.lp-x-pause {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .lp-x-more {
