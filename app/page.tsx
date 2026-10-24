@@ -5,6 +5,7 @@ import { HeroFlow } from "@/components/landing/hero-flow";
 import { LandingIcon } from "@/components/landing/icons";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { SessionWindows } from "@/components/landing/session-windows";
+import { SessionPhone } from "@/components/landing/session-phone";
 import { SessionViewer } from "@/components/landing/session-viewer";
 import { UseCases } from "@/components/landing/use-cases";
 import { SafariWindow } from "@/components/mac";
@@ -106,15 +107,27 @@ export default function Home() {
                 {SESSION.title}
               </h2>
             </div>
-            <SessionWindows>
-              <SafariWindow secure className="lp-session-win">
-                <SessionViewer
-                  label={SESSION.label}
-                  session={SAMPLE_SESSION}
-                  title={SESSION.sessionTitle}
-                />
-              </SafariWindow>
-            </SessionWindows>
+            {/* from a tablet's width, the windows; on a phone, a short slice of the session at the column's width */}
+            <div className="lp-session-body">
+              <div className="lp-session-wide">
+                <SessionWindows>
+                  <SafariWindow secure className="lp-session-win">
+                    <SessionViewer
+                      label={SESSION.label}
+                      session={SAMPLE_SESSION}
+                      title={SESSION.sessionTitle}
+                    />
+                  </SafariWindow>
+                </SessionWindows>
+              </div>
+              <SessionPhone
+                label={SESSION.label}
+                session={SAMPLE_SESSION}
+                prompt={SESSION.phone.prompt}
+                turn={SESSION.phone.turn}
+                tool={SESSION.phone.tool}
+              />
+            </div>
           </div>
         </section>
 

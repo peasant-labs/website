@@ -127,7 +127,8 @@ test("the session's windows fan out from one stack once, the transcript wide in 
     .poll(() => windows.locator(".lp-check").evaluate((element) => getComputedStyle(element).transform))
     .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
 
-  for (const width of [1440, 390]) {
+  // a phone shows the session's slice instead of the windows (its own test), so this reads the wide layout
+  for (const width of [1440]) {
     await page.setViewportSize({ width, height: 900 });
     const layout = await windows.evaluate((group) => {
       const rect = (selector: string) => group.querySelector(selector)!.getBoundingClientRect();
@@ -184,10 +185,10 @@ test("the session's windows fan out from one stack once, the transcript wide in 
   expect(await back.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
 });
 
-test("the transcript browser fits at phone and tablet widths, a long line scrolling inside its own block", async ({
+test("the transcript browser fits at a tablet's width, a long line scrolling inside its own block", async ({
   browser,
 }) => {
-  for (const width of [390, 768]) {
+  for (const width of [768]) {
     const context = await browser.newContext({ ...PHONE, viewport: { width, height: 900 } });
     const page = await context.newPage();
     await page.goto("/");
@@ -205,6 +206,65 @@ test("the transcript browser fits at phone and tablet widths, a long line scroll
       contained: box.scrollWidth <= box.clientWidth || /auto|scroll/.test(getComputedStyle(box).overflowX),
     }));
     expect(fit, `the transcript browser does not fit at ${width}`).toEqual({ page: 0, contained: true });
+    await context.close();
+  }
+});
+
+test("on a phone the session is a short slice at the column's width, its redacted key read whole", async ({
+  browser,
+}) => {
+  for (const width of fixture.session.phone.widths) {
+    const context = await browser.newContext({ ...PHONE, viewport: { width, height: 844 } });
+    const page = await context.newPage();
+    await page.goto("/");
+    const section = page.locator("#session");
+    const slice = section.locator("[data-session-phone]");
+    await slice.scrollIntoViewIfNeeded();
+    // no windows: no browser chrome, no Terminal behind
+    await expect(section.locator(".lp-session-win")).toBeHidden();
+    await expect(section.locator(".lp-windows-term")).toBeHidden();
+    await expect(slice).toBeVisible();
+    // the prompt, the tool call that read .env open on its redacted key, and the commit with its churn
+    await expect(slice.locator(".txn-turn.user")).toContainText(fixture.session.phone.prompt);
+    const env = slice.locator(".tc-head", { hasText: fixture.session.phone.tool });
+    await expect(env).toHaveAttribute("aria-expanded", "true");
+    const result = env.locator("xpath=..").locator("pre");
+    await expect(result).toContainText(`${fixture.session.phone.key}${fixture.session.phone.marker}`);
+    await expect(slice.locator(".lp-phone-commit")).toContainText(fixture.session.phone.commit);
+    await expect(slice.locator(".lp-phone-commit")).toContainText(fixture.session.phone.stat);
+
+    const layout = await slice.evaluate((element, marker) => {
+      const pre = element.querySelector("pre")!;
+      // the marker sits on one line, never split by a wrap
+      const node = [...pre.childNodes].find((child) => child.textContent?.includes(marker))!;
+      const range = document.createRange();
+      const at = node.textContent!.indexOf(marker);
+      range.setStart(node, at);
+      range.setEnd(node, at + marker.length);
+      const texts = [...element.querySelectorAll("*")].filter(
+        (item) => item.getClientRects().length && [...item.childNodes].some((child) => child.nodeType === 3 && child.textContent?.trim()),
+      );
+      const targets = [...element.querySelectorAll("button")].filter((item) => item.getClientRects().length);
+      return {
+        page: document.documentElement.scrollWidth - window.innerWidth,
+        width: Math.round(element.getBoundingClientRect().width),
+        column: Math.round(element.closest("section")!.querySelector(".lp-head")!.getBoundingClientRect().width),
+        overflowing: [...element.children].filter((child) => child.getBoundingClientRect().right > window.innerWidth).length,
+        markerLines: new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size,
+        smallestText: Math.min(...texts.map((item) => parseFloat(getComputedStyle(item).fontSize))),
+        smallestTarget: Math.min(...targets.map((item) => item.getBoundingClientRect().height)),
+      };
+    }, fixture.session.phone.marker);
+    expect(layout, `the slice at ${width}`).toMatchObject({ page: 0, overflowing: 0, markerLines: 1 });
+    expect(layout.width).toBe(layout.column);
+    expect(layout.smallestText, `text under 14px at ${width}`).toBeGreaterThanOrEqual(14);
+    expect(layout.smallestTarget, `a target under 44px at ${width}`).toBeGreaterThanOrEqual(44);
+
+    // the tool call closes and opens on the reader's tap, and on nothing else
+    await env.tap();
+    await expect(env).toHaveAttribute("aria-expanded", "false");
+    await env.tap();
+    await expect(env).toHaveAttribute("aria-expanded", "true");
     await context.close();
   }
 });

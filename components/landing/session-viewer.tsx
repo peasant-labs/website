@@ -49,7 +49,7 @@ function useNear(ref: RefObject<Element | null>) {
 const ENDED_AGO_MS = 50 * 60 * 1000;
 
 /* the sample, moved in time as a whole so it ended ENDED_AGO_MS before `now`; its own spacing is kept */
-function endedRecently(session: TranscriptWireInput, now: number): TranscriptWireInput {
+export function endedRecently(session: TranscriptWireInput, now: number): TranscriptWireInput {
   const end = Date.parse(session.endTime ?? session.startTime ?? "");
   if (Number.isNaN(end)) return session;
   const offset = now - ENDED_AGO_MS - end;

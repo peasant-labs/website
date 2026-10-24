@@ -1526,14 +1526,17 @@ test("the transcript browser rests where it opens, and only the reader's own inp
   test.setTimeout(60_000);
   for (const viewport of [
     { width: 1440, height: 900 },
+    { width: 768, height: 1024 },
     { width: 390, height: 844 },
   ]) {
     const context = await browser.newContext(viewport.width < 500 ? { ...PHONE, viewport } : { viewport });
     const page = await context.newPage();
     await page.goto("/");
-    const viewer = page.locator("#session [data-session-viewer]");
+    // a phone shows the session's slice instead of the browser; it holds still the same way
+    const phone = viewport.width < 768;
+    const viewer = page.locator(phone ? "#session [data-session-phone]" : "#session [data-session-viewer]");
     await viewer.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-    await expect(viewer.locator(".txn-app")).toBeVisible();
+    await expect(viewer.locator(phone ? ".txn-turn" : ".txn-app").first()).toBeVisible();
     // what a hand could change: the tab, how far the conversation is scrolled, what is open, anything moving
     const state = () =>
       viewer.evaluate((element) => ({
@@ -1550,15 +1553,11 @@ test("the transcript browser rests where it opens, and only the reader's own inp
         pointers: element.querySelectorAll(".mac-pointer, [data-touring]").length,
         lit: "highlights" in CSS ? CSS.highlights.size : 0,
       }));
-    // it opens at rest on the full trace, at its top, nothing open but what fairtrade opens by default
+    // it opens at rest (the browser on the full trace, at its top), nothing open but what it opens by default
     const opening = await state();
-    expect(opening, `the opening state at ${viewport.width}`).toMatchObject({
-      tab: "full",
-      scrolled: 0,
-      moving: 0,
-      pointers: 0,
-      lit: 0,
-    });
+    expect(opening, `the opening state at ${viewport.width}`).toMatchObject(
+      phone ? { moving: 0, pointers: 0, lit: 0 } : { tab: "full", scrolled: 0, moving: 0, pointers: 0, lit: 0 },
+    );
     if (viewport.width >= 1024) expect(opening.filters).toBe("closed");
     // and left alone, it stays exactly so
     await page.waitForTimeout(6_000);

@@ -143,6 +143,15 @@ session:
   sessionId: sess_c41e07
   # the author the header shows: the publisher's handle, not a redaction marker
   author: "@ada"
+  # on a phone, the slice shown instead of the windows: the prompt, the redacted line of the .env it read, and the commit
+  phone:
+    widths: [360, 390]
+    prompt: Uploads to staging fail with a 403 since this morning.
+    tool: .env
+    key: AWS_ACCESS_KEY_ID=
+    marker: "<AWS_ACCESS_KEY>"
+    commit: 9b20f4e
+    stat: "+11 −4, 2 files"
   # the transcript browser's own tabs, as online's transcript page shows them
   tabs: [highlights, full trace, diffs, files, annotations]
   # the pull request's check, in village's own words (backend/internal/digest/render.go) for one transcript and one commit

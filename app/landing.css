@@ -2424,6 +2424,65 @@
   }
 }
 
+/*
+ * On a phone the windows give way to a short slice of the session at the
+ * column's full width: no chrome around it, fairtrade's turn cards stacked,
+ * then the commit. From a tablet's width the windows stand as they are.
+ */
+.lp-phone {
+  display: none;
+}
+
+@media (max-width: 47.99rem) {
+  .lp-session-wide {
+    display: none;
+  }
+
+  .lp-phone {
+    display: grid;
+    gap: var(--sp-4);
+    min-width: 0;
+  }
+
+  /* each block takes the column's width, however wide its longest line, with one even gap between blocks */
+  .lp-phone > *,
+  .lp-phone > * > .txn-turn {
+    min-width: 0;
+    margin-block: 0;
+  }
+
+  /* the slice keeps to what it shows: no turn numbers, disclosures, links, times or token counts to aim at */
+  .lp-phone :is(.txn-turnnum, .txn-turn-disclosure, .txn-anchor),
+  .lp-phone .term-anchor:has(.txn-turntime, .txn-tokbadge) {
+    display: none;
+  }
+
+  /* the turn's controls open and close on a tap, on full-size targets */
+  .lp-phone :is(.tc-head, .txn-thinking-toggle) {
+    min-block-size: var(--target-comfortable);
+  }
+
+  /* the commit is the chip the trace marks it with, across the column, without the trace's rules around it */
+  .lp-phone .lp-phone-commit {
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .lp-phone .lp-phone-commit .mkc {
+    flex: 1;
+  }
+
+  /*
+   * A result's lines wrap within the column rather than running out of it, so
+   * the redacted key reads whole: the line breaks before its marker, never
+   * inside it, and a token is cut only when nothing else fits.
+   */
+  .lp-phone pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
 .lp-viewer {
   position: relative;
   inline-size: 100%;

@@ -52,6 +52,15 @@ export type LandingFixture = {
     title: string;
     sessionId: string;
     author: string;
+    phone: {
+      widths: number[];
+      prompt: string;
+      tool: string;
+      key: string;
+      marker: string;
+      commit: string;
+      stat: string;
+    };
     tabs: string[];
     check: { name: string; summary: string };
     markers: string[];
