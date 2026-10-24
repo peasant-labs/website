@@ -36,7 +36,7 @@ export const HERO = {
     { text: "permissioned sharing", icon: "lock" },
     { text: "open source", icon: "code" },
     { text: "works with many agents", icon: "bot" },
-    { text: "data attribution", icon: "link" },
+    { text: "data attribution", icon: "stamp" },
   ],
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
@@ -98,7 +98,8 @@ export type LandingIconName =
   | "review"
   | "bot"
   | "zap"
-  | "book";
+  | "book"
+  | "stamp";
 
 /** a capability: its headline, one or two sentences on what it is, and its own picture, which shows while it does */
 export type Capability = Readonly<{ text: string; detail: string; icon: LandingIconName; art: Art }>;
