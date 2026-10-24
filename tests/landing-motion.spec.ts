@@ -127,8 +127,8 @@ test("the session's windows fan out from one stack once, the transcript wide in 
     .poll(() => windows.locator(".lp-check").evaluate((element) => getComputedStyle(element).transform))
     .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
 
-  // a phone shows the session's slice instead of the windows (its own test), so this reads the wide layout
-  for (const width of [1440]) {
+  // the windows stand from a tablet's width; a phone shows the session's slice instead (its own test)
+  for (const width of [1440, 768]) {
     await page.setViewportSize({ width, height: 900 });
     const layout = await windows.evaluate((group) => {
       const rect = (selector: string) => group.querySelector(selector)!.getBoundingClientRect();
@@ -146,38 +146,19 @@ test("the session's windows fan out from one stack once, the transcript wide in 
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
+    const at = `at ${width}`;
     // behind and up to the left; the transcript wide in front; the check over the front window's lower left edge
-    expect(layout.back.left, `at ${width}`).toBeLessThan(layout.front.left);
-    expect(layout.back.top, `at ${width}`).toBeLessThan(layout.front.top);
-    expect(layout.check.left, `at ${width}`).toBeLessThan(layout.front.left);
-    expect(layout.check.right, `at ${width}`).toBeGreaterThan(layout.front.left);
-    // over the front window's left edge on a wide screen; hanging just under it on a phone, clear of the reel's controls
-    // it crosses only the front window's bottom edge on a wide screen, never its content; on a phone it hangs below
-    if (width === 1440) {
-      expect(layout.check.top).toBeLessThan(layout.front.bottom);
-      expect(layout.check.top).toBeGreaterThanOrEqual(layout.front.bottom - 16);
-    } else expect(layout.check.top).toBeGreaterThanOrEqual(layout.front.bottom);
-    if (width === 1440) expect(layout.front.width / layout.inner).toBeGreaterThan(0.85);
-    // on a phone the check spans the column, so its summary keeps its last word on its line
-    else {
-      expect(layout.check.width).toBeGreaterThanOrEqual(layout.inner - 1);
-      // its summary never leaves one word alone on a line: the last line is at least a third of the first
-      const widths = await windows.locator(".lp-check-summary").evaluate((summary) => {
-        const range = document.createRange();
-        range.selectNodeContents(summary);
-        const lines = new Map<number, number>();
-        for (const rect of range.getClientRects()) {
-          const top = Math.round(rect.top);
-          lines.set(top, Math.max(lines.get(top) ?? 0, rect.right));
-        }
-        const left = summary.getBoundingClientRect().left;
-        return [...lines.values()].map((right) => right - left);
-      });
-      expect(widths.at(-1)! / widths[0]!, "the check's summary leaves a word alone").toBeGreaterThan(0.33);
-    }
-    expect(layout.front.right, `the transcript runs past the content at ${width}`).toBeLessThanOrEqual(layout.right + 1);
-    expect(layout.back.left, `the Terminal runs past the content at ${width}`).toBeGreaterThanOrEqual(layout.left - 1);
-    expect(layout.overflow, `the page overflows at ${width}`).toBe(false);
+    expect(layout.back.left, at).toBeLessThan(layout.front.left);
+    expect(layout.back.top, at).toBeLessThan(layout.front.top);
+    expect(layout.check.left, at).toBeLessThan(layout.front.left);
+    expect(layout.check.right, at).toBeGreaterThan(layout.front.left);
+    // it crosses only the front window's bottom edge, never its content
+    expect(layout.check.top, at).toBeLessThan(layout.front.bottom);
+    expect(layout.check.top, at).toBeGreaterThanOrEqual(layout.front.bottom - 16);
+    expect(layout.front.width / layout.inner, at).toBeGreaterThan(0.85);
+    expect(layout.front.right, `the transcript runs past the content ${at}`).toBeLessThanOrEqual(layout.right + 1);
+    expect(layout.back.left, `the Terminal runs past the content ${at}`).toBeGreaterThanOrEqual(layout.left - 1);
+    expect(layout.overflow, `the page overflows ${at}`).toBe(false);
   }
 
   await page.emulateMedia({ reducedMotion: "reduce" });

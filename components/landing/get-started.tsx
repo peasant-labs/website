@@ -5,7 +5,7 @@ import { Tabs } from "@/components/fairtrade-client";
 import { INSTALL } from "@/lib/landing";
 import { ArrowRight } from "@peasant-labs/fairtrade/icons";
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 type PlatformId = (typeof INSTALL.platforms)[number]["id"];
 
@@ -22,18 +22,48 @@ function detectPlatform(): PlatformId {
  * label style. The first command follows the chosen system; a Windows visitor
  * lands on the PowerShell tab. Nothing moves.
  *
- * On a phone each row reads as the docs' captioned commands do: its number and
- * what it does on a line, then the command on one line that scrolls sideways
+ * On a phone each row reads as the docs' captioned commands do: a small step
+ * label, what it does, then the command on one line that scrolls sideways
  * inside its block; and under the card, a quiet link to the install guide.
+ * A command that scrolls is a scroll area a keyboard can reach, named the way
+ * fairtrade names its own one-line commands; one that shows whole stays out of
+ * the tab order.
  */
 export function GetStarted() {
   const detected = useSyncExternalStore(noSubscription, detectPlatform, () => "unix" as const);
   const [chosen, setPlatform] = useState<PlatformId | null>(null);
   const platform = chosen ?? detected;
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    const lines = [...card.querySelectorAll<HTMLElement>(".cli-cmd-line")];
+    const mark = () => {
+      for (const line of lines) {
+        if (line.scrollWidth > line.clientWidth + 1) {
+          const command = [...(line.querySelector("code")?.childNodes ?? [])]
+            .filter((node) => !(node instanceof Element && node.classList.contains("cli-cmd-sigil")))
+            .map((node) => node.textContent)
+            .join("");
+          line.tabIndex = 0;
+          line.setAttribute("role", "region");
+          line.setAttribute("aria-label", `command: ${command}`);
+        } else {
+          line.removeAttribute("tabindex");
+          line.removeAttribute("role");
+          line.removeAttribute("aria-label");
+        }
+      }
+    };
+    const observer = new ResizeObserver(mark);
+    for (const line of lines) observer.observe(line);
+    return () => observer.disconnect();
+  }, [platform]);
 
   return (
     <>
-      <div className="gs" data-install-shell>
+      <div ref={cardRef} className="gs" data-install-shell>
         <Tabs
           aria-label="operating system"
           value={platform}

@@ -248,7 +248,7 @@ test("on a wide screen the install card keeps every command whole on its line, w
   expect(lines).toEqual([true, true, true]);
 });
 
-test("on a phone each install step is its number and words on a line, then its command on one line that scrolls sideways inside its block", async ({
+test("on a phone each install step is a small step label, its words, then its command on one line that scrolls sideways inside its block", async ({
   browser,
 }) => {
   for (const width of fixture.install.phoneWidths) {
@@ -299,8 +299,8 @@ test("on a phone each install step is its number and words on a line, then its c
       const groups = probe.getBoundingClientRect().width;
       probe.style.width = "var(--sp-2)";
       const caption = probe.getBoundingClientRect().width;
-      probe.style.width = "var(--sp-3)";
-      const beside = probe.getBoundingClientRect().width;
+      probe.style.width = "var(--sp-1)";
+      const label = probe.getBoundingClientRect().width;
       probe.remove();
       const card = element.getBoundingClientRect();
       const edge = document.querySelector("#install-title")!.getBoundingClientRect().left;
@@ -314,16 +314,17 @@ test("on a phone each install step is its number and words on a line, then its c
         const copy = row.querySelector(".cli-copy")!.getBoundingClientRect();
         return {
           // the number leads the words on their first line, and both stand above the command
-          numberFirst: Math.abs(n.top - note.top) < 4 && n.right <= note.left + 1 && note.bottom <= block.top,
-          // the number stands apart from the words by space alone, with no mark between them
-          numberGap: Math.round(note.left - n.right - beside),
+          // the step's label on its own line, then the words, then the command
+          order: n.bottom <= note.top + 1 && note.bottom <= block.top + 1,
+          label: `${getComputedStyle(row.querySelector(".gs-n")!, "::before").content}${row.querySelector(".gs-n")!.textContent}`,
+          labelGap: Math.round(note.top - n.bottom - label),
           mark: getComputedStyle(row.querySelector(".gs-n")!, "::after").content,
-          // the number and the command share the page's one edge, the title's
-          edge: Math.abs(n.left - edge) < 1 && Math.abs(block.left - edge) < 1,
+          // the label, the words and the command share the page's one edge, the title's: no hanging indent
+          edge: [n.left, note.left, block.left].every((left) => Math.abs(left - edge) < 1),
           captionGap: Math.round(block.top - note.bottom - caption),
           blockTop: block.top,
           blockBottom: block.bottom,
-          labelTop: Math.min(n.top, note.top),
+          labelTop: n.top,
           // one line, never wrapped, across the card's whole width
           oneLine: Math.round(code.getBoundingClientRect().height / parseFloat(getComputedStyle(code).lineHeight)) === 1,
           across: Math.abs(block.left - card.left) < 2 && Math.abs(block.right - card.right) < 2,
@@ -345,10 +346,11 @@ test("on a phone each install step is its number and words on a line, then its c
     expect(geometry.band, `an empty band stands under the last command ${at}`).toBe(0);
     for (const [index, row] of geometry.rows.entries()) {
       const name = `step ${index + 1} ${at}`;
-      expect(row.numberFirst, `${name}: the number and words are not one line above the command`).toBe(true);
-      expect(Math.abs(row.numberGap), `${name}: the number does not stand a gap from its words`).toBeLessThanOrEqual(1);
-      expect(["none", "normal"], `${name}: a mark stands between the number and its words`).toContain(row.mark);
-      expect(row.edge, `${name}: the number or the command is off the page's edge`).toBe(true);
+      expect(row.order, `${name}: the label, words and command are out of order`).toBe(true);
+      expect(row.label, `${name}: the step's label`).toBe(`"step "${index + 1}`);
+      expect(Math.abs(row.labelGap), `${name}: the words do not sit just under the label`).toBeLessThanOrEqual(1);
+      expect(["none", "normal"], `${name}: a mark stands beside the step`).toContain(row.mark);
+      expect(row.edge, `${name}: the label, words or command are off the page's edge`).toBe(true);
       expect(Math.abs(row.captionGap), `${name}: the words do not sit the docs' caption gap above the command`).toBeLessThanOrEqual(1);
       expect(row.oneLine, `${name}: the command wraps`).toBe(true);
       expect(row.across, `${name}: the command does not run across the card`).toBe(true);
@@ -373,6 +375,19 @@ test("on a phone each install step is its number and words on a line, then its c
       return { last: range.getBoundingClientRect().right <= line.getBoundingClientRect().right + 1 };
     });
     expect(end.last, `the end of the curl line cannot be reached ${at}`).toBe(true);
+    // a command that scrolls is a scroll area a keyboard reaches and moves, named as fairtrade names its own
+    const curl = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').first().locator(".cli-cmd-line");
+    await expect(curl).toHaveAttribute("tabindex", "0");
+    await expect(curl).toHaveAttribute("role", "region");
+    await expect(curl).toHaveAttribute("aria-label", `command: ${fixture.install.platforms[0]!.command}`);
+    await curl.evaluate((line) => line.scrollTo({ left: 0, behavior: "instant" }));
+    await curl.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect.poll(() => curl.evaluate((line) => line.scrollLeft)).toBeGreaterThan(0);
+    // one that shows whole stays out of the tab order
+    await expect(shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').nth(1).locator(".cli-cmd-line")).not.toHaveAttribute("tabindex", "0");
+    const axe = await new AxeBuilder({ page }).include("#install").withRules(["scrollable-region-focusable"]).analyze();
+    expect(axe.violations, `a scrolling command cannot be reached ${at}`).toEqual([]);
     // the copy button gives the exact bytes
     const command = fixture.install.platforms[0]!.command;
     const first = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').first();

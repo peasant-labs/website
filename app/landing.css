@@ -2301,9 +2301,9 @@
 /*
  * On a phone the card gives way to the page: the systems' tabs stand as a
  * strip, and under them each step reads as the docs' captioned commands do,
- * standing as far from the next as their groups do: its number, then what it
- * does, on a line, and the command on one line across the content's width,
- * all on the page's one edge. The command never wraps: it scrolls sideways
+ * standing as far from the next as their groups do: a small "step" label,
+ * what it does across the full width, and the command on one line across the
+ * content's width, all on the page's one edge. The command never wraps: it scrolls sideways
  * inside its block, fading at the right edge while more of it is out of
  * sight, and its copy button stays an icon at full tap size. Under the steps,
  * a quiet link to the install guide takes the place of the one beside the
@@ -2327,34 +2327,32 @@
   }
 
   .gs-line {
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas:
-      "n note"
-      "cmd cmd";
-    gap: var(--sp-2) var(--sp-3);
-    align-items: baseline;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
   }
 
+  /* one column no wider than the page, however long the one-line command inside it */
   .gs-text {
-    display: contents;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
   }
 
+  /* the step as a small label of its own: "step 1" */
   .gs-n {
-    grid-area: n;
     padding: 0;
     line-height: 1.45;
   }
 
-  /* set as the docs set their mono captions, so a short one keeps to its line */
-  .gs-note {
-    grid-area: note;
-    word-spacing: normal;
+  .gs-n::before {
+    content: "step ";
   }
 
-  /* the number and the words share a baseline; the command, on its own row, stands at the row's top */
-  .gs .dx-cmd {
-    grid-area: cmd;
-    align-self: start;
+  /* what it does, under its label and over its command; set as the docs set their mono captions */
+  .gs-note {
+    order: -1;
+    margin-block: var(--sp-1) var(--sp-2);
+    word-spacing: normal;
   }
 
   .gs .cli-cmd-wrap .cli-cmd-line {
