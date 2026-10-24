@@ -27,7 +27,7 @@ footer:
 hero:
   title: the open-source commons for agent transcripts
   lede: Peasant gathers the sessions your coding agents save on your computer. Before you share one, Peasant hides its secrets and personal details.
-  pillars: [permissioned sharing, open source, works with many agents, fast indexing]
+  pillars: [permissioned sharing, open source, works with many agents, data attribution]
   # how the four tags sit at each width, as tags per line: one row, two and two, or one column; never a lone tag
   # after a pair
   tagRows:
@@ -49,7 +49,7 @@ sections:
   - { id: install, heading: get started in three commands }
   - { id: uses, heading: find your use case }
   - { id: how, heading: how it works }
-  - { id: session, heading: "a new standard for transcript sharing and viewing" }
+  - { id: session, heading: "a new standard for transcript sharing, viewing, and attribution" }
 # copy from earlier designs of the page that must not come back
 removed:
   - featured collectives
@@ -171,7 +171,7 @@ session:
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
 # the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:
-  line: We are building a sustainable, respectful ecosystem where people have a stake in their data.
+  line: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.
   story:
     - "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's capital."
     - "We think the work also belongs to the people who did it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use."

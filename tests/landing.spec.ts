@@ -1141,7 +1141,8 @@ test("the vision stands on its own grounded panel, and the landing ends on a cal
 test("/about carries the owner's statement in full, word for word", async ({ page }) => {
   await page.goto("/about");
   const vision = page.locator(".pj-vision");
-  await expect(vision.locator("p")).toHaveText([fixture.vision.line, ...fixture.vision.story]);
+  // the lead line is the page's heading, the story its paragraphs
+  await expect(vision.locator("h1, p")).toHaveText([fixture.vision.line, ...fixture.vision.story]);
 });
 
 test("whitespace, not rules, separates the sections, with generous room between them", async ({ page }) => {
