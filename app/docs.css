@@ -960,6 +960,23 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
+/* a post's card keeps its picture above its words on a phone too: a post's summary is too long to sit beside it */
+.bx-post.dx-guide {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+}
+
+.bx-post.dx-guide .dx-pic {
+  min-height: 0;
+  padding: var(--sp-4);
+  border-inline-end: 0;
+  border-block-end: var(--bd);
+}
+
+.bx-post .dx-guide-text {
+  padding: var(--card-pad);
+}
+
 /* a quote: a hairline on its left, the words in the secondary ink */
 .essay-aside {
   padding-inline-start: var(--sp-4);
