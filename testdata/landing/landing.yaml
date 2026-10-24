@@ -7,13 +7,10 @@ header:
     - { label: docs, href: /docs }
     - { label: blog, href: /blog }
   login: { label: log in, href: "/?login" }
-  # the phone menu, in order, then its actions
+  # the phone menu mirrors the header's destinations, then its actions; the rest of the site is in the footer
   menu:
     - { label: docs, href: /docs }
     - { label: blog, href: /blog }
-    - { label: projects, href: /projects }
-    - { label: about, href: /about }
-    - { label: contact, href: /contact }
 footer:
   # the call to action every page ends with; install points at the landing's
   # install section, in place on the landing and across from any other page
@@ -26,7 +23,7 @@ footer:
     - { label: blog, href: /blog }
     - { label: projects, href: /projects }
     - { label: github, href: https://github.com/peasant-labs }
-    - { label: contact, href: /contact }
+    - { label: contact, href: "mailto:hello@peasantlabs.org" }
 hero:
   title: the open-source commons for agent transcripts
   lede: Peasant gathers the sessions your coding agents save on your computer. Before you share one, Peasant hides its secrets and personal details.

@@ -48,22 +48,19 @@ export const SITE_NAV = [
   { id: "blog", label: "blog", href: "/blog" },
 ] as const;
 
-/** the phone menu: every destination, in the order a reader looks for them. */
-export const MENU_NAV = [
-  { id: "docs", label: "docs", href: "/docs" },
-  { id: "blog", label: "blog", href: "/blog" },
-  { id: "projects", label: "projects", href: "/projects" },
-  { id: "about", label: "about", href: "/about" },
-  { id: "contact", label: "contact", href: "/contact" },
-] as const;
+/** the phone menu: the header's destinations and nothing more; the rest of the site is in the footer. */
+export const MENU_NAV = SITE_NAV;
 
-/** the footer's destinations. contact is last: it is the one link a reader goes looking for. */
+/** where "talk to us" and the footer's contact link write to */
+export const CONTACT_EMAIL = "hello@peasantlabs.org";
+
+/** the footer's destinations. contact is last: it is the one link a reader goes looking for, and it opens an email. */
 export const FOOTER_NAV = [
   { id: "docs", label: "docs", href: "/docs" },
   { id: "blog", label: "blog", href: "/blog" },
   { id: "projects", label: "projects", href: "/projects" },
   { id: "github", label: "github", href: GITHUB_URL },
-  { id: "contact", label: "contact", href: "/contact" },
+  { id: "contact", label: "contact", href: `mailto:${CONTACT_EMAIL}` },
 ] as const;
 
 /**
