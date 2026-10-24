@@ -342,7 +342,7 @@ export const SESSION = {
 export const VISION = {
   line: "We are building a sustainable, respectful ecosystem where people have a stake in their data.",
   story: [
-    "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's asset.",
+    "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's capital.",
     "We think the work also belongs to the people who did it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use.",
   ],
   cta: { label: "about us", href: "/about" },
