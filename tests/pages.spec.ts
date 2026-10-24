@@ -79,10 +79,7 @@ test("/about says who we are, not that it will later, in sentence-case prose", a
   for (const paragraph of await main.locator("p").allTextContents()) {
     expect(paragraph.trim()[0], paragraph).toMatch(/[A-Z]/);
   }
-  await expect(main.getByRole("link", { name: "the essay on the blog" })).toHaveAttribute(
-    "href",
-    "/blog/reclaiming-data-autonomy-as-a-peasant",
-  );
+  await expect(main.getByRole("link", { name: "our blog" })).toHaveAttribute("href", "/blog");
 });
 
 test("on a phone every control on the project pages is a full tap target", async ({ browser }) => {

@@ -10,8 +10,8 @@ export const metadata = metadataForRoute({
 });
 
 /**
- * Who we are and what we make, in a few plain lines; the long account of why
- * is the essay on the blog.
+ * Why we build peasant, in the owner's words: the statement the landing ends
+ * on, its lead line as the page's heading, then a pointer to the blog.
  */
 export default function AboutPage() {
   return (
@@ -19,27 +19,21 @@ export default function AboutPage() {
       <main id="content" className="pj-main" tabIndex={-1}>
         <header className="pj-catalog-hero">
           <div className="pj-hero-copy">
-            <h1 id="project-heading" tabIndex={-1}>
-              about
-            </h1>
-            <p className="pj-lede" data-reading-text>
-              We build peasant, an app that keeps the sessions your coding agents leave on
-              your computer, and peasant online, where you publish the ones you choose for
-              your team or a research group. Both are open source under Apache-2.0.
-            </p>
             {/* why, in the owner's words: the same statement the landing ends on */}
             <div className="pj-vision" data-reading-text>
-              <p className="pj-vision-line">{VISION.line}</p>
+              <h1 id="project-heading" className="pj-vision-line" tabIndex={-1}>
+                {VISION.line}
+              </h1>
               {VISION.story.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
             </div>
             <p className="pj-lede" data-reading-text>
-              The long version is{" "}
-              <Link className="site-link" href="/blog/reclaiming-data-autonomy-as-a-peasant">
-                the essay on the blog
-              </Link>
-              .
+              See{" "}
+              <Link className="site-link" href="/blog">
+                our blog
+              </Link>{" "}
+              for the long version.
             </p>
           </div>
         </header>

@@ -169,7 +169,7 @@ site:
           description: We are developing the suite of tools required to safely share and manage access to transcripts produced by coding agent sessions.
     - id: about
       path: /about
-      h1: about
+      h1: We are building a sustainable, respectful ecosystem where people have a stake in their data.
       metadata:
         title: about | peasant
         description: who we are and what peasant is for.
