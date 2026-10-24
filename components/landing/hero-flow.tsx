@@ -42,8 +42,8 @@ const SHOWN = 3;
 /* how many cards show on the stack before one slips behind the base */
 const DEPTH = 4;
 
-/* one cycle per card, mostly a calm pause after it lands; a card's own animation runs for all six cycles */
-const CYCLE = 6000;
+/* one cycle per card, with a short calm after it lands so the picture never reads as frozen; a card's own animation runs for all six cycles */
+const CYCLE = 4400;
 const LOOP = CYCLE * COUNT;
 
 /*
@@ -69,8 +69,8 @@ const BEAT = {
   roomTo: 2950,
   settled: 3250,
   noticed: 3500,
-  forgetFrom: 5000,
-  forgotten: 5700,
+  forgetFrom: 3900,
+  forgotten: 4300,
 } as const;
 
 /*
@@ -1116,14 +1116,18 @@ const CardArt = memo(function CardArt({ plan, mark, index, className }: { plan: 
 
 /**
  * The loop holds while the picture is off screen, while the tab is behind
- * another, and while a pointer rests on it. It plays from the first paint:
- * nothing waits for the page's script to start it.
+ * another, and while a pointer that has moved onto it rests there. A page
+ * scrolled under a still pointer does not hold it, and scrolling lets a hold
+ * go. It plays from the first paint: nothing waits for the page's script to
+ * start it.
  */
 export function HeroFlow() {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(true);
   const [pageVisible, setPageVisible] = useState(true);
   const [hovered, setHovered] = useState(false);
+  // where the pointer last was on screen, to tell a real move from the one the browser reports after a scroll
+  const pointer = useRef<{ x: number; y: number } | null>(null);
   const paused = hovered || !inView || !pageVisible;
 
   useEffect(() => {
@@ -1133,9 +1137,17 @@ export function HeroFlow() {
     observer.observe(element);
     const update = () => setPageVisible(document.visibilityState === "visible");
     document.addEventListener("visibilitychange", update);
+    const track = (event: PointerEvent) => {
+      pointer.current = { x: event.clientX, y: event.clientY };
+    };
+    const release = () => setHovered(false);
+    window.addEventListener("pointermove", track, { passive: true });
+    window.addEventListener("scroll", release, { passive: true });
     return () => {
       observer.disconnect();
       document.removeEventListener("visibilitychange", update);
+      window.removeEventListener("pointermove", track);
+      window.removeEventListener("scroll", release);
     };
   }, []);
 
@@ -1145,8 +1157,11 @@ export function HeroFlow() {
         ref={ref}
         className="hf"
         data-paused={paused ? "true" : "false"}
-        onPointerEnter={(event) => {
-          if (event.pointerType === "mouse") setHovered(true);
+        onPointerMove={(event) => {
+          // runs before the window's listener records this position, so an unchanged one means the page moved, not the pointer
+          const last = pointer.current;
+          const moved = !last || last.x !== event.clientX || last.y !== event.clientY;
+          if (event.pointerType === "mouse" && moved) setHovered(true);
         }}
         onPointerLeave={() => setHovered(false)}
       >
