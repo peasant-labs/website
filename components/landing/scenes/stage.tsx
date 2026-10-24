@@ -29,16 +29,8 @@ const EASE_SETTLE = "cubic-bezier(0.23, 1, 0.32, 1)";
 const EASE_GLIDE = "cubic-bezier(0.45, 0, 0.2, 1)";
 /* how long a part pushed along by new content takes to glide to its new place */
 const FLIP_MS = 360;
-/*
- * A take loops while it plays: its finished frame rests a moment, then the
- * screen dips out, the scene starts over out of sight, and the screen comes
- * back in on its first frame, so the seam is a short fade, never a cut.
- */
-const LOOP_REST = 1200;
-const DIP_OUT = 240;
-const DIP_IN = 360;
-/* how long a new round waits out of sight for its first frame to render before the camera frames it */
-const DIP_SETTLE = 80;
+/* how long a take's finished frame rests before the take counts as finished */
+const FINISHED_REST = 900;
 
 /* where an element sits on the virtual screen by layout alone, whatever transforms are running */
 function layoutOffset(element: HTMLElement, screen: HTMLElement) {
@@ -230,8 +222,8 @@ function boxOf(screen: HTMLElement, focus: string): Box {
  * starts from wherever the camera is, so the take is one continuous shot.
  * The component text is DOM, so it stays sharp at every zoom.
  *
- * The take loops while it plays: each round starts the scene over on a fresh
- * mount of its screen, so every part is back in its first state.
+ * The take reports how far it has got, and when its finished frame has
+ * rested, it reports that it is done and stays on that frame.
  *
  * Under reduced motion nothing moves: the scene renders its finished phase,
  * framed on its final focus. A new take is a new mount (the caller keys it).
@@ -240,15 +232,21 @@ export function SceneStage({
   scene,
   playing,
   reduced,
+  onProgress,
+  onFinish,
 }: {
   scene: SceneDefinition;
   /**
-   * The take plays, looping, while this is true: it starts the first time the
-   * scene can be seen, and holds exactly where it is whenever it is false (off
-   * screen, or the reader's keyboard on it), then carries on.
+   * The take plays while this is true: it starts the first time the scene can
+   * be seen, and holds exactly where it is whenever it is false (off screen,
+   * or the reader's keyboard on it), then carries on.
    */
   playing: boolean;
   reduced: boolean;
+  /** how far the take has got, 0..1, on every frame it runs; it reaches 1 as it finishes */
+  onProgress?: (progress: number) => void;
+  /** the take has played through and its finished frame has rested */
+  onFinish?: () => void;
 }) {
   const viewRef = useRef<HTMLDivElement>(null);
   const cameraRef = useRef<HTMLDivElement>(null);
@@ -258,8 +256,14 @@ export function SceneStage({
   const holdTake = useRef<((held: boolean) => void) | null>(null);
   const playingNow = useRef(playing);
   const [phase, setPhase] = useState(reduced ? scene.finalPhase : 0);
-  // each round of a looping take renders the scene on a fresh mount
-  const [round, setRound] = useState(0);
+  const report = useRef({ onProgress, onFinish });
+  useEffect(() => {
+    report.current = { onProgress, onFinish };
+  });
+  // a new take has got nowhere yet, even before it can start
+  useLayoutEffect(() => {
+    if (!reduced) report.current.onProgress?.(0);
+  }, [reduced]);
   // A take starts the first time the scene can be seen; after that, it holds while it cannot be.
   const [started, setStarted] = useState(false);
   if (playing && !started && !reduced) setStarted(true);
@@ -330,14 +334,13 @@ export function SceneStage({
   }, [rest, reduced, started, phase]);
 
   // A part marked data-flip that a beat pushes along glides from where it was (FLIP), so nothing jumps.
-  // A change of screen size, or a new round, is a new layout, not a move: it is recorded, never animated.
-  const flipLayout = useRef(`${compact}/${round}`);
+  // A change of screen size is a new layout, not a move: it is recorded, never animated.
+  const flipLayout = useRef(compact);
   useLayoutEffect(() => {
     const screen = screenRef.current;
     if (!screen) return;
-    const layout = `${compact}/${round}`;
-    const relaid = flipLayout.current !== layout;
-    flipLayout.current = layout;
+    const relaid = flipLayout.current !== compact;
+    flipLayout.current = compact;
     const now = new Map<string, { x: number; y: number }>();
     for (const element of screen.querySelectorAll<HTMLElement>("[data-flip]")) {
       const key = element.dataset.flip!;
@@ -351,7 +354,7 @@ export function SceneStage({
       );
     }
     flipFrom.current = now;
-  }, [phase, reduced, started, compact, round]);
+  }, [phase, reduced, started, compact]);
 
   // Hold the take, and the scene's own short animations, whenever it is not playing.
   useEffect(() => {
@@ -361,7 +364,7 @@ export function SceneStage({
     if (view) view.dataset.paused = String(!playing);
   }, [playing]);
 
-  // One take: the scene's beats, the camera moves and the cursor, on one clock, round after round.
+  // One take: the scene's beats, the camera moves and the cursor, on one clock.
   useEffect(() => {
     if (reduced || !started) return;
     const camera = cameraRef.current;
@@ -378,9 +381,12 @@ export function SceneStage({
     let last = performance.now();
     let held = !playingNow.current;
     let tick = 0;
+    const length = scene.duration + FINISHED_REST;
     const advance = (now: number) => {
-      if (!held) elapsed += now - last;
+      // (a frame's time can be a moment before the take set its clock)
+      if (!held) elapsed += Math.max(0, now - last);
       last = now;
+      report.current.onProgress?.(Math.min(1, elapsed / length));
       pending.sort((a, b) => a.at - b.at);
       while (pending.length && pending[0]!.at <= elapsed) pending.shift()!.run();
       tick = pending.length ? window.requestAnimationFrame(advance) : 0;
@@ -432,25 +438,25 @@ export function SceneStage({
       pointer.style.opacity = "1";
     }
 
-    /* one round of the take from `start` on its clock; as it ends, the next one is set up */
-    const playRound = (start: number) => {
-      for (const cue of scene.cues) at(start + cue.at, () => setPhase(cue.phase));
+    report.current.onProgress?.(0);
+    for (const cue of scene.cues) at(cue.at, () => setPhase(cue.phase));
 
-      for (const shot of scene.shots) {
-        at(start + shot.at, () => {
-          const from = getComputedStyle(camera).transform;
-          const to = frame(shot.focus, shot.fill ?? 0.94, shot.width, shot.cropBelow);
-          play(
-            camera,
-            [{ transform: from }, { transform: to }],
-            { duration: shot.move, easing: shot.ease === "settle" ? EASE_SETTLE : EASE_MOVE, fill: "forwards" },
-            () => (camera.style.transform = to),
-          );
-        });
-      }
+    for (const shot of scene.shots) {
+      at(shot.at, () => {
+        const from = getComputedStyle(camera).transform;
+        const to = frame(shot.focus, shot.fill ?? 0.94, shot.width, shot.cropBelow);
+        play(
+          camera,
+          [{ transform: from }, { transform: to }],
+          { duration: shot.move, easing: shot.ease === "settle" ? EASE_SETTLE : EASE_MOVE, fill: "forwards" },
+          () => (camera.style.transform = to),
+        );
+      });
+    }
 
-      for (const cue of pointer ? scene.cursor! : []) {
-        at(start + cue.at, () => {
+    if (pointer) {
+      for (const cue of scene.cursor!) {
+        at(cue.at, () => {
           const target = targetOf(camera, cue.to);
           const box = scrollIntoPage(camera, cue.to, boxOf(camera, cue.to));
           const [ax, ay] = cue.aim ?? [0.5, 0.5];
@@ -477,12 +483,12 @@ export function SceneStage({
             hovered = null;
           }
           // leaving a text field, the I-beam turns back into the arrow a moment after setting off
-          if (pointer!.dataset.shape !== "arrow" && cue.shape !== "ibeam") {
-            later(cue.move * 0.15, () => (pointer!.dataset.shape = "arrow"));
+          if (pointer.dataset.shape !== "arrow" && cue.shape !== "ibeam") {
+            later(cue.move * 0.15, () => (pointer.dataset.shape = "arrow"));
           }
-          play(pointer!, frames, { duration: cue.move, easing: EASE_GLIDE, fill: "forwards" }, () => {
-            pointer!.style.transform = frames.at(-1)!.transform;
-            if (cue.shape === "ibeam") pointer!.dataset.shape = "ibeam";
+          play(pointer, frames, { duration: cue.move, easing: EASE_GLIDE, fill: "forwards" }, () => {
+            pointer.style.transform = frames.at(-1)!.transform;
+            if (cue.shape === "ibeam") pointer.dataset.shape = "ibeam";
             if (target) {
               target.dataset.hover = "true";
               hovered = target;
@@ -491,7 +497,7 @@ export function SceneStage({
             // after a short hover, a click: the pointer dips and the control gives way under it
             later(cue.hover ?? 200, () => {
               for (const [element, depth] of [
-                [pointer!.querySelector<HTMLElement>(".scn-pointer"), 0.82],
+                [pointer.querySelector<HTMLElement>(".scn-pointer"), 0.82],
                 [target, 0.97],
               ] as const) {
                 if (!element) continue;
@@ -504,44 +510,15 @@ export function SceneStage({
           });
         });
       }
+    }
 
-      // The finished frame rests; then the screen dips out, and the scene starts over out of sight.
-      // The pointer stays where the hand left it, and sets off from there in the next round.
-      const end = start + scene.duration + LOOP_REST;
-      at(end, () => {
-        camera.style.opacity = "0";
-        play(camera, [{ opacity: 1 }, { opacity: 0 }], { duration: DIP_OUT, easing: EASE_MOVE });
-      });
-      at(end + DIP_OUT, () => {
-        running.forEach((animation) => animation.cancel());
-        running.clear();
-        if (hovered) {
-          delete hovered.dataset.hover;
-          hovered = null;
-        }
-        if (pointer) {
-          pointer.style.transform = `translate(${here[0]}px, ${here[1]}px)`;
-          pointer.dataset.shape = "arrow";
-        }
-        setPhase(0);
-        setRound((value) => value + 1);
-      });
-      // once the first frame has rendered, the next round frames it and the screen comes back in
-      at(end + DIP_OUT + DIP_SETTLE, () => {
-        playRound(elapsed);
-        at(elapsed, () => {
-          camera.style.opacity = "";
-          play(camera, [{ opacity: 0 }, { opacity: 1 }], { duration: DIP_IN, easing: EASE_SETTLE });
-        });
-      });
-    };
-    playRound(0);
+    // the finished frame rests, and then the take is done
+    at(length, () => report.current.onFinish?.());
 
     return () => {
       window.cancelAnimationFrame(tick);
       holdTake.current = null;
       running.forEach((animation) => animation.cancel());
-      camera.style.opacity = "";
       camera.querySelectorAll<HTMLElement>("[data-hover]").forEach((element) => delete element.dataset.hover);
     };
   }, [scene, started, reduced, frame, screen]);
@@ -549,7 +526,7 @@ export function SceneStage({
   const Render = scene.Render;
 
   return (
-    <div className="scn-view" ref={viewRef} data-round={round}>
+    <div className="scn-view" ref={viewRef}>
       <div
         className="scn-camera"
         ref={cameraRef}
@@ -557,7 +534,7 @@ export function SceneStage({
         style={{ width: screen.width, height: screen.height }}
       >
         <div className="scn-screen" ref={screenRef} inert aria-hidden="true">
-          <Render key={round} phase={reduced ? scene.finalPhase : phase} />
+          <Render phase={reduced ? scene.finalPhase : phase} />
         </div>
         {scene.cursor?.length && !reduced ? (
           <div className="scn-cursor" ref={cursorRef} aria-hidden="true">

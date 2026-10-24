@@ -13,19 +13,22 @@ import { useLayoutEffect, useRef, useState } from "react";
 const SCENES: readonly SceneDefinition[] = [RECORD_SCENE, REVIEW_SCENE, PUBLISH_SCENE];
 
 /**
- * How it works, told by scrolling. The section holds still while the page
- * scrolls through it, about one screen per step, and each step's scene plays
- * as it becomes the current one; after the third the page simply carries on.
- * Nothing hijacks the scroll: the section's scroll is cut in thirds, one per
- * step, so momentum, the keyboard and the scroll bar all work as usual.
- * Choosing a step scrolls to it. So the held section never looks frozen, the
- * current step's bar, along its bottom rule, fills with its third.
+ * How it works, three steps that play on their own. While the section can be
+ * seen, the current step's scene plays through, and as it finishes the next
+ * step takes over: record, review, publish, then record again. The current
+ * step's bar, along its bottom rule, fills with its scene, so the next step
+ * never comes as a surprise.
  *
- * The scenes have no controls: the current step's take plays, round after
- * round, while its screen can be seen, and a pointer resting on it or a tap
- * on it never stops it. The screen is one image to assistive technology,
- * described by the step at hand, and it takes keyboard focus, which holds the
- * take where it is until the focus moves on.
+ * The section also holds still while the page scrolls through it, about one
+ * screen per step, and scrolling into a step's third makes it current; the
+ * steps carry on by themselves from there. Choosing a step makes it current
+ * and plays its scene from the start. Nothing ever moves the page: the scroll
+ * is the reader's, and only the step and its scene change on their own.
+ *
+ * The scenes have no controls, and a pointer resting on one or a tap on it
+ * never stops it. The screen is one image to assistive technology, described
+ * by the step at hand, and it takes keyboard focus, which holds the take, and
+ * with it the stepping, until the focus moves on.
  *
  * The steps show their titles; only the current one opens its description,
  * and the last one closes as it does, both on one height transition. The list
@@ -45,33 +48,34 @@ const SCENES: readonly SceneDefinition[] = [RECORD_SCENE, REVIEW_SCENE, PUBLISH_
  */
 export function HowItWorks({ title }: { title: string }) {
   const reduced = useReducedMotion();
-  const [active, setActive] = useState(0);
-  /* one take counter per scene: a scene starts a fresh take each time it becomes current, and on replay */
-  const [takes, setTakes] = useState<readonly number[]>(() => SCENES.map(() => 0));
+  /*
+   * The current step, and one take counter per scene: a scene starts a fresh
+   * take, from its first frame, each time it is made current.
+   */
+  const [{ active, takes }, setRun] = useState(() => ({ active: 0, takes: SCENES.map(() => 0) }));
+  const select = (pick: (current: number) => number) =>
+    setRun(({ active, takes }) => {
+      const next = pick(active);
+      return { active: next, takes: takes.map((take, index) => (index === next ? take + 1 : take)) };
+    });
   /* keyboard focus on the screen holds the take where it is; a click or a tap that focuses it does not */
   const [held, setHeld] = useState(false);
-  const [shown, setShown] = useState(active);
-  if (shown !== active) {
-    setShown(active);
-    setTakes((current) => current.map((value, index) => (index === active ? value + 1 : value)));
-  }
   const windowRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
   const stepsRef = useRef<HTMLOListElement>(null);
+  const fillRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const onScreen = useOnScreen(windowRef, 0.4);
 
-  // The scroll through the held section is cut in thirds, one per step; the current step's third fills its own bar.
+  // The scroll through the held section is cut in thirds, one per step: scrolling into a third makes its step current.
+  const scrolledTo = useRef(0);
   useHeldProgress(
     rootRef,
     (progress) => {
-      setActive(Math.min(SCENES.length - 1, Math.floor(progress * SCENES.length)));
-      const root = rootRef.current;
-      if (!root) return;
-      root.querySelectorAll<HTMLElement>(".hw-step-fill").forEach((fill, index) => {
-        const own = Math.min(1, Math.max(0, progress * SCENES.length - index));
-        fill.style.transform = `scaleX(${own})`;
-      });
+      const third = Math.min(SCENES.length - 1, Math.floor(progress * SCENES.length));
+      if (third === scrolledTo.current) return;
+      scrolledTo.current = third;
+      select(() => third);
     },
     !reduced,
   );
@@ -102,14 +106,6 @@ export function HowItWorks({ title }: { title: string }) {
     return () => observer.disconnect();
   }, [reduced]);
 
-  /* choosing a step scrolls to the middle of its third */
-  function goTo(index: number) {
-    const root = rootRef.current;
-    if (!root) return;
-    const box = root.getBoundingClientRect();
-    const room = Math.max(1, box.height - window.innerHeight);
-    window.scrollTo({ top: window.scrollY + box.top + (room * (index + 0.5)) / SCENES.length });
-  }
 
   if (reduced) {
     return (
@@ -158,12 +154,18 @@ export function HowItWorks({ title }: { title: string }) {
                       aria-pressed={on}
                       aria-expanded={on}
                       aria-controls={`hw-more-${step.id}`}
-                      onClick={() => goTo(index)}
+                      onClick={() => select(() => index)}
                     >
                       <LandingIcon name={step.icon} className="hw-ic" />
                       <span className="hw-step-title">{step.title}</span>
                     </button>
-                    <span className="hw-step-fill" aria-hidden="true" />
+                    <span
+                      className="hw-step-fill"
+                      aria-hidden="true"
+                      ref={(fill) => {
+                        fillRefs.current[index] = fill;
+                      }}
+                    />
                     <div className="hw-step-more" id={`hw-more-${step.id}`}>
                       <div className="hw-step-clip">
                         <p className="hw-step-body">{withCommands(step.body)}</p>
@@ -197,6 +199,11 @@ export function HowItWorks({ title }: { title: string }) {
                         scene={scene}
                         playing={index === active && onScreen && !held}
                         reduced={false}
+                        onProgress={(progress) => {
+                          const fill = fillRefs.current[index];
+                          if (fill) fill.style.transform = `scaleX(${progress})`;
+                        }}
+                        onFinish={() => select((current) => (current === index ? (index + 1) % SCENES.length : current))}
                       />
                     </div>
                   ))}
