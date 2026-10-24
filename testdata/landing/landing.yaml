@@ -162,7 +162,7 @@ session:
     key: AWS_ACCESS_KEY_ID=
     marker: "<AWS_ACCESS_KEY>"
     commit: 7c3e9a1
-    stat: "+86 −0, 2 files"
+    stat: "+36 −1, 2 files"
   # the terminal window's title, and the sample's first ask word for word (the Terminal repeats it)
   terminal: billing — claude — 80×24
   firstAsk: hey claude, run our billing retry suite against each model, same seed, and write a table of pass rate, tokens and wall time per model

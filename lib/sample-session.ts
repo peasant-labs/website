@@ -15,15 +15,47 @@ import type { TranscriptWireInput } from "@peasant-labs/fairtrade/ui";
 
 const START = "2026-10-14T13:05:00Z";
 
-const BENCH_SCRIPT = `import { runSuite } from "../tests/billing/retry-suite"
+const BENCH_SCRIPT = `import { writeFileSync } from "node:fs"
+import { resolve } from "node:path"
+import { runSuite } from "../tests/billing/retry-suite"
 
+// the last three models, oldest first
 const MODELS = ["claude-opus-4-5", "claude-opus-5", "claude-opus-5-5"]
 const SEED = 7
+const CASES = 48
 
+const args = process.argv.slice(2)
+const onlyTimeouts = args.includes("--only-timeouts")
+const limitAt = args.indexOf("--limit")
+// seconds a single case may run before it counts as a timeout
+const limitSecs = limitAt >= 0 ? Number(args[limitAt + 1]) : 120
+
+const pct = (passed: number, total: number) => Math.round((100 * passed) / total) + "% (" + passed + "/" + total + ")"
+
+function secs(ms: number) {
+  const total = Math.round(ms / 1000)
+  return Math.floor(total / 60) + "m " + String(total % 60).padStart(2, "0") + "s"
+}
+
+const results = []
 for (const model of MODELS) {
-  const run = await runSuite({ model, seed: SEED, cases: 48 })
-  console.log([model, pct(run.passed, run.cases), run.tokens, secs(run.wallMs)].join("\\t"))
-}`;
+  // the same seed for every model, so each one sees the same cases in the same order
+  const run = await runSuite({ model, seed: SEED, cases: CASES, limitSecs, onlyTimeouts })
+  results.push({ model, ...run })
+  console.log(model, pct(run.passed, run.cases), run.tokens, secs(run.wallMs))
+  if (run.timedOut > 0) console.log("  " + run.timedOut + " timed out")
+}
+
+const out = resolve("bench/out-" + SEED + ".json")
+writeFileSync(out, JSON.stringify(results, null, 2))
+console.log("wrote " + out)`;
+
+const PACKAGE_BEFORE = `    "test": "vitest run"
+  }`;
+
+const PACKAGE_AFTER = `    "test": "vitest run",
+    "bench:models": "tsx bench/models.ts"
+  }`;
 
 const FIRST_RUN = `bedrock us-east-1, key <AWS_ACCESS_KEY>, seed 7, 48 cases
 claude-opus-4-5   34/48   412k tokens   9m 12s   (3 timed out)
@@ -51,11 +83,11 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
   project: "billing",
   workingDirectory: "/Users/<USER>/src/billing",
   startTime: START,
-  endTime: "2026-10-14T13:31:00Z",
-  durationMins: 26,
+  endTime: "2026-10-14T13:50:00Z",
+  durationMins: 45,
   turnCount: 12,
   inputSubmissionCount: 5,
-  toolCallCount: 5,
+  toolCallCount: 6,
   totalTokens: 52600,
   tokensIn: 44100,
   tokensOut: 8500,
@@ -70,10 +102,10 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       {
         hash: "7c3e9a1b52d84f06a9e3c1d7b4f20856",
         message: "add a model benchmark for the billing retry suite",
-        timestamp: "2026-10-14T13:30:00Z",
+        timestamp: "2026-10-14T13:49:20Z",
         filesChanged: 2,
-        insertions: 86,
-        deletions: 0,
+        insertions: 36,
+        deletions: 1,
         session: true,
       },
     ],
@@ -114,7 +146,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       depth: 0,
       entryType: "text",
       content:
-        "The suite signs its Bedrock calls with `<AWS_ACCESS_KEY>` from `.env`, has 48 retry cases, and takes a model id and a seed. I will add one script that runs it for the last three models with a single seed and prints a row for each.",
+        "The suite signs its Bedrock calls with `<AWS_ACCESS_KEY>` from `.env`, has 48 retry cases, and takes a model id and a seed. I will add one script that runs it for the last three models with a single seed and prints a row for each, and a package script to start it.",
       timestamp: "2026-10-14T13:09:10Z",
       toolCalls: [
         {
@@ -123,7 +155,15 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
           toolKind: "edit",
           filePath: "bench/models.ts",
           arguments: JSON.stringify({ file_path: "bench/models.ts", content: BENCH_SCRIPT }),
-          result: JSON.stringify({ ok: true, additions: 84, deletions: 0 }),
+          result: JSON.stringify({ ok: true, additions: 34, deletions: 0 }),
+        },
+        {
+          id: "tc_edit_package",
+          name: "Edit",
+          toolKind: "edit",
+          filePath: "package.json",
+          arguments: JSON.stringify({ file_path: "package.json", old_string: PACKAGE_BEFORE, new_string: PACKAGE_AFTER }),
+          result: JSON.stringify({ ok: true, additions: 2, deletions: 1 }),
         },
       ],
     },
@@ -150,7 +190,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       depth: 0,
       entryType: "text",
       content: "claude-opus-4-5 looks low. did those 3 cases fail, or just time out?",
-      timestamp: "2026-10-14T13:19:00Z",
+      timestamp: "2026-10-14T13:36:10Z",
     },
     {
       index: 5,
@@ -159,7 +199,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       entryType: "text",
       content:
         "They timed out, so I will rerun only those three with a longer limit. If they pass now, the old number was unfair to that model.",
-      timestamp: "2026-10-14T13:20:20Z",
+      timestamp: "2026-10-14T13:37:30Z",
       toolCalls: [
         {
           id: "tc_bash_rerun",
@@ -176,7 +216,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       depth: 0,
       entryType: "text",
       content: "fine, they did not change. give me the table, one row per model",
-      timestamp: "2026-10-14T13:23:10Z",
+      timestamp: "2026-10-14T13:43:20Z",
     },
     {
       index: 7,
@@ -184,7 +224,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       depth: 0,
       entryType: "text",
       content: TABLE,
-      timestamp: "2026-10-14T13:23:50Z",
+      timestamp: "2026-10-14T13:44:00Z",
     },
     {
       index: 8,
@@ -192,7 +232,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       depth: 0,
       entryType: "text",
       content: "is any of the 5.5 misses a bug in our retry budget rather than the model?",
-      timestamp: "2026-10-14T13:25:40Z",
+      timestamp: "2026-10-14T13:45:40Z",
     },
     {
       index: 9,
@@ -201,7 +241,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       entryType: "text",
       content:
         "No. All three misses retried to the cap of 3 and still returned a stale invoice, which is the case the suite means to catch. The budget worked as written, so they count as the model's misses.",
-      timestamp: "2026-10-14T13:26:30Z",
+      timestamp: "2026-10-14T13:46:30Z",
       stopReason: "end_turn",
     },
     {
@@ -210,7 +250,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       depth: 0,
       entryType: "text",
       content: "ok, commit the script. I will email the table to <EMAIL> myself.",
-      timestamp: "2026-10-14T13:28:20Z",
+      timestamp: "2026-10-14T13:48:00Z",
     },
     {
       index: 11,
@@ -219,7 +259,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
       entryType: "text",
       content:
         "Committed. I have not contacted <EMAIL>; the table and the raw results in /Users/<USER>/src/billing/bench/out-7.json are yours to send.",
-      timestamp: "2026-10-14T13:30:40Z",
+      timestamp: "2026-10-14T13:48:50Z",
       toolCalls: [
         {
           id: "tc_bash_commit",
@@ -230,7 +270,7 @@ export const SAMPLE_SESSION: TranscriptWireInput = {
           }),
           result: JSON.stringify({
             exitCode: 0,
-            stdout: "[bench-retry-models 7c3e9a1] add a model benchmark for the billing retry suite\n 2 files changed, 86 insertions(+)",
+            stdout: "[bench-retry-models 7c3e9a1] add a model benchmark for the billing retry suite\n 2 files changed, 36 insertions(+), 1 deletion(-)",
           }),
         },
       ],
