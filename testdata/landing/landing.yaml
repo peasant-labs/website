@@ -29,8 +29,8 @@ footer:
     - { label: contact, href: /contact }
 hero:
   title: the open-source commons for agent transcripts
-  lede: Peasant gathers the sessions your coding agents save on your computer. Before you publish one, Peasant hides its secrets and personal details. You choose who can read it.
-  pillars: [private until you publish, open source, works with many agents, fast indexing]
+  lede: Peasant gathers the sessions your coding agents save on your computer. Before you share one, Peasant hides its secrets and personal details.
+  pillars: [permissioned sharing, open source, works with many agents, fast indexing]
   # the picture under the buttons shows no words; its accessible name names the agents peasant reads
   flow:
     agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
@@ -45,7 +45,7 @@ sections:
   - { id: install, heading: get started in three commands }
   - { id: uses, heading: find your use case }
   - { id: how, heading: how it works }
-  - { id: session, heading: "we're setting a new standard for transcript sharing and viewing" }
+  - { id: session, heading: "a new standard for transcript sharing and viewing" }
 # copy from earlier designs of the page that must not come back
 removed:
   - featured collectives
@@ -76,9 +76,9 @@ useCases:
   slides:
     - id: researchers
       label: researchers
-      capabilities: [build evals from real work, study how agents are used, run a class on agents]
+      capabilities: [build evals from real work, study how agents are used, run a class with open agent use]
       details:
-        - "Collect real coding transcripts in a private collective, secrets hidden, then download them to test agents."
+        - "Collect real coding transcripts in a private collective, then download them to test agents."
         - "Read how people actually talk to their agents and correct them, in transcripts shared with your collective."
         - "Students publish their sessions to your class's collective, so you can see how each worked with an agent."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
@@ -94,11 +94,11 @@ useCases:
       pictures: [uc-lens, uc-signpost, uc-candles]
     - id: developers
       label: developers
-      capabilities: [find any past session, explain a change in one comment, publish on every push]
+      capabilities: [find any past session, explain a PR in one comment, publish on every push]
       details:
         - "Search and open your past sessions from supported agents, all kept on your computer."
         - "Comment /peasant attach on your pull request, then confirm, to link your transcripts behind its commits."
-        - "Turn it on once, and each push publishes that project's sessions, secrets hidden, to your chosen collectives."
+        - "Automatically push sessions to your chosen collectives."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lantern, uc-door, uc-bell]
     - id: companies
@@ -157,7 +157,7 @@ vision:
   line: We are building a sustainable, respectful ecosystem where people have a stake in their data.
   story:
     - "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's asset."
-    - "We think the record of the work belongs to the people who did it. You keep it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use and no one can fence off again."
+    - "We think the work also belongs to the people who did it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use."
   cta: { label: about us, href: /about }
 docsNav:
   - { label: overview, href: /docs }

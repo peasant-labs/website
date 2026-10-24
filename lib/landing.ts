@@ -21,19 +21,18 @@ function art(name: string, alt: string, width: number, height: number): Art {
 /*
  * The hero says the mission in the owner's words: the open-source commons for
  * agent transcripts. Everything under it is in plain words. The tags name the
- * four promises the product stands on: nothing leaves the computer until it is
- * published, peasant and village are Apache-2.0, peasant reads six agents'
- * sessions, and indexing skips sessions that have not changed. The lede says
- * where the sessions come from (the agents write them, peasant gathers them),
- * that secrets and personal details are hidden on the computer before a
- * session is published, and that the person publishing picks who can read it:
- * the collectives they choose, or everyone.
+ * four promises the product stands on: a session is shared only with the
+ * people its owner permits, peasant and village are Apache-2.0, peasant reads
+ * six agents' sessions, and indexing skips sessions that have not changed. The
+ * lede says where the sessions come from (the agents write them, peasant
+ * gathers them) and that secrets and personal details are hidden on the
+ * computer before a session is shared.
  */
 export const HERO = {
   title: "the open-source commons for agent transcripts",
-  lede: "Peasant gathers the sessions your coding agents save on your computer. Before you publish one, Peasant hides its secrets and personal details. You choose who can read it.",
+  lede: "Peasant gathers the sessions your coding agents save on your computer. Before you share one, Peasant hides its secrets and personal details.",
   pillars: [
-    { text: "private until you publish", icon: "lock" },
+    { text: "permissioned sharing", icon: "lock" },
     { text: "open source", icon: "code" },
     { text: "works with many agents", icon: "bot" },
     { text: "fast indexing", icon: "zap" },
@@ -147,7 +146,7 @@ export const USE_CASES = {
         {
           text: "build evals from real work",
           detail:
-            "Collect real coding transcripts in a private collective, secrets hidden, then download them to test agents.",
+            "Collect real coding transcripts in a private collective, then download them to test agents.",
           icon: "check",
           art: capabilityArt("uc-balance", "a balance scale with an amber weight in its right pan"),
         },
@@ -159,7 +158,7 @@ export const USE_CASES = {
           art: capabilityArt("uc-book", "an open book on a stand with an amber ribbon bookmark"),
         },
         {
-          text: "run a class on agents",
+          text: "run a class with open agent use",
           detail:
             "Students publish their sessions to your class's collective, so you can see how each worked with an agent.",
           icon: "class",
@@ -208,7 +207,7 @@ export const USE_CASES = {
           art: capabilityArt("uc-lantern", "a lantern with amber glass"),
         },
         {
-          text: "explain a change in one comment",
+          text: "explain a PR in one comment",
           detail:
             "Comment `/peasant attach` on your pull request, then confirm, to link your transcripts behind its commits.",
           icon: "link",
@@ -217,7 +216,7 @@ export const USE_CASES = {
         {
           text: "publish on every push",
           detail:
-            "Turn it on once, and each push publishes that project's sessions, secrets hidden, to your chosen collectives.",
+            "Automatically push sessions to your chosen collectives.",
           icon: "send",
           art: capabilityArt("uc-bell", "an amber town crier's handbell"),
         },
@@ -316,7 +315,7 @@ export const INSTALL = {
  * one commit.
  */
 export const SESSION = {
-  title: "we're setting a new standard for transcript sharing and viewing",
+  title: "a new standard for transcript sharing and viewing",
   /* the short title the transcript browser shows for the sample, the way a curated page names a session */
   sessionTitle: "fix the staging 403",
   label: "a sample session",
@@ -336,7 +335,7 @@ export const VISION = {
   line: "We are building a sustainable, respectful ecosystem where people have a stake in their data.",
   story: [
     "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's asset.",
-    "We think the record of the work belongs to the people who did it. You keep it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use and no one can fence off again.",
+    "We think the work also belongs to the people who did it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use.",
   ],
   cta: { label: "about us", href: "/about" },
   art: art(
