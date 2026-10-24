@@ -18,6 +18,7 @@ import {
   Send,
   ShieldCheck,
   SquareTerminal,
+  Stamp,
   Users,
   Zap,
 } from "@peasant-labs/fairtrade/icons";
@@ -45,6 +46,7 @@ const ICONS: Record<LandingIconName, ComponentType<SVGProps<SVGSVGElement>>> = {
   bot: Bot,
   zap: Zap,
   book: BookOpen,
+  stamp: Stamp,
 };
 
 /** A landing icon, decorative: the words beside it carry the meaning. */

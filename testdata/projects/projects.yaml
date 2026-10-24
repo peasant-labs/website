@@ -140,17 +140,17 @@ site:
       h1: blog
       metadata:
         title: blog | peasant
-        description: Essays on who owns the data that agent work produces.
+        description: Essays about data labour.
         canonical: https://peasantlabs.org/blog
         openGraph:
           title: blog | peasant
-          description: Essays on who owns the data that agent work produces.
+          description: Essays about data labour.
           url: https://peasantlabs.org/blog
           type: website
         twitter:
           card: summary_large_image
           title: blog | peasant
-          description: Essays on who owns the data that agent work produces.
+          description: Essays about data labour.
     - id: post-reclaiming
       path: /blog/reclaiming-data-autonomy-as-a-peasant
       h1: Reclaiming Data Autonomy as a Peasant
@@ -169,7 +169,7 @@ site:
           description: We are developing the suite of tools required to safely share and manage access to transcripts produced by coding agent sessions.
     - id: about
       path: /about
-      h1: about
+      h1: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.
       metadata:
         title: about | peasant
         description: who we are and what peasant is for.

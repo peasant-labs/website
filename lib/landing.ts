@@ -23,7 +23,8 @@ function art(name: string, alt: string, width: number, height: number): Art {
  * agent transcripts. Everything under it is in plain words. The tags name the
  * four promises the product stands on: a session is shared only with the
  * people its owner permits, peasant and village are Apache-2.0, peasant reads
- * six agents' sessions, and indexing skips sessions that have not changed. The
+ * six agents' sessions, and a published session stays credited to the person
+ * who made it. The
  * lede says where the sessions come from (the agents write them, peasant
  * gathers them) and that secrets and personal details are hidden on the
  * computer before a session is shared.
@@ -35,7 +36,7 @@ export const HERO = {
     { text: "permissioned sharing", icon: "lock" },
     { text: "open source", icon: "code" },
     { text: "works with many agents", icon: "bot" },
-    { text: "fast indexing", icon: "zap" },
+    { text: "data attribution", icon: "stamp" },
   ],
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
@@ -97,7 +98,8 @@ export type LandingIconName =
   | "review"
   | "bot"
   | "zap"
-  | "book";
+  | "book"
+  | "stamp";
 
 /** a capability: its headline, one or two sentences on what it is, and its own picture, which shows while it does */
 export type Capability = Readonly<{ text: string; detail: string; icon: LandingIconName; art: Art }>;
@@ -317,7 +319,7 @@ export const INSTALL = {
  * one commit.
  */
 export const SESSION = {
-  title: "a new standard for transcript sharing and viewing",
+  title: "a new standard for transcript sharing, viewing, and attribution",
   /* the short title the transcript browser shows for the sample, the way a curated page names a session */
   sessionTitle: "fix the staging 403",
   label: "a sample session",
@@ -340,9 +342,9 @@ export const SESSION = {
  * lead line; the other two say why. Short contexts keep only the lead line.
  */
 export const VISION = {
-  line: "We are building a sustainable, respectful ecosystem where people have a stake in their data.",
+  line: "We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.",
   story: [
-    "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's asset.",
+    "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's capital.",
     "We think the work also belongs to the people who did it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use.",
   ],
   cta: { label: "about us", href: "/about" },
