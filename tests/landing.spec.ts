@@ -243,7 +243,7 @@ test("the use cases are one row of all twelve capabilities, each tagged with its
   // no arrows and no counter: the row is the way through
   await expect(row.getByRole("button")).toHaveCount(0);
 
-  const cards = row.locator(".uc-card:not([aria-hidden])");
+  const cards = row.locator(".uc-card");
   const { more } = fixture.useCases;
   const all = [
     ...fixture.useCases.slides.flatMap((slide) =>
@@ -278,10 +278,8 @@ test("the use cases are one row of all twelve capabilities, each tagged with its
     "href",
     more.cta.href,
   );
-  // the loop's second set is hidden from assistive technology and out of the tab order
-  const clones = row.locator('.uc-card[aria-hidden="true"]');
-  await expect(clones).toHaveCount(all.length);
-  expect(await clones.evaluateAll((items) => items.every((item) => item.hasAttribute("inert")))).toBe(true);
+  // one pass through the cards: none is repeated
+  await expect(row.locator(".uc-card")).toHaveCount(all.length);
 
   // every headline and every description is in the page as served, for search engines and readers without script
   // (read as text: a command in the words is set in its own code element)
@@ -313,10 +311,7 @@ test("the use cases are one row of all twelve capabilities, each tagged with its
 
   // the whole docs card is its action's target: a tap on its picture opens the docs
   await row.hover();
-  await row.evaluate((element) => {
-    const all = [...element.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
-    element.scrollTo({ left: all.at(-1)!.offsetLeft - all[0]!.offsetLeft, behavior: "instant" });
-  });
+  await row.evaluate((element) => element.scrollTo({ left: element.scrollWidth, behavior: "instant" }));
   const picture = (await cards.last().locator("figure").boundingBox())!;
   await page.mouse.click(picture.x + picture.width / 2, picture.y + picture.height / 2);
   await expect(page).toHaveURL(new RegExp(`${more.cta.href}$`));
@@ -352,7 +347,7 @@ test("every card has one shape, on the same lines across the row: picture, tag, 
     await page.goto("/");
     const geometry = await page.evaluate(() => {
       const row = document.querySelector("[data-use-cases]") as HTMLElement;
-      const cards = [...row.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
+      const cards = [...row.querySelectorAll<HTMLElement>(".uc-card")];
       const lines = (element: Element) =>
         element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight);
       // unrounded, offset by the card's own left: offsetTop rounds, and the row is moving
@@ -458,11 +453,12 @@ test("every card has one shape, on the same lines across the row: picture, tag, 
   }
 });
 
-test("the row starts under its title, and every card, the last ones too, can stand whole on the title's edge", async ({
+test("the row runs from edge to edge of the screen, fading softly at both, from the first card on the title's edge to the docs card on the content's right edge", async ({
   page,
 }) => {
   for (const [width, motion] of [
     [1440, "no-preference"],
+    [1280, "no-preference"],
     [390, "no-preference"],
     [1440, "reduce"],
     [390, "reduce"],
@@ -471,72 +467,53 @@ test("the row starts under its title, and every card, the last ones too, can sta
     await page.emulateMedia({ reducedMotion: motion });
     await page.goto("/");
     const row = page.locator("[data-use-cases]");
-    // before it moves, the first card stands on the title's edge
-    expect(
-      await page.evaluate(
-        () =>
-          Math.abs(
-            document.querySelector("[data-use-cases] .uc-card")!.getBoundingClientRect().left -
-              document.querySelector("#uses-title")!.getBoundingClientRect().left,
-          ) < 2,
-      ),
-      `the row does not start under its title at ${width}, ${motion}`,
-    ).toBe(true);
-    await row.scrollIntoViewIfNeeded();
-    await row.hover();
-    const rests = await row.evaluate(async (element) => {
-      const edge = document.querySelector("#uses-title")!.getBoundingClientRect().left;
-      const cards = [...element.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
-      const first = cards[0]!.offsetLeft;
-      const fadeFrom = edge - 12;
-      const out: { index: number; onEdge: boolean; previousHidden: boolean; neighbour: boolean }[] = [];
-      for (const [index, card] of cards.entries()) {
-        element.scrollTo({ left: card.offsetLeft - first, behavior: "instant" });
-        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-        const left = card.getBoundingClientRect().left;
-        const previous = cards[index - 1]?.getBoundingClientRect().right ?? -Infinity;
-        // the row never runs out: the next card, real or its twin, stands to the right
-        const next = (cards[index + 1] ?? element.querySelector<HTMLElement>("[data-clone]")!).getBoundingClientRect();
-        out.push({
-          index,
-          onEdge: Math.abs(left - edge) < 2,
-          previousHidden: previous <= fadeFrom,
-          neighbour: next.left < element.getBoundingClientRect().right,
-        });
-      }
-      return out;
-    });
-    for (const rest of rests) {
-      expect(rest, `card ${rest.index + 1} cannot stand on the edge at ${width}, ${motion}`).toEqual({
-        index: rest.index,
-        onEdge: true,
-        previousHidden: true,
-        neighbour: true,
+    const at = `at ${width}, ${motion}`;
+    const edges = () =>
+      page.evaluate(() => {
+        const row = document.querySelector<HTMLElement>("[data-use-cases]")!;
+        const cards = [...row.querySelectorAll<HTMLElement>(".uc-card")];
+        const content = document.querySelector("#uses .lp-head")!.getBoundingClientRect();
+        const box = row.getBoundingClientRect();
+        const mask = getComputedStyle(row).maskImage;
+        return {
+          rowLeft: box.left,
+          rowRight: box.right,
+          viewport: document.documentElement.clientWidth,
+          contentLeft: content.left,
+          contentRight: content.right,
+          first: cards[0]!.getBoundingClientRect().left,
+          last: cards.at(-1)!.getBoundingClientRect().right,
+          // transparent at both screen edges, solid between
+          fades: mask.startsWith("linear-gradient(to right, rgba(0, 0, 0, 0)") && mask.endsWith("rgba(0, 0, 0, 0))"),
+          clones: row.querySelectorAll('[aria-hidden="true"].uc-card').length,
+        };
       });
-    }
-    // moved on by hand past the docs card, the row comes round to the first card again
-    await row.evaluate((element) => {
-      const clone = element.querySelector<HTMLElement>("[data-clone]")!;
-      element.scrollTo({ left: clone.offsetLeft - (element.firstElementChild as HTMLElement).offsetLeft, behavior: "instant" });
-    });
-    await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 3000 }).toBeLessThan(2);
+    // before it moves, the first card stands on the title's edge
+    const start = await edges();
+    expect(start.rowLeft, `the row does not reach the screen's left edge ${at}`).toBe(0);
+    expect(Math.abs(start.rowRight - start.viewport), `the row does not reach the screen's right edge ${at}`).toBeLessThan(1);
+    expect(start.fades, `the row does not fade at both edges ${at}`).toBe(true);
+    expect(start.clones, `the row repeats its cards ${at}`).toBe(0);
+    expect(Math.abs(start.first - start.contentLeft), `the first card is off the title's edge ${at}`).toBeLessThan(2);
+    // at the end, the docs card's right edge stands on the content's right edge
+    await row.hover();
+    await row.evaluate((element) => element.scrollTo({ left: element.scrollWidth, behavior: "instant" }));
+    const end = await edges();
+    expect(Math.abs(end.last - end.contentRight), `the docs card is off the content's right edge ${at}`).toBeLessThan(2);
   }
 });
 
-test("the row drifts slowly and evenly without settling, loops without a seam, holds when hovered, and stands still under reduced motion", async ({
+test("the row drifts slowly and evenly to its end, rests, glides back to the start, rests, and drifts again; hovering holds it", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const row = page.locator("[data-use-cases]");
-  await row.scrollIntoViewIfNeeded();
+  await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
   await page.mouse.move(0, 0);
   await expect(row).toHaveAttribute("data-playing", "true");
   // nothing pulls it onto a card
   expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("none");
-  expect(
-    await row.evaluate((element) => getComputedStyle(element).maskImage.startsWith("linear-gradient(to right, rgba(0, 0, 0, 0)")),
-  ).toBe(true);
   // a few pixels every few frames, never standing and never jumping: an even drift
   const samples = await row.evaluate(async (element) => {
     const out: number[] = [];
@@ -553,15 +530,46 @@ test("the row drifts slowly and evenly without settling, loops without a seam, h
     expect(step, `the drift stood or jumped: ${samples}`).toBeLessThan(20);
   }
 
-  // past the end of the first set it carries on from the same place in it, so the loop never runs out
-  const set = await row.evaluate((element) => {
-    const clone = element.querySelector<HTMLElement>("[data-clone]")!;
-    const set = clone.offsetLeft - (element.firstElementChild as HTMLElement).offsetLeft;
-    element.scrollTo({ left: set - 4, behavior: "instant" });
-    return set;
+  // near the end it drifts on to the end and rests there, then goes back to the start in one eased move,
+  // rests, and drifts on; recorded every frame
+  const trace = await row.evaluate(async (element) => {
+    const end = element.scrollWidth - element.clientWidth;
+    element.scrollTo({ left: end - 20, behavior: "instant" });
+    const out: { t: number; left: number }[] = [];
+    const start = performance.now();
+    await new Promise<void>((resolve) => {
+      const frame = (now: number) => {
+        out.push({ t: now - start, left: element.scrollLeft });
+        if (now - start < 7000) requestAnimationFrame(frame);
+        else resolve();
+      };
+      requestAnimationFrame(frame);
+    });
+    return { end, out };
   });
-  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 5000 }).toBeLessThan(set / 2);
-  await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  const { end, out } = trace;
+  const atEnd = out.filter((point) => Math.abs(point.left - end) < 1);
+  const rest = atEnd.at(-1)!.t - atEnd[0]!.t;
+  expect(rest, "the row did not rest at its end for about two seconds").toBeGreaterThan(1700);
+  expect(rest).toBeLessThan(2600);
+  const back = out.filter((point) => point.t > atEnd.at(-1)!.t && point.left > 1);
+  const leftEnd = out.findIndex((point) => point.t > atEnd.at(-1)!.t);
+  const home = out.findIndex((point, index) => index > leftEnd && point.left < 1);
+  expect(home, "the row did not come back to its start").toBeGreaterThan(0);
+  const way = out[home]!.t - out[leftEnd]!.t;
+  // one eased move, not a jump: well over a second, through many places, never turning round
+  expect(way, "the way back was not one move of a second or so").toBeGreaterThan(1000);
+  expect(way).toBeLessThan(1900);
+  expect(back.length).toBeGreaterThan(30);
+  for (const [index, point] of back.entries()) {
+    if (index) expect(point.left, "the way back turned round").toBeLessThanOrEqual(back[index - 1]!.left + 1);
+  }
+  // it rests at the start for about a second, then drifts on
+  const atStart = out.filter((point, index) => index >= home && point.left < 1);
+  const pause = atStart.at(-1)!.t - atStart[0]!.t;
+  expect(pause, "the row did not rest at its start for about a second").toBeGreaterThan(700);
+  expect(pause).toBeLessThan(1600);
+  expect(out.at(-1)!.left, "the row did not drift on after its rest").toBeGreaterThan(1);
 
   // hovering holds it where it is
   await row.hover();
@@ -569,30 +577,47 @@ test("the row drifts slowly and evenly without settling, loops without a seam, h
   const held = await row.evaluate((element) => element.scrollLeft);
   await page.waitForTimeout(1500);
   expect(await row.evaluate((element) => element.scrollLeft)).toBe(held);
-
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  // still round: the second set follows, hidden from assistive technology, but nothing moves on its own
-  await expect(row.locator('.uc-card[aria-hidden="true"]')).toHaveCount(await row.locator(".uc-card:not([aria-hidden])").count());
-  await expect(row).toHaveAttribute("data-playing", "false");
-  expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("x mandatory");
-  await row.scrollIntoViewIfNeeded();
+  // left at its end by a hand, it goes back to the start all the same once the pointer leaves
+  await row.evaluate((element) => element.scrollTo({ left: element.scrollWidth, behavior: "instant" }));
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(1500);
-  expect(await row.evaluate((element) => element.scrollLeft)).toBe(0);
+  await expect.poll(() => row.evaluate((element) => element.scrollLeft), { timeout: 6000 }).toBeLessThan(1);
 });
 
-/* where the row stands, and where the line's mark stands along the line, as a share of it */
+test("under reduced motion the row never moves on its own, not even back from its end, and snaps to each card by hand", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  await page.mouse.move(0, 0);
+  await expect(row).toHaveAttribute("data-playing", "false");
+  expect(await row.evaluate((element) => getComputedStyle(element).scrollSnapType)).toBe("x mandatory");
+  await page.waitForTimeout(1500);
+  expect(await row.evaluate((element) => element.scrollLeft)).toBe(0);
+  const end = await row.evaluate((element) => {
+    element.scrollTo({ left: element.scrollWidth, behavior: "instant" });
+    return element.scrollWidth - element.clientWidth;
+  });
+  await page.waitForTimeout(4500);
+  expect(Math.abs((await row.evaluate((element) => element.scrollLeft)) - end)).toBeLessThan(1);
+});
+
+/* where the row stands, as a share of how far it can scroll, and where the line's mark stands along the room it has */
 async function rowAndMark(page: Page) {
   return page.evaluate(() => {
     const row = document.querySelector<HTMLElement>("[data-use-cases]")!;
     const line = document.querySelector(".uc-progress")!.getBoundingClientRect();
     const mark = document.querySelector(".uc-progress-mark")!.getBoundingClientRect();
-    const clone = row.querySelector<HTMLElement>("[data-clone]")!;
+    const end = row.scrollWidth - row.clientWidth;
     return {
       left: row.scrollLeft,
-      mark: (mark.left - line.left) / line.width,
-      set: clone.offsetLeft - (row.firstElementChild as HTMLElement).offsetLeft,
+      end,
+      at: row.scrollLeft / end,
+      mark: (mark.left - line.left) / (line.width - mark.width),
+      first: row.querySelector(".uc-card")!.getBoundingClientRect().left,
+      last: row.querySelector(".uc-card:last-child")!.getBoundingClientRect().right,
       selected: String(window.getSelection()),
       dragging: row.hasAttribute("data-dragging"),
     };
@@ -619,14 +644,12 @@ async function dragBy(page: Page, x: number, y: number, dx: number, { flick = fa
   return during;
 }
 
-test("a mouse drags the row one to one from a picture or the words, round the loop either way, and the line moves with it", async ({
-  page,
-}) => {
+test("a mouse drags the row one to one from a picture or the words, and the line moves with it", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const row = page.locator("[data-use-cases]");
   await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-  const card = row.locator(".uc-card:not([aria-hidden])").nth(1);
+  const card = row.locator(".uc-card").nth(1);
   for (const part of [".uc-figure", ".uc-cap-detail"]) {
     const box = (await card.locator(part).boundingBox())!;
     const [x, y] = [box.x + box.width / 2, box.y + box.height / 2];
@@ -636,7 +659,8 @@ test("a mouse drags the row one to one from a picture or the words, round the lo
     const during = await dragBy(page, x, y, -300);
     expect(Math.abs(during.left - before.left - 300), `a drag from ${part} did not move the row with the hand`).toBeLessThan(4);
     expect(during.dragging).toBe(true);
-    expect(during.mark - before.mark, `the line did not follow a drag from ${part}`).toBeCloseTo(300 / before.set, 2);
+    expect(during.mark - before.mark, `the line did not follow a drag from ${part}`).toBeGreaterThan(0.03);
+    expect(Math.abs(during.mark - during.at), `the line does not show where the row is after a drag from ${part}`).toBeLessThan(0.01);
     await page.waitForTimeout(400);
     const after = await rowAndMark(page);
     // a drag that came to rest before letting go stays where the hand left it, with nothing selected
@@ -645,20 +669,44 @@ test("a mouse drags the row one to one from a picture or the words, round the lo
     expect(after.dragging).toBe(false);
   }
 
-  // dragged back past the first card, it comes round from the docs card's side, the line with it
-  await row.evaluate((element) => element.scrollTo({ left: 100, behavior: "instant" }));
-  const box = (await card.locator(".uc-figure").boundingBox())!;
-  const back = await dragBy(page, box.x + box.width / 2, box.y + box.height / 2, 300);
-  expect(Math.abs(back.left - (back.set - 200))).toBeLessThan(4);
-  expect(back.mark).toBeGreaterThan(0.9);
-
   // a flick glides on after letting go, and comes to a stop
+  const box = (await card.locator(".uc-figure").boundingBox())!;
   const flung = await dragBy(page, box.x + box.width / 2, box.y + box.height / 2, -200, { flick: true });
   await page.waitForTimeout(1200);
   const glided = await rowAndMark(page);
   expect(glided.left - flung.left, "a flick did not glide on").toBeGreaterThan(20);
   await page.waitForTimeout(400);
   expect((await rowAndMark(page)).left).toBe(glided.left);
+});
+
+test("dragged past either end, the cards give way a little and spring back, and the row stays at its end", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const row = page.locator("[data-use-cases]");
+  await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  const box = (await row.locator(".uc-card").nth(1).locator(".uc-figure").boundingBox())!;
+  const [x, y] = [box.x + box.width / 2, box.y + box.height / 2];
+  await page.mouse.move(x, y);
+  await row.evaluate((element) => element.scrollTo({ left: 0, behavior: "instant" }));
+  const start = await rowAndMark(page);
+  // past the start: the row stays at 0 and the first card follows the hand only part of the way
+  const before = await dragBy(page, x, y, 300);
+  expect(before.left).toBe(0);
+  expect(before.first - start.first, "the cards did not give way past the start").toBeGreaterThan(20);
+  expect(before.first - start.first, "the cards followed the hand past the start").toBeLessThan(150);
+  await expect.poll(async () => Math.abs((await rowAndMark(page)).first - start.first)).toBeLessThan(1);
+
+  // past the end, the same the other way
+  await row.evaluate((element) => element.scrollTo({ left: element.scrollWidth, behavior: "instant" }));
+  const end = await rowAndMark(page);
+  const after = await dragBy(page, x, y, -300);
+  expect(Math.abs(after.left - end.end)).toBeLessThan(1);
+  expect(end.last - after.last, "the cards did not give way past the end").toBeGreaterThan(20);
+  expect(end.last - after.last, "the cards followed the hand past the end").toBeLessThan(150);
+  expect(after.mark, "the line is not at its end").toBeGreaterThan(0.99);
+  await expect.poll(async () => Math.abs((await rowAndMark(page)).last - end.last)).toBeLessThan(1);
 });
 
 test("under reduced motion a drag still moves the row, then it stands on the nearest card, with no glide", async ({
@@ -669,7 +717,7 @@ test("under reduced motion a drag still moves the row, then it stands on the nea
   await page.goto("/");
   const row = page.locator("[data-use-cases]");
   await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
-  const box = (await row.locator(".uc-card:not([aria-hidden])").nth(1).locator(".uc-figure").boundingBox())!;
+  const box = (await row.locator(".uc-card").nth(1).locator(".uc-figure").boundingBox())!;
   const during = await dragBy(page, box.x + box.width / 2, box.y + box.height / 2, -300);
   expect(Math.abs(during.left - 300)).toBeLessThan(4);
   const pitch = await row.evaluate((element) => {
@@ -691,7 +739,8 @@ test("the wheel scrolls the row, and the line moves with it", async ({ page }) =
   await page.mouse.wheel(300, 0);
   await expect.poll(async () => (await rowAndMark(page)).left - before.left).toBeGreaterThan(290);
   const after = await rowAndMark(page);
-  expect(after.mark - before.mark).toBeCloseTo((after.left - before.left) / before.set, 2);
+  expect(after.mark - before.mark).toBeGreaterThan(0.03);
+  expect(Math.abs(after.mark - after.at)).toBeLessThan(0.01);
 });
 
 test("a click that barely moves is still a click: the docs card opens the docs", async ({ page }) => {
@@ -700,11 +749,8 @@ test("a click that barely moves is still a click: the docs card opens the docs",
   const row = page.locator("[data-use-cases]");
   await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
   await row.hover();
-  await row.evaluate((element) => {
-    const cards = [...element.querySelectorAll<HTMLElement>(".uc-card:not([aria-hidden])")];
-    element.scrollTo({ left: cards.at(-1)!.offsetLeft - cards[0]!.offsetLeft, behavior: "instant" });
-  });
-  const link = (await row.locator(".uc-cta").first().boundingBox())!;
+  await row.evaluate((element) => element.scrollTo({ left: element.scrollWidth, behavior: "instant" }));
+  const link = (await row.locator(".uc-cta").boundingBox())!;
   await page.mouse.move(link.x + 20, link.y + link.height / 2);
   await page.mouse.down();
   await page.mouse.move(link.x + 23, link.y + link.height / 2);
@@ -729,17 +775,17 @@ test("on a phone the row drifts too, holds under a finger, and moves on again af
   await context.close();
 });
 
-test("a quiet line under the row marks where it is in its loop, moving with it, and is no control", async ({ page }) => {
+test("a quiet line under the row marks where it is, from its start to its end, and is no control", async ({ page }) => {
   for (const motion of ["no-preference", "reduce"] as const) {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ reducedMotion: motion });
     await page.goto("/");
     const row = page.locator("[data-use-cases]");
     const line = page.locator(".uc-progress");
-    // a reading, not a control: hidden from assistive technology, with nothing to press, and no segments
+    // a reading, not a control: hidden from assistive technology, with nothing to press, and one mark
     await expect(line).toHaveAttribute("aria-hidden", "true");
     await expect(line.locator("button, a")).toHaveCount(0);
-    await expect(line.locator(".uc-progress-mark")).toHaveCount(2);
+    await expect(line.locator(".uc-progress-mark")).toHaveCount(1);
     // it sits under the row, on the title's edge
     const edges = await page.evaluate(() => ({
       line: document.querySelector(".uc-progress")!.getBoundingClientRect(),
@@ -749,25 +795,22 @@ test("a quiet line under the row marks where it is in its loop, moving with it, 
     expect(edges.line.top).toBeGreaterThan(edges.row.bottom - 1);
     expect(Math.abs(edges.line.left - edges.title)).toBeLessThan(2);
 
-    // held still and moved by hand to the middle of its loop, the mark stands in the middle of the line
-    await row.scrollIntoViewIfNeeded();
+    // held still and moved by hand, the mark stands as far along its line as the row is along its way
+    await row.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
     await row.hover();
-    const mark = () =>
-      page.evaluate(() => {
-        const line = document.querySelector(".uc-progress")!.getBoundingClientRect();
-        const mark = document.querySelector(".uc-progress-mark")!.getBoundingClientRect();
-        return { at: (mark.left - line.left) / line.width, span: mark.width / line.width };
-      });
-    for (const share of [0.25, 0.5]) {
+    for (const share of [0, 0.25, 0.5, 1]) {
       await row.evaluate((element, share) => {
-        const clone = element.querySelector<HTMLElement>("[data-clone]")!;
-        const set = clone.offsetLeft - (element.firstElementChild as HTMLElement).offsetLeft;
-        element.scrollTo({ left: set * share, behavior: "instant" });
+        element.scrollTo({ left: (element.scrollWidth - element.clientWidth) * share, behavior: "instant" });
       }, share);
-      await expect.poll(async () => Math.abs((await mark()).at - share), { message: `${motion}` }).toBeLessThan(0.08);
+      await expect
+        .poll(async () => Math.abs((await rowAndMark(page)).mark - share), { message: `${motion} at ${share}` })
+        .toBeLessThan(motion === "reduce" ? 0.12 : 0.01);
     }
-    // the mark is as long as the share of the loop on screen
-    const { span } = await mark();
+    // the mark is as long as the share of the row on screen
+    const span = await page.evaluate(() => {
+      const line = document.querySelector(".uc-progress")!.getBoundingClientRect();
+      return document.querySelector(".uc-progress-mark")!.getBoundingClientRect().width / line.width;
+    });
     expect(span).toBeGreaterThan(0.1);
     expect(span).toBeLessThan(0.4);
   }

@@ -44,10 +44,26 @@ const DRAG_PX = 6;
 const FLICK_MS = 100;
 const GLIDE_MAX = 3;
 const GLIDE_KEEP = 0.92;
+/* dragged past either end, the cards give way less and less, never more than this far */
+const PULL_PX = 160;
 /* after a touch lets go, the row waits this long before it moves on its own again */
 const TOUCH_REST_MS = 2400;
 /* the drift picks up its speed over this long when it starts or comes back from a hold */
 const EASE_IN_MS = 600;
+/* at the end the row rests, goes back to the start in one eased move, and rests again before it drifts on */
+const END_REST_MS = 2000;
+const BACK_MS = 1400;
+const START_REST_MS = 1000;
+
+/* slow at both ends, quickest in the middle: the way back to the start */
+function easeInOut(t: number) {
+  return t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
+}
+
+/* how far the row can scroll */
+function endOf(row: HTMLElement) {
+  return row.scrollWidth - row.clientWidth;
+}
 
 /**
  * The use cases: the section's heading on its own row, then one row of all
@@ -56,19 +72,21 @@ const EASE_IN_MS = 600;
  * what it is), and a last card in the same shape that leads on to the docs,
  * the only one with an action. Every card's words are in the page as served.
  *
- * The row drifts on its own, slowly and evenly, and never ends: a second set
- * of the cards follows the first, hidden from assistive technology and out of
- * the tab order, and the row steps back by one set, without motion, when it
- * reaches it. It holds while hovered, keyboard-focused, touched, off screen
- * or in a background tab. It is a real scroll area, so a finger swipes it, a
- * wheel or trackpad scrolls it, and the arrow keys move it once it has focus.
- * A mouse drags it one to one from anywhere on a card, round the loop either
- * way, and a flick glides on briefly after the button lets go. The drift
- * carries on from wherever it was left. Under a quiet line, a short mark moves
- * with the row through the whole loop: a reading, not a control.
+ * The row runs from one edge of the screen to the other and fades softly at
+ * both. It starts with the first card on the title's edge and drifts on its
+ * own, slowly and evenly, until the docs card stands on the content's right
+ * edge. There it rests, goes back to the start in one eased move, rests, and
+ * drifts on again. It holds while hovered, keyboard-focused, touched, off
+ * screen or in a background tab. It is a real scroll area, so a finger swipes
+ * it, a wheel or trackpad scrolls it, and the arrow keys move it once it has
+ * focus. A mouse drags it one to one from anywhere on a card; past either end
+ * the cards give way a little and spring back, and a flick glides on briefly
+ * after the button lets go. The drift carries on from wherever it was left.
+ * Under a quiet line, a short mark stands where the row is, from start to end:
+ * a reading, not a control.
  *
  * Under reduced motion it never moves on its own: it scrolls and snaps to each
- * card by hand, and still goes round, and the mark still follows it.
+ * card by hand, and the mark still follows it.
  */
 export function UseCases() {
   const rowRef = useRef<HTMLDivElement>(null);
@@ -79,42 +97,58 @@ export function UseCases() {
   if (onScreen && !near) setNear(true);
   const reduced = useReducedMotion();
   const [held, setHeld] = useState({ hover: false, focus: false, touch: false, drag: false });
-  const drag = useRef<{ x: number; left: number; moved: boolean; trail: { t: number; x: number }[] } | null>(null);
+  const drag = useRef<{
+    x: number;
+    left: number;
+    end: number;
+    moved: boolean;
+    pulled: boolean;
+    trail: { t: number; x: number }[];
+  } | null>(null);
   const glide = useRef(0);
   const restTimer = useRef(0);
   const playing = onScreen && !reduced && !held.hover && !held.focus && !held.touch && !held.drag;
 
-  /* the width of one set of cards: past it, the row stands at the same place in the first set */
-  function setWidth(row: HTMLElement) {
-    const clone = row.querySelector<HTMLElement>("[data-clone]");
-    return clone ? clone.offsetLeft - (row.firstElementChild as HTMLElement).offsetLeft : 0;
-  }
-
-  /* a place anywhere along the endless row, as the same place in the first set */
-  function round(row: HTMLElement, left: number) {
-    const set = setWidth(row);
-    return set ? ((left % set) + set) % set : left;
-  }
-
-  // The drift: a few pixels a second, once per frame, back a set at the seam. The row keeps its own
-  // unrounded place, so the drift stays even between whole pixels, and takes up the scroll position
-  // again whenever a hand has moved it.
+  // The drift, once per frame: on to the end, a rest, back to the start, a rest, and on again. The row
+  // keeps its own unrounded place, so the drift stays even between whole pixels, and takes up the scroll
+  // position again whenever a hand has moved it.
   useEffect(() => {
     const row = rowRef.current;
     if (!row || !playing) return;
     let frame = 0;
-    let start = 0;
     let last = 0;
     let at = row.scrollLeft;
+    let mode: "drift" | "end" | "back" | "start" = "drift";
+    let since = 0;
+    let from = 0;
     const tick = (time: number) => {
-      if (!start) start = time;
-      if (last) {
-        if (Math.abs(row.scrollLeft - at) > 1) at = row.scrollLeft;
-        const ease = Math.min(1, (time - start) / EASE_IN_MS);
-        at += ((time - last) / 1000) * USE_CASES.speed * ease * ease * (3 - 2 * ease);
-        const set = setWidth(row);
-        if (set && at >= set) at -= set;
+      if (!since) since = time;
+      if (Math.abs(row.scrollLeft - at) > 1) at = row.scrollLeft;
+      const end = endOf(row);
+      if (mode === "drift") {
+        if (at >= end - 0.5) {
+          mode = "end";
+          since = time;
+        } else if (last) {
+          const ease = Math.min(1, (time - since) / EASE_IN_MS);
+          at = Math.min(end, at + ((time - last) / 1000) * USE_CASES.speed * ease * ease * (3 - 2 * ease));
+          row.scrollLeft = at;
+        }
+      } else if (mode === "end" && time - since >= END_REST_MS) {
+        mode = "back";
+        since = time;
+        from = at;
+      } else if (mode === "back") {
+        const t = Math.min(1, (time - since) / BACK_MS);
+        at = from * (1 - easeInOut(t));
         row.scrollLeft = at;
+        if (t === 1) {
+          mode = "start";
+          since = time;
+        }
+      } else if (mode === "start" && time - since >= START_REST_MS) {
+        mode = "drift";
+        since = time;
       }
       last = time;
       frame = requestAnimationFrame(tick);
@@ -123,30 +157,22 @@ export function UseCases() {
     return () => cancelAnimationFrame(frame);
   }, [playing]);
 
-  // The line follows the row, whoever moves it; a hand scroll that comes to rest in the second set stands
-  // on the same place in the first, so the row goes round by hand too.
+  // The line follows the row on every frame it moves, whoever moves it: the mark stands where the row is
+  // between its start and its end, as long as the share of the row on screen.
   useEffect(() => {
     const row = rowRef.current;
     if (!row) return;
     let frame = 0;
-    let timer = 0;
-    // the mark stands at the row's place in its loop, as long as the share of the loop on screen
     const place = () => {
       frame = 0;
-      const set = setWidth(row);
       const line = lineRef.current;
-      if (!set || !line) return;
-      const shown = row.clientWidth - parseFloat(getComputedStyle(row).paddingLeft);
-      line.style.setProperty("--uc-at", String((row.scrollLeft % set) / set));
-      line.style.setProperty("--uc-span", String(Math.min(1, shown / set)));
+      if (!line) return;
+      const end = endOf(row);
+      line.style.setProperty("--uc-at", String(end > 0 ? Math.min(1, row.scrollLeft / end) : 0));
+      line.style.setProperty("--uc-span", String(Math.min(1, row.clientWidth / row.scrollWidth)));
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(place);
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => {
-        const set = setWidth(row);
-        if (set && row.scrollLeft >= set) row.scrollTo({ left: row.scrollLeft - set, behavior: "instant" });
-      }, 160);
     };
     place();
     row.addEventListener("scroll", onScroll, { passive: true });
@@ -155,7 +181,6 @@ export function UseCases() {
       row.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (frame) cancelAnimationFrame(frame);
-      window.clearTimeout(timer);
     };
   }, []);
 
@@ -167,6 +192,19 @@ export function UseCases() {
     [],
   );
 
+  // Dragged past an end, the cards give way by less and less of the hand's overshoot.
+  function pull(row: HTMLElement, over: number) {
+    const give = PULL_PX * (1 - 1 / ((Math.abs(over) * 0.55) / PULL_PX + 1));
+    row.style.setProperty("--uc-pull", `${-Math.sign(over) * give}px`);
+  }
+
+  // Let go past an end, the cards spring back into place.
+  function release(row: HTMLElement) {
+    row.dataset.pullback = "";
+    row.style.setProperty("--uc-pull", "0px");
+    window.setTimeout(() => delete row.dataset.pullback, 420);
+  }
+
   // A drag, and the glide after it, is over: the row snaps again under reduced motion, standing on the
   // nearest card, and it may drift once the pointer leaves.
   function settle(row: HTMLElement) {
@@ -174,7 +212,7 @@ export function UseCases() {
     if (reduced) {
       const cards = row.querySelectorAll<HTMLElement>(".uc-card");
       const pitch = cards[1]!.offsetLeft - cards[0]!.offsetLeft;
-      row.scrollLeft = Math.round(row.scrollLeft / pitch) * pitch;
+      row.scrollLeft = Math.min(endOf(row), Math.round(row.scrollLeft / pitch) * pitch);
     }
     delete row.dataset.dragging;
     setHeld((value) => ({ ...value, drag: false }));
@@ -194,7 +232,9 @@ export function UseCases() {
       drag.current = {
         x: event.clientX,
         left: row.scrollLeft,
+        end: endOf(row),
         moved: false,
+        pulled: false,
         trail: [{ t: event.timeStamp, x: event.clientX }],
       };
       return;
@@ -216,8 +256,15 @@ export function UseCases() {
       row.dataset.dragging = "";
       setHeld((value) => ({ ...value, drag: true }));
     }
-    row.scrollLeft = round(row, current.left - dx);
-    current.trail = [...current.trail.filter((point) => event.timeStamp - point.t < FLICK_MS), { t: event.timeStamp, x: event.clientX }];
+    const target = current.left - dx;
+    const left = Math.max(0, Math.min(current.end, target));
+    row.scrollLeft = left;
+    current.pulled = target !== left;
+    pull(row, target - left);
+    current.trail = [
+      ...current.trail.filter((point) => event.timeStamp - point.t < FLICK_MS),
+      { t: event.timeStamp, x: event.clientX },
+    ];
   }
 
   function endPointer(event: PointerEvent<HTMLDivElement>) {
@@ -230,7 +277,12 @@ export function UseCases() {
       const swallow = (click: MouseEvent) => click.preventDefault();
       row.addEventListener("click", swallow, { capture: true, once: true });
       window.setTimeout(() => row.removeEventListener("click", swallow, { capture: true }));
-      // a flick glides on, slowing to a stop; a drag that came to rest before letting go stays put
+      if (current.pulled) {
+        release(row);
+        settle(row);
+        return;
+      }
+      // a flick glides on, slowing to a stop or to an end; a drag that came to rest before letting go stays put
       const recent = current.trail.filter((point) => event.timeStamp - point.t < FLICK_MS);
       const first = recent[0];
       const last = recent.at(-1);
@@ -245,10 +297,11 @@ export function UseCases() {
       const step = (now: number) => {
         const dt = now - then;
         then = now;
-        at = round(row, at + speed * dt);
+        const end = endOf(row);
+        at = Math.max(0, Math.min(end, at + speed * dt));
         row.scrollLeft = at;
         speed *= GLIDE_KEEP ** (dt / (1000 / 60));
-        if (Math.abs(speed) > 0.02) glide.current = requestAnimationFrame(step);
+        if (Math.abs(speed) > 0.02 && at > 0 && at < end) glide.current = requestAnimationFrame(step);
         else settle(row);
       };
       glide.current = requestAnimationFrame(step);
@@ -300,42 +353,35 @@ export function UseCases() {
           }
         }}
       >
-        {/* the second set follows under reduced motion too, so the row goes round when moved by hand */}
-        {[false, true].flatMap((clone) =>
-          CARDS.map((card, index) => (
-            <article
-              key={`${clone ? "clone" : "card"}-${card.text}`}
-              className="uc-card"
-              aria-roledescription={clone ? undefined : "slide"}
-              aria-label={clone ? undefined : `${index + 1} of ${CARDS.length}: ${card.text}`}
-              aria-hidden={clone ? true : undefined}
-              inert={clone}
-              data-clone={clone && index === 0 ? "" : undefined}
-              data-use-case={clone ? undefined : card.id}
-            >
-              <figure className="uc-figure">
-                <Art art={card.art} className="uc-art" near={near} draggable={false} />
-              </figure>
-              <p className="uc-tag">
-                <LandingIcon name={card.icon} className="uc-ic" />
-                {card.tag}
-              </p>
-              <h3 className="uc-cap-text">{card.text}</h3>
-              <p className="uc-cap-detail">{withCommands(card.detail)}</p>
-              {card.cta ? (
-                <a className="uc-cta" href={card.cta.href} tabIndex={clone ? -1 : undefined}>
-                  {card.cta.label}
-                  <ArrowRight aria-hidden="true" focusable="false" />
-                </a>
-              ) : null}
-            </article>
-          )),
-        )}
+        {CARDS.map((card, index) => (
+          <article
+            key={card.text}
+            className="uc-card"
+            aria-roledescription="slide"
+            aria-label={`${index + 1} of ${CARDS.length}: ${card.text}`}
+            data-use-case={card.id}
+          >
+            <figure className="uc-figure">
+              <Art art={card.art} className="uc-art" near={near} draggable={false} />
+            </figure>
+            <p className="uc-tag">
+              <LandingIcon name={card.icon} className="uc-ic" />
+              {card.tag}
+            </p>
+            <h3 className="uc-cap-text">{card.text}</h3>
+            <p className="uc-cap-detail">{withCommands(card.detail)}</p>
+            {card.cta ? (
+              <a className="uc-cta" href={card.cta.href}>
+                {card.cta.label}
+                <ArrowRight aria-hidden="true" focusable="false" />
+              </a>
+            ) : null}
+          </article>
+        ))}
       </div>
-      {/* where the row is in its loop: a reading, not a control, so it is hidden from assistive technology */}
+      {/* where the row is, from start to end: a reading, not a control, so it is hidden from assistive technology */}
       <div className="site-wrap">
         <div ref={lineRef} className="uc-progress" aria-hidden="true">
-          <span className="uc-progress-mark" />
           <span className="uc-progress-mark" />
         </div>
       </div>

@@ -437,9 +437,10 @@
 /* use cases */
 
 /*
- * One row of all twelve capabilities, from edge to edge of the screen. It
- * starts at the content's left edge and fades out at its right, so it reads
- * as going on. Cards are 27rem on a wide screen, wide enough for every
+ * One row of all twelve capabilities and the docs card, from edge to edge of
+ * the screen, fading softly at both edges, like the agents' band. It starts
+ * with the first card on the content's left edge and ends with the docs card
+ * on its right edge. Cards are 27rem on a wide screen, wide enough for every
  * headline on one line, two and a bit across a tablet, and most of a phone's
  * width, all one width and one height. The row is a scroll area with its bar
  * hidden: it drifts on its own, and a finger, the arrow keys or a mouse drag
@@ -450,22 +451,21 @@
   --uc-pad: var(--sp-6);
   --uc-gap: clamp(1rem, 2.5vw, 2rem);
   --uc-edge: max(var(--uc-pad), calc((100vw - 75rem) / 2 + var(--uc-pad)));
-  --uc-fade: clamp(1.5rem, 6vw, 6rem);
+  /* no wider than the space before the first card, so a card standing on the content's edge is never faded */
+  --uc-fade: min(clamp(1.5rem, 6vw, 6rem), var(--uc-edge));
   --uc-card: 85vw;
 
   display: flex;
   gap: var(--uc-gap);
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  /* room after the last card, so even it can rest on the title's edge: the row never stops right-aligned */
-  padding: var(--sp-2) calc(100% - var(--uc-edge) - var(--uc-card)) var(--sp-2) var(--uc-edge);
+  padding: var(--sp-2) var(--uc-edge);
   scroll-padding-inline: var(--uc-edge);
   scrollbar-width: none;
-  /* nothing shows left of the title's edge; the row runs on to the right and fades out there */
   mask-image: linear-gradient(
     to right,
-    transparent calc(var(--uc-edge) - var(--sp-3)),
-    #000 var(--uc-edge),
+    transparent,
+    #000 var(--uc-fade),
     #000 calc(100% - var(--uc-fade)),
     transparent
   );
@@ -537,12 +537,6 @@
   }
 }
 
-/* on a phone the fade is only gutter-wide */
-@media (max-width: 47.99rem) {
-  .uc {
-    --uc-fade: var(--uc-pad);
-  }
-}
 
 /*
  * A card: picture, audience tag, headline and words, in every card alike and
@@ -555,6 +549,12 @@
   flex: 0 0 var(--uc-card);
   align-content: start;
   min-width: 0;
+  /* dragged past an end, the cards give way a little, then spring back */
+  translate: var(--uc-pull, 0px) 0;
+}
+
+.uc[data-pullback] .uc-card {
+  transition: translate 400ms var(--ease-out);
 }
 
 /*
@@ -583,10 +583,9 @@
 }
 
 /*
- * Under the row, where it is in its loop: a thin line with a short ink mark
- * that moves with the row, as long as the share of the loop on screen. When
- * the mark runs off the line's end, its twin comes in at the start, as the
- * row comes round to its first card. A reading, not a control.
+ * Under the row, where it is: a thin line with a short ink mark, as long as
+ * the share of the row on screen, at the line's start when the row is and at
+ * its end when the row is, sliding back with it. A reading, not a control.
  */
 .uc-progress {
   --uc-at: 0;
@@ -606,11 +605,7 @@
   inset-inline-start: 0;
   width: calc(var(--uc-span) * 100%);
   background: var(--ink-3);
-  transform: translateX(calc(var(--uc-at) / var(--uc-span) * 100%));
-}
-
-.uc-progress-mark + .uc-progress-mark {
-  transform: translateX(calc((var(--uc-at) - 1) / var(--uc-span) * 100%));
+  transform: translateX(calc(var(--uc-at) * (1 / var(--uc-span) - 1) * 100%));
 }
 
 /* the audience: a small tag with its icon, the card's one icon */
