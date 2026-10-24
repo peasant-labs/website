@@ -150,60 +150,25 @@ install:
 session:
   label: a sample session
   # the viewer names the sample by this short title; its id is shown nowhere
-  title: rewrite billing retries
-  sessionId: sess_8d3f52
+  title: fix the staging 403
+  sessionId: sess_c41e07
   # the author the header shows: the publisher's handle, not a redaction marker
-  author: "@mira_builds"
-  # how long before the reader arrived the sample ended: every post in the thread comes after it
-  endedAgo: 50m
+  author: "@ada"
   # on a phone, the slice shown instead of the windows: the prompt, the redacted line of the .env it read, and the commit
   phone:
     widths: [360, 390]
-    prompt: hey claude, run our billing retry suite against each model, same seed, and write a table of pass rate, tokens and wall time per model
+    prompt: Uploads to staging fail with a 403 since this morning.
     tool: .env
     key: AWS_ACCESS_KEY_ID=
     marker: "<AWS_ACCESS_KEY>"
-    commit: 7c3e9a1
-    stat: "+36 −1, 2 files"
-  # the terminal window's title, and the sample's first ask word for word (the Terminal repeats it)
-  terminal: billing — claude — 80×24
-  firstAsk: hey claude, run our billing retry suite against each model, same seed, and write a table of pass rate, tokens and wall time per model
-  # what the sample carries so a card can show its figures: the prompt count equals the user turns, the token
-  # total sits on the session, and no turn carries a usage count of its own
-  figures: { model: claude-opus-5-5, inputSubmissionCount: 5, totalTokens: 52600 }
+    commit: 9b20f4e
+    stat: "+11 −4, 2 files"
   # the transcript browser's own tabs, as online's transcript page shows them
   tabs: [highlights, full trace, diffs, files, annotations]
   # the pull request's check, in village's own words (backend/internal/digest/render.go) for one transcript and one commit
   check: { name: peasant / prompts, summary: 1 transcript traces 1 of 1 commits }
   # placeholders the redaction engine writes, visible in the transcript
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
-# the share card the transcript's link preview shows, drawn by fairtrade from the sample: its figures are the
-# sample's own prompt count and token total
-card:
-  figures: { prompts: 5, tokens: 52600 }
-# the X thread beside the windows: mira's benchmark, a reply asking for the prompt, and her answer, which is only
-# the transcript's link preview; it is read as one short group. Each post's time is its age, after the session ended
-# and newer down the thread
-thread:
-  label: a thread on X sharing the transcript
-  posts:
-    - { name: mira, handle: "@mira_builds", time: 40m, text: "I ran some experiments with the new Opus 5.5. here's how it did vs the last two models" }
-    - { name: doofus, handle: "@doofuslord69", time: 25m, text: wat prompt did u use }
-    - { name: mira, handle: "@mira_builds", time: 18m, text: "" }
-  # X's actions under every post, in X's order
-  actions: [reply, repost, like, views, bookmark, share]
-  # the system face X's posts are set in, at the head of the thread's computed font stack, with or without a window
-  face: -apple-system
-  # the bars of the first post's chart, oldest model first: each value is that model's pass rate in the sample's table
-  chart:
-    - { label: model A, value: 71 }
-    - { label: model B, value: 83 }
-    - { label: Opus 5.5, value: 94 }
-  from: From village.peasantlabs.org
-  # on a phone the thread follows the session's slice at the column's width, with no window around it: its post text
-  # and the card's prompt, measured as drawn (the card's own size times its scale), stay readable at the phone widths
-  # the session tests (session.phone.widths)
-  phone: { postText: 12, cardPrompt: 11, promptWord: hey }
 # the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:
   line: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.

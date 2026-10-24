@@ -8,7 +8,6 @@ import { SessionWindows } from "@/components/landing/session-windows";
 import { SessionPhone } from "@/components/landing/session-phone";
 import { SessionViewer } from "@/components/landing/session-viewer";
 import { UseCases } from "@/components/landing/use-cases";
-import { XThread } from "@/components/landing/x-thread";
 import { SafariWindow } from "@/components/mac";
 import { SiteShell } from "@/components/site-shell";
 import { HERO, HOW, INSTALL, SESSION, VISION } from "@/lib/landing";
@@ -108,8 +107,7 @@ export default function Home() {
                 {SESSION.title}
               </h2>
             </div>
-            {/* from a tablet's width, the windows; on a phone, a short slice of the session and then the thread that
-                shared it, each at the column's width */}
+            {/* from a tablet's width, the windows; on a phone, a short slice of the session at the column's width */}
             <div className="lp-session-body">
               <div className="lp-session-wide">
                 <SessionWindows>
@@ -129,7 +127,6 @@ export default function Home() {
                 turn={SESSION.phone.turn}
                 tool={SESSION.phone.tool}
               />
-              <XThread chrome={false} className="lp-phone-x" />
             </div>
           </div>
         </section>

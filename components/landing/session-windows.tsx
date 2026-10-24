@@ -1,6 +1,5 @@
 "use client";
 
-import { XThread } from "@/components/landing/x-thread";
 import { TerminalWindow } from "@/components/mac";
 import { SESSION } from "@/lib/landing";
 import { SAMPLE_SESSION } from "@/lib/sample-session";
@@ -13,18 +12,15 @@ const ASK_TEXT = String(ASK?.content ?? "");
 const ANSWER_TEXT = String(ANSWER?.content ?? "").replace(/<thinking>[\s\S]*?<\/thinking>/g, "");
 
 /**
- * One session in four windows: behind and up to the left, Claude Code in
+ * One session in three windows: behind and up to the left, Claude Code in
  * Terminal, where it was recorded; in front and wide, the published transcript
  * a reviewer reads (passed in); over its lower left edge, the pull request's
- * peasant check that links to it; over its lower right edge, the thread on X
- * where its author shared the link. Recorded, read, checked, shared. From a
- * tablet's width only: a phone shows a slice of the session and the thread
- * without windows instead.
+ * peasant check that links to it. A phone keeps all three, with smaller offsets.
  *
  * They fan out from one stack the first time the group comes into view; only
  * transform and opacity move. Without motion they are simply where they end.
  * The Terminal repeats what the transcript already says, so it is hidden from
- * assistive technology; the check and the thread are each read as a short group.
+ * assistive technology; the check is read as a short group.
  */
 export function SessionWindows({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -51,13 +47,13 @@ export function SessionWindows({ children }: { children: ReactNode }) {
       <div className="lp-windows-term" aria-hidden="true">
         <TerminalWindow title={SESSION.terminal} active={false}>
           <div className="cc">
-            <div>you@macbook billing % claude</div>
+            <div>you@macbook shop % claude</div>
             <div className="cc-welcome">
               <div>
                 <span className="cc-accent">✻</span> <b>Welcome to Claude Code!</b>
               </div>
               <div className="cc-gap" />
-              <div className="cc-dim">cwd: /Users/you/src/billing</div>
+              <div className="cc-dim">cwd: /Users/you/src/shop</div>
             </div>
             <div className="cc-out">
               <div className="cc-dim">&gt; {ASK_TEXT}</div>
@@ -73,18 +69,13 @@ export function SessionWindows({ children }: { children: ReactNode }) {
           </div>
         </TerminalWindow>
       </div>
-      <div className="lp-windows-stage">
-        <div className="lp-windows-front">{children}</div>
-        <div className="lp-check" role="group" aria-label={SESSION.check.label}>
-          <CircleCheck className="lp-check-ic" aria-hidden="true" focusable="false" />
-          <div className="lp-check-text">
-            <span className="lp-check-name">{SESSION.check.name}</span>
-            <span className="lp-check-summary">{SESSION.check.summary}</span>
-          </div>
+      <div className="lp-windows-front">{children}</div>
+      <div className="lp-check" role="group" aria-label={SESSION.check.label}>
+        <CircleCheck className="lp-check-ic" aria-hidden="true" focusable="false" />
+        <div className="lp-check-text">
+          <span className="lp-check-name">{SESSION.check.name}</span>
+          <span className="lp-check-summary">{SESSION.check.summary}</span>
         </div>
-      </div>
-      <div className="lp-windows-x">
-        <XThread />
       </div>
     </div>
   );
