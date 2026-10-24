@@ -97,12 +97,15 @@ export function TerminalWindow({ title, ...props }: WindowProps & { title: strin
 export function SafariWindow({
   url,
   secure = false,
+  favicon,
   ...props
 }: WindowProps & {
   /** the address as Safari shows it, without the scheme */
   url?: string;
   /** an https address: the padlock in the field */
   secure?: boolean;
+  /** the page's icon, which Safari shows before the address */
+  favicon?: ReactNode;
 }) {
   return (
     <Frame
@@ -121,7 +124,10 @@ export function SafariWindow({
           </span>
           <span className="mac-address">
             {secure ? <Lock focusable="false" className="mac-address-lock" /> : null}
-            <span className="mac-address-text">{url ?? ""}</span>
+            <span className="mac-address-text">
+              {favicon ? <span className="mac-address-icon">{favicon}</span> : null}
+              {url ?? ""}
+            </span>
             <RotateCw focusable="false" className="mac-address-reload" />
           </span>
           <span className="mac-tools mac-tools-end">
