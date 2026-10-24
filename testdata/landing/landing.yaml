@@ -175,6 +175,24 @@ session:
   check: { name: peasant / prompts, summary: 1 transcript traces 1 of 1 commits }
   # placeholders the redaction engine writes, visible in the transcript
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
+# the share card the transcript's link preview shows, drawn by fairtrade from the sample: its figures are the
+# sample's own prompt count and token total
+card:
+  figures: { prompts: 5, tokens: 52600 }
+# the X thread beside the windows: mira's benchmark, a reply asking for the prompt, and her answer, which is only
+# the transcript's link preview; it is read as one short group
+thread:
+  label: a reply sharing the transcript
+  posts:
+    - { name: mira, handle: "@mira_builds", time: 2h, text: "I ran some experiments with the new Opus 5.5. here's how it did vs the last two models" }
+    - { name: doofus, handle: "@doofuslord69", time: 1h, text: wat prompt did u use }
+    - { name: mira, handle: "@mira_builds", time: 58m, text: "" }
+  # the bars of the first post's chart, oldest model first: each value is that model's pass rate in the sample's table
+  chart:
+    - { label: model A, value: 71 }
+    - { label: model B, value: 83 }
+    - { label: Opus 5.5, value: 94 }
+  from: From village.peasantlabs.org
 # the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:
   line: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.

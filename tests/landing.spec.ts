@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { SAMPLE_SESSION } from "../lib/sample-session";
+import { shareCardAlt, shareCardFromPayload } from "@peasant-labs/fairtrade/share";
 import { loadLandingFixture, PHONE } from "./landing-fixture";
 
 const fixture = loadLandingFixture();
@@ -1699,6 +1700,174 @@ test("the sample session carries the figures a share card shows", () => {
   for (const turn of turns) expect(Object.keys(turn).filter((key) => /token|usage/i.test(key))).toEqual([]);
 });
 
+test("the share card's figures are the sample's own prompt count and token total", () => {
+  const card = shareCardFromPayload(SAMPLE_SESSION);
+  expect(card?.figures).toEqual(fixture.card.figures);
+  expect(card?.firstPrompt).toBe(fixture.session.firstAsk);
+});
+
+/* the X thread in the session section, scrolled into view */
+async function openThread(page: Page) {
+  await page.goto("/");
+  const thread = page.locator("#session [data-x-thread]");
+  await thread.scrollIntoViewIfNeeded();
+  await expect(thread).toBeVisible();
+  return thread;
+}
+
+test("the X thread's three posts carry their names, handles, times and words, and the first its chart", async ({
+  page,
+}) => {
+  const thread = await openThread(page);
+  const posts = thread.locator(".lp-x-post");
+  await expect(posts).toHaveCount(fixture.thread.posts.length);
+  for (const [index, post] of fixture.thread.posts.entries()) {
+    const shown = posts.nth(index);
+    await expect(shown.locator(".lp-x-name")).toHaveText(post.name);
+    await expect(shown.locator(".lp-x-handle")).toHaveText(post.handle);
+    await expect(shown.locator(".lp-x-time")).toHaveText(post.time);
+    if (post.text) await expect(shown.locator(".lp-x-text")).toHaveText(post.text);
+    else await expect(shown.locator(".lp-x-text")).toHaveCount(0);
+  }
+  // the chart's bars, oldest model first, each the pass rate the sample's own table reports
+  const bars = posts.first().locator(".lp-x-bar");
+  expect(await bars.locator(".lp-x-bar-label").allInnerTexts()).toEqual(fixture.thread.chart.map((bar) => bar.label));
+  expect(await bars.locator(".lp-x-bar-value").allInnerTexts()).toEqual(fixture.thread.chart.map((bar) => `${bar.value}%`));
+  const sample = JSON.stringify(SAMPLE_SESSION);
+  for (const bar of fixture.thread.chart) expect(sample).toContain(`| ${bar.value}% (`);
+  // a taller bar for a higher pass rate
+  const heights = await bars.locator(".lp-x-bar-fill").evaluateAll((fills) => fills.map((fill) => fill.getBoundingClientRect().height));
+  expect([...heights].sort((a, b) => a - b)).toEqual(heights);
+  // X's one separator sits between each handle and its time and nowhere else; no emoji stands in for an icon
+  const text = await thread.innerText();
+  expect(text.split("·")).toHaveLength(fixture.thread.posts.length + 1);
+  expect(text).not.toMatch(/\p{Extended_Pictographic}/u);
+  // the post text reads at X's own size
+  const sizes = await thread
+    .locator(".lp-x-text, .lp-x-name, .lp-x-handle, .lp-x-time")
+    .evaluateAll((items) => items.map((item) => parseFloat(getComputedStyle(item).fontSize)));
+  expect(Math.min(...sizes)).toBeGreaterThanOrEqual(15);
+});
+
+test("every post in the X thread has its more dots at its top right, hidden from assistive technology", async ({
+  page,
+}) => {
+  const thread = await openThread(page);
+  const more = thread.locator(".lp-x-more");
+  await expect(more).toHaveCount(fixture.thread.posts.length);
+  for (const [index] of fixture.thread.posts.entries()) {
+    const dots = more.nth(index);
+    await expect(dots).toHaveAttribute("aria-hidden", "true");
+    const place = await dots.evaluate((element) => {
+      const post = element.closest(".lp-x-post")!.getBoundingClientRect();
+      const box = element.getBoundingClientRect();
+      const head = element.closest(".lp-x-post")!.querySelector(".lp-x-name")!.getBoundingClientRect();
+      return { right: post.right - box.right, top: box.top - post.top, middle: Math.abs((box.top + box.bottom) / 2 - (head.top + head.bottom) / 2) };
+    });
+    // in from the post's right edge by its padding, on the line of the name
+    expect(place.right, `post ${index + 1}`).toBeLessThanOrEqual(20);
+    expect(place.top, `post ${index + 1}`).toBeLessThanOrEqual(20);
+    expect(place.middle, `post ${index + 1}`).toBeLessThanOrEqual(4);
+  }
+  // every post carries X's actions: reply, repost, like, views, then bookmark and share
+  const actions = thread.locator(".lp-x-actions");
+  await expect(actions).toHaveCount(fixture.thread.posts.length);
+  for (const [index] of fixture.thread.posts.entries()) {
+    expect(
+      await actions.nth(index).locator("[data-action]").evaluateAll((items) => items.map((item) => item.getAttribute("data-action"))),
+    ).toEqual(["reply", "repost", "like", "views", "bookmark", "share"]);
+  }
+});
+
+test("the X thread reads once as a short group, the card as one image named by its alt, its icons hidden", async ({
+  page,
+}) => {
+  const thread = await openThread(page);
+  const group = page.getByRole("group", { name: fixture.thread.label });
+  await expect(group).toHaveCount(1);
+  expect(await group.evaluate((element) => element.hasAttribute("data-x-thread"))).toBe(true);
+  // the card is one image named by fairtrade's alt for this sample; the words it lays out one by one are hidden
+  const card = shareCardFromPayload(SAMPLE_SESSION)!;
+  const image = group.getByRole("img", { name: shareCardAlt(card), exact: true });
+  await expect(image).toHaveCount(1);
+  await expect(image.locator("> *")).toHaveAttribute("aria-hidden", "true");
+  // the chart is one image too, named by its bars
+  await expect(group.getByRole("img", { name: /model A 71%/ })).toHaveCount(1);
+  // every drawn icon is decoration
+  const exposed = await thread.locator("svg").evaluateAll(
+    (icons) => icons.filter((icon) => !icon.closest('[aria-hidden="true"]')).length,
+  );
+  expect(exposed, "icons assistive technology would read").toBe(0);
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme });
+    await expect(page.locator("html")).toHaveAttribute("data-theme", colorScheme);
+    await expect
+      .poll(() => page.evaluate(() => document.getAnimations().filter((item) => item instanceof CSSTransition).length))
+      .toBe(0);
+    // a picture of X: its dark UI in both of the site's themes
+    expect(await thread.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgb(0, 0, 0)");
+    const accessibility = await new AxeBuilder({ page }).include("#session [data-x-thread]").analyze();
+    expect(accessibility.violations, `the thread in the ${colorScheme} theme`).toEqual([]);
+  }
+});
+
+test("the card in the X thread shows the transcript's own prompt count, token total and first prompt", async ({
+  page,
+}) => {
+  const thread = await openThread(page);
+  const viewer = page.locator("#session [data-session-viewer]");
+  await viewer.scrollIntoViewIfNeeded();
+  await expect(viewer.locator(".txn-app")).toBeVisible();
+  const card = thread.locator(".lp-x-card");
+  await card.scrollIntoViewIfNeeded();
+  const words = (await card.innerText()).replace(/\s+/g, " ").trim();
+  const prompts = words.match(/prompts (\d+)/)?.[1];
+  const tokens = words.match(/tokens (\d+(?:\.\d+)?[kM]?)/)?.[1];
+  // the transcript's header counts the same prompts and tokens
+  const meta = (await viewer.locator(".txn-meta").innerText()).replace(/\s+/g, " ");
+  expect(prompts).toBe(String(fixture.card.figures.prompts));
+  expect(meta).toContain(`${prompts} prompts`);
+  expect(tokens).toBeTruthy();
+  expect(meta).toContain(`${tokens} tokens`);
+  // its prompt is the transcript's first user turn, cut where the card runs out of lines
+  const prompt = words.split(/\buser\b/)[1]!.replace(/…$/, "").trim();
+  const first = (await viewer.locator(".txn-turn.user").first().innerText()).replace(/\s+/g, " ");
+  expect(prompt.length).toBeGreaterThan(20);
+  expect(first).toContain(prompt);
+  expect(fixture.session.firstAsk.startsWith(prompt)).toBe(true);
+  // drawn in the card's own face, which the landing does not restyle, and scaled to the post's width
+  const drawn = await card.evaluate((frame) => {
+    const word = [...frame.querySelectorAll("span")].find((span) => span.textContent === "billing")!;
+    const inner = frame.querySelector('[aria-hidden="true"]')!.getBoundingClientRect();
+    return {
+      family: getComputedStyle(word).fontFamily,
+      loaded: document.fonts.check('44px "Atkinson Hyperlegible"'),
+      frame: frame.getBoundingClientRect().width,
+      inner: inner.width,
+      ratio: inner.width / inner.height,
+    };
+  });
+  expect(drawn.family).toMatch(/^"?Atkinson Hyperlegible"?(,|$)/);
+  expect(drawn.loaded).toBe(true);
+  expect(Math.abs(drawn.inner - drawn.frame)).toBeLessThanOrEqual(2);
+  expect(drawn.ratio).toBeCloseTo(2, 1);
+});
+
+test("under the card in the X thread, the line naming where it links", async ({ page }) => {
+  const thread = await openThread(page);
+  const last = thread.locator(".lp-x-post").last();
+  const from = last.locator(".lp-x-from");
+  await expect(from).toHaveText(fixture.thread.from);
+  const order = await from.evaluate((line) => {
+    const card = line.previousElementSibling!;
+    return {
+      card: card.classList.contains("lp-x-card"),
+      below: line.getBoundingClientRect().top >= card.getBoundingClientRect().bottom,
+    };
+  });
+  expect(order).toEqual({ card: true, below: true });
+});
+
 test("a sample session opens in the real transcript browser, in a wide window that keeps its height", async ({
   page,
 }) => {
@@ -1763,7 +1932,8 @@ test("a sample session opens in the real transcript browser, in a wide window th
   // the browser's own tabs, each of which works, and the window keeps its height whichever is shown
   const tabs = viewer.getByRole("tab");
   expect((await tabs.allInnerTexts()).map((text) => text.split("\n")[0])).toEqual(fixture.session.tabs);
-  const browser = section.locator(".mac-win-browser");
+  // the transcript's window, not the thread's beside it
+  const browser = section.locator(".mac-win-browser.lp-session-win");
   const height = () => browser.evaluate((window) => window.getBoundingClientRect().height);
   const before = await height();
   for (const [index] of fixture.session.tabs.entries()) {

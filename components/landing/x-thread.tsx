@@ -1,0 +1,146 @@
+"use client";
+
+import {
+  BookmarkIcon,
+  LikeIcon,
+  MoreIcon,
+  PLogo,
+  ReplyIcon,
+  RepostIcon,
+  ShareIcon,
+  ViewsIcon,
+} from "@/components/landing/x-icons";
+import { SafariWindow } from "@/components/mac";
+import { THREAD } from "@/lib/landing";
+import { SAMPLE_SESSION } from "@/lib/sample-session";
+import { SHARE_CARD_WIDTH, ShareCard, shareCardAlt, shareCardFromPayload } from "@peasant-labs/fairtrade/share";
+import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
+
+/* the card village would show for the sample's link: its figures and first prompt are the sample's own */
+const CARD = shareCardFromPayload(SAMPLE_SESSION);
+
+type Post = (typeof THREAD.posts)[number];
+
+/*
+ * The link's card as X shows it: fairtrade's share card drawn at its own 1200
+ * pixels and scaled to the post's width, in X's rounded media frame. It lays
+ * out each word on its own, so it is read as one image named by its alt.
+ */
+function Card() {
+  const frame = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+
+  // the card keeps its own layout at any width: only its scale follows the frame
+  useLayoutEffect(() => {
+    const element = frame.current;
+    if (!element) return;
+    const fit = () => inner.current?.style.setProperty("--lp-x-card-scale", String(element.clientWidth / SHARE_CARD_WIDTH));
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={frame} className="lp-x-card" role="img" aria-label={CARD ? shareCardAlt(CARD) : undefined}>
+      <div ref={inner} className="lp-x-card-scale" aria-hidden="true">
+        <ShareCard card={CARD} />
+      </div>
+    </div>
+  );
+}
+
+/* the first post's picture: a chart of the sample's pass rates, as a quick plot would draw it */
+function Chart() {
+  const { title, bars } = THREAD.chart;
+  const label = `bar chart, ${title}: ${bars.map((bar) => `${bar.label} ${bar.value}%`).join(", ")}`;
+  return (
+    <div className="lp-x-media lp-x-chart" role="img" aria-label={label}>
+      <div className="lp-x-chart-title">{title}</div>
+      <div className="lp-x-bars">
+        {bars.map((bar) => (
+          <div key={bar.label} className="lp-x-bar">
+            <div className="lp-x-bar-plot">
+              <span className="lp-x-bar-value">{bar.value}%</span>
+              <span className="lp-x-bar-fill" style={{ "--lp-x-bar": `${bar.value}%` } as CSSProperties} />
+            </div>
+            <span className="lp-x-bar-label">{bar.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Action({ name, icon, count }: { name: string; icon: ReactNode; count?: string }) {
+  return (
+    <span className="lp-x-action" data-action={name}>
+      {icon}
+      {count ? <span className="lp-x-count">{count}</span> : null}
+    </span>
+  );
+}
+
+function PostView({ post, linked, children }: { post: Post; linked: boolean; children?: ReactNode }) {
+  return (
+    <div className="lp-x-post" data-linked={linked ? "true" : undefined}>
+      <div className="lp-x-gutter" aria-hidden="true">
+        <span className={`lp-x-avatar lp-x-avatar-${post.name}`} />
+        {linked ? <span className="lp-x-line" /> : null}
+      </div>
+      <div className="lp-x-main">
+        <div className="lp-x-head">
+          <span className="lp-x-name">{post.name}</span>
+          <span className="lp-x-handle">{post.handle}</span>
+          <span className="lp-x-sep" aria-hidden="true">
+            ·
+          </span>
+          <span className="lp-x-time">{post.time}</span>
+          <span className="lp-x-more" aria-hidden="true">
+            <MoreIcon />
+          </span>
+        </div>
+        {post.text ? <div className="lp-x-text">{post.text}</div> : null}
+        {children}
+        <div className="lp-x-actions" aria-hidden="true">
+          <Action name="reply" icon={<ReplyIcon />} count={post.counts.reply} />
+          <Action name="repost" icon={<RepostIcon />} count={post.counts.repost} />
+          <Action name="like" icon={<LikeIcon />} count={post.counts.like} />
+          <Action name="views" icon={<ViewsIcon />} count={post.counts.views} />
+          <span className="lp-x-action-end">
+            <Action name="bookmark" icon={<BookmarkIcon />} />
+            <Action name="share" icon={<ShareIcon />} />
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * mira's thread on X, in a Safari window: her benchmark of the sample's models
+ * with its chart, a reply asking for the prompt, and her answer, which is only
+ * the transcript's link card and the line naming where it links. It looks
+ * exactly as X does, in X's dark appearance whatever the site's theme, except
+ * that the logo is our P. It is read once, as a short group.
+ */
+export function XThread({ className }: { className?: string }) {
+  const [benchmark, question, answer] = THREAD.posts;
+  return (
+    <SafariWindow className={`lp-x-win${className ? ` ${className}` : ""}`} favicon={<PLogo />}>
+      <div className="lp-x" data-x-thread role="group" aria-label={THREAD.label}>
+        <div className="lp-x-top" aria-hidden="true">
+          <PLogo className="lp-x-logo" />
+        </div>
+        <PostView post={benchmark} linked>
+          <Chart />
+        </PostView>
+        <PostView post={question} linked />
+        <PostView post={answer} linked={false}>
+          <Card />
+          <div className="lp-x-from">{THREAD.from}</div>
+        </PostView>
+      </div>
+    </SafariWindow>
+  );
+}

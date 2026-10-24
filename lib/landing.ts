@@ -338,6 +338,51 @@ export const SESSION = {
 } as const;
 
 /*
+ * The thread beside the windows, drawn as X draws it: mira posts a benchmark
+ * of the sample's three models, a reply asks for the prompt, and her answer is
+ * only the transcript's link preview. The chart's bars are the pass rates in
+ * the sample's own results table (lib/sample-session.ts), oldest model first.
+ * Counts are as X shows them: none beside an action nobody took.
+ */
+export const THREAD = {
+  /* how assistive technology names the whole thread */
+  label: "a reply sharing the transcript",
+  posts: [
+    {
+      name: "mira",
+      handle: "@mira_builds",
+      time: "2h",
+      text: "I ran some experiments with the new Opus 5.5. here's how it did vs the last two models",
+      counts: { reply: "24", repost: "31", like: "412", views: "18K" },
+    },
+    {
+      name: "doofus",
+      handle: "@doofuslord69",
+      time: "1h",
+      text: "wat prompt did u use",
+      counts: { reply: "1", repost: "", like: "57", views: "3.2K" },
+    },
+    {
+      name: "mira",
+      handle: "@mira_builds",
+      time: "58m",
+      text: "",
+      counts: { reply: "3", repost: "9", like: "96", views: "2.4K" },
+    },
+  ],
+  chart: {
+    title: "billing retry suite, pass rate",
+    bars: [
+      { label: "model A", value: 71 },
+      { label: "model B", value: 83 },
+      { label: "Opus 5.5", value: 94 },
+    ],
+  },
+  /* the line X writes under a link's card */
+  from: "From village.peasantlabs.org",
+} as const;
+
+/*
  * The owner's statement, word for word, in three paragraphs: the first is the
  * lead line; the other two say why. Short contexts keep only the lead line.
  */

@@ -2628,6 +2628,304 @@
   }
 }
 
+/*
+ * A thread on X, drawn as X draws it in its dark appearance, in both of the
+ * site's themes: it is a picture of X, so X's own colours, sizes and the
+ * system face apply inside the window, not fairtrade's. Posts sit on a 40px
+ * avatar column with X's 12px by 16px padding; a reply in the same
+ * conversation hangs from a 2px line under the avatar before it.
+ */
+.mac-address-icon {
+  display: inline-flex;
+  vertical-align: -0.15em;
+  margin-inline-end: calc(5 * var(--mac-u));
+}
+
+.mac-address-icon svg {
+  width: calc(13 * var(--mac-u));
+  height: calc(13 * var(--mac-u));
+  color: var(--mac-field-ink);
+}
+
+.lp-x-win .mac-body {
+  background: #000000;
+}
+
+.lp-x {
+  --lp-x-ink: #e7e9ea;
+  --lp-x-ink-2: #71767b;
+  --lp-x-rule: #2f3336;
+  --lp-x-line: #333639;
+
+  background: #000000;
+  color: var(--lp-x-ink);
+  font-family: var(--mac-font);
+  font-size: 15px;
+  letter-spacing: normal;
+  line-height: 20px;
+  text-transform: none;
+  word-spacing: normal;
+}
+
+.lp-x-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 53px;
+  border-bottom: 1px solid var(--lp-x-rule);
+}
+
+.lp-x-logo {
+  width: 26px;
+  height: 26px;
+  color: var(--lp-x-ink);
+}
+
+.lp-x-post {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  column-gap: 8px;
+  padding: 12px 16px;
+}
+
+/* a reply in the same conversation follows the line, with no rule between them */
+.lp-x-post[data-linked="true"] + .lp-x-post {
+  padding-block-start: 4px;
+}
+
+.lp-x-post:last-child {
+  border-bottom: 1px solid var(--lp-x-rule);
+}
+
+.lp-x-gutter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lp-x-avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.lp-x-avatar-mira {
+  background:
+    radial-gradient(circle at 50% 38%, #f3d2b8 0 22%, transparent 23%),
+    radial-gradient(circle at 50% 100%, #2b6f6a 0 45%, transparent 46%),
+    linear-gradient(160deg, #9fd4c9, #5b8fd6);
+}
+
+.lp-x-avatar-doofus {
+  background:
+    radial-gradient(circle at 38% 42%, #1b1b1b 0 6%, transparent 7%),
+    radial-gradient(circle at 62% 42%, #1b1b1b 0 6%, transparent 7%),
+    radial-gradient(circle at 50% 50%, #ffcf4a 0 40%, transparent 41%),
+    linear-gradient(200deg, #ff7a45, #c2185b);
+}
+
+.lp-x-line {
+  flex: 1;
+  width: 2px;
+  margin-block: 4px -12px;
+  background: var(--lp-x-line);
+}
+
+.lp-x-main {
+  min-width: 0;
+}
+
+.lp-x-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.lp-x-name {
+  overflow: hidden;
+  color: var(--lp-x-ink);
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.lp-x-handle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lp-x-handle,
+.lp-x-sep,
+.lp-x-time {
+  color: var(--lp-x-ink-2);
+}
+
+.lp-x-sep,
+.lp-x-time {
+  flex: none;
+}
+
+.lp-x-more {
+  display: flex;
+  flex: none;
+  margin-inline-start: auto;
+  color: var(--lp-x-ink-2);
+}
+
+.lp-x-more svg {
+  width: 18.75px;
+  height: 18.75px;
+}
+
+.lp-x-text {
+  margin-block-start: 2px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* a post's picture or link card: X's rounded frame with its hairline */
+.lp-x-media,
+.lp-x-card {
+  margin-block-start: 12px;
+  overflow: hidden;
+  border: 1px solid var(--lp-x-rule);
+  border-radius: 16px;
+}
+
+/* the chart, as a quick plot draws one: a white page, a title, light grid lines, one colour of bar */
+.lp-x-chart {
+  padding: 14px 16px 12px;
+  background: #ffffff;
+  color: #1f1f1f;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.lp-x-chart-title {
+  margin-block-end: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.lp-x-bars {
+  display: flex;
+  gap: 18px;
+  padding-inline: 6px;
+  background: repeating-linear-gradient(to top, #e4e4e4 0 1px, transparent 1px 25%) 0 0 / 100% 104px no-repeat;
+}
+
+.lp-x-bar {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.lp-x-bar-plot {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  height: 104px;
+  border-bottom: 1px solid #555555;
+}
+
+.lp-x-bar-value {
+  margin-block-end: 2px;
+  font-size: 12px;
+}
+
+.lp-x-bar-fill {
+  align-self: stretch;
+  height: calc(var(--lp-x-bar) * 0.84);
+  background: #4c72b0;
+}
+
+.lp-x-bar-label {
+  margin-block-start: 4px;
+  overflow: hidden;
+  font-size: 12px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * The link card: fairtrade's card at its own 1200 by 600 pixels, scaled to
+ * the frame's width, its hairline drawn over it so the frame stays exactly
+ * 2:1. Nothing here styles what the card draws inside itself.
+ */
+.lp-x-card {
+  position: relative;
+  aspect-ratio: 2 / 1;
+  border: 0;
+  background: #0b0b0a;
+}
+
+.lp-x-card::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--lp-x-rule);
+  content: "";
+  pointer-events: none;
+}
+
+.lp-x-card-scale {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 1200px;
+  height: 600px;
+  transform: scale(var(--lp-x-card-scale, 0.4));
+  transform-origin: 0 0;
+}
+
+.lp-x-from {
+  margin-block-start: 4px;
+  color: var(--lp-x-ink-2);
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.lp-x-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 600px;
+  margin-block-start: 12px;
+  color: var(--lp-x-ink-2);
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.lp-x-action,
+.lp-x-action-end {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lp-x-action-end {
+  gap: 12px;
+}
+
+.lp-x-action svg {
+  width: 18.75px;
+  height: 18.75px;
+}
+
+/* until it takes its place among the windows, the thread stands under them at the right */
+.lp-session-x {
+  width: min(100%, 34rem);
+  margin-inline-start: auto;
+  margin-block-start: var(--sp-6);
+}
+
 /* vision */
 
 /*

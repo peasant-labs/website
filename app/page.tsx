@@ -8,6 +8,7 @@ import { SessionWindows } from "@/components/landing/session-windows";
 import { SessionPhone } from "@/components/landing/session-phone";
 import { SessionViewer } from "@/components/landing/session-viewer";
 import { UseCases } from "@/components/landing/use-cases";
+import { XThread } from "@/components/landing/x-thread";
 import { SafariWindow } from "@/components/mac";
 import { SiteShell } from "@/components/site-shell";
 import { HERO, HOW, INSTALL, SESSION, VISION } from "@/lib/landing";
@@ -119,6 +120,9 @@ export default function Home() {
                     />
                   </SafariWindow>
                 </SessionWindows>
+                <div className="lp-session-x">
+                  <XThread />
+                </div>
               </div>
               <SessionPhone
                 label={SESSION.label}

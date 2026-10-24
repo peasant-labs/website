@@ -71,6 +71,13 @@ export type LandingFixture = {
     check: { name: string; summary: string };
     markers: string[];
   };
+  card: { figures: { prompts: number; tokens: number } };
+  thread: {
+    label: string;
+    posts: Array<{ name: string; handle: string; time: string; text: string }>;
+    chart: Array<{ label: string; value: number }>;
+    from: string;
+  };
   vision: { line: string; story: string[]; cta: Link };
   docsNav: Link[];
   posts: Array<{ slug: string; title: string }>;
