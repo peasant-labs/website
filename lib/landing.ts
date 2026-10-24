@@ -24,10 +24,9 @@ function art(name: string, alt: string, width: number, height: number): Art {
  * four promises the product stands on: a session is shared only with the
  * people its owner permits, peasant and village are Apache-2.0, peasant reads
  * six agents' sessions, and indexing skips sessions that have not changed. The
- * lede says
- * where the sessions come from (the agents write them, peasant gathers them)
- * and that secrets and personal details are hidden on the computer before a
- * session is shared.
+ * lede says where the sessions come from (the agents write them, peasant
+ * gathers them) and that secrets and personal details are hidden on the
+ * computer before a session is shared.
  */
 export const HERO = {
   title: "the open-source commons for agent transcripts",
