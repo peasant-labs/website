@@ -2414,7 +2414,8 @@
 /*
  * Three windows, layered: Claude Code behind and up to the left, the transcript
  * in front and wide, the pull request's check over the front window's lower
- * left edge. A phone keeps all three with smaller offsets.
+ * left edge. From a tablet's width only: a phone shows a short slice of the
+ * session instead (.lp-phone, below).
  */
 .lp-windows {
   --lp-windows-x: clamp(1rem, 6vw, 5rem);
@@ -2471,26 +2472,6 @@
   box-shadow: var(--overlay-shadow);
 }
 
-/* on a phone the check hangs just under the window, across the column, clear of the viewer's controls */
-@media (max-width: 47.99rem) {
-  .lp-windows {
-    --lp-check-room: 0px;
-
-    /* room under the check, so the next section starts as far off as between any two */
-    padding-block-end: var(--sp-5);
-  }
-
-  .lp-check {
-    position: relative;
-    inset: auto;
-    width: calc(100% + var(--lp-windows-x));
-    max-width: none;
-    padding-inline: var(--sp-4);
-    margin-block-start: var(--sp-3);
-    margin-inline-start: calc(-1 * var(--lp-windows-x));
-  }
-}
-
 .lp-check-ic {
   flex: none;
   width: var(--ic-lg);
@@ -2528,17 +2509,6 @@
 .lp-session-win .mac-body {
   flex: none;
   block-size: clamp(32rem, 78svh, 48rem);
-}
-
-/* on a phone Safari's chrome scales down in proportion and keeps only what fits: the lights, back, forward and the address */
-@media (max-width: 47.99rem) {
-  .lp-session-win {
-    --mac-u: 0.78px;
-  }
-
-  .lp-session-win :is(.mac-sidebar, .mac-tools-end) {
-    display: none;
-  }
 }
 
 /*
