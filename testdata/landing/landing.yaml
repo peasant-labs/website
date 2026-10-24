@@ -136,6 +136,10 @@ install:
     - finds your sessions, asks what to record, and can sign you in
     - publishes your chosen sessions to peasant online, secrets hidden, private to you
   guide: { label: read our docs, href: /docs }
+  # on a phone, under the card, in place of the link beside the title
+  installGuide: { label: read the install guide, href: "/docs#install" }
+  # the phone widths where each command keeps to one line and scrolls sideways
+  phoneWidths: [390, 360]
 session:
   label: a sample session
   # the viewer names the sample by this short title; its id is shown nowhere

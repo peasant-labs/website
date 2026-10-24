@@ -46,6 +46,8 @@ export type LandingFixture = {
     push: string;
     notes: string[];
     guide: Link;
+    installGuide: Link;
+    phoneWidths: number[];
   };
   session: {
     label: string;

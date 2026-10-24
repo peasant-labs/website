@@ -2263,32 +2263,138 @@
   }
 }
 
+/* the link to the install guide shows on a phone only, under the card, in place of the one beside the title */
+.gs-guide {
+  display: none;
+}
+
+/* how much of a phone's command fades at its right edge while more of it is out of sight; none at its end */
+/* in px: a registered property's starting value cannot hang on the root's font size */
+@property --gs-fade {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 24px;
+}
+
+@keyframes gs-fade-out {
+  0%,
+  85% {
+    --gs-fade: 24px;
+  }
+
+  100% {
+    --gs-fade: 0px;
+  }
+}
+
 /*
- * A narrow phone gives the command the card's whole width: the number moves
- * above it as a small label, and the command block runs from edge to edge of
- * the card, its sides on the card's own border, while the label and the words
- * under it keep the card's inset.
+ * On a phone the card gives way to the page: the systems' tabs stand as a
+ * strip, and under them each step reads as the docs' captioned commands do,
+ * standing as far from the next as their groups do: its number, then what it
+ * does, on a line, and the command on one line across the content's width,
+ * all on the page's one edge. The command never wraps: it scrolls sideways
+ * inside its block, fading at the right edge while more of it is out of
+ * sight, and its copy button stays an icon at full tap size. Under the steps,
+ * a quiet link to the install guide takes the place of the one beside the
+ * title.
  */
 @media (max-width: 30rem) {
+  .lp-install-guide {
+    display: none;
+  }
+
+  .gs {
+    --gs-row-x: 0px;
+
+    border: 0;
+    background: none;
+  }
+
   .gs-lines {
-    padding-inline: 0;
+    gap: var(--sp-5);
+    padding: var(--sp-5) 0 0;
   }
 
   .gs-line {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--sp-1);
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "n note"
+      "cmd cmd";
+    gap: var(--sp-2) var(--sp-3);
+    align-items: baseline;
+  }
+
+  .gs-text {
+    display: contents;
   }
 
   .gs-n {
-    padding: 0 var(--gs-row-x);
+    grid-area: n;
+    padding: 0;
+    line-height: 1.45;
   }
 
-  .gs .cli-cmd {
-    border-inline: 0;
-  }
-
+  /* set as the docs set their mono captions, so a short one keeps to its line */
   .gs-note {
-    padding-inline: var(--gs-row-x);
+    grid-area: note;
+    word-spacing: normal;
+  }
+
+  /* the number and the words share a baseline; the command, on its own row, stands at the row's top */
+  .gs .dx-cmd {
+    grid-area: cmd;
+    align-self: start;
+  }
+
+  .gs .cli-cmd-wrap .cli-cmd-line {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--gs-fade)), transparent);
+    animation: gs-fade-out linear both;
+    animation-timeline: scroll(self inline);
+  }
+
+  .gs .cli-cmd-wrap .cli-cmd-line::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*
+   * fairtrade lets each token wrap on its own, and the docs' break points sit inside them: hold them all to
+   * the line, and take the break points out of layout, since Chromium breaks at a <wbr> even where nothing wraps
+   */
+  .gs .cli-cmd-wrap .cli-cmd-line :is(code, code *) {
+    white-space: pre;
+  }
+
+  .gs .cli-cmd-wrap .cli-cmd-line wbr {
+    display: none;
+  }
+
+  /* a keyboard focus ring shows whole */
+  .gs .cli-cmd-wrap .cli-cmd-line:focus-visible {
+    mask-image: none;
+  }
+
+  .gs-guide {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: var(--target-comfortable);
+    margin-block-start: var(--sp-3);
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0;
+    text-decoration: underline;
+    text-decoration-color: var(--rule-strong);
+    text-underline-offset: 4px;
+  }
+
+  .gs-guide svg {
+    flex: none;
+    width: var(--ic-sm);
+    height: var(--ic-sm);
   }
 }
 

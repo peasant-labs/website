@@ -146,11 +146,16 @@ test("the install card is fairtrade's tabs and CommandBlocks, three numbered com
       const rows = await lines.evaluateAll((items) =>
         items.map((item) => {
           const block = item.querySelector(".cli-cmd")!.getBoundingClientRect();
+          const line = item.querySelector<HTMLElement>(".cli-cmd-line")!;
           const code = item.querySelector(".cli-cmd code")!.getBoundingClientRect();
           const copy = item.querySelector(".cli-copy")!.getBoundingClientRect();
           return {
-            // the command shows whole, inside its block, never under the copy button
-            whole: code.right <= copy.left + 1 && code.width > 0,
+            // the command's line sits inside its block, never under the copy button; it shows whole, or on a
+            // phone scrolls sideways inside its block
+            whole:
+              line.getBoundingClientRect().right <= copy.left + 1 &&
+              code.width > 0 &&
+              (code.right <= line.getBoundingClientRect().right + 1 || line.scrollWidth > line.clientWidth),
             // commands read at the 16px floor, as in the docs
             size: getComputedStyle(item.querySelector(".cli-cmd-line")!).fontSize,
             // the copy button is a full tap target at the block's right edge
@@ -170,43 +175,6 @@ test("the install card is fairtrade's tabs and CommandBlocks, three numbered com
       }
     }
 
-    // a long address breaks after its slashes, never inside a word
-    const curl = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').first().locator(".cli-cmd code");
-    await expect(curl.locator("wbr")).toHaveCount(2);
-    if (width === 390) {
-      const lines = await curl.evaluate((code) => {
-        const range = document.createRange();
-        range.selectNodeContents(code);
-        const rows = new Map<number, string>();
-        const walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT);
-        while (walker.nextNode()) {
-          const text = walker.currentNode as Text;
-          for (let index = 0; index < text.length; index += 1) {
-            range.setStart(text, index);
-            range.setEnd(text, index + 1);
-            const top = Math.round(range.getBoundingClientRect().top);
-            rows.set(top, (rows.get(top) ?? "") + text.data[index]);
-          }
-        }
-        return [...rows.values()].map((row) => row.trim());
-      });
-      for (const line of lines) {
-        expect(line, "a command line starts or ends inside a word").toMatch(/^(\$ )?[^\s]*(\s[^\s]+)*$/);
-      }
-      expect(lines.some((line) => line.endsWith("https://")), `the address does not break after its scheme: ${lines}`).toBe(true);
-      // with the card's whole width the curl line takes three lines, and "peasant village push" one
-      expect(lines.length, `the curl line wraps to ${lines.length} lines: ${lines}`).toBeLessThanOrEqual(3);
-      const push = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').nth(2).locator(".cli-cmd code");
-      expect(
-        await push.evaluate((code) => Math.round(code.getBoundingClientRect().height / parseFloat(getComputedStyle(code).lineHeight))),
-      ).toBe(1);
-      // the number is a small label above its command
-      const label = await shell
-        .locator('[role="tabpanel"]:not([hidden]) .gs-line')
-        .first()
-        .evaluate((row) => row.querySelector(".gs-n")!.getBoundingClientRect().bottom <= row.querySelector(".cli-cmd")!.getBoundingClientRect().top + 1);
-      expect(label, "the step number is not above its command on a phone").toBe(true);
-    }
     // the rows stand apart by space: no rule between them
     expect(
       await shell
@@ -227,9 +195,157 @@ test("the install card is fairtrade's tabs and CommandBlocks, three numbered com
     await page.keyboard.press("ArrowRight");
     await expect(shell.getByRole("tab", { name: fixture.install.platforms[1]!.label })).toBeFocused();
   }
+});
 
-  const guide = page.locator("#install").getByRole("link", { name: fixture.install.guide.label });
+test("on a wide screen the install card keeps every command whole on its line, with the docs link beside the title", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const section = page.locator("#install");
+  const guide = section.getByRole("link", { name: fixture.install.guide.label });
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
+  await expect(section.getByRole("link", { name: fixture.install.installGuide.label })).toHaveCount(0);
+  // nothing scrolls: each command shows whole, on one line
+  const lines = await section
+    .locator('[role="tabpanel"]:not([hidden]) .cli-cmd-line')
+    .evaluateAll((items) => items.map((line) => line.scrollWidth <= line.clientWidth + 1));
+  expect(lines).toEqual([true, true, true]);
+});
+
+test("on a phone each install step is its number and words on a line, then its command on one line that scrolls sideways inside its block", async ({
+  browser,
+}) => {
+  for (const width of fixture.install.phoneWidths) {
+    const context = await browser.newContext({
+      ...PHONE,
+      viewport: { width, height: 844 },
+      permissions: ["clipboard-read", "clipboard-write"],
+    });
+    // what the copy button hands the clipboard, read back exactly
+    await context.addInitScript(() => {
+      const write = navigator.clipboard.writeText.bind(navigator.clipboard);
+      navigator.clipboard.writeText = (text: string) => {
+        (window as unknown as { copied: string[] }).copied = [
+          ...((window as unknown as { copied?: string[] }).copied ?? []),
+          text,
+        ];
+        return write(text);
+      };
+    });
+    const page = await context.newPage();
+    await page.goto("/");
+    const section = page.locator("#install");
+    const shell = section.locator("[data-install-shell]");
+    const at = `at ${width}`;
+    // the longest command: the suite's browser says it runs on Windows, so the card opens on that system's tab
+    await shell.getByRole("tab", { name: fixture.install.platforms[0]!.label }).click();
+    // measured once the panel has finished coming in (the commands' fade runs on their scroll, not on time)
+    await expect
+      .poll(() =>
+        shell.evaluate(
+          (element) =>
+            element.getAnimations({ subtree: true }).filter((animation) => animation.timeline instanceof DocumentTimeline && animation.playState === "running").length,
+        ),
+      )
+      .toBe(0);
+    // the link beside the title gives way to a quiet one under the card, to the install guide
+    await expect(section.getByRole("link", { name: fixture.install.guide.label })).toHaveCount(0);
+    const guide = section.getByRole("link", { name: fixture.install.installGuide.label });
+    await expect(guide).toHaveAttribute("href", fixture.install.installGuide.href);
+    const [card, link] = [(await shell.boundingBox())!, (await guide.boundingBox())!];
+    expect(link.y, `the install guide link is not under the card ${at}`).toBeGreaterThan(card.y + card.height);
+    expect(link.height).toBeGreaterThanOrEqual(44);
+
+    const geometry = await shell.evaluate((element) => {
+      const probe = document.createElement("div");
+      probe.style.width = "var(--sp-5)";
+      element.append(probe);
+      const groups = probe.getBoundingClientRect().width;
+      probe.style.width = "var(--sp-2)";
+      const caption = probe.getBoundingClientRect().width;
+      probe.style.width = "var(--sp-3)";
+      const beside = probe.getBoundingClientRect().width;
+      probe.remove();
+      const card = element.getBoundingClientRect();
+      const edge = document.querySelector("#install-title")!.getBoundingClientRect().left;
+      const blocks = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) .cli-cmd')];
+      const rows = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) .gs-line')].map((row) => {
+        const n = row.querySelector(".gs-n")!.getBoundingClientRect();
+        const note = row.querySelector(".gs-note")!.getBoundingClientRect();
+        const block = row.querySelector(".cli-cmd")!.getBoundingClientRect();
+        const line = row.querySelector<HTMLElement>(".cli-cmd-line")!;
+        const code = line.querySelector("code")!;
+        const copy = row.querySelector(".cli-copy")!.getBoundingClientRect();
+        return {
+          // the number leads the words on their first line, and both stand above the command
+          numberFirst: Math.abs(n.top - note.top) < 4 && n.right <= note.left + 1 && note.bottom <= block.top,
+          // the number stands apart from the words by space alone, with no mark between them
+          numberGap: Math.round(note.left - n.right - beside),
+          mark: getComputedStyle(row.querySelector(".gs-n")!, "::after").content,
+          // the number and the command share the page's one edge, the title's
+          edge: Math.abs(n.left - edge) < 1 && Math.abs(block.left - edge) < 1,
+          captionGap: Math.round(block.top - note.bottom - caption),
+          blockTop: block.top,
+          blockBottom: block.bottom,
+          labelTop: Math.min(n.top, note.top),
+          // one line, never wrapped, across the card's whole width
+          oneLine: Math.round(code.getBoundingClientRect().height / parseFloat(getComputedStyle(code).lineHeight)) === 1,
+          across: Math.abs(block.left - card.left) < 2 && Math.abs(block.right - card.right) < 2,
+          scrolls: line.scrollWidth > line.clientWidth,
+          fades: getComputedStyle(line).maskImage !== "none",
+          lineBeforeCopy: line.getBoundingClientRect().right <= copy.left + 1,
+          target: copy.width >= 44 && copy.height >= 44,
+        };
+      });
+      return {
+        groups,
+        rows,
+        // no card on a phone: no frame, and nothing under the last command
+        frame: getComputedStyle(element).borderTopWidth,
+        band: Math.round(card.bottom - blocks.at(-1)!.getBoundingClientRect().bottom),
+      };
+    });
+    expect(geometry.frame, `the install card keeps its frame ${at}`).toBe("0px");
+    expect(geometry.band, `an empty band stands under the last command ${at}`).toBe(0);
+    for (const [index, row] of geometry.rows.entries()) {
+      const name = `step ${index + 1} ${at}`;
+      expect(row.numberFirst, `${name}: the number and words are not one line above the command`).toBe(true);
+      expect(Math.abs(row.numberGap), `${name}: the number does not stand a gap from its words`).toBeLessThanOrEqual(1);
+      expect(["none", "normal"], `${name}: a mark stands between the number and its words`).toContain(row.mark);
+      expect(row.edge, `${name}: the number or the command is off the page's edge`).toBe(true);
+      expect(Math.abs(row.captionGap), `${name}: the words do not sit the docs' caption gap above the command`).toBeLessThanOrEqual(1);
+      expect(row.oneLine, `${name}: the command wraps`).toBe(true);
+      expect(row.across, `${name}: the command does not run across the card`).toBe(true);
+      expect(row.fades, `${name}: the command has no fade at its edge`).toBe(true);
+      expect(row.lineBeforeCopy, `${name}: the command runs under its copy button`).toBe(true);
+      expect(row.target, `${name}: the copy button is not a full tap target`).toBe(true);
+      const next = geometry.rows[index + 1];
+      if (next) {
+        expect(Math.abs(next.labelTop - row.blockBottom - geometry.groups), `${name}: the steps do not stand the docs' group gap apart`).toBeLessThanOrEqual(2);
+      }
+    }
+    // the long address scrolls inside its block; the page itself never scrolls sideways
+    expect(geometry.rows[0]!.scrolls, `the curl line does not scroll ${at}`).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    // scrolled to its end, the line shows the command's last word, unfaded
+    const end = await shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').first().locator(".cli-cmd-line").evaluate(async (line) => {
+      line.scrollTo({ left: line.scrollWidth, behavior: "instant" });
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      const code = line.querySelector("code")!;
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      return { last: range.getBoundingClientRect().right <= line.getBoundingClientRect().right + 1 };
+    });
+    expect(end.last, `the end of the curl line cannot be reached ${at}`).toBe(true);
+    // the copy button gives the exact bytes
+    const command = fixture.install.platforms[0]!.command;
+    const first = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').first();
+    await first.locator(".cli-copy").click();
+    await expect(first.locator(".cli-copy")).toContainText("copied");
+    expect(await page.evaluate(() => (window as unknown as { copied?: string[] }).copied)).toEqual([command]);
+    await context.close();
+  }
 });
 
 test("the use cases are one row of all twelve capabilities, each tagged with its audience, then the docs card, all in the served page", async ({

@@ -287,6 +287,8 @@ export const HOW = {
 export const INSTALL = {
   title: "get started in three commands",
   guide: { label: "read our docs", href: "/docs" },
+  /* on a phone, under the card, in place of the link beside the title */
+  installGuide: { label: "read the install guide", href: "/docs#install" },
   /* the first command, for each system; the other two are the same on both */
   platforms: [
     { id: "unix", label: "macos and linux", command: "curl -fsSL https://peasantlabs.org/install | bash" },

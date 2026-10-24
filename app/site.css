@@ -520,19 +520,6 @@ html {
 
 /* ---------- commands ---------- */
 
-/*
- * A command drawn by DocCommand (the docs and the landing) wraps after an
- * address's slashes as well as at its spaces. Fairtrade sets each word of a
- * wrapped command as an inline block, which keeps a word whole but, once a
- * long address wraps inside its block, stretches that block across the line
- * and pushes the next word down. Here the words run inline, so "install |
- * bash" stays together; a word still breaks inside only when it is wider than
- * the line.
- */
-.dx-cmd .cli-tok {
-  display: inline;
-}
-
 /* ---------- signed in to online ---------- */
 
 /* the head script marks <html data-online> before the first paint, so exactly
