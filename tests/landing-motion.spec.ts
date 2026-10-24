@@ -279,7 +279,7 @@ test("a heading that mounts after load is still revealed", async ({ page }) => {
   await expect(page.locator("#late")).toHaveAttribute("data-shown", "true");
 });
 
-test("the hero picture loops while on screen, holds while a pointer rests on it, and holds still for reduced motion", async ({
+test("the hero picture loops while on screen, holds while a pointer moves onto it, and holds still for reduced motion", async ({
   page,
 }) => {
   const panel = page.locator(".hf-panel");
@@ -321,10 +321,28 @@ test("the hero picture loops while on screen, holds while a pointer rests on it,
   }
 
   expect(await running()).toEqual(["running"]);
+  // scroll first: a scroll lets a hold go, and hover() would otherwise scroll after moving the pointer
+  await flow.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
   await flow.hover();
   await expect(flow).toHaveAttribute("data-paused", "true");
   expect(await running()).toEqual(["paused"]);
   await page.mouse.move(0, 0);
+  await expect(flow).toHaveAttribute("data-paused", "false");
+
+  // scrolling the picture under a pointer that has not moved does not hold it
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const box = (await flow.boundingBox())!;
+  const x = box.x + box.width / 2;
+  await page.mouse.move(x, Math.max(10, box.y - 200));
+  await page.mouse.wheel(0, 300);
+  await expect.poll(async () => (await flow.boundingBox())!.y).toBeLessThan(box.y - 200);
+  await page.waitForTimeout(300);
+  await expect(flow).toHaveAttribute("data-paused", "false");
+  // moving the pointer over it does, and scrolling again lets it go
+  await page.mouse.move(x + 4, Math.max(10, box.y - 200) + 4);
+  await expect(flow).toHaveAttribute("data-paused", "true");
+  await page.mouse.wheel(0, 40);
   await expect(flow).toHaveAttribute("data-paused", "false");
 
   await page.emulateMedia({ reducedMotion: "reduce" });
