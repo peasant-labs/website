@@ -1,5 +1,6 @@
 "use client";
 
+import { SESSION } from "@/lib/landing";
 import { currentTheme, subscribeToTheme, type Theme } from "@/lib/theme";
 import { adaptTranscript, TranscriptViewer, type TranscriptWireInput } from "@peasant-labs/fairtrade/ui";
 import { startTransition, useEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from "react";
@@ -45,8 +46,8 @@ function useNear(ref: RefObject<Element | null>) {
   return near;
 }
 
-/* how long before the reader arrived the sample session ended, so its relative times read as today's work */
-const ENDED_AGO_MS = 50 * 60 * 1000;
+/* the sample ended this long before the reader arrived (SESSION.endedAgoMinutes) */
+const ENDED_AGO_MS = SESSION.endedAgoMinutes * 60 * 1000;
 
 /* the sample, moved in time as a whole so it ended ENDED_AGO_MS before `now`; its own spacing is kept */
 export function endedRecently(session: TranscriptWireInput, now: number): TranscriptWireInput {

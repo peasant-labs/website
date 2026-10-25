@@ -55,6 +55,10 @@ export type LandingFixture = {
     title: string;
     sessionId: string;
     author: string;
+    endedAgo: string;
+    terminal: string;
+    firstAsk: string;
+    figures: { model: string; inputSubmissionCount: number; totalTokens: number };
     phone: {
       widths: number[];
       prompt: string;
@@ -65,8 +69,17 @@ export type LandingFixture = {
       stat: string;
     };
     tabs: string[];
-    check: { name: string; summary: string };
     markers: string[];
+  };
+  card: { figures: { prompts: number; tokens: number } };
+  thread: {
+    label: string;
+    posts: Array<{ name: string; handle: string; time: string; text: string }>;
+    actions: string[];
+    face: string;
+    chart: Array<{ label: string; value: number }>;
+    from: string;
+    phone: { postText: number; cardPrompt: number; promptWord: string };
   };
   vision: { line: string; story: string[]; cta: Link };
   docsNav: Link[];

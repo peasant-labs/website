@@ -1187,11 +1187,17 @@
  * --mac-u, so a small screen scales the whole chrome down in proportion.
  */
 
+/* the system face: the windows' chrome, and the thread on X, which a phone shows without a window around it */
+.mac-desk,
+.mac-win,
+.lp-x {
+  --mac-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 .mac-desk,
 .mac-win {
   /* the dark appearance, with the site's dark theme */
   --mac-u: 1px;
-  --mac-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mac-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --mac-bar-bg: #2d2d2d;
   --mac-bar-rule: #0d0d0d;
@@ -1463,6 +1469,19 @@
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
+}
+
+/* the page's icon, before its address, as Safari shows it */
+.mac-address-icon {
+  display: inline-flex;
+  vertical-align: -0.15em;
+  margin-inline-end: calc(5 * var(--mac-u));
+}
+
+.mac-address-icon svg {
+  width: calc(13 * var(--mac-u));
+  height: calc(13 * var(--mac-u));
+  color: var(--mac-field-ink);
 }
 
 .mac-body {
@@ -2410,20 +2429,30 @@
 /* a published session */
 
 /*
- * Three windows, layered: Claude Code behind and up to the left, the transcript
- * in front and wide, the pull request's check over the front window's lower
- * left edge. From a tablet's width only: a phone shows a short slice of the
- * session instead (.lp-phone, below).
+ * Three windows, layered back to front: Claude Code behind and up to the left,
+ * the transcript in front and wide, and the thread on X over the transcript's
+ * right side. The one last pointed at or focused comes to the front
+ * (data-front, components/landing/session-windows.tsx).
+ * From a tablet's width only: a phone shows a short slice of the session and
+ * the thread without its window instead (.lp-phone and .lp-phone-x, below).
  */
 .lp-windows {
   --lp-windows-x: clamp(1rem, 6vw, 5rem);
-  /* the room under the front window for the check that hangs from its corner */
-  --lp-check-room: 5.5rem;
+  /* how far the thread stands out past the transcript's right edge */
+  --lp-windows-x-end: clamp(1rem, 4vw, 3.5rem);
+  /* the transcript window's body: one height whatever it shows (.lp-session-win, below) */
+  --lp-windows-body: clamp(32rem, 78svh, 48rem);
+  /* how far the transcript stands below the Terminal behind it */
+  --lp-windows-lead: clamp(2.5rem, 6vw, 4.5rem);
+  /* how far up the transcript the thread over its right side reaches: its top halfway between the Terminal's and the transcript's */
+  --lp-windows-x-overlap: calc(var(--lp-windows-body) + var(--lp-windows-chrome) + var(--lp-windows-lead) / 2);
+  /* the browser window's title bar above its body (components/mac.tsx) */
+  --lp-windows-chrome: 52px;
 
   position: relative;
   min-width: 0;
-  padding-block: clamp(2.5rem, 6vw, 4.5rem) var(--lp-check-room);
-  padding-inline-start: var(--lp-windows-x);
+  padding-block-start: var(--lp-windows-lead);
+  padding-inline: var(--lp-windows-x) var(--lp-windows-x-end);
 }
 
 .lp-windows-term {
@@ -2448,55 +2477,8 @@
   z-index: 1;
 }
 
-/*
- * The check hangs from the front window's lower left corner: it crosses only
- * the window's bottom edge, never its content, and the rest of it sits out to
- * the left and below. It holds nothing to press, so a press under its edge
- * reaches the window.
- */
-.lp-check {
-  position: absolute;
-  z-index: 2;
-  inset-block-start: calc(100% - var(--lp-check-room) - 0.75rem);
-  inset-inline-start: 0;
-  pointer-events: none;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-3);
-  max-width: calc(100% - var(--sp-5));
-  padding: var(--sp-4) var(--sp-5);
-  border: var(--bd-strong);
-  background: var(--canvas);
-  box-shadow: var(--overlay-shadow);
-}
 
-.lp-check-ic {
-  flex: none;
-  width: var(--ic-lg);
-  height: var(--ic-lg);
-  margin-block-start: 2px;
-  color: var(--success);
-}
 
-.lp-check-text {
-  display: grid;
-  gap: 2px;
-  font-family: var(--font-mono);
-  letter-spacing: 0;
-}
-
-.lp-check-name {
-  color: var(--ink-strong);
-  font-size: var(--fs-body);
-  font-weight: 700;
-}
-
-/* on a narrow card the summary splits in two even lines rather than leaving one word alone */
-.lp-check-summary {
-  color: var(--ink-3);
-  font-size: var(--fs-sm);
-  text-wrap: balance;
-}
 
 /*
  * The transcript browser sits in a browser window that keeps one height
@@ -2506,7 +2488,61 @@
  */
 .lp-session-win .mac-body {
   flex: none;
-  block-size: clamp(32rem, 78svh, 48rem);
+  block-size: var(--lp-windows-body);
+}
+
+/*
+ * The thread on X stands over the transcript's right side: its top halfway
+ * between the Terminal's and the transcript's, its right edge out past the
+ * transcript's on the column's edge, the rest of it below. Hovering or focusing the transcript
+ * brings it back in front, filters and all. It is in the flow, so the section
+ * makes room for however tall it draws.
+ */
+.lp-windows-x {
+  position: relative;
+  z-index: 2;
+  /* at a tablet's width it takes more of the row, so the card it carries still reads */
+  width: min(30rem, 60%);
+  margin-block-start: calc(-1 * var(--lp-windows-x-overlap));
+  margin-inline: auto calc(-1 * var(--lp-windows-x-end));
+}
+
+/*
+ * X lays a thread out in a 600px column; the window is narrower than that. So
+ * the thread draws at X's own sizes on a column 1/0.9 times the window's width,
+ * then shows at 0.9, as a browser zoomed out a step would, rather than X's
+ * full-size type crowded into a narrow window. Phones show it without a window,
+ * at full size.
+ */
+.lp-windows-x .lp-x {
+  zoom: 0.9;
+}
+
+/* the window last pointed at or focused stands in front of the other two */
+.lp-windows[data-front="term"] > .lp-windows-term,
+.lp-windows[data-front="front"] > .lp-windows-front,
+.lp-windows[data-front="x"] > .lp-windows-x {
+  z-index: 3;
+}
+
+/*
+ * It rises into place rather than snapping there: from a little below and a
+ * little faint, on the same spring the windows fan out on. The animation
+ * starts each time a window becomes the one in front.
+ */
+@keyframes lp-window-raise {
+  from {
+    opacity: 0.55;
+    transform: translate3d(0, 0.75rem, 0) scale(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lp-windows[data-front="term"] > .lp-windows-term,
+  .lp-windows[data-front="front"] > .lp-windows-front,
+  .lp-windows[data-front="x"] > .lp-windows-x {
+    animation: lp-window-raise 600ms var(--ease-spring);
+  }
 }
 
 /*
@@ -2604,17 +2640,17 @@
   max-inline-size: none;
 }
 
-/* the first time they come into view, the back window and the check fan out from behind the front one */
+/* the first time they come into view, the back window and the thread fan out from behind the front one */
 @media (prefers-reduced-motion: no-preference) {
   .lp-windows-term,
-  .lp-check {
+  .lp-windows-x {
     transition:
       transform 1000ms var(--ease-spring),
       opacity 600ms var(--ease-out);
   }
 
-  .lp-check {
-    transition-delay: 240ms;
+  .lp-windows-x {
+    transition-delay: 120ms;
   }
 
   .js-reveal .lp-windows[data-fanned="false"] .lp-windows-term {
@@ -2622,9 +2658,313 @@
     transform: translate3d(18%, 2.5rem, 0) scale(0.94);
   }
 
-  .js-reveal .lp-windows[data-fanned="false"] .lp-check {
+  .js-reveal .lp-windows[data-fanned="false"] .lp-windows-x {
     opacity: 0;
-    transform: translate3d(0, 1.5rem, 0);
+    transform: translate3d(-14%, -2.5rem, 0) scale(0.94);
+  }
+}
+
+/*
+ * A thread on X, drawn as X draws it in its dark appearance, in both of the
+ * site's themes: it is a picture of X, so X's own colours, sizes and the
+ * system face apply inside the window, not fairtrade's. Posts sit on a 40px
+ * avatar column with X's 12px by 16px padding; a reply in the same
+ * conversation hangs from a 2px line under the avatar before it.
+ */
+.lp-x-win .mac-body {
+  background: #000000;
+}
+
+.lp-x {
+  --lp-x-ink: #e7e9ea;
+  --lp-x-ink-2: #71767b;
+  --lp-x-rule: #2f3336;
+  --lp-x-line: #333639;
+
+  background: #000000;
+  color: var(--lp-x-ink);
+  font-family: var(--mac-font);
+  font-size: 15px;
+  letter-spacing: normal;
+  line-height: 20px;
+  text-transform: none;
+  word-spacing: normal;
+}
+
+.lp-x-post {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  column-gap: 8px;
+  padding: 12px 16px;
+}
+
+/* a reply in the same conversation follows the line, with no rule between them */
+.lp-x-post[data-linked="true"] + .lp-x-post {
+  padding-block-start: 4px;
+}
+
+.lp-x-post:last-child {
+  border-bottom: 1px solid var(--lp-x-rule);
+}
+
+.lp-x-gutter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lp-x-avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.lp-x-avatar-mira {
+  background: #7a5cff;
+}
+
+.lp-x-avatar-doofus {
+  background: #c44;
+}
+
+.lp-x-line {
+  flex: 1;
+  width: 2px;
+  margin-block: 4px -12px;
+  background: var(--lp-x-line);
+}
+
+.lp-x-main {
+  min-width: 0;
+}
+
+.lp-x-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.lp-x-name {
+  overflow: hidden;
+  color: var(--lp-x-ink);
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.lp-x-handle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lp-x-handle,
+.lp-x-sep,
+.lp-x-time {
+  color: var(--lp-x-ink-2);
+}
+
+.lp-x-sep,
+.lp-x-time {
+  flex: none;
+}
+
+/* the pause a screen reader makes between a handle and its time, where the eye has X's separator */
+.lp-x-pause {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.lp-x-more {
+  display: flex;
+  flex: none;
+  margin-inline-start: auto;
+  color: var(--lp-x-ink-2);
+}
+
+.lp-x-more svg {
+  width: 18.75px;
+  height: 18.75px;
+}
+
+.lp-x-text {
+  margin-block-start: 2px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* a post's picture or link card: X's rounded frame with its hairline */
+.lp-x-media,
+.lp-x-card {
+  margin-block-start: 12px;
+  overflow: hidden;
+  border: 1px solid var(--lp-x-rule);
+  border-radius: 16px;
+}
+
+/* the chart, as a quick plot draws one: a white page, a title, light grid lines, one colour of bar */
+.lp-x-chart {
+  padding: 14px 16px 12px;
+  background: #ffffff;
+  color: #1f1f1f;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.lp-x-chart-title {
+  margin-block-end: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.lp-x-bars {
+  display: flex;
+  gap: 18px;
+  padding-inline: 6px;
+  background: repeating-linear-gradient(to top, #e4e4e4 0 1px, transparent 1px 25%) 0 0 / 100% 104px no-repeat;
+}
+
+.lp-x-bar {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.lp-x-bar-plot {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  height: 104px;
+  border-bottom: 1px solid #555555;
+}
+
+.lp-x-bar-value {
+  margin-block-end: 2px;
+  font-size: 12px;
+}
+
+.lp-x-bar-fill {
+  align-self: stretch;
+  height: calc(var(--lp-x-bar) * 0.84);
+  background: #4c72b0;
+}
+
+.lp-x-bar-label {
+  margin-block-start: 4px;
+  overflow: hidden;
+  font-size: 12px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * The link card: fairtrade's card at its own 1200 by 600 pixels, scaled to
+ * the frame's width, its hairline drawn over it so the frame stays exactly
+ * 2:1. The frame is a size container, so the scale is its width over 1200
+ * in CSS alone, right before any script runs. Nothing here styles what the
+ * card draws inside itself.
+ */
+.lp-x-card {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 2 / 1;
+  border: 0;
+  background: #0b0b0a;
+}
+
+.lp-x-card::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--lp-x-rule);
+  content: "";
+  pointer-events: none;
+}
+
+.lp-x-card-scale {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 1200px;
+  height: 600px;
+  /* the ratio of two lengths: atan2 then tan where a length cannot yet divide a length */
+  transform: scale(tan(atan2(100cqw, 1200px)));
+  transform: scale(calc(100cqw / 1200px));
+  transform-origin: 0 0;
+}
+
+.lp-x-from {
+  margin-block-start: 4px;
+  color: var(--lp-x-ink-2);
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.lp-x-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 600px;
+  margin-block-start: 12px;
+  color: var(--lp-x-ink-2);
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.lp-x-action,
+.lp-x-action-end {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lp-x-action-end {
+  gap: 12px;
+}
+
+.lp-x-action svg {
+  width: 18.75px;
+  height: 18.75px;
+}
+
+/*
+ * On a phone the thread follows the session's slice at the column's width,
+ * with no window around it. The card leaves the avatar column and takes the
+ * post's whole width, with X's narrower phone padding, so its prompt still
+ * reads at a small phone's width.
+ */
+.lp-phone-x {
+  display: none;
+}
+
+@media (max-width: 47.99rem) {
+  .lp-phone-x {
+    display: block;
+    min-width: 0;
+    margin-block-start: var(--sp-6);
+  }
+
+  .lp-phone-x .lp-x-post {
+    padding-inline: 12px;
+  }
+
+  .lp-phone-x :is(.lp-x-card, .lp-x-from) {
+    margin-inline-start: -48px;
+  }
+
+  /* out from the avatar column, the card starts below the avatar rather than over it */
+  .lp-phone-x .lp-x-card {
+    margin-block-start: 28px;
   }
 }
 
