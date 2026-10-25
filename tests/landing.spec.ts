@@ -1916,7 +1916,11 @@ test("a keyboard user's focus in the transcript is never hidden under the thread
     const viewer = page.locator("#session [data-session-viewer]");
     await viewer.scrollIntoViewIfNeeded();
     await expect(viewer.locator(".txn-app")).toBeVisible();
+    // hydrated: the windows have seen themselves come into view, so focus can bring its window forward
+    await expect(page.locator("#session .lp-windows")).toHaveAttribute("data-fanned", "true");
     await viewer.locator(".txn-stream").evaluate((stream) => stream.querySelector<HTMLElement>("a, button, [tabindex]")!.focus());
+    // the transcript, focused, stands in front of the thread
+    await expect(page.locator("#session .lp-windows")).toHaveAttribute("data-front", "front");
     let reached = 0;
     for (let press = 0; press < 40; press += 1) {
       await page.keyboard.press("Tab");

@@ -170,13 +170,12 @@ test("the session's four windows fan out from one stack once, the transcript wid
     expect(layout.shared.left, at).toBeGreaterThan(layout.front.left + layout.front.width / 3);
     expect(layout.shared.left, at).toBeLessThan(layout.front.right);
     expect(layout.shared.right, at).toBeGreaterThan(layout.front.right);
-    expect(layout.shared.top, at).toBeGreaterThan(layout.front.top + layout.front.height / 4);
-    expect(layout.shared.top, at).toBeLessThan(layout.front.top + layout.front.height / 2);
+    // its top halfway between the Terminal's and the transcript's
+    expect(Math.abs(layout.shared.top - (layout.back.top + layout.front.top) / 2), at).toBeLessThan(8);
     expect(layout.layers, at).toEqual([...layout.layers].sort((a, b) => a - b));
     expect(new Set(layout.layers).size, at).toBe(3);
-    // its top level with the top of the filters' strip, where the viewer is wide enough to show it
+    // the filters' strip still shows where the viewer is wide enough for it
     if (width >= 1024) expect(layout.strip, `the filters' strip ${at}`).not.toBeNull();
-    if (layout.strip) expect(Math.abs(layout.shared.top - layout.strip.top), at).toBeLessThan(24);
     expect(layout.shared.right, `the thread runs past the content ${at}`).toBeLessThanOrEqual(layout.right + 1);
     expect(layout.overflow, `the page overflows ${at}`).toBe(false);
   }

@@ -107,8 +107,9 @@ function PostView({ post, linked, children }: { post: Post; linked: boolean; chi
  * mira's thread on X, in a Safari window: her benchmark of the sample's models
  * with its chart, a reply asking for the prompt, and her answer, which is only
  * the transcript's link card and the line naming where it links. It looks
- * exactly as X does, in X's dark appearance whatever the site's theme, except
- * that the logo is our P. It is read once, as a short group.
+ * as X does, in X's dark appearance whatever the site's theme, starting
+ * straight at the posts with no top bar so the thread has the room; the
+ * window's tab shows our P, never X's mark. It is read once, as a short group.
  *
  * Without `chrome`, the thread stands alone, with no window around it, as a
  * phone shows it under the session's slice.
@@ -122,9 +123,6 @@ export function XThread({ className, chrome = true }: { className?: string; chro
       role="group"
       aria-label={THREAD.label}
     >
-      <div className="lp-x-top" aria-hidden="true">
-        <PLogo className="lp-x-logo" />
-      </div>
       <PostView post={benchmark} linked>
         <Chart />
       </PostView>

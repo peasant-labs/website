@@ -2442,12 +2442,16 @@
   --lp-windows-x-end: clamp(1rem, 4vw, 3.5rem);
   /* the transcript window's body: one height whatever it shows (.lp-session-win, below) */
   --lp-windows-body: clamp(32rem, 78svh, 48rem);
-  /* how far up the transcript's body the thread over its right side reaches: to the top of its filters' strip */
-  --lp-windows-x-overlap: calc(var(--lp-windows-body) - 12rem);
+  /* how far the transcript stands below the Terminal behind it */
+  --lp-windows-lead: clamp(2.5rem, 6vw, 4.5rem);
+  /* how far up the transcript the thread over its right side reaches: its top halfway between the Terminal's and the transcript's */
+  --lp-windows-x-overlap: calc(var(--lp-windows-body) + var(--lp-windows-chrome) + var(--lp-windows-lead) / 2);
+  /* the browser window's title bar above its body (components/mac.tsx) */
+  --lp-windows-chrome: 52px;
 
   position: relative;
   min-width: 0;
-  padding-block-start: clamp(2.5rem, 6vw, 4.5rem);
+  padding-block-start: var(--lp-windows-lead);
   padding-inline: var(--lp-windows-x) var(--lp-windows-x-end);
 }
 
@@ -2488,9 +2492,9 @@
 }
 
 /*
- * The thread on X stands over the transcript's right side: its top level with
- * the top of the filters' strip, its right edge out past the transcript's on
- * the column's edge, the rest of it below. Hovering or focusing the transcript
+ * The thread on X stands over the transcript's right side: its top halfway
+ * between the Terminal's and the transcript's, its right edge out past the
+ * transcript's on the column's edge, the rest of it below. Hovering or focusing the transcript
  * brings it back in front, filters and all. It is in the flow, so the section
  * makes room for however tall it draws.
  */
@@ -2503,11 +2507,42 @@
   margin-inline: auto calc(-1 * var(--lp-windows-x-end));
 }
 
+/*
+ * X lays a thread out in a 600px column; the window is narrower than that. So
+ * the thread draws at X's own sizes on a column 1/0.9 times the window's width,
+ * then shows at 0.9, as a browser zoomed out a step would, rather than X's
+ * full-size type crowded into a narrow window. Phones show it without a window,
+ * at full size.
+ */
+.lp-windows-x .lp-x {
+  zoom: 0.9;
+}
+
 /* the window last pointed at or focused stands in front of the other two */
 .lp-windows[data-front="term"] > .lp-windows-term,
 .lp-windows[data-front="front"] > .lp-windows-front,
 .lp-windows[data-front="x"] > .lp-windows-x {
   z-index: 3;
+}
+
+/*
+ * It rises into place rather than snapping there: from a little below and a
+ * little faint, on the same spring the windows fan out on. The animation
+ * starts each time a window becomes the one in front.
+ */
+@keyframes lp-window-raise {
+  from {
+    opacity: 0.55;
+    transform: translate3d(0, 0.75rem, 0) scale(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lp-windows[data-front="term"] > .lp-windows-term,
+  .lp-windows[data-front="front"] > .lp-windows-front,
+  .lp-windows[data-front="x"] > .lp-windows-x {
+    animation: lp-window-raise 600ms var(--ease-spring);
+  }
 }
 
 /*
@@ -2656,20 +2691,6 @@
   word-spacing: normal;
 }
 
-.lp-x-top {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 53px;
-  border-bottom: 1px solid var(--lp-x-rule);
-}
-
-.lp-x-logo {
-  width: 26px;
-  height: 26px;
-  color: var(--lp-x-ink);
-}
-
 .lp-x-post {
   position: relative;
   display: grid;
@@ -2701,18 +2722,11 @@
 }
 
 .lp-x-avatar-mira {
-  background:
-    radial-gradient(circle at 50% 38%, #f3d2b8 0 22%, transparent 23%),
-    radial-gradient(circle at 50% 100%, #2b6f6a 0 45%, transparent 46%),
-    linear-gradient(160deg, #9fd4c9, #5b8fd6);
+  background: #7a5cff;
 }
 
 .lp-x-avatar-doofus {
-  background:
-    radial-gradient(circle at 38% 42%, #1b1b1b 0 6%, transparent 7%),
-    radial-gradient(circle at 62% 42%, #1b1b1b 0 6%, transparent 7%),
-    radial-gradient(circle at 50% 50%, #ffcf4a 0 40%, transparent 41%),
-    linear-gradient(200deg, #ff7a45, #c2185b);
+  background: #c44;
 }
 
 .lp-x-line {
