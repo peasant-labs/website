@@ -1,0 +1,46 @@
+{
+  "commit": "f12adabd1b401b41690f17adc49363070c6dde53",
+  "url": "https://peasantlabs.org/",
+  "styles": [
+    {
+      "asset": "/_next/static/css/e1ca4a7f35ff7017.css",
+      "sha256": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+      "bytes": 5681,
+      "shared_depth": false,
+      "layered_windows": false,
+      "mission": false
+    },
+    {
+      "asset": "/_next/static/css/e4dfac593443a3e4.css",
+      "sha256": "431d2a38a269e1c6278d0fa66b7d6ad2a1b79178718f6c25f2bc46ab5ddb1cbd",
+      "bytes": 404307,
+      "shared_depth": true,
+      "layered_windows": false,
+      "mission": false
+    },
+    {
+      "asset": "/_next/static/css/f505c5205671eb79.css",
+      "sha256": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+      "bytes": 49319,
+      "shared_depth": false,
+      "layered_windows": false,
+      "mission": false
+    },
+    {
+      "asset": "/_next/static/css/979f57c9c923ceff.css",
+      "sha256": "e48b1386ab33307e5560da94f88adcd8e84728bf1fe4c3284c67102e4179fe3d",
+      "bytes": 40142,
+      "shared_depth": false,
+      "layered_windows": true,
+      "mission": false
+    },
+    {
+      "asset": "/_next/static/css/6d9d8256903444dc.css",
+      "sha256": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+      "bytes": 56,
+      "shared_depth": false,
+      "layered_windows": false,
+      "mission": false
+    }
+  ]
+}
