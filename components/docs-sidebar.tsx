@@ -20,9 +20,9 @@ const ICONS: Record<DocsIcon, ComponentType> = {
 
 /**
  * The docs app's sidebar: fairtrade's shared AppSidebar in its one order, the
- * same as the online and local apps: the mark, the shortcuts (search, then the
- * switcher, where fairtrade lists no other app, only community as soon), the
- * docs pages, then the footer with the account row, which is "log in", or
+ * same as the online and local apps: the mark, the docs pages, then search
+ * near the footer. Fairtrade hides community and lists no other app in the
+ * docs switcher. The footer carries the account row, which is "log in", or
  * "dashboard" for a reader signed in there, and the theme toggle. fairtrade
  * draws the phone top bar and drawer. A page's own sections are in its "on
  * this page" list, not here.

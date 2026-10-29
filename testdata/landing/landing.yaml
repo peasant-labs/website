@@ -223,8 +223,8 @@ docsNav:
   - { label: agent evals, href: /docs/guides/evals }
   - { label: pr reviews, href: /docs/guides/reviews }
   - { label: blog, href: /blog }
-# the docs sidebar's shortcuts, above its pages: search, then the switcher, which lists no other app,
-# only what is coming (the account row reaches online)
-docsShortcuts: [search, community]
+# Pages lead; search sits near the account footer. The docs app has no other app in its switcher.
+docsNavigation: [docs pages, guides, more, shortcuts]
+docsShortcuts: [search]
 posts:
   - { slug: reclaiming-data-autonomy-as-a-peasant, title: Reclaiming Data Autonomy as a Peasant }
