@@ -32,6 +32,8 @@ type WindowProps = {
   /** for a window that opens during a scene: false keeps it mounted but not yet shown */
   open?: boolean;
   className?: string;
+  /** Names a scrollable window body and makes it reachable by keyboard. */
+  scrollLabel?: string;
   style?: CSSProperties;
   children: ReactNode;
 };
@@ -52,6 +54,7 @@ function Frame({
   active = true,
   open,
   className,
+  scrollLabel,
   style,
   bar,
   children,
@@ -68,7 +71,9 @@ function Frame({
       <div className="mac-bar" aria-hidden="true">
         {bar}
       </div>
-      <div className="mac-body">{children}</div>
+      <div className="mac-body" tabIndex={scrollLabel ? 0 : undefined} role={scrollLabel ? "region" : undefined} aria-label={scrollLabel}>
+        {children}
+      </div>
     </div>
   );
 }

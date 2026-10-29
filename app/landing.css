@@ -2640,12 +2640,20 @@
   background: #000000;
 }
 
+.lp-x-win .mac-body:focus-visible {
+  outline: var(--focus-ring-width) solid var(--lp-x-ink);
+  outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+.lp-x-win .mac-body,
 .lp-x {
   --lp-x-ink: #e7e9ea;
   --lp-x-ink-2: #71767b;
   --lp-x-rule: #2f3336;
   --lp-x-line: #333639;
+}
 
+.lp-x {
   background: #000000;
   color: var(--lp-x-ink);
   font-family: var(--mac-font);

@@ -1946,6 +1946,30 @@ test("a keyboard user's focus in the transcript is never hidden under the thread
   }
 });
 
+test("the shared thread can be reached and scrolled by keyboard", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of fixture.session.windows.widths) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const windows = page.locator("#session .lp-windows");
+    const body = windows.getByRole("region", { name: fixture.thread.label });
+    await body.scrollIntoViewIfNeeded();
+    await expect(windows).toHaveAttribute("data-fanned", "true");
+    await expect(windows.locator(".txn-app")).toBeVisible();
+    await body.focus();
+    await page.keyboard.press("Shift+Tab");
+    await expect(body).not.toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(body).toBeFocused();
+    await expect(windows).toHaveAttribute("data-front", "x");
+    await page.keyboard.press("End");
+    await expect.poll(() => body.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+    await expect.poll(() => body.evaluate((element) => element.scrollTop + element.clientHeight)).toBeGreaterThanOrEqual(
+      await body.evaluate((element) => element.scrollHeight - 1),
+    );
+  }
+});
+
 test("a sample session opens in the real transcript browser, in a wide window that keeps its height", async ({
   page,
 }) => {
