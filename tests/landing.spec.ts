@@ -1022,7 +1022,7 @@ test("every section opens on its title alone on a row, in one style at one edge,
   }
 });
 
-test("the vision leads with its statement above an open editorial split, and the landing keeps its closing action", async ({
+test("the mission keeps a readable proportional lead with its explanation and illustration", async ({
   page,
 }) => {
   for (const width of [1440, 1280, 390]) {
@@ -1062,13 +1062,14 @@ test("the vision leads with its statement above an open editorial split, and the
         rule: getComputedStyle(element.querySelector(".lp-vision-art")!, "::after").content,
         beside: art.right <= words.left + 1,
         // side by side, the illustration and explanation share a baseline
-        aligned: Math.abs(art.bottom - words.bottom) < 2,
-        statementLeads: line.getBoundingClientRect().bottom <= Math.min(art.top, words.top),
+        aligned: Math.abs((art.top + art.bottom) / 2 - (words.top + words.bottom) / 2) < 2,
+        statementLeads: line.parentElement === element.querySelector(".lp-vision-words"),
         // stacked, the picture's left edge is the words' left edge
-        stackedEdge: Math.abs(art.left - words.left) < 2 && art.bottom <= words.top,
+        stackedEdge: Math.abs(art.left - words.left) < 2 && words.bottom <= art.top,
         evenPadding: Math.abs(parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)) < 1,
-        lineFace: getComputedStyle(line).fontFamily === getComputedStyle(title).fontFamily,
-        lineScale: getComputedStyle(line).fontSize === getComputedStyle(title).fontSize,
+        lineFace: getComputedStyle(line).fontFamily === getComputedStyle(element.querySelector(".lp-vision-story")!).fontFamily,
+        lineScale: parseFloat(getComputedStyle(line).fontSize) <= 28,
+        readableLeading: parseFloat(getComputedStyle(line).lineHeight) / parseFloat(getComputedStyle(line).fontSize),
         filledCta: cta.classList.contains("btn-primary"),
         lastLines,
         art: { width: art.width, height: art.height },
@@ -1077,18 +1078,18 @@ test("the vision leads with its statement above an open editorial split, and the
     expect(layout.open && layout.border === "1px", `the vision is not an open section at ${width}`).toBe(true);
     expect(layout.statementLeads, `the statement does not lead at ${width}`).toBe(true);
     expect(layout.rule === "none" || layout.rule === "normal", `a rule runs under the picture at ${width}`).toBe(true);
-    if (width >= 1280) expect(layout.beside && layout.aligned, `the vision does not share a baseline at ${width}`).toBe(true);
-    else expect(layout.stackedEdge, `the picture does not sit on the words' edge at ${width}`).toBe(true);
+    if (width >= 1280) expect(layout.beside && layout.aligned, `the illustration and explanation are detached at ${width}`).toBe(true);
+    else expect(layout.stackedEdge, `the picture does not follow the story at ${width}`).toBe(true);
     expect(layout.evenPadding, `the vision's padding is uneven at ${width}`).toBe(true);
-    expect(layout.lineFace && layout.lineScale, `the statement does not share the section-title scale at ${width}`).toBe(true);
+    expect(layout.lineFace && layout.lineScale, `the lead does not use a readable proportional scale at ${width}`).toBe(true);
+    expect(layout.readableLeading, `the lead is cramped at ${width}`).toBeGreaterThanOrEqual(1.5);
     expect(layout.filledCta, "the vision's button is filled amber").toBe(false);
     for (const line of layout.lastLines) {
       expect(line, `a paragraph leaves one word alone on its last line at ${width}`).toContain(" ");
     }
     // the picture keeps its square ratio and its supporting size
     expect(Math.abs(layout.art.width - layout.art.height), `the picture is not square at ${width}`).toBeLessThan(1);
-    if (width >= 1280) expect(layout.art.width).toBe(fixture.vision.artMax);
-    else expect(layout.art.width).toBeLessThanOrEqual(fixture.vision.artMax);
+    expect(layout.art.width).toBeLessThanOrEqual(fixture.vision.artMax);
   }
   await page.setViewportSize({ width: 1440, height: 900 });
 

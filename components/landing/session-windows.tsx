@@ -15,15 +15,14 @@ const ANSWER_TEXT = String(ANSWER?.content ?? "").replace(/<thinking>[\s\S]*?<\/
 type Window = "term" | "front" | "x";
 
 /**
- * One session in three windows: behind and up to the left, Claude Code in
- * Terminal, where it was recorded; in front and wide, the published transcript
- * a reviewer reads (passed in); at its lower right, the thread on X where its
- * author shared the link. Recorded, read, shared. From a tablet's width only: a
+ * One session in three readable windows: the published transcript a reviewer
+ * reads (passed in) leads at full width. Beneath it, Claude Code in Terminal
+ * shows where it was recorded, beside the thread on X where its author shared
+ * the link. Recorded, read, shared. From a tablet's width only: a
  * phone shows a slice of the session and the thread without windows instead.
  *
- * The window a pointer moves onto, or keyboard focus moves into, comes to the
- * front and stays there until another one is chosen, as on a desktop. So focus
- * is never hidden under another window.
+ * The window a pointer moves onto, or keyboard focus moves into, is marked
+ * active until another one is chosen. Every window stays readable beside it.
  *
  * The supporting windows ease into place the first time the group comes into view; only
  * transform and opacity move. Without motion they are simply where they end.

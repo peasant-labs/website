@@ -2430,32 +2430,43 @@
 /* a published session */
 
 /*
- * Three windows, layered back to front: Claude Code behind and up to the left,
- * the transcript in front and wide, and the thread on X over the transcript's
- * right side. The one last pointed at or focused comes to the front
+ * The transcript leads at full width. Claude Code and the shared thread sit
+ * below it with their contents visible, side by side when space allows.
+ * The one last pointed at or focused is marked as the active window
  * (data-front, components/landing/session-windows.tsx).
  * From a tablet's width only: a phone shows a short slice of the session and
  * the thread without its window instead (.lp-phone and .lp-phone-x, below).
  */
 .lp-windows {
   --lp-windows-body: clamp(28rem, 65svh, 36rem);
-  --lp-windows-lead: var(--sp-8);
-  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-5);
   min-width: 0;
-  padding-block: var(--lp-windows-lead) var(--sp-5);
-  padding-inline: var(--sp-5);
 }
 
 .lp-windows-term {
-  position: absolute;
+  position: relative;
+  grid-row: 2;
   z-index: 0;
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  width: min(44%, calc(var(--sp-8) * 7));
+  min-width: 0;
 }
 
-.lp-windows-term .mac-win {
-  height: calc(var(--sp-8) * 3);
+.lp-windows-x .mac-win {
+  block-size: calc(var(--sp-8) * 11);
+}
+
+.lp-windows-term .mac-body {
+  min-block-size: calc(var(--sp-8) * 5);
+}
+
+.lp-windows-term .cc {
+  font-size: var(--fs-body);
+  line-height: var(--lh-mono);
+}
+
+.lp-windows-term .cc-welcome {
+  max-inline-size: 100%;
 }
 
 .lp-windows-reply {
@@ -2465,7 +2476,10 @@
 
 .lp-windows-front {
   position: relative;
+  grid-row: 1;
+  grid-column: 1 / -1;
   z-index: 1;
+  min-width: 0;
 }
 
 
@@ -2482,32 +2496,32 @@
   block-size: var(--lp-windows-body);
 }
 
-/* The thread is a smaller supporting window at the transcript's lower right.
-   Its own body scrolls, so the whole conversation remains available without
-   covering the transcript's title, opening turn or reading controls. */
+/* Both supporting windows keep their full titlebars and usable bodies.
+   Nothing overlaps the transcript or another window's content. */
 .lp-windows-x {
-  position: absolute;
+  position: relative;
+  grid-row: 3;
   z-index: 2;
-  inset-block-end: 0;
-  inset-inline-end: 0;
-  width: min(44%, calc(var(--sp-8) * 7));
+  min-width: 0;
 }
 
 .lp-windows-x .mac-body {
-  max-block-size: calc(var(--sp-8) * 6);
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-/*
- * X lays a thread out in a 600px column; the window is narrower than that. So
- * the thread draws at X's own sizes on a column 1/0.9 times the window's width,
- * then shows at 0.9, as a browser zoomed out a step would, rather than X's
- * full-size type crowded into a narrow window. Phones show it without a window,
- * at full size.
- */
-.lp-windows-x .lp-x {
-  zoom: 0.9;
+@media (min-width: 64rem) {
+  .lp-windows {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lp-windows-term {
+    grid-column: 1;
+  }
+  .lp-windows-x {
+    grid-column: 2;
+    grid-row: 2;
+  }
 }
 
 /* the window last pointed at or focused stands in front of the other two */
@@ -2962,19 +2976,15 @@
 
 /* vision */
 
-/* An open editorial composition: the statement spans the page, with the
-   illustration and the explanation sharing the quieter row underneath. */
+/* The mission reads as one story: a modest proportional lead, its explanation
+   and illustration kept together instead of a detached display banner. */
 .lp-vision-inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  align-items: end;
-  gap: var(--site-head-gap);
+  align-items: center;
+  gap: var(--sp-7);
   padding-block: var(--site-head-gap);
   border-top: var(--bd);
-}
-
-.lp-vision-line {
-  grid-column: 1 / -1;
 }
 
 .lp-vision-scene {
@@ -2988,9 +2998,17 @@
   aspect-ratio: 1;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 64rem) {
   .lp-vision-inner {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+  .lp-vision-scene {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .lp-vision-words {
+    grid-column: 2;
+    grid-row: 1;
   }
 }
 
@@ -3012,14 +3030,13 @@
 }
 
 .lp-vision-line {
+  max-inline-size: 42ch;
   color: var(--ink-strong);
-  font-family: var(--font-display);
-  max-inline-size: 38ch;
-  font-size: var(--site-title-fs);
+  font-family: var(--font-body);
+  font-size: var(--fs-xl);
   font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.4;
-  text-wrap: balance;
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .lp-vision-story {
@@ -3031,8 +3048,8 @@
   text-wrap: pretty;
 }
 
-.lp-vision-story:first-child {
-  margin-block-start: 0;
+.lp-vision-line + .lp-vision-story {
+  margin-block-start: var(--sp-5);
 }
 
 .lp-vision-cta {

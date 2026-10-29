@@ -51,6 +51,8 @@ export type LandingFixture = {
     phoneWidths: number[];
   };
   session: {
+    terminalBodyMin: number;
+    sharedBodyMin: number;
     label: string;
     title: string;
     sessionId: string;

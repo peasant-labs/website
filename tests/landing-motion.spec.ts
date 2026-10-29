@@ -108,7 +108,7 @@ test("the agents drift past under the hero, hold when hovered, and stand still f
   expect(await track.evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
 });
 
-test("the session keeps the transcript dominant and supporting windows inside the page", async ({
+test("the session keeps every window readable with the transcript leading at full width", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -147,6 +147,8 @@ test("the session keeps the transcript dominant and supporting windows inside th
         back: rect(".lp-windows-term"),
         front: rect(".lp-windows-front .mac-win"),
         shared: rect(".lp-windows-x .mac-win"),
+        terminalBody: rect(".lp-windows-term .mac-body"),
+        sharedBody: rect(".lp-windows-x .mac-body"),
         // the filters' strip down the transcript's right edge, where the viewer is wide enough to show it
         strip: group.querySelector(".txn-rail-strip-right")?.getClientRects().length ? rect(".txn-rail-strip-right") : null,
         // back to front: the Terminal, the transcript, the thread
@@ -160,21 +162,21 @@ test("the session keeps the transcript dominant and supporting windows inside th
       };
     });
     const at = `at ${width}`;
-    // behind and up to the left; the transcript wide in front
-    expect(layout.back.left, at).toBeLessThan(layout.front.left);
-    expect(layout.back.top, at).toBeLessThan(layout.front.top);
-    expect(layout.front.width / layout.inner, at).toBeGreaterThan(0.85);
+    // The transcript takes the whole column. Both supporting windows have
+    // their own space below it, without covering its words or each other.
+    expect(layout.front.width / layout.inner, at).toBeGreaterThan(0.98);
     expect(layout.front.right, `the transcript runs past the content ${at}`).toBeLessThanOrEqual(layout.right + 1);
     expect(layout.back.left, `the Terminal runs past the content ${at}`).toBeGreaterThanOrEqual(layout.left - 1);
-    // the thread over the transcript's right side, in front of the Terminal
-    expect(layout.shared.left, at).toBeGreaterThan(layout.front.left + layout.front.width / 3);
-    expect(layout.shared.left, at).toBeLessThan(layout.front.right);
-    expect(layout.shared.right, at).toBeGreaterThan(layout.front.right);
-    // the supporting thread starts near the transcript's end, leaving its opening clear
-    expect(layout.shared.top, at).toBeGreaterThan(layout.front.top + layout.front.height / 3);
-    expect(layout.shared.top, at).toBeLessThan(layout.front.bottom);
-    expect(layout.shared.width / layout.inner, at).toBeLessThan(0.5);
-    expect(layout.back.width / layout.inner, at).toBeLessThan(0.5);
+    expect(layout.back.top, at).toBeGreaterThanOrEqual(layout.front.bottom);
+    expect(layout.shared.top, at).toBeGreaterThanOrEqual(layout.front.bottom);
+    if (width >= 1024) {
+      expect(layout.back.right, at).toBeLessThanOrEqual(layout.shared.left);
+      expect(Math.abs(layout.back.top - layout.shared.top), at).toBeLessThan(1);
+    } else {
+      expect(layout.shared.top, at).toBeGreaterThanOrEqual(layout.back.bottom);
+    }
+    expect(layout.terminalBody.height, at).toBeGreaterThanOrEqual(fixture.session.terminalBodyMin);
+    expect(layout.sharedBody.height, at).toBeGreaterThanOrEqual(fixture.session.sharedBodyMin);
     expect(layout.layers, at).toEqual([...layout.layers].sort((a, b) => a - b));
     expect(new Set(layout.layers).size, at).toBe(3);
     // the filters' strip still shows where the viewer is wide enough for it
@@ -456,6 +458,7 @@ test("the window a pointer moves onto or focus moves into comes to the front, an
   await expect.poll(order).toBe("x");
   // each window comes forward from a part of it that shows, wherever the page's own bar is not over it
   const point = async (selector: string, fx: number, fy: number) => {
+    await windows.locator(selector).scrollIntoViewIfNeeded();
     const box = (await windows.locator(selector).boundingBox())!;
     const [x, y] = [box.x + box.width * fx, box.y + box.height * fy];
     expect(await page.evaluate(([px, py]) => !!document.elementFromPoint(px, py)?.closest(".lp-windows"), [x, y])).toBe(true);
@@ -465,7 +468,7 @@ test("the window a pointer moves onto or focus moves into comes to the front, an
   await expect.poll(order).toBe("term");
   await point(".lp-windows-front", 0.3, 0.6);
   await expect.poll(order).toBe("front");
-  // the filters' strip under the thread's top is the transcript's again, and takes a press
+  // The transcript's reading controls remain unobstructed.
   const strip = windows.locator(".txn-rail-strip-right");
   const box = (await strip.boundingBox())!;
   const hit = await page.evaluate(
@@ -476,7 +479,7 @@ test("the window a pointer moves onto or focus moves into comes to the front, an
   // it stays in front after the pointer leaves the windows
   await page.mouse.move(5, 5);
   await expect.poll(order).toBe("front");
-  // the thread's top right, out past the transcript's edge
+  // The thread stays independently reachable below the transcript.
   await point(".lp-windows-x", 0.95, 0.1);
   await expect.poll(order).toBe("x");
   // keyboard focus brings its window forward too
