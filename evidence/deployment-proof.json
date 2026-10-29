@@ -42,5 +42,20 @@
       "layered_windows": false,
       "mission": false
     }
-  ]
+  ],
+  "publicBrowserVerification": {
+    "url": "https://peasantlabs.org/",
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      1440,
+      390
+    ],
+    "viewerMountWaited": true,
+    "pageErrors": [],
+    "rootOverflow": false,
+    "note": "Desktop composition is verified after its IntersectionObserver mounts the canonical viewer; phone uses the existing native-width session slice."
+  }
 }

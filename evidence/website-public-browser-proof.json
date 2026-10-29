@@ -1,0 +1,20 @@
+[
+  {
+    "theme": "light",
+    "actualTheme": "light",
+    "width": 1440,
+    "scroll": 1440,
+    "composition": true,
+    "title": "peasant: the open-source commons for agent transcripts",
+    "errors": []
+  },
+  {
+    "theme": "dark",
+    "actualTheme": "dark",
+    "width": 1440,
+    "scroll": 1440,
+    "composition": true,
+    "title": "peasant: the open-source commons for agent transcripts",
+    "errors": []
+  }
+]
