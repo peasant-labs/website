@@ -19,6 +19,7 @@ const frame = parse(readFileSync(resolve("testdata/docs/frame.yaml"), "utf8")) a
 const search = parse(readFileSync(resolve("testdata/docs/search.yaml"), "utf8")) as SearchFixture;
 const landing = parse(readFileSync(resolve("testdata/landing/landing.yaml"), "utf8")) as {
   posts: Array<{ slug: string }>;
+  docsNavigation: string[];
   docsShortcuts: string[];
 };
 
@@ -195,12 +196,14 @@ test("on a phone, closing search gives focus to a control the reader can see", a
   await context.close();
 });
 
-test("the docs sidebar leads with search and the switcher, which offers no other app", async ({ page }) => {
+test("the docs sidebar puts pages first and search near the footer without community", async ({ page }) => {
   await page.goto("/docs");
   const sidebar = page.getByRole("complementary", { name: "docs" });
   const groups = sidebar.locator(".asb-scroll nav");
-  await expect(groups.first()).toHaveAttribute("aria-label", "shortcuts");
-  const labels = await groups.first().locator(".asb-label").allTextContents();
+  expect(await groups.evaluateAll((items) => items.map((item) => item.getAttribute("aria-label")))).toEqual(landing.docsNavigation);
+  const shortcuts = sidebar.getByRole("navigation", { name: "shortcuts" });
+  const labels = await shortcuts.locator(".asb-label").allTextContents();
   expect(labels.map((label) => label.trim())).toEqual(landing.docsShortcuts);
+  await expect(sidebar.getByText("community", { exact: true })).toHaveCount(0);
   await expect(sidebar.locator('a[href*="village.peasantlabs.org"]:not(.asb-account), a[href*="localhost:8690"]')).toHaveCount(0);
 });

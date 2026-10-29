@@ -1022,7 +1022,7 @@ test("every section opens on its title alone on a row, in one style at one edge,
   }
 });
 
-test("the vision stands on its own grounded panel, and the landing ends on a calm split call to action", async ({
+test("the mission keeps a readable proportional lead with its explanation and illustration", async ({
   page,
 }) => {
   for (const width of [1440, 1280, 390]) {
@@ -1056,37 +1056,40 @@ test("the vision stands on its own grounded panel, and the landing ends on a cal
         return [...rows.values()].at(-1)!.trim();
       });
       return {
-        surface: style.backgroundColor !== getComputedStyle(document.body).backgroundColor,
+        open: style.backgroundColor === "rgba(0, 0, 0, 0)" && style.borderRightWidth === "0px",
         border: style.borderTopWidth,
         // no rule runs under the picture
         rule: getComputedStyle(element.querySelector(".lp-vision-art")!, "::after").content,
         beside: art.right <= words.left + 1,
-        // side by side, both are centred on the panel's height
-        centred: Math.abs(art.top + art.height / 2 - (words.top + words.height / 2)) < 2,
+        // side by side, the illustration and explanation share a baseline
+        aligned: Math.abs((art.top + art.bottom) / 2 - (words.top + words.bottom) / 2) < 2,
+        statementLeads: line.parentElement === element.querySelector(".lp-vision-words"),
         // stacked, the picture's left edge is the words' left edge
-        stackedEdge: Math.abs(art.left - words.left) < 2 && art.bottom <= words.top,
+        stackedEdge: Math.abs(art.left - words.left) < 2 && words.bottom <= art.top,
         evenPadding: Math.abs(parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)) < 1,
-        lineFace: getComputedStyle(line).fontFamily === getComputedStyle(title).fontFamily,
-        lineSmaller: parseFloat(getComputedStyle(line).fontSize) < parseFloat(getComputedStyle(title).fontSize),
+        lineFace: getComputedStyle(line).fontFamily === getComputedStyle(element.querySelector(".lp-vision-story")!).fontFamily,
+        lineScale: parseFloat(getComputedStyle(line).fontSize) <= 28,
+        readableLeading: parseFloat(getComputedStyle(line).lineHeight) / parseFloat(getComputedStyle(line).fontSize),
         filledCta: cta.classList.contains("btn-primary"),
         lastLines,
         art: { width: art.width, height: art.height },
       };
     });
-    expect(layout.surface && layout.border === "1px", `the vision has no panel at ${width}`).toBe(true);
+    expect(layout.open && layout.border === "1px", `the vision is not an open section at ${width}`).toBe(true);
+    expect(layout.statementLeads, `the statement does not lead at ${width}`).toBe(true);
     expect(layout.rule === "none" || layout.rule === "normal", `a rule runs under the picture at ${width}`).toBe(true);
-    if (width >= 1280) expect(layout.beside && layout.centred, `the vision is not a centred split at ${width}`).toBe(true);
-    else expect(layout.stackedEdge, `the picture does not sit on the words' edge at ${width}`).toBe(true);
+    if (width >= 1280) expect(layout.beside && layout.aligned, `the illustration and explanation are detached at ${width}`).toBe(true);
+    else expect(layout.stackedEdge, `the picture does not follow the story at ${width}`).toBe(true);
     expect(layout.evenPadding, `the vision's padding is uneven at ${width}`).toBe(true);
-    expect(layout.lineFace && layout.lineSmaller, `the lead line is not one step under the section titles at ${width}`).toBe(true);
+    expect(layout.lineFace && layout.lineScale, `the lead does not use a readable proportional scale at ${width}`).toBe(true);
+    expect(layout.readableLeading, `the lead is cramped at ${width}`).toBeGreaterThanOrEqual(1.5);
     expect(layout.filledCta, "the vision's button is filled amber").toBe(false);
     for (const line of layout.lastLines) {
       expect(line, `a paragraph leaves one word alone on its last line at ${width}`).toContain(" ");
     }
-    // the picture is a square, 440px beside the words and no wider than that when stacked
+    // the picture keeps its square ratio and its supporting size
     expect(Math.abs(layout.art.width - layout.art.height), `the picture is not square at ${width}`).toBeLessThan(1);
-    if (width >= 1280) expect(layout.art.width).toBe(440);
-    else expect(layout.art.width).toBeLessThanOrEqual(440);
+    expect(layout.art.width).toBeLessThanOrEqual(fixture.vision.artMax);
   }
   await page.setViewportSize({ width: 1440, height: 900 });
 
@@ -1940,6 +1943,30 @@ test("a keyboard user's focus in the transcript is never hidden under the thread
       expect(focus.hidden, `at ${width}, after ${press + 1} presses, ${focus.name}`).toBe(false);
     }
     expect(reached, `focus stayed in the transcript at ${width}`).toBeGreaterThan(20);
+  }
+});
+
+test("the shared thread can be reached and scrolled by keyboard", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of fixture.session.windows.widths) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const windows = page.locator("#session .lp-windows");
+    const body = windows.getByRole("region", { name: fixture.thread.label });
+    await body.scrollIntoViewIfNeeded();
+    await expect(windows).toHaveAttribute("data-fanned", "true");
+    await expect(windows.locator(".txn-app")).toBeVisible();
+    await body.focus();
+    await page.keyboard.press("Shift+Tab");
+    await expect(body).not.toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(body).toBeFocused();
+    await expect(windows).toHaveAttribute("data-front", "x");
+    await page.keyboard.press("End");
+    await expect.poll(() => body.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+    await expect.poll(() => body.evaluate((element) => element.scrollTop + element.clientHeight)).toBeGreaterThanOrEqual(
+      await body.evaluate((element) => element.scrollHeight - 1),
+    );
   }
 });
 

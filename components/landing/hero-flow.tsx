@@ -16,7 +16,7 @@ import { memo, useEffect, useRef, useState, type ReactNode } from "react";
  * amber block while it is still on the computer; the card lifts out of the
  * laptop, glides over to the commons, is stamped as it is published, and
  * slides down onto the shared stack, which eases down a notch to make room
- * while one of the peasants standing at it lifts an amber basket. Its
+ * beside three grounded peasants, one carrying an amber basket. Its
  * accessible name tells the same story.
  *
  * Every card makes the same journey, one cycle after the last, so the loop
@@ -1023,13 +1023,15 @@ const Scene = memo(function Scene({ layout }: { layout: Layout }) {
       <Face points={keys} light="shade" />
       <Box x={lid[0]} y={lid[1]} w={lid[2]} h={lid[3]} depth={1} front="mid" top="mid" side="deep" />
       <Face points={corners(...display)} light="lit" />
-      {commons.map(({ member, x: mx }) =>
-        "sheaf" in member ? (
-          <Sheaf key={mx} plan={member.sheaf} x={mx} ground={field} />
-        ) : (
-          <Peasant key={mx} figure={member.figure} x={mx} ground={field} lit={member.noticed === true} />
-        ),
-      )}
+      <g className="hf-commons">
+        {commons.map(({ member, x: mx }) =>
+          "sheaf" in member ? (
+            <Sheaf key={mx} plan={member.sheaf} x={mx} ground={field} />
+          ) : (
+            <Peasant key={mx} figure={member.figure} x={mx} ground={field} lit={member.noticed === true} />
+          ),
+        )}
+      </g>
     </svg>
   );
 });

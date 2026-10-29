@@ -135,7 +135,7 @@ export function XThread({ className, chrome = true }: { className?: string; chro
   );
   if (!chrome) return thread;
   return (
-    <SafariWindow className={`lp-x-win${className ? ` ${className}` : ""}`} favicon={<PLogo />}>
+    <SafariWindow className={`lp-x-win${className ? ` ${className}` : ""}`} favicon={<PLogo />} scrollLabel={THREAD.label}>
       {thread}
     </SafariWindow>
   );

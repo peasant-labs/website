@@ -15,20 +15,14 @@ const ANSWER_TEXT = String(ANSWER?.content ?? "").replace(/<thinking>[\s\S]*?<\/
 type Window = "term" | "front" | "x";
 
 /**
- * One session in three windows: behind and up to the left, Claude Code in
- * Terminal, where it was recorded; in front and wide, the published transcript
- * a reviewer reads (passed in); over its right side, the thread on X where its
- * author shared the link. Recorded, read, shared. From a tablet's width only: a
- * phone shows a slice of the session and the thread without windows instead.
+ * One session in a layered desktop scene: its recording up to the left,
+ * the published transcript leading in the centre, and the shared link over
+ * its lower-right corner. Every support window exposes its title and context.
+ * A phone keeps the existing transcript slice and thread without window chrome.
  *
- * The window a pointer moves onto, or keyboard focus moves into, comes to the
- * front and stays there until another one is chosen, as on a desktop. So focus
- * is never hidden under another window.
- *
- * They fan out from one stack the first time the group comes into view; only
- * transform and opacity move. Without motion they are simply where they end.
- * The Terminal repeats what the transcript already says, so it is hidden from
- * assistive technology; the thread is read as a short group.
+ * Pointer entry or keyboard focus raises that window without changing its
+ * size or opacity. The supports fan out once, with no hidden initial state.
+ * The Terminal repeats the transcript, so it is decorative for screen readers.
  */
 export function SessionWindows({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);

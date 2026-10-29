@@ -77,7 +77,8 @@
 /* the agents peasant reads, drifting under the hero and fading out at both edges */
 .lp-agents {
   overflow: hidden;
-  padding-block: var(--sp-4);
+  padding-block: var(--sp-6);
+  border-block: var(--bd);
   mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
 }
 
@@ -149,7 +150,7 @@
 /* hero */
 
 .lp-hero {
-  padding-block: var(--site-sec-y);
+  padding-block: var(--site-sec-y) var(--sp-7);
 }
 
 .lp-hero-inner {
@@ -2429,120 +2430,116 @@
 /* a published session */
 
 /*
- * Three windows, layered back to front: Claude Code behind and up to the left,
- * the transcript in front and wide, and the thread on X over the transcript's
- * right side. The one last pointed at or focused comes to the front
- * (data-front, components/landing/session-windows.tsx).
+ * The transcript leads the layered scene. Claude Code exposes its context
+ * above the left edge; the shared thread extends beyond the lower-right.
+ * The one last pointed at or focused stands in front (data-front).
  * From a tablet's width only: a phone shows a short slice of the session and
  * the thread without its window instead (.lp-phone and .lp-phone-x, below).
  */
 .lp-windows {
-  --lp-windows-x: clamp(1rem, 6vw, 5rem);
-  /* how far the thread stands out past the transcript's right edge */
-  --lp-windows-x-end: clamp(1rem, 4vw, 3.5rem);
-  /* the transcript window's body: one height whatever it shows (.lp-session-win, below) */
-  --lp-windows-body: clamp(32rem, 78svh, 48rem);
-  /* how far the transcript stands below the Terminal behind it */
-  --lp-windows-lead: clamp(2.5rem, 6vw, 4.5rem);
-  /* how far up the transcript the thread over its right side reaches: its top halfway between the Terminal's and the transcript's */
-  --lp-windows-x-overlap: calc(var(--lp-windows-body) + var(--lp-windows-chrome) + var(--lp-windows-lead) / 2);
-  /* the browser window's title bar above its body (components/mac.tsx) */
-  --lp-windows-chrome: 52px;
-
+  --lp-windows-body: clamp(28rem, 65svh, 36rem);
+  --lp-windows-reveal: calc(var(--sp-8) * 3);
+  --lp-windows-overlap: calc(var(--sp-6) * 3);
+  --lp-windows-social-h: calc(var(--sp-8) * 8);
   position: relative;
+  isolation: isolate;
   min-width: 0;
-  padding-block-start: var(--lp-windows-lead);
-  padding-inline: var(--lp-windows-x) var(--lp-windows-x-end);
+  padding-block: var(--lp-windows-reveal) calc(var(--lp-windows-social-h) - var(--lp-windows-overlap));
+  padding-inline: var(--sp-5) var(--sp-6);
 }
 
+/* The recording is visible above the transcript: titlebar, command and
+   welcome. Its lower portion sits behind the main window until raised. */
 .lp-windows-term {
   position: absolute;
   z-index: 0;
   inset-block-start: 0;
   inset-inline-start: 0;
-  width: min(80%, 34rem);
+  width: min(56%, calc(var(--sp-8) * 8));
+  min-width: 0;
 }
-
 .lp-windows-term .mac-win {
-  height: clamp(12rem, 26vw, 22rem);
+  block-size: calc(var(--sp-8) * 5);
 }
-
+.lp-windows-term .mac-body {
+  container: session-terminal / inline-size;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.lp-windows-term .cc {
+  grid-template-columns: minmax(0, 1fr);
+  min-inline-size: 0;
+  block-size: auto;
+  min-block-size: 100%;
+  font-size: var(--fs-body);
+  line-height: var(--lh-mono);
+}
+.lp-windows-term .cc > * {
+  min-inline-size: 0;
+}
+.lp-windows-term .cc-welcome {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 52ch;
+  padding: var(--sp-2) var(--sp-3);
+}
+@container session-terminal (max-width: 26rem) {
+  .lp-windows-term .cc {
+    padding: var(--sp-2);
+  }
+  .lp-windows-term .cc-welcome {
+    padding: var(--sp-2);
+  }
+  .lp-windows-term .cc-welcome .cc-dim {
+    padding-inline-start: 0;
+  }
+}
 .lp-windows-reply {
   grid-template-columns: 2ch minmax(0, 1fr);
   padding-inline-start: 0;
 }
 
+/* The published transcript is the large, stable reading window. */
 .lp-windows-front {
   position: relative;
   z-index: 1;
+  min-width: 0;
 }
-
-
-
-
-/*
- * The transcript browser sits in a browser window that keeps one height
- * whatever it shows: switching tabs or opening a turn scrolls inside the
- * viewer's own columns, never moving the page under the reader. svh, so a
- * phone's toolbars never resize it.
- */
 .lp-session-win .mac-body {
   flex: none;
   block-size: var(--lp-windows-body);
 }
 
-/*
- * The thread on X stands over the transcript's right side: its top halfway
- * between the Terminal's and the transcript's, its right edge out past the
- * transcript's on the column's edge, the rest of it below. Hovering or focusing the transcript
- * brings it back in front, filters and all. It is in the flow, so the section
- * makes room for however tall it draws.
- */
+/* The shared link stands beyond the transcript's lower-right corner.
+   Only the bottom strip overlaps; its title and opening turn stay clear. */
 .lp-windows-x {
-  position: relative;
+  position: absolute;
   z-index: 2;
-  /* at a tablet's width it takes more of the row, so the card it carries still reads */
-  width: min(30rem, 60%);
-  margin-block-start: calc(-1 * var(--lp-windows-x-overlap));
-  margin-inline: auto calc(-1 * var(--lp-windows-x-end));
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  width: min(54%, calc(var(--sp-8) * 8));
+  min-width: 0;
+}
+.lp-windows-x .mac-win {
+  block-size: var(--lp-windows-social-h);
+}
+.lp-windows-x .mac-body {
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (min-width: 64rem) {
+  .lp-windows {
+    padding-inline: var(--sp-8) calc(var(--sp-8) * 2);
+  }
 }
 
-/*
- * X lays a thread out in a 600px column; the window is narrower than that. So
- * the thread draws at X's own sizes on a column 1/0.9 times the window's width,
- * then shows at 0.9, as a browser zoomed out a step would, rather than X's
- * full-size type crowded into a narrow window. Phones show it without a window,
- * at full size.
- */
-.lp-windows-x .lp-x {
-  zoom: 0.9;
-}
-
-/* the window last pointed at or focused stands in front of the other two */
+/* Raising a window changes only its layer: no flicker, fade or resize. */
 .lp-windows[data-front="term"] > .lp-windows-term,
 .lp-windows[data-front="front"] > .lp-windows-front,
 .lp-windows[data-front="x"] > .lp-windows-x {
   z-index: 3;
-}
-
-/*
- * It rises into place rather than snapping there: from a little below and a
- * little faint, on the same spring the windows fan out on. The animation
- * starts each time a window becomes the one in front.
- */
-@keyframes lp-window-raise {
-  from {
-    opacity: 0.55;
-    transform: translate3d(0, 0.75rem, 0) scale(0.985);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .lp-windows[data-front="term"] > .lp-windows-term,
-  .lp-windows[data-front="front"] > .lp-windows-front,
-  .lp-windows[data-front="x"] > .lp-windows-x {
-    animation: lp-window-raise 600ms var(--ease-spring);
-  }
 }
 
 /*
@@ -2640,27 +2637,17 @@
   max-inline-size: none;
 }
 
-/* the first time they come into view, the back window and the thread fan out from behind the front one */
+/* A short fan-out once, from an already readable, fully opaque default. */
 @media (prefers-reduced-motion: no-preference) {
   .lp-windows-term,
   .lp-windows-x {
-    transition:
-      transform 1000ms var(--ease-spring),
-      opacity 600ms var(--ease-out);
+    transition: transform var(--dur-3) var(--ease-out);
   }
-
-  .lp-windows-x {
-    transition-delay: 120ms;
-  }
-
   .js-reveal .lp-windows[data-fanned="false"] .lp-windows-term {
-    opacity: 0;
-    transform: translate3d(18%, 2.5rem, 0) scale(0.94);
+    transform: translate3d(var(--sp-4), var(--sp-3), 0);
   }
-
   .js-reveal .lp-windows[data-fanned="false"] .lp-windows-x {
-    opacity: 0;
-    transform: translate3d(-14%, -2.5rem, 0) scale(0.94);
+    transform: translate3d(calc(-1 * var(--sp-4)), calc(-1 * var(--sp-3)), 0);
   }
 }
 
@@ -2675,12 +2662,20 @@
   background: #000000;
 }
 
+.lp-x-win .mac-body:focus-visible {
+  outline: var(--focus-ring-width) solid var(--lp-x-ink);
+  outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+.lp-x-win .mac-body,
 .lp-x {
   --lp-x-ink: #e7e9ea;
   --lp-x-ink-2: #71767b;
   --lp-x-rule: #2f3336;
   --lp-x-line: #333639;
+}
 
+.lp-x {
   background: #000000;
   color: var(--lp-x-ink);
   font-family: var(--mac-font);
@@ -2970,46 +2965,40 @@
 
 /* vision */
 
-/*
- * The statement's own panel, at the content's width: the picture on the left,
- * the words on the right, both centred on the panel's height. The section
- * carries the room around the panel; the panel's own padding is smaller and
- * even. A phone stacks them, the picture first, its left edge on the words'
- * edge. The picture carries its own ground in its contact shadows; no rule
- * runs under it, and nothing it draws leaves its box.
- */
+/* The mission reads as one story: a modest proportional lead, its explanation
+   and illustration kept together instead of a detached display banner. */
 .lp-vision-inner {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  gap: var(--sp-6) var(--site-head-gap);
-  padding: clamp(var(--sp-6), 5vw, calc(var(--sp-8) + var(--sp-5)));
-  border: var(--bd);
-  background: var(--surface-2);
-}
-
-/* side by side from 72rem: the picture at its drawn size, 440px square, and the words in the rest */
-@media (min-width: 72rem) {
-  .lp-vision-inner {
-    grid-template-columns: 440px minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 47.99rem) {
-  .lp-vision-inner {
-    padding: var(--sp-6) var(--sp-5);
-  }
+  gap: var(--sp-7);
+  padding-block: var(--site-head-gap);
+  border-top: var(--bd);
 }
 
 .lp-vision-scene {
   min-width: 0;
 }
 
-/* drawn at twice 440 square; it shows at that size, and only shrinks when its column is narrower */
 .lp-vision-art {
   display: block;
   width: 100%;
-  max-width: 440px;
+  max-width: calc(var(--sp-8) * 7);
   aspect-ratio: 1;
+}
+
+@media (min-width: 64rem) {
+  .lp-vision-inner {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+  .lp-vision-scene {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .lp-vision-words {
+    grid-column: 2;
+    grid-row: 1;
+  }
 }
 
 .lp-vision-art .art-img {
@@ -3018,7 +3007,7 @@
   object-fit: contain;
 }
 
-/* the words: the lead line in the section titles' face one step down, then why, then the way to the rest */
+/* The explanation keeps a comfortable reading measure beneath the statement. */
 .lp-vision-words {
   display: grid;
   justify-items: start;
@@ -3030,17 +3019,17 @@
 }
 
 .lp-vision-line {
+  max-inline-size: 42ch;
   color: var(--ink-strong);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--fs-xl);
   font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-  text-wrap: balance;
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .lp-vision-story {
-  margin-block-start: var(--sp-4);
+  margin-block-start: var(--sp-5);
   color: var(--ink-2);
   font-family: var(--font-body);
   font-size: var(--fs-md);
@@ -3056,11 +3045,6 @@
   margin-block-start: var(--sp-6);
 }
 
-@media (max-width: 47.99rem) {
-  .lp-vision-line {
-    font-size: var(--fs-lg);
-  }
-}
 
 /*
  * The landing ends on a calm split inside the content width: its line at the

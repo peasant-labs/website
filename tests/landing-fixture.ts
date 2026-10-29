@@ -16,7 +16,7 @@ export type LandingFixture = {
     lede: string;
     pillars: string[];
     tagRows: Array<{ width: number; rows: number[] }>;
-    flow: { agents: string[] };
+    flow: { agents: string[]; groundedFrames: number[]; layouts: Array<{ width: number; colorScheme: "light" | "dark" }> };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };
@@ -51,6 +51,10 @@ export type LandingFixture = {
     phoneWidths: number[];
   };
   session: {
+    windows: { widths: number[]; frontMinRatio: number; frontMaxRatio: number; terminalExposedMin: number; socialOverlapMax: number };
+    terminalBodyMin: number;
+    terminalTextMin: number;
+    sharedBodyMin: number;
     label: string;
     title: string;
     sessionId: string;
@@ -81,7 +85,7 @@ export type LandingFixture = {
     from: string;
     phone: { postText: number; cardPrompt: number; promptWord: string };
   };
-  vision: { line: string; story: string[]; cta: Link };
+  vision: { line: string; story: string[]; cta: Link; artMax: number };
   docsNav: Link[];
   posts: Array<{ slug: string; title: string }>;
 };

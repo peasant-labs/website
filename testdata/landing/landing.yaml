@@ -38,6 +38,13 @@ hero:
   # the picture under the buttons shows no words; its accessible name names the agents peasant reads
   flow:
     agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
+    # The people stay planted through every stage of the card journey.
+    groundedFrames: [0, 2400, 3000, 3500, 4300]
+    layouts:
+      - { width: 390, colorScheme: light }
+      - { width: 390, colorScheme: dark }
+      - { width: 1440, colorScheme: light }
+      - { width: 1440, colorScheme: dark }
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
 # the band under the hero: the harnesses peasant reads, each led by its mark
@@ -148,6 +155,15 @@ install:
   # the phone widths where each command keeps to one line and scrolls sideways
   phoneWidths: [390, 360, 320]
 session:
+  windows:
+    widths: [1440, 1024, 768]
+    frontMinRatio: 0.8
+    frontMaxRatio: 0.95
+    terminalExposedMin: 144
+    socialOverlapMax: 112
+  terminalBodyMin: 240
+  terminalTextMin: 16
+  sharedBodyMin: 380
   label: a sample session
   # the viewer names the sample by this short title; its id is shown nowhere
   title: rewrite billing retries
@@ -204,6 +220,7 @@ thread:
   phone: { postText: 12, cardPrompt: 11, promptWord: hey }
 # the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:
+  artMax: 392
   line: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.
   story:
     - "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's capital."
@@ -214,8 +231,8 @@ docsNav:
   - { label: agent evals, href: /docs/guides/evals }
   - { label: pr reviews, href: /docs/guides/reviews }
   - { label: blog, href: /blog }
-# the docs sidebar's shortcuts, above its pages: search, then the switcher, which lists no other app,
-# only what is coming (the account row reaches online)
-docsShortcuts: [search, community]
+# Pages lead; search sits near the account footer. The docs app has no other app in its switcher.
+docsNavigation: [docs pages, guides, more, shortcuts]
+docsShortcuts: [search]
 posts:
   - { slug: reclaiming-data-autonomy-as-a-peasant, title: Reclaiming Data Autonomy as a Peasant }

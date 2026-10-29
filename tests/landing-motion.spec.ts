@@ -108,79 +108,61 @@ test("the agents drift past under the hero, hold when hovered, and stand still f
   expect(await track.evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
 });
 
-test("the session's four windows fan out from one stack once, the transcript wide in front, all inside the page", async ({
-  page,
-}) => {
+test("the desktop collage exposes its supporting windows without covering the transcript's opening", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const windows = page.locator(".lp-windows");
   const back = windows.locator(".lp-windows-term");
   const shared = windows.locator(".lp-windows-x");
   await expect(windows).toHaveAttribute("data-fanned", "false");
-  expect(await back.evaluate((element) => getComputedStyle(element).opacity)).toBe("0");
-  expect(await shared.evaluate((element) => getComputedStyle(element).opacity)).toBe("0");
-
+  for (const item of [back, shared]) {
+    expect(await item.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
+  }
   await windows.scrollIntoViewIfNeeded();
   await expect(windows).toHaveAttribute("data-fanned", "true");
   await expect(windows.locator(".txn-app")).toBeVisible();
-  await expect
-    .poll(() => back.evaluate((element) => getComputedStyle(element).transform))
-    .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
-  await expect
-    .poll(() => shared.evaluate((element) => getComputedStyle(element).transform))
-    .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
-  // only transform and opacity move
-  expect(await shared.evaluate((element) => getComputedStyle(element).transitionProperty)).toBe("transform, opacity");
+  await expect.poll(() => back.evaluate((element) => getComputedStyle(element).transform)).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+  await expect.poll(() => shared.evaluate((element) => getComputedStyle(element).transform)).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+  expect(await shared.evaluate((element) => getComputedStyle(element).transitionProperty)).toBe("transform");
 
-  // the windows stand from a tablet's width; a phone shows the session's slice instead (its own test)
-  for (const width of [1440, 768]) {
+  for (const width of fixture.session.windows.widths) {
     await page.setViewportSize({ width, height: 900 });
-    // one thread, in its window; the phone's copy without one stays hidden
     await expect(page.locator("#session [data-x-thread]").filter({ visible: true }), `at ${width}`).toHaveCount(1);
     const layout = await windows.evaluate((group) => {
       const rect = (selector: string) => group.querySelector(selector)!.getBoundingClientRect();
-      const column = group.parentElement!;
-      const style = getComputedStyle(column);
-      const left = column.getBoundingClientRect().left + parseFloat(style.paddingLeft);
-      const inner = column.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const box = group.getBoundingClientRect();
       return {
-        back: rect(".lp-windows-term"),
-        front: rect(".lp-windows-front .mac-win"),
-        shared: rect(".lp-windows-x .mac-win"),
-        // the filters' strip down the transcript's right edge, where the viewer is wide enough to show it
-        strip: group.querySelector(".txn-rail-strip-right")?.getClientRects().length ? rect(".txn-rail-strip-right") : null,
-        // back to front: the Terminal, the transcript, the thread
-        layers: [".lp-windows-term", ".lp-windows-front", ".lp-windows-x"].map((selector) =>
-          Number(getComputedStyle(group.querySelector(selector)!).zIndex),
-        ),
-        left,
-        right: left + inner,
-        inner,
+        back: rect(".lp-windows-term"), front: rect(".lp-windows-front .mac-win"), shared: rect(".lp-windows-x .mac-win"),
+        terminalBody: rect(".lp-windows-term .mac-body"),
+        terminalOverflow: [...group.querySelectorAll(".lp-windows-term :is(.mac-body, .cc, .cc-welcome)")].map((element) => element.scrollWidth - element.clientWidth),
+        terminalWelcome: rect(".lp-windows-term .cc-welcome"),
+        terminalText: parseFloat(getComputedStyle(group.querySelector(".lp-windows-term .cc")!).fontSize),
+        sharedBody: rect(".lp-windows-x .mac-body"),
+        title: rect(".lp-windows-front .txn-title"),
+        left: box.left, right: box.right, inner: box.width,
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       };
     });
     const at = `at ${width}`;
-    // behind and up to the left; the transcript wide in front
-    expect(layout.back.left, at).toBeLessThan(layout.front.left);
-    expect(layout.back.top, at).toBeLessThan(layout.front.top);
-    expect(layout.front.width / layout.inner, at).toBeGreaterThan(0.85);
-    expect(layout.front.right, `the transcript runs past the content ${at}`).toBeLessThanOrEqual(layout.right + 1);
-    expect(layout.back.left, `the Terminal runs past the content ${at}`).toBeGreaterThanOrEqual(layout.left - 1);
-    // the thread over the transcript's right side, in front of the Terminal
-    expect(layout.shared.left, at).toBeGreaterThan(layout.front.left + layout.front.width / 3);
-    expect(layout.shared.left, at).toBeLessThan(layout.front.right);
+    expect(layout.front.width / layout.inner, at).toBeGreaterThan(fixture.session.windows.frontMinRatio);
+    expect(layout.front.width / layout.inner, at).toBeLessThan(fixture.session.windows.frontMaxRatio);
+    expect(layout.front.right, at).toBeLessThanOrEqual(layout.right + 1);
+    expect(layout.back.left, at).toBeGreaterThanOrEqual(layout.left - 1);
+    expect(layout.front.top - layout.back.top, `the terminal's context stays exposed ${at}`).toBeGreaterThanOrEqual(fixture.session.windows.terminalExposedMin);
+    expect(layout.back.bottom, `the terminal is layered behind the transcript ${at}`).toBeGreaterThan(layout.front.top);
+    expect(layout.front.bottom - layout.shared.top, `the social window has a limited overlap ${at}`).toBeGreaterThan(0);
+    expect(layout.front.bottom - layout.shared.top, at).toBeLessThanOrEqual(fixture.session.windows.socialOverlapMax);
+    expect(layout.shared.top, `the social window leaves the transcript title clear ${at}`).toBeGreaterThan(layout.title.bottom);
     expect(layout.shared.right, at).toBeGreaterThan(layout.front.right);
-    // its top halfway between the Terminal's and the transcript's
-    expect(Math.abs(layout.shared.top - (layout.back.top + layout.front.top) / 2), at).toBeLessThan(8);
-    expect(layout.layers, at).toEqual([...layout.layers].sort((a, b) => a - b));
-    expect(new Set(layout.layers).size, at).toBe(3);
-    // the filters' strip still shows where the viewer is wide enough for it
-    if (width >= 1024) expect(layout.strip, `the filters' strip ${at}`).not.toBeNull();
-    expect(layout.shared.right, `the thread runs past the content ${at}`).toBeLessThanOrEqual(layout.right + 1);
-    expect(layout.overflow, `the page overflows ${at}`).toBe(false);
+    expect(layout.shared.right, at).toBeLessThanOrEqual(layout.right + 1);
+    expect(layout.terminalBody.height, at).toBeGreaterThanOrEqual(fixture.session.terminalBodyMin);
+    for (const overflow of layout.terminalOverflow) expect(overflow, `the terminal content fits its window ${at}`).toBeLessThanOrEqual(1);
+    expect(layout.terminalWelcome.right, at).toBeLessThanOrEqual(layout.terminalBody.right);
+    expect(layout.terminalText, at).toBeGreaterThanOrEqual(fixture.session.terminalTextMin);
+    expect(layout.sharedBody.height, at).toBeGreaterThanOrEqual(fixture.session.sharedBodyMin);
+    expect(layout.overflow, at).toBe(false);
   }
 
-  // without motion all four stand where they end, before the group is ever scrolled to
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(windows).toHaveAttribute("data-fanned", "false");
@@ -366,7 +348,8 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   const card = flow.locator(".hf-card").first();
   const running = () => card.evaluate((element) => element.getAnimations().map((animation) => animation.playState));
 
-  for (const width of [390, 1440]) {
+  for (const { width, colorScheme } of fixture.hero.flow.layouts) {
+    await page.emulateMedia({ colorScheme });
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     for (const agent of fixture.hero.flow.agents) {
@@ -376,6 +359,16 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
     await expect(picture.locator(".hf-card").first()).toBeVisible();
     expect((await picture.innerText()).trim()).toBe("");
     await expect(panel.getByRole("button")).toHaveCount(0);
+    await flow.scrollIntoViewIfNeeded();
+    await expect(page.locator(".lp-hero-flow")).toHaveCSS("opacity", "1");
+    const people = flow.locator(".hf-art:visible .hf-commons");
+    const grounded = await people.boundingBox();
+    for (const frame of fixture.hero.flow.groundedFrames) {
+      await flow.evaluate((element, time) => {
+        for (const animation of element.getAnimations({ subtree: true })) animation.currentTime = time;
+      }, frame);
+      expect(await people.boundingBox(), `the people remain grounded at ${width}, ${colorScheme}, ${frame}ms`).toEqual(grounded);
+    }
     // the picture holds its height from the first paint: nothing below it moves
     const layout = () =>
       flow.evaluate((root) => ({
@@ -399,6 +392,7 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   }
 
   expect(await running()).toEqual(["running"]);
+  expect(await flow.locator(".hf-wide .hf-commons").evaluate((element) => element.getAnimations())).toEqual([]);
   // scroll first: a scroll lets a hold go, and hover() would otherwise scroll after moving the pointer
   await flow.scrollIntoViewIfNeeded();
   await page.waitForTimeout(300);
@@ -426,6 +420,7 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   expect(await running()).toEqual([]);
+  expect(await flow.locator(".hf-wide .hf-commons").evaluate((element) => element.getAnimations())).toEqual([]);
   await expect(card).toHaveCSS("opacity", "1");
 });
 
@@ -451,16 +446,17 @@ test("the window a pointer moves onto or focus moves into comes to the front, an
   await expect.poll(order).toBe("x");
   // each window comes forward from a part of it that shows, wherever the page's own bar is not over it
   const point = async (selector: string, fx: number, fy: number) => {
+    await windows.locator(selector).scrollIntoViewIfNeeded();
     const box = (await windows.locator(selector).boundingBox())!;
     const [x, y] = [box.x + box.width * fx, box.y + box.height * fy];
     expect(await page.evaluate(([px, py]) => !!document.elementFromPoint(px, py)?.closest(".lp-windows"), [x, y])).toBe(true);
     await page.mouse.move(x, y);
   };
-  await point(".lp-windows-term", 0.06, 0.6);
+  await point(".lp-windows-term", 0.3, 0.15);
   await expect.poll(order).toBe("term");
   await point(".lp-windows-front", 0.3, 0.6);
   await expect.poll(order).toBe("front");
-  // the filters' strip under the thread's top is the transcript's again, and takes a press
+  // The transcript's reading controls remain unobstructed.
   const strip = windows.locator(".txn-rail-strip-right");
   const box = (await strip.boundingBox())!;
   const hit = await page.evaluate(
@@ -471,7 +467,7 @@ test("the window a pointer moves onto or focus moves into comes to the front, an
   // it stays in front after the pointer leaves the windows
   await page.mouse.move(5, 5);
   await expect.poll(order).toBe("front");
-  // the thread's top right, out past the transcript's edge
+  // The thread stays independently reachable below the transcript.
   await point(".lp-windows-x", 0.95, 0.1);
   await expect.poll(order).toBe("x");
   // keyboard focus brings its window forward too
