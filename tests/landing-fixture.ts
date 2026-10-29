@@ -51,6 +51,7 @@ export type LandingFixture = {
     phoneWidths: number[];
   };
   session: {
+    windows: { widths: number[]; frontMinRatio: number; frontMaxRatio: number; terminalExposedMin: number; socialOverlapMax: number };
     terminalBodyMin: number;
     sharedBodyMin: number;
     label: string;

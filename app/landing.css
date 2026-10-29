@@ -2430,125 +2430,94 @@
 /* a published session */
 
 /*
- * The transcript leads at full width. Claude Code and the shared thread sit
- * below it with their contents visible, side by side when space allows.
- * The one last pointed at or focused is marked as the active window
- * (data-front, components/landing/session-windows.tsx).
+ * The transcript leads the layered scene. Claude Code exposes its context
+ * above the left edge; the shared thread extends beyond the lower-right.
+ * The one last pointed at or focused stands in front (data-front).
  * From a tablet's width only: a phone shows a short slice of the session and
  * the thread without its window instead (.lp-phone and .lp-phone-x, below).
  */
 .lp-windows {
   --lp-windows-body: clamp(28rem, 65svh, 36rem);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--sp-5);
-  min-width: 0;
-}
-
-.lp-windows-term {
+  --lp-windows-reveal: calc(var(--sp-8) * 3);
+  --lp-windows-overlap: calc(var(--sp-6) * 3);
+  --lp-windows-social-h: calc(var(--sp-8) * 8);
   position: relative;
-  grid-row: 2;
+  isolation: isolate;
+  min-width: 0;
+  padding-block: var(--lp-windows-reveal) calc(var(--lp-windows-social-h) - var(--lp-windows-overlap));
+  padding-inline: var(--sp-5) var(--sp-6);
+}
+
+/* The recording is visible above the transcript: titlebar, command and
+   welcome. Its lower portion sits behind the main window until raised. */
+.lp-windows-term {
+  position: absolute;
   z-index: 0;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: min(56%, calc(var(--sp-8) * 8));
   min-width: 0;
 }
-
-.lp-windows-x .mac-win {
-  block-size: calc(var(--sp-8) * 11);
+.lp-windows-term .mac-win {
+  block-size: calc(var(--sp-8) * 5);
 }
-
 .lp-windows-term .mac-body {
-  min-block-size: calc(var(--sp-8) * 5);
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
-
 .lp-windows-term .cc {
   font-size: var(--fs-body);
   line-height: var(--lh-mono);
 }
-
 .lp-windows-term .cc-welcome {
   max-inline-size: 100%;
 }
-
 .lp-windows-reply {
   grid-template-columns: 2ch minmax(0, 1fr);
   padding-inline-start: 0;
 }
 
+/* The published transcript is the large, stable reading window. */
 .lp-windows-front {
   position: relative;
-  grid-row: 1;
-  grid-column: 1 / -1;
   z-index: 1;
   min-width: 0;
 }
-
-
-
-
-/*
- * The transcript browser sits in a browser window that keeps one height
- * whatever it shows: switching tabs or opening a turn scrolls inside the
- * viewer's own columns, never moving the page under the reader. svh, so a
- * phone's toolbars never resize it.
- */
 .lp-session-win .mac-body {
   flex: none;
   block-size: var(--lp-windows-body);
 }
 
-/* Both supporting windows keep their full titlebars and usable bodies.
-   Nothing overlaps the transcript or another window's content. */
+/* The shared link stands beyond the transcript's lower-right corner.
+   Only the bottom strip overlaps; its title and opening turn stay clear. */
 .lp-windows-x {
-  position: relative;
-  grid-row: 3;
+  position: absolute;
   z-index: 2;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  width: min(54%, calc(var(--sp-8) * 8));
   min-width: 0;
 }
-
+.lp-windows-x .mac-win {
+  block-size: var(--lp-windows-social-h);
+}
 .lp-windows-x .mac-body {
-  min-height: 0;
+  min-block-size: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-
 @media (min-width: 64rem) {
   .lp-windows {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .lp-windows-term {
-    grid-column: 1;
-  }
-  .lp-windows-x {
-    grid-column: 2;
-    grid-row: 2;
+    padding-inline: var(--sp-8) calc(var(--sp-8) * 2);
   }
 }
 
-/* the window last pointed at or focused stands in front of the other two */
+/* Raising a window changes only its layer: no flicker, fade or resize. */
 .lp-windows[data-front="term"] > .lp-windows-term,
 .lp-windows[data-front="front"] > .lp-windows-front,
 .lp-windows[data-front="x"] > .lp-windows-x {
   z-index: 3;
-}
-
-/*
- * It rises into place rather than snapping there: from a little below and a
- * little faint, on the same spring the windows fan out on. The animation
- * starts each time a window becomes the one in front.
- */
-@keyframes lp-window-raise {
-  from {
-    opacity: 0.55;
-    transform: translate3d(0, 0.75rem, 0) scale(0.985);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .lp-windows[data-front="term"] > .lp-windows-term,
-  .lp-windows[data-front="front"] > .lp-windows-front,
-  .lp-windows[data-front="x"] > .lp-windows-x {
-    animation: lp-window-raise 600ms var(--ease-spring);
-  }
 }
 
 /*
@@ -2646,27 +2615,17 @@
   max-inline-size: none;
 }
 
-/* the first time they come into view, the back window and the thread fan out from behind the front one */
+/* A short fan-out once, from an already readable, fully opaque default. */
 @media (prefers-reduced-motion: no-preference) {
   .lp-windows-term,
   .lp-windows-x {
-    transition:
-      transform 1000ms var(--ease-spring),
-      opacity 600ms var(--ease-out);
+    transition: transform var(--dur-3) var(--ease-out);
   }
-
-  .lp-windows-x {
-    transition-delay: 120ms;
-  }
-
   .js-reveal .lp-windows[data-fanned="false"] .lp-windows-term {
-    opacity: 0;
-    transform: translate3d(18%, 2.5rem, 0) scale(0.94);
+    transform: translate3d(var(--sp-4), var(--sp-3), 0);
   }
-
   .js-reveal .lp-windows[data-fanned="false"] .lp-windows-x {
-    opacity: 0;
-    transform: translate3d(-14%, -2.5rem, 0) scale(0.94);
+    transform: translate3d(calc(-1 * var(--sp-4)), calc(-1 * var(--sp-3)), 0);
   }
 }
 

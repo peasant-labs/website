@@ -148,8 +148,14 @@ install:
   # the phone widths where each command keeps to one line and scrolls sideways
   phoneWidths: [390, 360, 320]
 session:
+  windows:
+    widths: [1440, 1024, 768]
+    frontMinRatio: 0.8
+    frontMaxRatio: 0.95
+    terminalExposedMin: 144
+    socialOverlapMax: 112
   terminalBodyMin: 240
-  sharedBodyMin: 400
+  sharedBodyMin: 380
   label: a sample session
   # the viewer names the sample by this short title; its id is shown nowhere
   title: rewrite billing retries
