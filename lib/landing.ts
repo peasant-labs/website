@@ -44,12 +44,12 @@ export const HERO = {
    * The picture under the buttons tells its story without words, so its
    * accessible name says it: a card comes up on the laptop's screen, is
    * redacted there, lifts out, is stamped as it is published and settles on
-   * the shared stack, where one of the people lifts an amber basket. There is
+   * the shared stack, beside people standing on the ground, one carrying an amber basket. There is
    * no reputation score: that person is the one the card is credited to.
    */
   flow: {
     label:
-      "A transcript card comes up on the screen of a laptop running Claude Code, Codex, Cursor, OpenCode, Pi and Strike, and a scan line turns its secret line into an amber block while it is still on the computer. The card lifts out, glides over to the commons, is stamped as you publish it, and settles on a shared stack beside three peasants: as it lands, one of them, you, lifts an amber basket.",
+      "A transcript card comes up on the screen of a laptop running Claude Code, Codex, Cursor, OpenCode, Pi and Strike, and a scan line turns its secret line into an amber block while it is still on the computer. The card lifts out, glides over to the commons, is stamped as you publish it, and settles on a shared stack beside three peasants standing on the ground, one of them, you, carrying an amber basket.",
     agents: [
       { mark: "claude", name: "Claude Code" },
       { mark: "codex", name: "Codex" },

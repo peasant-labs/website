@@ -38,6 +38,13 @@ hero:
   # the picture under the buttons shows no words; its accessible name names the agents peasant reads
   flow:
     agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
+    # The people stay planted through every stage of the card journey.
+    groundedFrames: [0, 2400, 3000, 3500, 4300]
+    layouts:
+      - { width: 390, colorScheme: light }
+      - { width: 390, colorScheme: dark }
+      - { width: 1440, colorScheme: light }
+      - { width: 1440, colorScheme: dark }
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
 # the band under the hero: the harnesses peasant reads, each led by its mark
@@ -155,6 +162,7 @@ session:
     terminalExposedMin: 144
     socialOverlapMax: 112
   terminalBodyMin: 240
+  terminalTextMin: 16
   sharedBodyMin: 380
   label: a sample session
   # the viewer names the sample by this short title; its id is shown nowhere

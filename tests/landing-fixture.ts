@@ -16,7 +16,7 @@ export type LandingFixture = {
     lede: string;
     pillars: string[];
     tagRows: Array<{ width: number; rows: number[] }>;
-    flow: { agents: string[] };
+    flow: { agents: string[]; groundedFrames: number[]; layouts: Array<{ width: number; colorScheme: "light" | "dark" }> };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };
@@ -53,6 +53,7 @@ export type LandingFixture = {
   session: {
     windows: { widths: number[]; frontMinRatio: number; frontMaxRatio: number; terminalExposedMin: number; socialOverlapMax: number };
     terminalBodyMin: number;
+    terminalTextMin: number;
     sharedBodyMin: number;
     label: string;
     title: string;

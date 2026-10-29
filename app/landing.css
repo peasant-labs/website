@@ -2462,16 +2462,38 @@
   block-size: calc(var(--sp-8) * 5);
 }
 .lp-windows-term .mac-body {
+  container: session-terminal / inline-size;
   min-block-size: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 .lp-windows-term .cc {
+  grid-template-columns: minmax(0, 1fr);
+  min-inline-size: 0;
+  block-size: auto;
+  min-block-size: 100%;
   font-size: var(--fs-body);
   line-height: var(--lh-mono);
 }
+.lp-windows-term .cc > * {
+  min-inline-size: 0;
+}
 .lp-windows-term .cc-welcome {
-  max-inline-size: 100%;
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 52ch;
+  padding: var(--sp-2) var(--sp-3);
+}
+@container session-terminal (max-width: 26rem) {
+  .lp-windows-term .cc {
+    padding: var(--sp-2);
+  }
+  .lp-windows-term .cc-welcome {
+    padding: var(--sp-2);
+  }
+  .lp-windows-term .cc-welcome .cc-dim {
+    padding-inline-start: 0;
+  }
 }
 .lp-windows-reply {
   grid-template-columns: 2ch minmax(0, 1fr);

@@ -133,7 +133,11 @@ test("the desktop collage exposes its supporting windows without covering the tr
       const box = group.getBoundingClientRect();
       return {
         back: rect(".lp-windows-term"), front: rect(".lp-windows-front .mac-win"), shared: rect(".lp-windows-x .mac-win"),
-        terminalBody: rect(".lp-windows-term .mac-body"), sharedBody: rect(".lp-windows-x .mac-body"),
+        terminalBody: rect(".lp-windows-term .mac-body"),
+        terminalOverflow: [...group.querySelectorAll(".lp-windows-term :is(.mac-body, .cc, .cc-welcome)")].map((element) => element.scrollWidth - element.clientWidth),
+        terminalWelcome: rect(".lp-windows-term .cc-welcome"),
+        terminalText: parseFloat(getComputedStyle(group.querySelector(".lp-windows-term .cc")!).fontSize),
+        sharedBody: rect(".lp-windows-x .mac-body"),
         title: rect(".lp-windows-front .txn-title"),
         left: box.left, right: box.right, inner: box.width,
         overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
@@ -152,6 +156,9 @@ test("the desktop collage exposes its supporting windows without covering the tr
     expect(layout.shared.right, at).toBeGreaterThan(layout.front.right);
     expect(layout.shared.right, at).toBeLessThanOrEqual(layout.right + 1);
     expect(layout.terminalBody.height, at).toBeGreaterThanOrEqual(fixture.session.terminalBodyMin);
+    for (const overflow of layout.terminalOverflow) expect(overflow, `the terminal content fits its window ${at}`).toBeLessThanOrEqual(1);
+    expect(layout.terminalWelcome.right, at).toBeLessThanOrEqual(layout.terminalBody.right);
+    expect(layout.terminalText, at).toBeGreaterThanOrEqual(fixture.session.terminalTextMin);
     expect(layout.sharedBody.height, at).toBeGreaterThanOrEqual(fixture.session.sharedBodyMin);
     expect(layout.overflow, at).toBe(false);
   }
@@ -341,7 +348,8 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   const card = flow.locator(".hf-card").first();
   const running = () => card.evaluate((element) => element.getAnimations().map((animation) => animation.playState));
 
-  for (const width of [390, 1440]) {
+  for (const { width, colorScheme } of fixture.hero.flow.layouts) {
+    await page.emulateMedia({ colorScheme });
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     for (const agent of fixture.hero.flow.agents) {
@@ -351,6 +359,16 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
     await expect(picture.locator(".hf-card").first()).toBeVisible();
     expect((await picture.innerText()).trim()).toBe("");
     await expect(panel.getByRole("button")).toHaveCount(0);
+    await flow.scrollIntoViewIfNeeded();
+    await expect(page.locator(".lp-hero-flow")).toHaveCSS("opacity", "1");
+    const people = flow.locator(".hf-art:visible .hf-commons");
+    const grounded = await people.boundingBox();
+    for (const frame of fixture.hero.flow.groundedFrames) {
+      await flow.evaluate((element, time) => {
+        for (const animation of element.getAnimations({ subtree: true })) animation.currentTime = time;
+      }, frame);
+      expect(await people.boundingBox(), `the people remain grounded at ${width}, ${colorScheme}, ${frame}ms`).toEqual(grounded);
+    }
     // the picture holds its height from the first paint: nothing below it moves
     const layout = () =>
       flow.evaluate((root) => ({
@@ -374,7 +392,7 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   }
 
   expect(await running()).toEqual(["running"]);
-  expect(await flow.locator(".hf-wide .hf-commons").evaluate((element) => element.getAnimations().map((animation) => animation.playState))).toEqual(["running"]);
+  expect(await flow.locator(".hf-wide .hf-commons").evaluate((element) => element.getAnimations())).toEqual([]);
   // scroll first: a scroll lets a hold go, and hover() would otherwise scroll after moving the pointer
   await flow.scrollIntoViewIfNeeded();
   await page.waitForTimeout(300);
