@@ -1,0 +1,42 @@
+{
+  "gitSha": "91a953cadb7c265ca4c4ece2199a853a64330e9b",
+  "treeSha": "b0055961b8bef3c681d43b8546b763ac497e5758",
+  "buildId": "-W1_FTBrn2vMfq-pZWwac",
+  "fairtrade": "0.0.53",
+  "evidence": [
+    {
+      "theme": "dark",
+      "width": 1440,
+      "errors": []
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "errors": []
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "errors": []
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "errors": []
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "errors": []
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "errors": []
+    }
+  ],
+  "captureNotes": {
+    "demo-dark-1440.png": "Viewport1440x1800 to keep the full component painted in a single mounted viewport; all other evidence uses viewport height1000. No DOM or styles were hidden or altered for capture.",
+    "inspection": "All18PNG files inspected. Both themes at1440 and390; demo additionally1024. No page errors or document horizontal overflow."
+  }
+}
