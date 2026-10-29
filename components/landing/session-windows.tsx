@@ -17,7 +17,7 @@ type Window = "term" | "front" | "x";
 /**
  * One session in three windows: behind and up to the left, Claude Code in
  * Terminal, where it was recorded; in front and wide, the published transcript
- * a reviewer reads (passed in); over its right side, the thread on X where its
+ * a reviewer reads (passed in); at its lower right, the thread on X where its
  * author shared the link. Recorded, read, shared. From a tablet's width only: a
  * phone shows a slice of the session and the thread without windows instead.
  *
@@ -25,7 +25,7 @@ type Window = "term" | "front" | "x";
  * front and stays there until another one is chosen, as on a desktop. So focus
  * is never hidden under another window.
  *
- * They fan out from one stack the first time the group comes into view; only
+ * The supporting windows ease into place the first time the group comes into view; only
  * transform and opacity move. Without motion they are simply where they end.
  * The Terminal repeats what the transcript already says, so it is hidden from
  * assistive technology; the thread is read as a short group.

@@ -1022,7 +1022,7 @@ test("every section opens on its title alone on a row, in one style at one edge,
   }
 });
 
-test("the vision stands on its own grounded panel, and the landing ends on a calm split call to action", async ({
+test("the vision leads with its statement above an open editorial split, and the landing keeps its closing action", async ({
   page,
 }) => {
   for (const width of [1440, 1280, 390]) {
@@ -1056,37 +1056,39 @@ test("the vision stands on its own grounded panel, and the landing ends on a cal
         return [...rows.values()].at(-1)!.trim();
       });
       return {
-        surface: style.backgroundColor !== getComputedStyle(document.body).backgroundColor,
+        open: style.backgroundColor === "rgba(0, 0, 0, 0)" && style.borderRightWidth === "0px",
         border: style.borderTopWidth,
         // no rule runs under the picture
         rule: getComputedStyle(element.querySelector(".lp-vision-art")!, "::after").content,
         beside: art.right <= words.left + 1,
-        // side by side, both are centred on the panel's height
-        centred: Math.abs(art.top + art.height / 2 - (words.top + words.height / 2)) < 2,
+        // side by side, the illustration and explanation share a baseline
+        aligned: Math.abs(art.bottom - words.bottom) < 2,
+        statementLeads: line.getBoundingClientRect().bottom <= Math.min(art.top, words.top),
         // stacked, the picture's left edge is the words' left edge
         stackedEdge: Math.abs(art.left - words.left) < 2 && art.bottom <= words.top,
         evenPadding: Math.abs(parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)) < 1,
         lineFace: getComputedStyle(line).fontFamily === getComputedStyle(title).fontFamily,
-        lineSmaller: parseFloat(getComputedStyle(line).fontSize) < parseFloat(getComputedStyle(title).fontSize),
+        lineScale: getComputedStyle(line).fontSize === getComputedStyle(title).fontSize,
         filledCta: cta.classList.contains("btn-primary"),
         lastLines,
         art: { width: art.width, height: art.height },
       };
     });
-    expect(layout.surface && layout.border === "1px", `the vision has no panel at ${width}`).toBe(true);
+    expect(layout.open && layout.border === "1px", `the vision is not an open section at ${width}`).toBe(true);
+    expect(layout.statementLeads, `the statement does not lead at ${width}`).toBe(true);
     expect(layout.rule === "none" || layout.rule === "normal", `a rule runs under the picture at ${width}`).toBe(true);
-    if (width >= 1280) expect(layout.beside && layout.centred, `the vision is not a centred split at ${width}`).toBe(true);
+    if (width >= 1280) expect(layout.beside && layout.aligned, `the vision does not share a baseline at ${width}`).toBe(true);
     else expect(layout.stackedEdge, `the picture does not sit on the words' edge at ${width}`).toBe(true);
     expect(layout.evenPadding, `the vision's padding is uneven at ${width}`).toBe(true);
-    expect(layout.lineFace && layout.lineSmaller, `the lead line is not one step under the section titles at ${width}`).toBe(true);
+    expect(layout.lineFace && layout.lineScale, `the statement does not share the section-title scale at ${width}`).toBe(true);
     expect(layout.filledCta, "the vision's button is filled amber").toBe(false);
     for (const line of layout.lastLines) {
       expect(line, `a paragraph leaves one word alone on its last line at ${width}`).toContain(" ");
     }
-    // the picture is a square, 440px beside the words and no wider than that when stacked
+    // the picture keeps its square ratio and its supporting size
     expect(Math.abs(layout.art.width - layout.art.height), `the picture is not square at ${width}`).toBeLessThan(1);
-    if (width >= 1280) expect(layout.art.width).toBe(440);
-    else expect(layout.art.width).toBeLessThanOrEqual(440);
+    if (width >= 1280) expect(layout.art.width).toBe(fixture.vision.artMax);
+    else expect(layout.art.width).toBeLessThanOrEqual(fixture.vision.artMax);
   }
   await page.setViewportSize({ width: 1440, height: 900 });
 

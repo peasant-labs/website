@@ -108,7 +108,7 @@ test("the agents drift past under the hero, hold when hovered, and stand still f
   expect(await track.evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
 });
 
-test("the session's four windows fan out from one stack once, the transcript wide in front, all inside the page", async ({
+test("the session keeps the transcript dominant and supporting windows inside the page", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -170,8 +170,11 @@ test("the session's four windows fan out from one stack once, the transcript wid
     expect(layout.shared.left, at).toBeGreaterThan(layout.front.left + layout.front.width / 3);
     expect(layout.shared.left, at).toBeLessThan(layout.front.right);
     expect(layout.shared.right, at).toBeGreaterThan(layout.front.right);
-    // its top halfway between the Terminal's and the transcript's
-    expect(Math.abs(layout.shared.top - (layout.back.top + layout.front.top) / 2), at).toBeLessThan(8);
+    // the supporting thread starts near the transcript's end, leaving its opening clear
+    expect(layout.shared.top, at).toBeGreaterThan(layout.front.top + layout.front.height / 3);
+    expect(layout.shared.top, at).toBeLessThan(layout.front.bottom);
+    expect(layout.shared.width / layout.inner, at).toBeLessThan(0.5);
+    expect(layout.back.width / layout.inner, at).toBeLessThan(0.5);
     expect(layout.layers, at).toEqual([...layout.layers].sort((a, b) => a - b));
     expect(new Set(layout.layers).size, at).toBe(3);
     // the filters' strip still shows where the viewer is wide enough for it
@@ -180,7 +183,7 @@ test("the session's four windows fan out from one stack once, the transcript wid
     expect(layout.overflow, `the page overflows ${at}`).toBe(false);
   }
 
-  // without motion all four stand where they end, before the group is ever scrolled to
+  // without motion all three stand where they end, before the group is ever scrolled to
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect(windows).toHaveAttribute("data-fanned", "false");
@@ -399,6 +402,7 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   }
 
   expect(await running()).toEqual(["running"]);
+  expect(await flow.locator(".hf-wide .hf-commons").evaluate((element) => element.getAnimations().map((animation) => animation.playState))).toEqual(["running"]);
   // scroll first: a scroll lets a hold go, and hover() would otherwise scroll after moving the pointer
   await flow.scrollIntoViewIfNeeded();
   await page.waitForTimeout(300);
@@ -426,6 +430,7 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   expect(await running()).toEqual([]);
+  expect(await flow.locator(".hf-wide .hf-commons").evaluate((element) => element.getAnimations())).toEqual([]);
   await expect(card).toHaveCSS("opacity", "1");
 });
 
@@ -456,7 +461,7 @@ test("the window a pointer moves onto or focus moves into comes to the front, an
     expect(await page.evaluate(([px, py]) => !!document.elementFromPoint(px, py)?.closest(".lp-windows"), [x, y])).toBe(true);
     await page.mouse.move(x, y);
   };
-  await point(".lp-windows-term", 0.06, 0.6);
+  await point(".lp-windows-term", 0.3, 0.15);
   await expect.poll(order).toBe("term");
   await point(".lp-windows-front", 0.3, 0.6);
   await expect.poll(order).toBe("front");

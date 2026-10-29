@@ -629,6 +629,15 @@ function sharedKeyframes(phoneScale: number, wideScale: number) {
     [BEAT.forgotten, "opacity: 0"],
     [CYCLE, "opacity: 0"],
   ]);
+  // The commons receives each arriving card with one coordinated response.
+  // The small lift answers the laptop's motion without moving the ground.
+  const receive = keyframes("hf-receive", CYCLE, [
+    [0, "transform: translateY(0)"],
+    [BEAT.roomFrom, "transform: translateY(0)", "out"],
+    [BEAT.landed, "transform: translateY(-2px)", "out"],
+    [BEAT.noticed, "transform: translateY(0)"],
+    [CYCLE, "transform: translateY(0)"],
+  ]);
   /* the marks give way while a card fills the screen, and come back once it lifts out */
   const giveWay = keyframes("hf-marks", CYCLE, [
     [0, "opacity: 1", "out"],
@@ -650,7 +659,7 @@ function sharedKeyframes(phoneScale: number, wideScale: number) {
         : [[0, hidden], [swap - 500, hidden, "out"], [swap - 100, rest], [LOOP - 500, rest, "out"], [LOOP - 100, hidden], [LOOP, hidden]],
     ),
   );
-  return [keyframes("hf-z", LOOP, z), card("hf-card-phone", phoneScale), card("hf-card-wide", wideScale), stamp, notice, giveWay, ...marks].join("\n");
+  return [keyframes("hf-z", LOOP, z), card("hf-card-phone", phoneScale), card("hf-card-wide", wideScale), stamp, notice, receive, giveWay, ...marks].join("\n");
 }
 
 function motionRules(cardName: string) {
@@ -674,6 +683,7 @@ const sharedMotion = [
   ...AGENTS.map((_, index) => `.hf-m${index} { animation: hf-mark-${index} ${LOOP}ms linear infinite }`),
   `.hf-marks { animation: hf-marks ${CYCLE}ms linear infinite }`,
   `.hf-notice { animation: hf-notice ${CYCLE}ms linear infinite }`,
+  `.hf-commons { animation: hf-receive ${CYCLE}ms linear infinite }`,
   `.hf-scan { animation: hf-scan ${CYCLE}ms linear infinite }`,
   `.hf[data-paused=true] * { animation-play-state: paused }`,
 ].join("\n");
@@ -1023,13 +1033,15 @@ const Scene = memo(function Scene({ layout }: { layout: Layout }) {
       <Face points={keys} light="shade" />
       <Box x={lid[0]} y={lid[1]} w={lid[2]} h={lid[3]} depth={1} front="mid" top="mid" side="deep" />
       <Face points={corners(...display)} light="lit" />
-      {commons.map(({ member, x: mx }) =>
-        "sheaf" in member ? (
-          <Sheaf key={mx} plan={member.sheaf} x={mx} ground={field} />
-        ) : (
-          <Peasant key={mx} figure={member.figure} x={mx} ground={field} lit={member.noticed === true} />
-        ),
-      )}
+      <g className="hf-commons">
+        {commons.map(({ member, x: mx }) =>
+          "sheaf" in member ? (
+            <Sheaf key={mx} plan={member.sheaf} x={mx} ground={field} />
+          ) : (
+            <Peasant key={mx} figure={member.figure} x={mx} ground={field} lit={member.noticed === true} />
+          ),
+        )}
+      </g>
     </svg>
   );
 });

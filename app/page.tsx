@@ -135,16 +135,16 @@ export default function Home() {
         </section>
 
         <section className="lp-sec lp-vision" aria-labelledby="vision-line">
-          {/* the statement's own panel: the picture beside the words */}
+          {/* the statement leads, with its illustration and explanation below */}
           <div className="site-wrap">
             <div className="lp-vision-inner">
+              <p id="vision-line" className="lp-vision-line" data-fade>
+                {VISION.line}
+              </p>
               <div className="lp-vision-scene">
                 <Art art={VISION.art} className="lp-vision-art" />
               </div>
               <div className="lp-vision-words">
-                <p id="vision-line" className="lp-vision-line" data-fade>
-                  {VISION.line}
-                </p>
                 {VISION.story.map((paragraph) => (
                   <p key={paragraph} className="lp-vision-story">
                     {paragraph}

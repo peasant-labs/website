@@ -77,7 +77,8 @@
 /* the agents peasant reads, drifting under the hero and fading out at both edges */
 .lp-agents {
   overflow: hidden;
-  padding-block: var(--sp-4);
+  padding-block: var(--sp-6);
+  border-block: var(--bd);
   mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
 }
 
@@ -149,7 +150,7 @@
 /* hero */
 
 .lp-hero {
-  padding-block: var(--site-sec-y);
+  padding-block: var(--site-sec-y) var(--sp-7);
 }
 
 .lp-hero-inner {
@@ -2437,22 +2438,12 @@
  * the thread without its window instead (.lp-phone and .lp-phone-x, below).
  */
 .lp-windows {
-  --lp-windows-x: clamp(1rem, 6vw, 5rem);
-  /* how far the thread stands out past the transcript's right edge */
-  --lp-windows-x-end: clamp(1rem, 4vw, 3.5rem);
-  /* the transcript window's body: one height whatever it shows (.lp-session-win, below) */
-  --lp-windows-body: clamp(32rem, 78svh, 48rem);
-  /* how far the transcript stands below the Terminal behind it */
-  --lp-windows-lead: clamp(2.5rem, 6vw, 4.5rem);
-  /* how far up the transcript the thread over its right side reaches: its top halfway between the Terminal's and the transcript's */
-  --lp-windows-x-overlap: calc(var(--lp-windows-body) + var(--lp-windows-chrome) + var(--lp-windows-lead) / 2);
-  /* the browser window's title bar above its body (components/mac.tsx) */
-  --lp-windows-chrome: 52px;
-
+  --lp-windows-body: clamp(28rem, 65svh, 36rem);
+  --lp-windows-lead: var(--sp-8);
   position: relative;
   min-width: 0;
-  padding-block-start: var(--lp-windows-lead);
-  padding-inline: var(--lp-windows-x) var(--lp-windows-x-end);
+  padding-block: var(--lp-windows-lead) var(--sp-5);
+  padding-inline: var(--sp-5);
 }
 
 .lp-windows-term {
@@ -2460,11 +2451,11 @@
   z-index: 0;
   inset-block-start: 0;
   inset-inline-start: 0;
-  width: min(80%, 34rem);
+  width: min(44%, calc(var(--sp-8) * 7));
 }
 
 .lp-windows-term .mac-win {
-  height: clamp(12rem, 26vw, 22rem);
+  height: calc(var(--sp-8) * 3);
 }
 
 .lp-windows-reply {
@@ -2491,20 +2482,21 @@
   block-size: var(--lp-windows-body);
 }
 
-/*
- * The thread on X stands over the transcript's right side: its top halfway
- * between the Terminal's and the transcript's, its right edge out past the
- * transcript's on the column's edge, the rest of it below. Hovering or focusing the transcript
- * brings it back in front, filters and all. It is in the flow, so the section
- * makes room for however tall it draws.
- */
+/* The thread is a smaller supporting window at the transcript's lower right.
+   Its own body scrolls, so the whole conversation remains available without
+   covering the transcript's title, opening turn or reading controls. */
 .lp-windows-x {
-  position: relative;
+  position: absolute;
   z-index: 2;
-  /* at a tablet's width it takes more of the row, so the card it carries still reads */
-  width: min(30rem, 60%);
-  margin-block-start: calc(-1 * var(--lp-windows-x-overlap));
-  margin-inline: auto calc(-1 * var(--lp-windows-x-end));
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  width: min(44%, calc(var(--sp-8) * 7));
+}
+
+.lp-windows-x .mac-body {
+  max-block-size: calc(var(--sp-8) * 6);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /*
@@ -2970,46 +2962,36 @@
 
 /* vision */
 
-/*
- * The statement's own panel, at the content's width: the picture on the left,
- * the words on the right, both centred on the panel's height. The section
- * carries the room around the panel; the panel's own padding is smaller and
- * even. A phone stacks them, the picture first, its left edge on the words'
- * edge. The picture carries its own ground in its contact shadows; no rule
- * runs under it, and nothing it draws leaves its box.
- */
+/* An open editorial composition: the statement spans the page, with the
+   illustration and the explanation sharing the quieter row underneath. */
 .lp-vision-inner {
   display: grid;
-  align-items: center;
-  gap: var(--sp-6) var(--site-head-gap);
-  padding: clamp(var(--sp-6), 5vw, calc(var(--sp-8) + var(--sp-5)));
-  border: var(--bd);
-  background: var(--surface-2);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: var(--site-head-gap);
+  padding-block: var(--site-head-gap);
+  border-top: var(--bd);
 }
 
-/* side by side from 72rem: the picture at its drawn size, 440px square, and the words in the rest */
-@media (min-width: 72rem) {
-  .lp-vision-inner {
-    grid-template-columns: 440px minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 47.99rem) {
-  .lp-vision-inner {
-    padding: var(--sp-6) var(--sp-5);
-  }
+.lp-vision-line {
+  grid-column: 1 / -1;
 }
 
 .lp-vision-scene {
   min-width: 0;
 }
 
-/* drawn at twice 440 square; it shows at that size, and only shrinks when its column is narrower */
 .lp-vision-art {
   display: block;
   width: 100%;
-  max-width: 440px;
+  max-width: calc(var(--sp-8) * 7);
   aspect-ratio: 1;
+}
+
+@media (min-width: 48rem) {
+  .lp-vision-inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
 }
 
 .lp-vision-art .art-img {
@@ -3018,7 +3000,7 @@
   object-fit: contain;
 }
 
-/* the words: the lead line in the section titles' face one step down, then why, then the way to the rest */
+/* The explanation keeps a comfortable reading measure beneath the statement. */
 .lp-vision-words {
   display: grid;
   justify-items: start;
@@ -3032,15 +3014,16 @@
 .lp-vision-line {
   color: var(--ink-strong);
   font-family: var(--font-display);
-  font-size: var(--fs-xl);
+  max-inline-size: 38ch;
+  font-size: var(--site-title-fs);
   font-weight: 700;
   letter-spacing: -0.01em;
-  line-height: 1.2;
+  line-height: 1.4;
   text-wrap: balance;
 }
 
 .lp-vision-story {
-  margin-block-start: var(--sp-4);
+  margin-block-start: var(--sp-5);
   color: var(--ink-2);
   font-family: var(--font-body);
   font-size: var(--fs-md);
@@ -3048,19 +3031,14 @@
   text-wrap: pretty;
 }
 
-.lp-vision-line + .lp-vision-story {
-  margin-block-start: var(--sp-5);
+.lp-vision-story:first-child {
+  margin-block-start: 0;
 }
 
 .lp-vision-cta {
   margin-block-start: var(--sp-6);
 }
 
-@media (max-width: 47.99rem) {
-  .lp-vision-line {
-    font-size: var(--fs-lg);
-  }
-}
 
 /*
  * The landing ends on a calm split inside the content width: its line at the

@@ -204,6 +204,7 @@ thread:
   phone: { postText: 12, cardPrompt: 11, promptWord: hey }
 # the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:
+  artMax: 392
   line: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.
   story:
     - "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's capital."

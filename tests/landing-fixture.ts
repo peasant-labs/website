@@ -81,7 +81,7 @@ export type LandingFixture = {
     from: string;
     phone: { postText: number; cardPrompt: number; promptWord: string };
   };
-  vision: { line: string; story: string[]; cta: Link };
+  vision: { line: string; story: string[]; cta: Link; artMax: number };
   docsNav: Link[];
   posts: Array<{ slug: string; title: string }>;
 };
