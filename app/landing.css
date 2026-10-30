@@ -42,11 +42,16 @@
   outline: none;
 }
 
-/*
- * The page breathes: 224px between sections on a wide screen and 112px on a
- * phone (twice --site-sec-y), and whitespace alone separates them; no rule
- * runs between.
- */
+/* The landing has a slower rhythm than the site's compact reading pages. */
+.site-shell:has(> .lp) {
+  --site-sec-y: clamp(
+    calc(var(--sp-8) + var(--sp-4)),
+    9vw,
+    calc(var(--sp-8) * 2 + var(--sp-7))
+  );
+}
+
+/* Two adjacent sections share their whitespace; content groups stay compact. */
 .lp-sec {
   padding-block: var(--site-sec-y);
 }
@@ -148,10 +153,6 @@
 }
 
 /* hero */
-
-.lp-hero {
-  padding-block: clamp(var(--sp-7), 5vw, var(--sp-8)) var(--sp-7);
-}
 
 .lp-hero-inner {
   display: grid;
@@ -2960,10 +2961,6 @@
 /* vision */
 
 /* A shared open ground ties the hero, mission and invitation together. */
-.lp-vision {
-  padding-block: clamp(var(--sp-7), 5vw, var(--sp-8));
-}
-
 .lp-vision-inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -3037,7 +3034,7 @@
 /* The final invitation is one quiet column: house, words, then actions. */
 .site-foot-close {
   margin-block-end: var(--sp-7);
-  padding-block: var(--sp-8);
+  padding-block: var(--site-sec-y);
 }
 
 .site-foot-close .site-foot-cta {
