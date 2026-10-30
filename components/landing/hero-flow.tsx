@@ -280,8 +280,13 @@ function sheafPlan(height: number, top: number, foot: number, count: number): Sh
 
 const WIDE_SHEAF = sheafPlan(33, 5, 5, 7);
 
-/** who stands at the commons, left to right: a sheaf, or a peasant and whether their basket lights up */
-type Member = Readonly<{ sheaf: SheafPlan } | { figure: Figure; noticed?: boolean }>;
+/** A planted member of the commons, positioned in depth on the drawing's grid. */
+type Member = Readonly<{
+  id: string;
+  x: number;
+  ground: number;
+  scale?: number;
+} & ({ sheaf: SheafPlan } | { figure: Figure; noticed?: boolean })>;
 
 /** One layout, every measure in cells. */
 type Layout = Readonly<{
@@ -299,66 +304,51 @@ type Layout = Readonly<{
   crest: number;
   /** the stack: its cards' left column, the row its base stands on, the base's height and depth, and the step between cards */
   stack: Readonly<{ left: number; ground: number; base: number; depth: number; notch: number }>;
-  /** the commons: the row it stands on, its first column, the gap between its members, and its members */
-  commons: Readonly<{ ground: number; from: number; gap: number; members: readonly Member[] }>;
+  /** Each person's feet and shadow share their own ground, rather than one chorus line. */
+  commons: readonly Member[];
   /** how many rows of contact shadow lie under everything */
   shadow: number;
 }>;
 
-/*
- * A wide screen, a little over three times as wide as it is tall: three
- * groups on one ground, the laptop, the stack and the commons, with the same
- * gap between them and the same margin outside, and the same air above the
- * scene as below it. The laptop is about one and a half cards wide; a
- * peasant stands as tall as a card, and the wheat reaches their faces.
- */
+/* The raised transcript leads a shallow triangle: private work below-left,
+ * a gathered commons below-right. Back figures are smaller on the same cell grid. */
 const WIDE: Layout = {
   name: "wide",
   width: 333,
   height: 104,
   card: WIDE_CARD,
-  laptop: { x: 14, ground: 78, w: 80, depth: 8, deck: 3, screen: 46, bezel: 3 },
-  marks: [24, 16],
-  onScreen: 0.85,
+  laptop: { x: 20, ground: 88, w: 70, depth: 7, deck: 3, screen: 40, bezel: 3 },
+  marks: [21, 14],
+  onScreen: 0.78,
   crest: 28,
-  stack: { left: 127, ground: 78, base: 4, depth: 2, notch: 3 },
-  commons: {
-    ground: 78,
-    from: 206,
-    gap: 3,
-    members: [
-      { sheaf: WIDE_SHEAF },
-      { figure: WIDE_FIGURES.rake },
-      { figure: WIDE_FIGURES.basket, noticed: true },
-      { figure: WIDE_FIGURES.wave },
-      { sheaf: WIDE_SHEAF },
-    ],
-  },
+  stack: { left: 135, ground: 65, base: 4, depth: 2, notch: 3 },
+  commons: [
+    { id: "wheat-left", sheaf: WIDE_SHEAF, x: 218, ground: 83, scale: 0.7 },
+    { id: "wheat-right", sheaf: WIDE_SHEAF, x: 304, ground: 84, scale: 0.7 },
+    { id: "rake", figure: WIDE_FIGURES.rake, x: 238, ground: 80, scale: 0.9 },
+    { id: "wave", figure: WIDE_FIGURES.wave, x: 285, ground: 82, scale: 0.9 },
+    { id: "basket", figure: WIDE_FIGURES.basket, x: 263, ground: 91, noticed: true },
+  ],
   shadow: 3,
 };
 
-/*
- * A phone, in two tiers with the same air above and below, held to the scene
- * so no band of empty ground is left: the laptop and the stack side by side
- * on top, the three peasants centred under them; the wheat is left out, too
- * small here to read as wheat.
- */
+/* On a phone the card remains above its source. The people gather below its
+ * destination, with a front figure rather than a second straight row. */
 const PHONE: Layout = {
   name: "phone",
   width: 100,
   height: 114,
   card: PHONE_CARD,
-  laptop: { x: 5, ground: 49, w: 40, depth: 4, deck: 2, screen: 26, bezel: 2 },
-  marks: [11, 7],
-  onScreen: 0.85,
+  laptop: { x: 3, ground: 56, w: 36, depth: 4, deck: 2, screen: 24, bezel: 2 },
+  marks: [10, 6],
+  onScreen: 0.82,
   crest: 16,
-  stack: { left: 62, ground: 49, base: 3, depth: 1, notch: 2 },
-  commons: {
-    ground: 93,
-    from: 23,
-    gap: 4,
-    members: [{ figure: PHONE_FIGURES.rake }, { figure: PHONE_FIGURES.basket, noticed: true }, { figure: PHONE_FIGURES.wave }],
-  },
+  stack: { left: 62, ground: 44, base: 3, depth: 1, notch: 2 },
+  commons: [
+    { id: "rake", figure: PHONE_FIGURES.rake, x: 34, ground: 88, scale: 0.9 },
+    { id: "wave", figure: PHONE_FIGURES.wave, x: 73, ground: 91, scale: 0.9 },
+    { id: "basket", figure: PHONE_FIGURES.basket, x: 54, ground: 101, noticed: true },
+  ],
   shadow: 2,
 };
 
@@ -940,9 +930,11 @@ function Peasant({ figure, x, ground, lit }: { figure: Figure; x: number; ground
   return (
     <g>
       {figure.behind.length ? <Strokes runs={figure.behind.map(place)} /> : null}
-      {figure.parts.map((part, index) => (
-        <Face key={index} points={place(part.points)} light={part.light} split={part.right ? [x, part.right] : undefined} />
-      ))}
+      <g className="hf-person-body">
+        {figure.parts.map((part, index) => (
+          <Face key={index} points={place(part.points)} light={part.light} split={part.right ? [x, part.right] : undefined} />
+        ))}
+      </g>
       <Strokes runs={figure.front.map(place)} />
       {figure.basket ? (
         <>
@@ -988,15 +980,30 @@ function reach(member: Member) {
   return { from: Math.min(...xs), to: Math.max(...xs), footFrom: Math.min(...foot), footTo: Math.max(...foot) };
 }
 
-/** the commons' members set out left to right from its first column, the same gap between each */
+/** Scale the drawn points, not the SVG layer: every edge still lands on a whole cell. */
 function arrange(layout: Layout) {
-  const { from, gap, members } = layout.commons;
-  let cursor = from;
-  return members.map((member) => {
-    const extent = reach(member);
-    const x = cursor - extent.from;
-    cursor = x + extent.to + 1 + gap;
-    return { member, x, extent };
+  return layout.commons.map((placed) => {
+    const scale = placed.scale ?? 1;
+    const points = (path: readonly Point[]): Point[] => path.map(([x, y]) => [Math.round(x * scale), Math.round(y * scale)]);
+    const rectangle = ([x, y, w, h]: Rect): Rect => [Math.round(x * scale), Math.round(y * scale), Math.max(1, Math.round(w * scale)), Math.max(1, Math.round(h * scale))];
+    const member = "sheaf" in placed ? {
+      ...placed,
+      sheaf: {
+        back: placed.sheaf.back.map(points),
+        stalks: placed.sheaf.stalks.map(points),
+        ears: placed.sheaf.ears.map(points),
+        band: rectangle(placed.sheaf.band),
+      },
+    } : {
+      ...placed,
+      figure: {
+        behind: placed.figure.behind.map(points),
+        parts: placed.figure.parts.map((part) => ({ ...part, points: points(part.points) })),
+        front: placed.figure.front.map(points),
+        basket: placed.figure.basket ? points(placed.figure.basket) : undefined,
+      },
+    };
+    return { member, x: placed.x, ground: placed.ground, extent: reach(member) };
   });
 }
 
@@ -1011,26 +1018,27 @@ const Scene = memo(function Scene({ layout }: { layout: Layout }) {
     back([x + 7, deckTop], depth - 2),
   ];
   const commons = arrange(layout);
-  const { ground: field } = layout.commons;
   return (
     <svg className={`hf-art ${sizeClass(layout)}`} viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true" focusable="false">
       <path className="hf-tone-ground" d={`M0 0h${layout.width}v${layout.height}h${-layout.width}z`} />
-      <Shadow from={x} to={x + w + 1} ground={ground} rows={layout.shadow} />
-      {commons.map(({ x: mx, extent }) => (
-        <Shadow key={mx} from={mx + extent.footFrom} to={mx + extent.footTo} ground={field} rows={layout.shadow} />
-      ))}
-      <Box x={x} y={deckTop} w={w} h={deck} depth={depth} front="deep" top="mid" side="deep" />
-      <Face points={keys} light="shade" />
-      <Box x={lid[0]} y={lid[1]} w={lid[2]} h={lid[3]} depth={1} front="mid" top="mid" side="deep" />
-      <Face points={corners(...display)} light="lit" />
+      <g className="hf-laptop">
+        <Shadow from={x} to={x + w + 1} ground={ground} rows={layout.shadow} />
+        <Box x={x} y={deckTop} w={w} h={deck} depth={depth} front="deep" top="mid" side="deep" />
+        <Face points={keys} light="shade" />
+        <Box x={lid[0]} y={lid[1]} w={lid[2]} h={lid[3]} depth={1} front="mid" top="mid" side="deep" />
+        <Face points={corners(...display)} light="lit" />
+      </g>
       <g className="hf-commons">
-        {commons.map(({ member, x: mx }) =>
-          "sheaf" in member ? (
-            <Sheaf key={mx} plan={member.sheaf} x={mx} ground={field} />
-          ) : (
-            <Peasant key={mx} figure={member.figure} x={mx} ground={field} lit={member.noticed === true} />
-          ),
-        )}
+        {commons.map(({ member, x: mx, ground: foot, extent }) => (
+          <g key={member.id} className="hf-member" data-member={member.id}>
+            <Shadow from={mx + extent.footFrom} to={mx + extent.footTo} ground={foot} rows={layout.shadow} />
+            {"sheaf" in member ? (
+              <Sheaf plan={member.sheaf} x={mx} ground={foot} />
+            ) : (
+              <Peasant figure={member.figure} x={mx} ground={foot} lit={member.noticed === true} />
+            )}
+          </g>
+        ))}
       </g>
     </svg>
   );
