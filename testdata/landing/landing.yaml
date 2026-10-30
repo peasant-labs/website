@@ -201,6 +201,11 @@ session:
   tabs: [highlights, full trace, diffs, files, annotations]
   # placeholders the redaction engine writes, visible in the transcript
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
+graphs:
+  - { name: landing-light, path: /, selector: "[data-session-viewer]", width: 1440, theme: light }
+  - { name: landing-dark, path: /, selector: "[data-session-viewer]", width: 1440, theme: dark }
+  - { name: projects-light, path: /projects, selector: "[data-transcript-demo]", width: 1440, theme: light }
+  - { name: projects-dark, path: /projects, selector: "[data-transcript-demo]", width: 1440, theme: dark }
 # the share card the transcript's link preview shows, drawn by fairtrade from the sample: its figures are the
 # sample's own prompt count and token total
 card:

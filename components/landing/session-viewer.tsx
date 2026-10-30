@@ -1,6 +1,7 @@
 "use client";
 
 import { SESSION } from "@/lib/landing";
+import { TranscriptGraph } from "@/components/transcript-graph";
 import { currentTheme, subscribeToTheme, type Theme } from "@/lib/theme";
 import { adaptTranscript, TranscriptViewer, type TranscriptWireInput } from "@peasant-labs/fairtrade/ui";
 import { startTransition, useEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from "react";
@@ -133,6 +134,7 @@ export function SessionViewer({
           onTabChange={(next) => startTransition(() => setTab(next))}
           openTools={openTools}
           onOpenToolsChange={(next) => startTransition(() => setOpenTools(next))}
+          graphSlot={({ viewModel }) => <TranscriptGraph session={session} viewModel={viewModel} />}
         />
       ) : null}
     </div>

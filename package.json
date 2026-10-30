@@ -20,6 +20,7 @@
     "@next/mdx": "^16.2.1",
     "@peasant-labs/fairtrade": "0.0.55",
     "@types/mdx": "^2.0.13",
+    "@xyflow/react": "12.10.2",
     "framer-motion": "^12.38.0",
     "gray-matter": "^4.0.3",
     "minisearch": "^7.2.0",

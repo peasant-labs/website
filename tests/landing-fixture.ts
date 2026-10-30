@@ -76,6 +76,7 @@ export type LandingFixture = {
     markers: string[];
   };
   card: { figures: { prompts: number; tokens: number } };
+  graphs: Array<{ name: string; path: string; selector: string; width: number; theme: "light" | "dark" }>;
   thread: {
     label: string;
     posts: Array<{ name: string; handle: string; time: string; text: string }>;
@@ -97,6 +98,10 @@ export function loadLandingFixture(): LandingFixture {
     throw new Error("testdata/landing/landing.yaml: expected version 1; update the loader with the fixture.");
   }
   const requiredJourneyFrames = ["screen", "scan", "flight", "crest", "landed", "settled"];
+  const requiredGraphs = ["landing-light", "landing-dark", "projects-light", "projects-dark"];
+  if (JSON.stringify(root.graphs?.map((graph) => graph.name)) !== JSON.stringify(requiredGraphs)) {
+    throw new Error("The graph fixture must retain both real viewer hosts in both themes.");
+  }
   if (JSON.stringify(root.hero.flow.journeyFrames?.map((frame) => frame.name)) !== JSON.stringify(requiredJourneyFrames)) {
     throw new Error("The hero fixture must retain every named stage of the card journey.");
   }
