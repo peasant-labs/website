@@ -1,0 +1,28 @@
+{
+  "source": "347c1a43ed3f50cea52926dd23164c9e2d1df50c",
+  "buildID": "wB0mvhMhPNueMa3UhuNpV",
+  "priorMatrixSource": "2e617b3405fa2eae4001e729b6c82cb50d6fe73c",
+  "delta": "The only source delta after the complete90matrix is347c1a4: headingLevel3 on the two standalone phone cards, plus its fixture regression. Visual styling is unchanged.",
+  "records": [
+    {
+      "theme": "light",
+      "width": 390,
+      "headings": [
+        "H3",
+        "H3"
+      ],
+      "errors": [],
+      "allAxeViolations": []
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "headings": [
+        "H3",
+        "H3"
+      ],
+      "errors": [],
+      "allAxeViolations": []
+    }
+  ]
+}

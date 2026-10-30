@@ -1,0 +1,108 @@
+canonicalURLs:
+  - /
+  - /projects
+  - /projects/peasant
+  - /projects/village
+  - /docs
+  - /docs/guides/evals
+  - /docs/guides/reviews
+  - /blog
+  - /blog/reclaiming-data-autonomy-as-a-peasant
+  - /about
+  - /contact
+themes:
+  - dark
+  - light
+widths:
+  - 1440
+  - 390
+probe:
+  name: not-found
+  path: /this-address-does-not-exist
+  status: 404
+states:
+  - name: login
+    path: /?login
+    action: none
+    widths:
+      - 1440
+      - 390
+  - name: install-windows
+    path: /
+    action: windows
+    widths:
+      - 1440
+      - 390
+  - name: landing-menu
+    path: /
+    action: menu
+    widths:
+      - 390
+  - name: docs-search-results
+    path: /docs
+    action: search
+    query: redaction
+    widths:
+      - 1440
+      - 390
+  - name: docs-search-empty
+    path: /docs
+    action: search
+    query: not-a-real-term-for-search
+    widths:
+      - 1440
+      - 390
+  - name: docs-menu
+    path: /docs
+    action: menu
+    widths:
+      - 390
+  - name: docs-jump
+    path: /docs
+    action: jump
+    widths:
+      - 390
+  - name: transcript-diffs
+    path: /
+    action: transcript
+    tab: diffs
+    widths:
+      - 1440
+  - name: transcript-files
+    path: /
+    action: transcript
+    tab: files
+    widths:
+      - 1440
+  - name: transcript-graph
+    path: /
+    action: graph
+    widths:
+      - 1440
+  - name: peasant-setup-step
+    path: /projects/peasant
+    action: wizard
+    widths:
+      - 1440
+      - 390
+  - name: village-setup-step
+    path: /projects/village
+    action: wizard
+    widths:
+      - 1440
+      - 390
+  - name: hero-tablet
+    path: /
+    action: hero
+    widths:
+      - 768
+  - name: graph-host-landing
+    path: /
+    action: graph
+    selector: "[data-session-viewer]"
+    widths: [1440]
+  - name: graph-host-projects
+    path: /projects
+    action: graph
+    selector: "[data-transcript-demo]"
+    widths: [1440]

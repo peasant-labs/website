@@ -1,0 +1,3286 @@
+{
+  "inventory": [
+    "/",
+    "/projects",
+    "/projects/peasant",
+    "/projects/village",
+    "/docs",
+    "/docs/guides/evals",
+    "/docs/guides/reviews",
+    "/blog",
+    "/blog/reclaiming-data-autonomy-as-a-peasant",
+    "/about",
+    "/contact"
+  ],
+  "uniqueCanonicalCount": 11,
+  "baseCombinations": 44,
+  "probeCombinations": 4,
+  "conditionalCombinations": 42,
+  "source": "2e617b3405fa2eae4001e729b6c82cb50d6fe73c",
+  "sourceDiffHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "buildID": "nLVWMhe5pKIMGh4jsHyyS",
+  "records": [
+    {
+      "name": "landing",
+      "path": "/",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "landing-dark-1440.png"
+    },
+    {
+      "name": "landing",
+      "path": "/",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7870,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "landing-dark-390.png"
+    },
+    {
+      "name": "landing",
+      "path": "/",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "landing-light-1440.png"
+    },
+    {
+      "name": "landing",
+      "path": "/",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7870,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "landing-light-390.png"
+    },
+    {
+      "name": "projects",
+      "path": "/projects",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "projects | peasant",
+        "h1": [
+          "a commons for AI coding transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7265,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-dark-1440.png"
+    },
+    {
+      "name": "projects",
+      "path": "/projects",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "projects | peasant",
+        "h1": [
+          "a commons for AI coding transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 10394,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-dark-390.png"
+    },
+    {
+      "name": "projects",
+      "path": "/projects",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "projects | peasant",
+        "h1": [
+          "a commons for AI coding transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7265,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-light-1440.png"
+    },
+    {
+      "name": "projects",
+      "path": "/projects",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "projects | peasant",
+        "h1": [
+          "a commons for AI coding transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 10394,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-light-390.png"
+    },
+    {
+      "name": "projects-peasant",
+      "path": "/projects/peasant",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: local coding-agent project history",
+        "h1": [
+          "keep your coding-agent transcripts. share the ones you choose."
+        ],
+        "overflow": 0,
+        "bodyHeight": 1892,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-peasant-dark-1440.png"
+    },
+    {
+      "name": "projects-peasant",
+      "path": "/projects/peasant",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: local coding-agent project history",
+        "h1": [
+          "keep your coding-agent transcripts. share the ones you choose."
+        ],
+        "overflow": 0,
+        "bodyHeight": 2565,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-peasant-dark-390.png"
+    },
+    {
+      "name": "projects-peasant",
+      "path": "/projects/peasant",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: local coding-agent project history",
+        "h1": [
+          "keep your coding-agent transcripts. share the ones you choose."
+        ],
+        "overflow": 0,
+        "bodyHeight": 1892,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-peasant-light-1440.png"
+    },
+    {
+      "name": "projects-peasant",
+      "path": "/projects/peasant",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: local coding-agent project history",
+        "h1": [
+          "keep your coding-agent transcripts. share the ones you choose."
+        ],
+        "overflow": 0,
+        "bodyHeight": 2565,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-peasant-light-390.png"
+    },
+    {
+      "name": "projects-village",
+      "path": "/projects/village",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant online: a governed commons for agent sessions",
+        "h1": [
+          "a shared home for the agent sessions people publish"
+        ],
+        "overflow": 0,
+        "bodyHeight": 2419,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-village-dark-1440.png"
+    },
+    {
+      "name": "projects-village",
+      "path": "/projects/village",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant online: a governed commons for agent sessions",
+        "h1": [
+          "a shared home for the agent sessions people publish"
+        ],
+        "overflow": 0,
+        "bodyHeight": 3423,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-village-dark-390.png"
+    },
+    {
+      "name": "projects-village",
+      "path": "/projects/village",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant online: a governed commons for agent sessions",
+        "h1": [
+          "a shared home for the agent sessions people publish"
+        ],
+        "overflow": 0,
+        "bodyHeight": 2419,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-village-light-1440.png"
+    },
+    {
+      "name": "projects-village",
+      "path": "/projects/village",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant online: a governed commons for agent sessions",
+        "h1": [
+          "a shared home for the agent sessions people publish"
+        ],
+        "overflow": 0,
+        "bodyHeight": 3423,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "projects-village-light-390.png"
+    },
+    {
+      "name": "docs",
+      "path": "/docs",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 13566,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-dark-1440.png"
+    },
+    {
+      "name": "docs",
+      "path": "/docs",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 16996,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-dark-390.png"
+    },
+    {
+      "name": "docs",
+      "path": "/docs",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 13566,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-light-1440.png"
+    },
+    {
+      "name": "docs",
+      "path": "/docs",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 16996,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-light-390.png"
+    },
+    {
+      "name": "docs-guides-evals",
+      "path": "/docs/guides/evals",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "run an agent eval | peasant docs",
+        "h1": [
+          "run an agent eval"
+        ],
+        "overflow": 0,
+        "bodyHeight": 3466,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "log in",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "see what you can pull",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "pull it",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-guides-evals-dark-1440.png"
+    },
+    {
+      "name": "docs-guides-evals",
+      "path": "/docs/guides/evals",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "run an agent eval | peasant docs",
+        "h1": [
+          "run an agent eval"
+        ],
+        "overflow": 0,
+        "bodyHeight": 4149,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "log in",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "see what you can pull",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "pull it",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-guides-evals-dark-390.png"
+    },
+    {
+      "name": "docs-guides-evals",
+      "path": "/docs/guides/evals",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "run an agent eval | peasant docs",
+        "h1": [
+          "run an agent eval"
+        ],
+        "overflow": 0,
+        "bodyHeight": 3466,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "log in",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "see what you can pull",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "pull it",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-guides-evals-light-1440.png"
+    },
+    {
+      "name": "docs-guides-evals",
+      "path": "/docs/guides/evals",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "run an agent eval | peasant docs",
+        "h1": [
+          "run an agent eval"
+        ],
+        "overflow": 0,
+        "bodyHeight": 4149,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "log in",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "see what you can pull",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "pull it",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-guides-evals-light-390.png"
+    },
+    {
+      "name": "docs-guides-reviews",
+      "path": "/docs/guides/reviews",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "review pull requests | peasant docs",
+        "h1": [
+          "review pull requests"
+        ],
+        "overflow": 0,
+        "bodyHeight": 2781,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-guides-reviews-dark-1440.png"
+    },
+    {
+      "name": "docs-guides-reviews",
+      "path": "/docs/guides/reviews",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "review pull requests | peasant docs",
+        "h1": [
+          "review pull requests"
+        ],
+        "overflow": 0,
+        "bodyHeight": 3281,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-guides-reviews-dark-390.png"
+    },
+    {
+      "name": "docs-guides-reviews",
+      "path": "/docs/guides/reviews",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "review pull requests | peasant docs",
+        "h1": [
+          "review pull requests"
+        ],
+        "overflow": 0,
+        "bodyHeight": 2781,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-guides-reviews-light-1440.png"
+    },
+    {
+      "name": "docs-guides-reviews",
+      "path": "/docs/guides/reviews",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "review pull requests | peasant docs",
+        "h1": [
+          "review pull requests"
+        ],
+        "overflow": 0,
+        "bodyHeight": 3281,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-guides-reviews-light-390.png"
+    },
+    {
+      "name": "blog",
+      "path": "/blog",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "blog | peasant",
+        "h1": [
+          "blog"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1000,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "blog-dark-1440.png"
+    },
+    {
+      "name": "blog",
+      "path": "/blog",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "blog | peasant",
+        "h1": [
+          "blog"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1000,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "blog-dark-390.png"
+    },
+    {
+      "name": "blog",
+      "path": "/blog",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "blog | peasant",
+        "h1": [
+          "blog"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1000,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "blog-light-1440.png"
+    },
+    {
+      "name": "blog",
+      "path": "/blog",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "blog | peasant",
+        "h1": [
+          "blog"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1000,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "blog-light-390.png"
+    },
+    {
+      "name": "blog-reclaiming-data-autonomy-as-a-peasant",
+      "path": "/blog/reclaiming-data-autonomy-as-a-peasant",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "Reclaiming Data Autonomy as a Peasant | peasant",
+        "h1": [
+          "Reclaiming Data Autonomy as a Peasant"
+        ],
+        "overflow": 0,
+        "bodyHeight": 4324,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "blog-reclaiming-data-autonomy-as-a-peasant-dark-1440.png"
+    },
+    {
+      "name": "blog-reclaiming-data-autonomy-as-a-peasant",
+      "path": "/blog/reclaiming-data-autonomy-as-a-peasant",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "Reclaiming Data Autonomy as a Peasant | peasant",
+        "h1": [
+          "Reclaiming Data Autonomy as a Peasant"
+        ],
+        "overflow": 0,
+        "bodyHeight": 5213,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "blog-reclaiming-data-autonomy-as-a-peasant-dark-390.png"
+    },
+    {
+      "name": "blog-reclaiming-data-autonomy-as-a-peasant",
+      "path": "/blog/reclaiming-data-autonomy-as-a-peasant",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "Reclaiming Data Autonomy as a Peasant | peasant",
+        "h1": [
+          "Reclaiming Data Autonomy as a Peasant"
+        ],
+        "overflow": 0,
+        "bodyHeight": 4324,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "blog-reclaiming-data-autonomy-as-a-peasant-light-1440.png"
+    },
+    {
+      "name": "blog-reclaiming-data-autonomy-as-a-peasant",
+      "path": "/blog/reclaiming-data-autonomy-as-a-peasant",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "Reclaiming Data Autonomy as a Peasant | peasant",
+        "h1": [
+          "Reclaiming Data Autonomy as a Peasant"
+        ],
+        "overflow": 0,
+        "bodyHeight": 5213,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "blog-reclaiming-data-autonomy-as-a-peasant-light-390.png"
+    },
+    {
+      "name": "about",
+      "path": "/about",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "about | peasant",
+        "h1": [
+          "We are building a sustainable, respectful ecosystem where people have a stake in the data they produce."
+        ],
+        "overflow": 0,
+        "bodyHeight": 1020,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "about-dark-1440.png"
+    },
+    {
+      "name": "about",
+      "path": "/about",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "about | peasant",
+        "h1": [
+          "We are building a sustainable, respectful ecosystem where people have a stake in the data they produce."
+        ],
+        "overflow": 0,
+        "bodyHeight": 1199,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "about-dark-390.png"
+    },
+    {
+      "name": "about",
+      "path": "/about",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "about | peasant",
+        "h1": [
+          "We are building a sustainable, respectful ecosystem where people have a stake in the data they produce."
+        ],
+        "overflow": 0,
+        "bodyHeight": 1020,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "about-light-1440.png"
+    },
+    {
+      "name": "about",
+      "path": "/about",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "about | peasant",
+        "h1": [
+          "We are building a sustainable, respectful ecosystem where people have a stake in the data they produce."
+        ],
+        "overflow": 0,
+        "bodyHeight": 1199,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "about-light-390.png"
+    },
+    {
+      "name": "contact",
+      "path": "/contact",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "contact | peasant",
+        "h1": [
+          "contact"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1066,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "contact-dark-1440.png"
+    },
+    {
+      "name": "contact",
+      "path": "/contact",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "contact | peasant",
+        "h1": [
+          "contact"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1091,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "contact-dark-390.png"
+    },
+    {
+      "name": "contact",
+      "path": "/contact",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "contact | peasant",
+        "h1": [
+          "contact"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1066,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "contact-light-1440.png"
+    },
+    {
+      "name": "contact",
+      "path": "/contact",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "contact | peasant",
+        "h1": [
+          "contact"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1091,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "contact-light-390.png"
+    },
+    {
+      "name": "not-found",
+      "path": "/this-address-does-not-exist",
+      "status": 404,
+      "theme": "dark",
+      "width": 1440,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 404,
+      "metrics": {
+        "title": "page not found | peasant",
+        "h1": [
+          "page not found"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1000,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "not-found-dark-1440.png"
+    },
+    {
+      "name": "not-found",
+      "path": "/this-address-does-not-exist",
+      "status": 404,
+      "theme": "dark",
+      "width": 390,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 404,
+      "metrics": {
+        "title": "page not found | peasant",
+        "h1": [
+          "page not found"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1000,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "not-found-dark-390.png"
+    },
+    {
+      "name": "not-found",
+      "path": "/this-address-does-not-exist",
+      "status": 404,
+      "theme": "light",
+      "width": 1440,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 404,
+      "metrics": {
+        "title": "page not found | peasant",
+        "h1": [
+          "page not found"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1000,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "not-found-light-1440.png"
+    },
+    {
+      "name": "not-found",
+      "path": "/this-address-does-not-exist",
+      "status": 404,
+      "theme": "light",
+      "width": 390,
+      "action": "none",
+      "fullPage": true,
+      "errors": [],
+      "actualStatus": 404,
+      "metrics": {
+        "title": "page not found | peasant",
+        "h1": [
+          "page not found"
+        ],
+        "overflow": 0,
+        "bodyHeight": 1000,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "not-found-light-390.png"
+    },
+    {
+      "name": "login",
+      "path": "/?login",
+      "action": "none",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "login-dark-1440.png"
+    },
+    {
+      "name": "login",
+      "path": "/?login",
+      "action": "none",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7870,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "login-dark-390.png"
+    },
+    {
+      "name": "login",
+      "path": "/?login",
+      "action": "none",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "login-light-1440.png"
+    },
+    {
+      "name": "login",
+      "path": "/?login",
+      "action": "none",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7870,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "login-light-390.png"
+    },
+    {
+      "name": "install-windows",
+      "path": "/",
+      "action": "windows",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "install-windows-dark-1440.png"
+    },
+    {
+      "name": "install-windows",
+      "path": "/",
+      "action": "windows",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7870,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "install-windows-dark-390.png"
+    },
+    {
+      "name": "install-windows",
+      "path": "/",
+      "action": "windows",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "install-windows-light-1440.png"
+    },
+    {
+      "name": "install-windows",
+      "path": "/",
+      "action": "windows",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7870,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "install-windows-light-390.png"
+    },
+    {
+      "name": "landing-menu",
+      "path": "/",
+      "action": "menu",
+      "widths": [
+        390
+      ],
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7870,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "landing-menu-dark-390.png"
+    },
+    {
+      "name": "landing-menu",
+      "path": "/",
+      "action": "menu",
+      "widths": [
+        390
+      ],
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7870,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "landing-menu-light-390.png"
+    },
+    {
+      "name": "docs-search-results",
+      "path": "/docs",
+      "action": "search",
+      "query": "redaction",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 13566,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-search-results-dark-1440.png"
+    },
+    {
+      "name": "docs-search-results",
+      "path": "/docs",
+      "action": "search",
+      "query": "redaction",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 16996,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-search-results-dark-390.png"
+    },
+    {
+      "name": "docs-search-results",
+      "path": "/docs",
+      "action": "search",
+      "query": "redaction",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 13566,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-search-results-light-1440.png"
+    },
+    {
+      "name": "docs-search-results",
+      "path": "/docs",
+      "action": "search",
+      "query": "redaction",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 16996,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-search-results-light-390.png"
+    },
+    {
+      "name": "docs-search-empty",
+      "path": "/docs",
+      "action": "search",
+      "query": "not-a-real-term-for-search",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 13566,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-search-empty-dark-1440.png"
+    },
+    {
+      "name": "docs-search-empty",
+      "path": "/docs",
+      "action": "search",
+      "query": "not-a-real-term-for-search",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 16996,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-search-empty-dark-390.png"
+    },
+    {
+      "name": "docs-search-empty",
+      "path": "/docs",
+      "action": "search",
+      "query": "not-a-real-term-for-search",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 13566,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-search-empty-light-1440.png"
+    },
+    {
+      "name": "docs-search-empty",
+      "path": "/docs",
+      "action": "search",
+      "query": "not-a-real-term-for-search",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 16996,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-search-empty-light-390.png"
+    },
+    {
+      "name": "docs-menu",
+      "path": "/docs",
+      "action": "menu",
+      "widths": [
+        390
+      ],
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 16996,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-menu-dark-390.png"
+    },
+    {
+      "name": "docs-menu",
+      "path": "/docs",
+      "action": "menu",
+      "widths": [
+        390
+      ],
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 16996,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-menu-light-390.png"
+    },
+    {
+      "name": "docs-jump",
+      "path": "/docs",
+      "action": "jump",
+      "widths": [
+        390
+      ],
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 17664,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-jump-dark-390.png"
+    },
+    {
+      "name": "docs-jump",
+      "path": "/docs",
+      "action": "jump",
+      "widths": [
+        390
+      ],
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "docs | peasant",
+        "h1": [
+          "docs"
+        ],
+        "overflow": 0,
+        "bodyHeight": 17664,
+        "windowOffsets": [],
+        "smallReading": [
+          {
+            "tag": "P",
+            "text": "macos, linux and wsl",
+            "size": "14px"
+          },
+          {
+            "tag": "P",
+            "text": "windows powershell",
+            "size": "14px"
+          }
+        ],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "docs-jump-light-390.png"
+    },
+    {
+      "name": "transcript-diffs",
+      "path": "/",
+      "action": "transcript",
+      "tab": "diffs",
+      "widths": [
+        1440
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "transcript-diffs-dark-1440.png"
+    },
+    {
+      "name": "transcript-diffs",
+      "path": "/",
+      "action": "transcript",
+      "tab": "diffs",
+      "widths": [
+        1440
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "transcript-diffs-light-1440.png"
+    },
+    {
+      "name": "transcript-files",
+      "path": "/",
+      "action": "transcript",
+      "tab": "files",
+      "widths": [
+        1440
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "transcript-files-dark-1440.png"
+    },
+    {
+      "name": "transcript-files",
+      "path": "/",
+      "action": "transcript",
+      "tab": "files",
+      "widths": [
+        1440
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "transcript-files-light-1440.png"
+    },
+    {
+      "name": "transcript-graph",
+      "path": "/",
+      "action": "graph",
+      "widths": [
+        1440
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "transcript-graph-dark-1440.png"
+    },
+    {
+      "name": "transcript-graph",
+      "path": "/",
+      "action": "graph",
+      "widths": [
+        1440
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "transcript-graph-light-1440.png"
+    },
+    {
+      "name": "peasant-setup-step",
+      "path": "/projects/peasant",
+      "action": "wizard",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: local coding-agent project history",
+        "h1": [
+          "keep your coding-agent transcripts. share the ones you choose."
+        ],
+        "overflow": 0,
+        "bodyHeight": 1892,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "peasant-setup-step-dark-1440.png"
+    },
+    {
+      "name": "peasant-setup-step",
+      "path": "/projects/peasant",
+      "action": "wizard",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: local coding-agent project history",
+        "h1": [
+          "keep your coding-agent transcripts. share the ones you choose."
+        ],
+        "overflow": 0,
+        "bodyHeight": 2526,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "peasant-setup-step-dark-390.png"
+    },
+    {
+      "name": "peasant-setup-step",
+      "path": "/projects/peasant",
+      "action": "wizard",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: local coding-agent project history",
+        "h1": [
+          "keep your coding-agent transcripts. share the ones you choose."
+        ],
+        "overflow": 0,
+        "bodyHeight": 1892,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "peasant-setup-step-light-1440.png"
+    },
+    {
+      "name": "peasant-setup-step",
+      "path": "/projects/peasant",
+      "action": "wizard",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: local coding-agent project history",
+        "h1": [
+          "keep your coding-agent transcripts. share the ones you choose."
+        ],
+        "overflow": 0,
+        "bodyHeight": 2526,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "peasant-setup-step-light-390.png"
+    },
+    {
+      "name": "village-setup-step",
+      "path": "/projects/village",
+      "action": "wizard",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant online: a governed commons for agent sessions",
+        "h1": [
+          "a shared home for the agent sessions people publish"
+        ],
+        "overflow": 0,
+        "bodyHeight": 2419,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "village-setup-step-dark-1440.png"
+    },
+    {
+      "name": "village-setup-step",
+      "path": "/projects/village",
+      "action": "wizard",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant online: a governed commons for agent sessions",
+        "h1": [
+          "a shared home for the agent sessions people publish"
+        ],
+        "overflow": 0,
+        "bodyHeight": 3384,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "village-setup-step-dark-390.png"
+    },
+    {
+      "name": "village-setup-step",
+      "path": "/projects/village",
+      "action": "wizard",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant online: a governed commons for agent sessions",
+        "h1": [
+          "a shared home for the agent sessions people publish"
+        ],
+        "overflow": 0,
+        "bodyHeight": 2419,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "village-setup-step-light-1440.png"
+    },
+    {
+      "name": "village-setup-step",
+      "path": "/projects/village",
+      "action": "wizard",
+      "widths": [
+        1440,
+        390
+      ],
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant online: a governed commons for agent sessions",
+        "h1": [
+          "a shared home for the agent sessions people publish"
+        ],
+        "overflow": 0,
+        "bodyHeight": 3384,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "village-setup-step-light-390.png"
+    },
+    {
+      "name": "hero-tablet",
+      "path": "/",
+      "action": "hero",
+      "widths": [
+        768
+      ],
+      "theme": "dark",
+      "width": 768,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7146,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "hero-tablet-dark-768.png"
+    },
+    {
+      "name": "hero-tablet",
+      "path": "/",
+      "action": "hero",
+      "widths": [
+        768
+      ],
+      "theme": "light",
+      "width": 768,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7146,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "hero-tablet-light-768.png"
+    },
+    {
+      "name": "graph-host-landing",
+      "path": "/",
+      "action": "graph",
+      "selector": "[data-session-viewer]",
+      "widths": [
+        1440
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "graph-host-landing-dark-1440.png"
+    },
+    {
+      "name": "graph-host-landing",
+      "path": "/",
+      "action": "graph",
+      "selector": "[data-session-viewer]",
+      "widths": [
+        1440
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "peasant: the open-source commons for agent transcripts",
+        "h1": [
+          "the open-source commons for agent transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7507,
+        "windowOffsets": [
+          {
+            "class": "mac-win mac-win-terminal scn-rec-term",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-rec-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser scn-full-browser",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-terminal",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-session-win",
+            "scrollTop": 0
+          },
+          {
+            "class": "mac-win mac-win-browser lp-x-win",
+            "scrollTop": 0
+          }
+        ],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "graph-host-landing-light-1440.png"
+    },
+    {
+      "name": "graph-host-projects",
+      "path": "/projects",
+      "action": "graph",
+      "selector": "[data-transcript-demo]",
+      "widths": [
+        1440
+      ],
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "projects | peasant",
+        "h1": [
+          "a commons for AI coding transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7685,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "graph-host-projects-dark-1440.png"
+    },
+    {
+      "name": "graph-host-projects",
+      "path": "/projects",
+      "action": "graph",
+      "selector": "[data-transcript-demo]",
+      "widths": [
+        1440
+      ],
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "fullPage": false,
+      "errors": [],
+      "actualStatus": 200,
+      "metrics": {
+        "title": "projects | peasant",
+        "h1": [
+          "a commons for AI coding transcripts"
+        ],
+        "overflow": 0,
+        "bodyHeight": 7685,
+        "windowOffsets": [],
+        "smallReading": [],
+        "smallControls": []
+      },
+      "axe": [],
+      "file": "graph-host-projects-light-1440.png"
+    }
+  ]
+}

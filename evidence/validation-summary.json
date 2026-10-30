@@ -1,0 +1,46 @@
+{
+  "fullCatalog": {
+    "total": 173,
+    "initialPasses": 171,
+    "initialFailures": 2,
+    "finding": "Standalone phone transcript headings skipped from section h2 to default turn h4."
+  },
+  "finalSource": "347c1a43ed3f50cea52926dd23164c9e2d1df50c",
+  "finalConfirmation": {
+    "phoneAccessibilityCases": {
+      "passed": 2,
+      "durationSeconds": 15.7
+    },
+    "phoneFixtureRegression": {
+      "passed": 1,
+      "durationSeconds": 1.8
+    },
+    "bothThemePhoneAxe": "No unfiltered axe violations; actual headings are h3,h3."
+  },
+  "build": "passed",
+  "frozenInstall": "passed",
+  "typecheck": "passed",
+  "eslint": {
+    "errors": 0,
+    "preexistingWarnings": 7
+  },
+  "fullMatrix": {
+    "canonicalURLs": 11,
+    "baseCombinations": 44,
+    "notFoundCombinations": 4,
+    "conditionalCombinations": 42,
+    "total": 90,
+    "pageErrors": 0,
+    "documentOverflow": 0,
+    "wcagTaggedAxeViolations": 0,
+    "nonzeroMockupScrollOffsets": 0
+  },
+  "visualReview": {
+    "matrixImages": 90,
+    "byteIdenticalToPreviouslyInspected": 60,
+    "changedOrNewManuallyInspected": 30,
+    "additionalHeroCloseupsInspected": 6,
+    "finalPhoneCapturesInspected": 4
+  },
+  "scopeNote": "The matrix and hero captures are from2e617b3. The only later source delta347c1a4 changes two phone heading-level props and their fixture regression. Both-theme phone captures and complete unfiltered phone accessibility checks confirm that final source."
+}
