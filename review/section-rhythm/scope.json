@@ -1,0 +1,47 @@
+[
+  {
+    "kind": "normal-motion",
+    "width": 1440,
+    "overflow": 0,
+    "pin": 935,
+    "available": 1000,
+    "stage": 450,
+    "coarse": false
+  },
+  {
+    "kind": "about-unchanged",
+    "width": 1440,
+    "before": "108px",
+    "after": "108px"
+  },
+  {
+    "kind": "normal-motion",
+    "width": 768,
+    "overflow": 0,
+    "pin": 740.359375,
+    "available": 1000,
+    "stage": 364,
+    "coarse": false
+  },
+  {
+    "kind": "about-unchanged",
+    "width": 768,
+    "before": "57.6px",
+    "after": "57.6px"
+  },
+  {
+    "kind": "normal-motion",
+    "width": 390,
+    "overflow": 0,
+    "pin": 792.359375,
+    "available": 1000,
+    "stage": 364,
+    "coarse": true
+  },
+  {
+    "kind": "about-unchanged",
+    "width": 390,
+    "before": "56px",
+    "after": "56px"
+  }
+]

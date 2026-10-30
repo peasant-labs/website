@@ -1,0 +1,295 @@
+{
+  "buildId": "lK0NSTHoM8xutuJOl0WAy",
+  "records": [
+    {
+      "name": "phone-light",
+      "interaction": true,
+      "width": 390,
+      "colorScheme": "light",
+      "raisedGap": 0.07,
+      "frontDepth": 0.07,
+      "titleLines": [
+        "the open-source",
+        "commons for",
+        "agent transcripts"
+      ],
+      "missionBeside": false,
+      "missionArtMax": 224,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "headingLeading": [
+          {
+            "selector": "hero-title",
+            "fontSize": "28px",
+            "lineHeight": "39.2px",
+            "ratio": 1.4000000000000001
+          },
+          {
+            "selector": "site-foot-line",
+            "fontSize": "28px",
+            "lineHeight": "39.2px",
+            "ratio": 1.4000000000000001
+          }
+        ],
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "phone-dark",
+      "interaction": true,
+      "width": 390,
+      "colorScheme": "dark",
+      "raisedGap": 0.07,
+      "frontDepth": 0.07,
+      "titleLines": [
+        "the open-source",
+        "commons for",
+        "agent transcripts"
+      ],
+      "missionBeside": false,
+      "missionArtMax": 224,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "headingLeading": [
+          {
+            "selector": "hero-title",
+            "fontSize": "28px",
+            "lineHeight": "39.2px",
+            "ratio": 1.4000000000000001
+          },
+          {
+            "selector": "site-foot-line",
+            "fontSize": "28px",
+            "lineHeight": "39.2px",
+            "ratio": 1.4000000000000001
+          }
+        ],
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "tablet-light",
+      "interaction": false,
+      "width": 768,
+      "colorScheme": "light",
+      "raisedGap": 0.12,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "headingLeading": [
+          {
+            "selector": "hero-title",
+            "fontSize": "28px",
+            "lineHeight": "39.2px",
+            "ratio": 1.4000000000000001
+          },
+          {
+            "selector": "site-foot-line",
+            "fontSize": "28px",
+            "lineHeight": "39.2px",
+            "ratio": 1.4000000000000001
+          }
+        ],
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "tablet-dark",
+      "interaction": false,
+      "width": 768,
+      "colorScheme": "dark",
+      "raisedGap": 0.12,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "headingLeading": [
+          {
+            "selector": "hero-title",
+            "fontSize": "28px",
+            "lineHeight": "39.2px",
+            "ratio": 1.4000000000000001
+          },
+          {
+            "selector": "site-foot-line",
+            "fontSize": "28px",
+            "lineHeight": "39.2px",
+            "ratio": 1.4000000000000001
+          }
+        ],
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "desktop-light",
+      "interaction": true,
+      "width": 1440,
+      "colorScheme": "light",
+      "raisedGap": 0.12,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "headingLeading": [
+          {
+            "selector": "hero-title",
+            "fontSize": "40px",
+            "lineHeight": "56px",
+            "ratio": 1.4
+          },
+          {
+            "selector": "site-foot-line",
+            "fontSize": "40px",
+            "lineHeight": "56px",
+            "ratio": 1.4
+          }
+        ],
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "desktop-dark",
+      "interaction": true,
+      "width": 1440,
+      "colorScheme": "dark",
+      "raisedGap": 0.12,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "headingLeading": [
+          {
+            "selector": "hero-title",
+            "fontSize": "40px",
+            "lineHeight": "56px",
+            "ratio": 1.4
+          },
+          {
+            "selector": "site-foot-line",
+            "fontSize": "40px",
+            "lineHeight": "56px",
+            "ratio": 1.4
+          }
+        ],
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    }
+  ]
+}

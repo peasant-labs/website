@@ -1,0 +1,399 @@
+{
+  "source": "30c33111066d4690db831830f3812942e028b868",
+  "tree": "96f25e7bf23bf9d4f6cbb7b4f4ab5f9e217088c4",
+  "buildId": "lK0NSTHoM8xutuJOl0WAy",
+  "sourceCssSha256": "48ae63cfb98a8d955d9a65f59e02121a43ca73e72d29b16e859f891af8cd35a8",
+  "runtime": {
+    "pid": 22574,
+    "cwd": "<workspace>/website/website-60--fix--landing-section-rhythm",
+    "port": 3383,
+    "buildId": "lK0NSTHoM8xutuJOl0WAy"
+  },
+  "assets": [
+    {
+      "path": "/_next/static/chunks/18bad13d-801de1ca2fb94551.js",
+      "sha256": "b91198d73599cb60bf5795912a75f284e125aa0c50415123468f1e5c04702b28",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/2167-e2a28884c56d2c6d.js",
+      "sha256": "b40a510225f66908c7102d2472807b3ee434f411d284c1307b02a026f7889fe4",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/368-ce6821a876415a95.js",
+      "sha256": "f96dc70fc8fdb29f59a0c78f98fef9825a9049610760a81a3c275c77a3569c79",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/5121-f6381344ef962c62.js",
+      "sha256": "0f553355ef0adb25c80a4b92754626c074ad9a35d6d4a180e9e1ec0704c3d007",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/7686-ba701e3d46af113b.js",
+      "sha256": "6ed0a9791fd626bad42303a5ff5ea92bb43e0adb6bc450ec0760c814497463af",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/7734-2db73a174bcdb61c.js",
+      "sha256": "8b220965897aa05961c57b0c3bd5cdf2e084234901750979d56dc0b361ac318d",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/77d3b4b7-0a729972948fb933.js",
+      "sha256": "ad82774d90e788369445f49065c50ef5b7e4d2ae8244eb5e9934b21f65754c51",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/7ea6f091-91c63f4d003c8224.js",
+      "sha256": "8f8e4501c90d131979ca4e2b1593a0498811a01aaf4be3144243c79357e485d5",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/9216-f8398bede6a99f77.js",
+      "sha256": "4a1996899eca169a8fb3e302f5a1a11ec728ccf0e56ff0f2c3fb9b57fb663467",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/app/error-025584a8c4fcf826.js",
+      "sha256": "648619d93fdd7f66c63bb9baf4fd55f8b44a8875a55ad30bf76b32e6f62deacc",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/app/global-error-d9150ef306eb3afe.js",
+      "sha256": "290bada30f888c241a3e63ab71ab1543814dbf924a0138d514ef1f35bc705832",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/app/layout-afe4d4e2cfedab4f.js",
+      "sha256": "555c3183400bdb7aa9e9b8b3e3bed39df77227d0254d62786605d3a39e2139d3",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/app/page-d2173215ea90df59.js",
+      "sha256": "27d61b0870f7e8f174271e88d04410b581609134f616f75a382d264b9df754f8",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/d56ac8e1-db15b4045c4c5926.js",
+      "sha256": "1b778926112709e9c7455548dba68f60d152f91f28a46d71ed49ee90de20155f",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/main-app-591f6cd420c1bbd0.js",
+      "sha256": "93937997a0ec1b97181eb80c4d320806e3cb79a12bea9df77e93c0a70802ecca",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/polyfills-42372ed130431b0a.js",
+      "sha256": "0973c1d64c88adc8e3c950410cb58b288f72118d5965b78049438deb8f2f9683",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/chunks/webpack-0f4fd714336aebf5.js",
+      "sha256": "733a02464e09922015118b68b4f9af39206b0c6843c674bdb9b5dcd2b5b9838a",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/css/59f1d625a66d3d70.css",
+      "sha256": "6846453176474b59ca07d46b1115e15aca5d24d4511403311ab99e0d0b27b4eb",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/css/6d9d8256903444dc.css",
+      "sha256": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/css/756aee017256b120.css",
+      "sha256": "129dc3f9054a73f96f398ec22c5d1ca1a7e821cf3dc0db1a613c75a474c6a17f",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/css/9d08faa1db65ab41.css",
+      "sha256": "4355c250daf3e0a2cfa023401f3e3790f0b1755f564bfca526bc756b5ebdc429",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/css/e1ca4a7f35ff7017.css",
+      "sha256": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+      "matchesBuild": true
+    },
+    {
+      "path": "/_next/static/css/f505c5205671eb79.css",
+      "sha256": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+      "matchesBuild": true
+    }
+  ],
+  "before": [
+    {
+      "width": 1440,
+      "height": 7042,
+      "heroPadding": "56px 40px",
+      "visionPadding": "56px",
+      "closingPadding": "56px",
+      "gaps": {
+        "heroToBand": 40,
+        "bandToInstall": 108,
+        "installToUses": 216,
+        "usesToHow": 216,
+        "howToSession": 216,
+        "sessionToMission": 164,
+        "missionToClosing": 112,
+        "closingToFooter": 96
+      },
+      "boxes": {
+        ".lp-hero-inner": {
+          "top": 121,
+          "bottom": 440,
+          "height": 319,
+          "width": 1200
+        },
+        ".lp-hero-flow": {
+          "top": 472,
+          "bottom": 838,
+          "height": 366,
+          "width": 1200
+        },
+        ".lp-vision-inner": {
+          "top": 5949.8125,
+          "bottom": 6411.625,
+          "height": 461.8125,
+          "width": 1136
+        },
+        ".site-foot-close .site-foot-cta": {
+          "top": 6523.625,
+          "bottom": 6861.625,
+          "height": 338,
+          "width": 1200
+        }
+      },
+      "overflow": 0
+    },
+    {
+      "width": 768,
+      "height": 6832,
+      "heroPadding": "40px",
+      "visionPadding": "40px",
+      "closingPadding": "56px",
+      "gaps": {
+        "heroToBand": 40,
+        "bandToInstall": 57.59375,
+        "installToUses": 115.1875,
+        "usesToHow": 115.1875,
+        "howToSession": 115.1875,
+        "sessionToMission": 97.59375,
+        "missionToClosing": 96,
+        "closingToFooter": 96
+      },
+      "boxes": {
+        ".lp-hero-inner": {
+          "top": 105,
+          "bottom": 419.375,
+          "height": 314.375,
+          "width": 768
+        },
+        ".lp-hero-flow": {
+          "top": 451.375,
+          "bottom": 689.9375,
+          "height": 238.5625,
+          "width": 768
+        },
+        ".lp-vision-inner": {
+          "top": 5587.1875,
+          "bottom": 6251.75,
+          "height": 664.5625,
+          "width": 704
+        },
+        ".site-foot-close .site-foot-cta": {
+          "top": 6347.75,
+          "bottom": 6652.125,
+          "height": 304.375,
+          "width": 768
+        }
+      },
+      "overflow": 0
+    },
+    {
+      "width": 390,
+      "height": 7272,
+      "heroPadding": "40px",
+      "visionPadding": "40px",
+      "closingPadding": "56px",
+      "gaps": {
+        "heroToBand": 40,
+        "bandToInstall": 56,
+        "installToUses": 112,
+        "usesToHow": 112,
+        "howToSession": 112,
+        "sessionToMission": 96,
+        "missionToClosing": 96,
+        "closingToFooter": 96
+      },
+      "boxes": {
+        ".lp-hero-inner": {
+          "top": 97,
+          "bottom": 562.5625,
+          "height": 465.5625,
+          "width": 390
+        },
+        ".lp-hero-flow": {
+          "top": 594.5625,
+          "bottom": 840.5625,
+          "height": 246,
+          "width": 390
+        },
+        ".lp-vision-inner": {
+          "top": 5715.0625,
+          "bottom": 6635.625,
+          "height": 920.5625,
+          "width": 358
+        },
+        ".site-foot-close .site-foot-cta": {
+          "top": 6731.625,
+          "bottom": 7036,
+          "height": 304.375,
+          "width": 390
+        }
+      },
+      "overflow": 0
+    }
+  ],
+  "after": [
+    {
+      "width": 1440,
+      "height": 7672,
+      "heroPadding": "129.6px",
+      "visionPadding": "129.6px",
+      "closingPadding": "129.6px",
+      "gaps": {
+        "heroToBand": 129.59375,
+        "bandToInstall": 129.59375,
+        "installToUses": 259.1875,
+        "usesToHow": 259.1875,
+        "howToSession": 259.1875,
+        "sessionToMission": 259.1875,
+        "missionToClosing": 259.1875,
+        "closingToFooter": 169.59375
+      },
+      "boxes": {
+        ".lp-hero-inner": {
+          "top": 194.59375,
+          "bottom": 513.59375,
+          "height": 319,
+          "width": 1200
+        },
+        ".lp-hero-flow": {
+          "top": 545.59375,
+          "bottom": 911.59375,
+          "height": 366,
+          "width": 1200
+        },
+        ".lp-vision-inner": {
+          "top": 6359.34375,
+          "bottom": 6821.15625,
+          "height": 461.8125,
+          "width": 1136
+        },
+        ".site-foot-close .site-foot-cta": {
+          "top": 7080.34375,
+          "bottom": 7418.34375,
+          "height": 338,
+          "width": 1200
+        }
+      },
+      "overflow": 0
+    },
+    {
+      "width": 768,
+      "height": 7107,
+      "heroPadding": "72px",
+      "visionPadding": "72px",
+      "closingPadding": "72px",
+      "gaps": {
+        "heroToBand": 72,
+        "bandToInstall": 72,
+        "installToUses": 144,
+        "usesToHow": 144,
+        "howToSession": 144,
+        "sessionToMission": 144,
+        "missionToClosing": 144,
+        "closingToFooter": 112
+      },
+      "boxes": {
+        ".lp-hero-inner": {
+          "top": 137,
+          "bottom": 451.375,
+          "height": 314.375,
+          "width": 768
+        },
+        ".lp-hero-flow": {
+          "top": 483.375,
+          "bottom": 721.9375,
+          "height": 238.5625,
+          "width": 768
+        },
+        ".lp-vision-inner": {
+          "top": 5798.4375,
+          "bottom": 6463,
+          "height": 664.5625,
+          "width": 704
+        },
+        ".site-foot-close .site-foot-cta": {
+          "top": 6607,
+          "bottom": 6911.375,
+          "height": 304.375,
+          "width": 768
+        }
+      },
+      "overflow": 0
+    },
+    {
+      "width": 390,
+      "height": 7560,
+      "heroPadding": "72px",
+      "visionPadding": "72px",
+      "closingPadding": "72px",
+      "gaps": {
+        "heroToBand": 72,
+        "bandToInstall": 72,
+        "installToUses": 144,
+        "usesToHow": 144,
+        "howToSession": 144,
+        "sessionToMission": 144,
+        "missionToClosing": 144,
+        "closingToFooter": 112
+      },
+      "boxes": {
+        ".lp-hero-inner": {
+          "top": 129,
+          "bottom": 594.5625,
+          "height": 465.5625,
+          "width": 390
+        },
+        ".lp-hero-flow": {
+          "top": 626.5625,
+          "bottom": 872.5625,
+          "height": 246,
+          "width": 390
+        },
+        ".lp-vision-inner": {
+          "top": 5939.0625,
+          "bottom": 6859.625,
+          "height": 920.5625,
+          "width": 358
+        },
+        ".site-foot-close .site-foot-cta": {
+          "top": 7003.625,
+          "bottom": 7308,
+          "height": 304.375,
+          "width": 390
+        }
+      },
+      "overflow": 0
+    }
+  ],
+  "all18CapturesInspected": true,
+  "scope": "one authored CSS file; no dependency, component, copy, motion or app changes"
+}

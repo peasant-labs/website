@@ -1,0 +1,10 @@
+
+Running 2 tests using 1 worker
+
+(node:23003) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/2] [chromium] › tests/landing.spec.ts:1010:5 › every section opens on its title alone on a row, in one style at one edge, with room before its content
+[2/2] [chromium] › tests/landing.spec.ts:1047:5 › the selected landing sections share an open ground and coherent responsive reading order
+  2 passed (3.0s)
