@@ -31,6 +31,7 @@ function art(name: string, alt: string, width: number, height: number): Art {
  */
 export const HERO = {
   title: "the open-source commons for agent transcripts",
+  titlePhrases: ["the open-source", "commons for", "agent transcripts"],
   lede: "Peasant gathers the sessions your coding agents save on your computer. Before you share one, Peasant hides its secrets and personal details.",
   pillars: [
     { text: "permissioned sharing", icon: "lock" },

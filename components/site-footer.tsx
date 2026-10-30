@@ -8,9 +8,8 @@ import Link from "next/link";
  * The footer: first the call to action every page ends with, then the mark and
  * every destination that is not in the header.
  *
- * Other pages end on a compact row. The landing ends on a calm split: the
- * line at the page's section-title size and its two buttons, beside a picture
- * on a panel, with room above it and below it before the footer's links.
+ * Other pages end on a compact row. The landing ends on one centered column:
+ * the house, its invitation, then the two actions before the footer's links.
  */
 export function SiteFooter({ landing = false }: { landing?: boolean }) {
   const size = landing ? "site-btn-xl" : "site-btn-lg";
@@ -36,10 +35,10 @@ export function SiteFooter({ landing = false }: { landing?: boolean }) {
         <div className="site-wrap site-foot-cta">
           {landing ? (
             <>
-              <div className="site-foot-close-words">{words}</div>
               <div className="site-foot-close-panel">
                 <Art art={CLOSE.art} className="site-foot-close-art" />
               </div>
+              <div className="site-foot-close-words">{words}</div>
             </>
           ) : (
             words

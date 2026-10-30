@@ -150,7 +150,7 @@
 /* hero */
 
 .lp-hero {
-  padding-block: var(--site-sec-y) var(--sp-7);
+  padding-block: clamp(var(--sp-7), 5vw, var(--sp-8)) var(--sp-7);
 }
 
 .lp-hero-inner {
@@ -163,24 +163,19 @@
 .lp-hero h1 {
   color: var(--ink-strong);
   font-family: var(--font-display);
-  /*
-   * The largest type on the page at every width. On a narrow phone it eases
-   * just below 34px so "commons for agent" (10.6em) still fits one line and
-   * the heading reads in three even lines; it never drops under the section
-   * titles.
-   */
-  font-size: clamp(1.875rem, max(4vw, min(2.125rem, calc((100vw - 2rem) / 10.7))), 3.625rem);
+  max-inline-size: 27ch;
+  font-size: clamp(var(--fs-xl), 3.4vw, var(--fs-hero));
   font-weight: 700;
-  line-height: 1.08;
+  line-height: 1.4;
   letter-spacing: -0.01em;
   text-wrap: balance;
 }
 
 /* balanced: two short sentences, so no line is left with a word or two */
 .lp-lede {
-  max-inline-size: 48ch;
+  max-inline-size: var(--measure-prose);
   color: var(--ink-2);
-  font-size: clamp(1.125rem, 1.5vw, 1.25rem);
+  font-size: var(--fs-md);
   text-wrap: balance;
 }
 
@@ -192,14 +187,15 @@
   margin-block-start: var(--sp-2);
 }
 
-/* on a phone the two buttons stack at one full width, like the closing section's */
+/* Short actions keep their natural size; only a genuinely narrow row wraps. */
 @media (max-width: 47.99rem) {
-  .lp-ctas {
-    width: 100%;
+  .lp-hero-phrase {
+    display: block;
   }
 
-  .lp-ctas .btn {
-    flex: 1 1 100%;
+  .lp-ctas .site-btn-xl,
+  .site-foot-close .site-foot-actions .site-btn-xl {
+    padding-inline: var(--sp-4);
   }
 }
 
@@ -259,10 +255,10 @@
  * darker scatter on the ground, and amber.
  */
 .lp-hero-flow {
-  margin-block-start: clamp(2.5rem, 5vw, 4rem);
+  margin-block-start: var(--sp-6);
 }
 
-/* the picture sits on a panel like the landing's other pictures; the stage holds the air above and below the scene, so the panel adds none */
+/* The page is the illustration's ground; only the drawn objects have a fill. */
 .hf-panel {
   --hf-ink: var(--ink-strong);
 
@@ -270,9 +266,7 @@
   box-sizing: border-box;
   display: grid;
   justify-items: center;
-  padding: 0 var(--sp-4);
-  border: var(--bd);
-  background: var(--surface-2);
+  padding: 0;
 }
 
 :root:not([data-theme="light"]) .hf-panel {
@@ -294,7 +288,7 @@
 @media (min-width: 48rem) {
   .hf {
     width: 100%;
-    max-width: 999px;
+    max-width: 1080px;
   }
 }
 
@@ -2965,39 +2959,39 @@
 
 /* vision */
 
-/* The mission reads as one story: a modest proportional lead, its explanation
-   and illustration kept together instead of a detached display banner. */
+/* A shared open ground ties the hero, mission and invitation together. */
+.lp-vision {
+  padding-block: clamp(var(--sp-7), 5vw, var(--sp-8));
+}
+
 .lp-vision-inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  gap: var(--sp-7);
-  padding-block: var(--site-head-gap);
-  border-top: var(--bd);
+  gap: var(--sp-6);
 }
 
 .lp-vision-scene {
+  display: grid;
+  justify-items: center;
   min-width: 0;
 }
 
 .lp-vision-art {
   display: block;
   width: 100%;
-  max-width: calc(var(--sp-8) * 7);
+  max-width: calc(var(--sp-8) * 4);
   aspect-ratio: 1;
 }
 
-@media (min-width: 64rem) {
+@media (min-width: 48rem) {
   .lp-vision-inner {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
+    gap: var(--sp-7);
   }
-  .lp-vision-scene {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  .lp-vision-words {
-    grid-column: 2;
-    grid-row: 1;
+
+  .lp-vision-art {
+    max-width: calc(var(--sp-8) * 8);
   }
 }
 
@@ -3007,7 +3001,6 @@
   object-fit: contain;
 }
 
-/* The explanation keeps a comfortable reading measure beneath the statement. */
 .lp-vision-words {
   display: grid;
   justify-items: start;
@@ -3037,82 +3030,52 @@
   text-wrap: pretty;
 }
 
-.lp-vision-line + .lp-vision-story {
-  margin-block-start: var(--sp-5);
-}
-
 .lp-vision-cta {
   margin-block-start: var(--sp-6);
 }
 
-
-/*
- * The landing ends on a calm split inside the content width: its line at the
- * page's section-title size and its two buttons, of one height, beside a
- * picture on a page-colour panel with a hairline, like the vision's but
- * smaller. A phone stacks them, picture first. Room above and below sets it
- * apart from the footer's links, with no rules.
- */
+/* The final invitation is one quiet column: house, words, then actions. */
 .site-foot-close {
-  margin-block-end: clamp(2.5rem, 6vw, 5rem);
+  margin-block-end: var(--sp-7);
+  padding-block: var(--sp-8);
 }
 
 .site-foot-close .site-foot-cta {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: clamp(2rem, 5vw, 4rem);
-}
-
-@media (min-width: 48rem) {
-  .site-foot-close .site-foot-cta {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    align-items: center;
-  }
+  justify-items: center;
+  gap: var(--sp-5);
 }
 
 .site-foot-close-words {
   display: grid;
-  justify-items: start;
-  gap: clamp(1.5rem, 3vw, 2.25rem);
+  justify-items: center;
+  gap: var(--sp-5);
+  text-align: center;
 }
 
 .site-foot-close .site-foot-line {
-  max-inline-size: 22ch;
-  font-size: var(--site-title-fs);
-  line-height: 1.12;
+  max-inline-size: 25ch;
+  font-size: clamp(var(--fs-xl), 3.4vw, var(--fs-hero));
+  line-height: 1.4;
 }
 
 .site-foot-close .site-foot-actions {
+  flex: initial;
+  justify-content: center;
   gap: var(--sp-3);
 }
 
-/* the picture, whole, on its panel */
+.site-foot-close .site-foot-actions .btn {
+  flex: initial;
+}
+
 .site-foot-close-panel {
   display: grid;
   place-items: center;
-  padding: clamp(1.5rem, 3.5vw, 2.5rem);
-  border: var(--bd);
-  background: var(--surface-2);
 }
 
 .site-foot-close-art {
-  width: 264px;
+  width: calc(var(--sp-8) * 3);
   max-width: 100%;
-}
-
-@media (min-width: 72rem) {
-  .site-foot-close-art {
-    width: 352px;
-  }
-}
-
-@media (max-width: 47.99rem) {
-  .site-foot-close-panel {
-    order: -1;
-  }
-
-  .site-foot-close-words,
-  .site-foot-close .site-foot-actions {
-    justify-items: stretch;
-  }
 }
