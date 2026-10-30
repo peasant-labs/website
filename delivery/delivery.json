@@ -1,0 +1,20 @@
+{
+  "mergedSource": "e49c42c03889f196d010ead7f7338a79de793641",
+  "inspectedSource": "347c1a43ed3f50cea52926dd23164c9e2d1df50c",
+  "sourceTree": "9dd65f2f58abcca57283ba47582eabe92cf8a1bd",
+  "mergedTreeMatchesInspected": true,
+  "normalDefaultBuild": "passed",
+  "localPreview": 3314,
+  "deployments": [
+    {
+      "id": 7439180152,
+      "status": "success"
+    },
+    {
+      "id": 7439180080,
+      "status": "success"
+    }
+  ],
+  "visualUserAcceptance": "User still dislikes hero positioning, sizes, holder and line wrapping; exploring alternative hero, mission and final CTA compositions before another replacement.",
+  "productionProof": "Both domains: six CSS files match inspected build; new hero positioning marker present; twelve of seventeen JS files byte-identical to inspected/default artifacts. Exact merge deployment succeeded on both services."
+}
