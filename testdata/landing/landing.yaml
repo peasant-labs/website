@@ -40,11 +40,21 @@ hero:
     agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
     # The people stay planted through every stage of the card journey.
     groundedFrames: [0, 2400, 3000, 3500, 4300]
+    journeyFrames:
+      - { name: screen, time: 450 }
+      - { name: scan, time: 1000 }
+      - { name: flight, time: 1500 }
+      - { name: crest, time: 2000 }
+      - { name: landed, time: 3000 }
+      - { name: settled, time: 3250 }
+    # Relative geometry protects a raised transcript and a planted group in depth.
     layouts:
-      - { width: 390, colorScheme: light }
-      - { width: 390, colorScheme: dark }
-      - { width: 1440, colorScheme: light }
-      - { width: 1440, colorScheme: dark }
+      - { name: phone-light, interaction: true, width: 390, colorScheme: light, raisedGap: 0.07, frontDepth: 0.07 }
+      - { name: phone-dark, interaction: true, width: 390, colorScheme: dark, raisedGap: 0.07, frontDepth: 0.07 }
+      - { name: tablet-light, interaction: false, width: 768, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06 }
+      - { name: tablet-dark, interaction: false, width: 768, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06 }
+      - { name: desktop-light, interaction: true, width: 1440, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06 }
+      - { name: desktop-dark, interaction: true, width: 1440, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06 }
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
 # the band under the hero: the harnesses peasant reads, each led by its mark
@@ -175,6 +185,7 @@ session:
   # on a phone, the slice shown instead of the windows: the prompt, the redacted line of the .env it read, and the commit
   phone:
     widths: [360, 390]
+    headingLevel: 3
     prompt: hey claude, run our billing retry suite against each model, same seed, and write a table of pass rate, tokens and wall time per model
     tool: .env
     key: AWS_ACCESS_KEY_ID=
@@ -191,6 +202,11 @@ session:
   tabs: [highlights, full trace, diffs, files, annotations]
   # placeholders the redaction engine writes, visible in the transcript
   markers: ["<USER>", "<AWS_ACCESS_KEY>", "<EMAIL>"]
+graphs:
+  - { name: landing-light, path: /, selector: "[data-session-viewer]", width: 1440, theme: light }
+  - { name: landing-dark, path: /, selector: "[data-session-viewer]", width: 1440, theme: dark }
+  - { name: projects-light, path: /projects, selector: "[data-transcript-demo]", width: 1440, theme: light }
+  - { name: projects-dark, path: /projects, selector: "[data-transcript-demo]", width: 1440, theme: dark }
 # the share card the transcript's link preview shows, drawn by fairtrade from the sample: its figures are the
 # sample's own prompt count and token total
 card:

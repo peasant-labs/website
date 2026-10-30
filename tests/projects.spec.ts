@@ -675,13 +675,13 @@ function parseComparisonCell(value: unknown, location: string): ComparisonCellFi
   const status = enumValue(object.status, COMPARISON_STATUSES, `${location}.status`);
   const qualification = nonEmptyString(object.qualification, `${location}.qualification`);
   const sources = stringArray(object.sources, `${location}.sources`);
-  if (status === "not-documented" && !sources.includes("entire-declared-corpus-2026-07-28") && location.endsWith(".entire")) {
+  if (status === "not-documented" && !sources.includes("entire-declared-corpus-2026-10-30") && location.endsWith(".entire")) {
     fixtureError(location, "not-documented lacks the declared Entire corpus", "cite the dated declared-corpus evidence ID");
   }
   if (
     status === "not-documented" &&
     location.endsWith(".peasantLabs") &&
-    !sources.includes("peasant-current-corpus-2026-07-28")
+    !sources.includes("peasant-current-corpus-2026-10-30")
   ) {
     fixtureError(
       location,

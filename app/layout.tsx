@@ -7,6 +7,8 @@ import type { Metadata, Viewport } from "next";
 import "@peasant-labs/fairtrade/tokens.css";
 import "@peasant-labs/fairtrade/base.css";
 import "@peasant-labs/fairtrade/components.css";
+import "@xyflow/react/dist/style.css";
+import "@peasant-labs/fairtrade/graph.css";
 import "./globals.css";
 import "./site.css";
 

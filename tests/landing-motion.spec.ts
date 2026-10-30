@@ -212,6 +212,10 @@ test("on a phone the session is a short slice at the column's width, its redacte
     await expect(section.locator(".lp-windows-term")).toBeHidden();
     await expect(section.locator(".mac-win").filter({ visible: true })).toHaveCount(0);
     await expect(slice).toBeVisible();
+    const turnHeadings = slice.locator(".txn-turn-heading");
+    await expect(turnHeadings).not.toHaveCount(0);
+    expect(await turnHeadings.evaluateAll((headings) => headings.map((heading) => heading.tagName)))
+      .toEqual(Array(await turnHeadings.count()).fill(`H${fixture.session.phone.headingLevel}`));
     await expect(section.locator("[data-x-thread]").filter({ visible: true })).toHaveCount(1);
     // the prompt, the tool call that read .env open on its redacted key, and the commit with its churn
     await expect(slice.locator(".txn-turn.user")).toContainText(fixture.session.phone.prompt);
@@ -339,6 +343,48 @@ test("a heading that mounts after load is still revealed", async ({ page }) => {
   await expect(page.locator("#late")).toHaveAttribute("data-shown", "true");
 });
 
+for (const { name, width, colorScheme, raisedGap, frontDepth } of fixture.hero.flow.layouts) {
+  test(`the hero composition keeps its raised transcript and planted figures: ${name}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const flow = page.locator(".hf");
+    await flow.scrollIntoViewIfNeeded();
+    const composition = await flow.evaluate((root) => {
+      const visible = (selector: string) => [...root.querySelectorAll(selector)].find((element) => getComputedStyle(element).display !== "none" && element.getBoundingClientRect().width > 0)!;
+      const art = visible(".hf-art");
+      const rect = (selector: string) => art.querySelector(selector)!.getBoundingClientRect().toJSON();
+      return {
+        height: root.getBoundingClientRect().height,
+        laptop: rect(".hf-laptop"),
+        stack: visible(".hf-base").getBoundingClientRect().toJSON(),
+        rake: rect('[data-member="rake"]'), wave: rect('[data-member="wave"]'), basket: rect('[data-member="basket"]'),
+        backBody: rect('[data-member="wave"] .hf-person-body'), frontBody: rect('[data-member="basket"] .hf-person-body'),
+      };
+    });
+    expect(composition.laptop.bottom - composition.stack.bottom, `raised transcript at ${width}`).toBeGreaterThan(composition.height * raisedGap);
+    expect(composition.basket.bottom - Math.max(composition.rake.bottom, composition.wave.bottom), `front figure at ${width}`).toBeGreaterThan(composition.height * frontDepth);
+    expect(composition.basket.left, `the people gather around the front figure at ${width}`).toBeGreaterThan(composition.rake.left);
+    expect(composition.basket.right, `the people gather around the front figure at ${width}`).toBeLessThan(composition.wave.right);
+    expect(composition.backBody.height / composition.frontBody.height, `back figures are smaller at ${width}`).toBeLessThan(0.96);
+    for (const frame of fixture.hero.flow.journeyFrames) {
+      const escaped = await flow.evaluate((root, time) => {
+        const animations = root.getAnimations({ subtree: true });
+        const originalTimes = animations.map((animation) => animation.currentTime);
+        for (const animation of animations) animation.currentTime = time;
+        const bounds = root.getBoundingClientRect();
+        const outside = [...root.querySelectorAll(".hf-card")].filter((element) => Number(getComputedStyle(element).opacity) > 0.01).filter((element) => {
+          const box = element.getBoundingClientRect();
+          return box.left < bounds.left - 1 || box.right > bounds.right + 1 || box.top < bounds.top - 1 || box.bottom > bounds.bottom + 1;
+        }).length;
+        animations.forEach((animation, index) => { animation.currentTime = originalTimes[index]; });
+        return outside;
+      }, frame.time);
+      expect(escaped, `cards stay in frame at ${width}, ${colorScheme}, ${frame.name}`).toBe(0);
+    }
+  });
+}
+
 test("the hero picture loops while on screen, holds while a pointer moves onto it, and holds still for reduced motion", async ({
   page,
 }) => {
@@ -348,7 +394,7 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   const card = flow.locator(".hf-card").first();
   const running = () => card.evaluate((element) => element.getAnimations().map((animation) => animation.playState));
 
-  for (const { width, colorScheme } of fixture.hero.flow.layouts) {
+  for (const { width, colorScheme } of fixture.hero.flow.layouts.filter((layout) => layout.interaction)) {
     await page.emulateMedia({ colorScheme });
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");

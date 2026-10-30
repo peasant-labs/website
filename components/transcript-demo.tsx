@@ -1,6 +1,7 @@
 "use client";
 
 import { DEMO_SESSION } from "@/lib/demo-session";
+import { TranscriptGraph } from "@/components/transcript-graph";
 import { currentTheme, subscribeToTheme, type Theme } from "@/lib/theme";
 import {
   adaptTranscript,
@@ -74,6 +75,7 @@ export function TranscriptDemo({
         activeTab={activeTab}
         onTabChange={setActiveTab}
         breadcrumb={breadcrumb}
+        graphSlot={({ viewModel }) => <TranscriptGraph session={session} viewModel={viewModel} />}
       />
     </div>
   );

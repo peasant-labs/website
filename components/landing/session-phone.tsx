@@ -49,10 +49,11 @@ export function SessionPhone({
     <div className="lp-phone" data-session-phone role="group" aria-label={label}>
       {drawn ? (
         <>
-          {ask ? <TranscriptTurnCard turn={ask} /> : null}
+          {ask ? <TranscriptTurnCard turn={ask} headingLevel={3} /> : null}
           {read ? (
             <TranscriptTurnCard
               turn={read}
+              headingLevel={3}
               openTools={openTools}
               toggleTool={(id) => setOpenTools((current) => ({ ...current, [id]: !current[id] }))}
             />

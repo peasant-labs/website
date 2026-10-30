@@ -10,6 +10,28 @@ import { loadLandingFixture, PHONE } from "./landing-fixture";
 
 const fixture = loadLandingFixture();
 
+for (const graph of fixture.graphs) {
+  test(`the sample graph renders transcript nodes and returns to reading: ${graph.name}`, async ({ page }) => {
+    await page.setViewportSize({ width: graph.width, height: 1000 });
+    await page.emulateMedia({ colorScheme: graph.theme, reducedMotion: "reduce" });
+    await page.addInitScript((theme) => localStorage.setItem("peasant-labs-theme", theme), graph.theme);
+    await page.goto(graph.path);
+    const viewer = page.locator(graph.selector);
+    await viewer.scrollIntoViewIfNeeded();
+    await expect(viewer.locator(".txn-app")).toBeVisible();
+    await expect(viewer.locator(".txn-app")).toHaveAttribute("data-theme", graph.theme);
+    await viewer.getByRole("tab", { name: /full trace/ }).click();
+    await viewer.getByRole("button", { name: "graph", exact: true }).click();
+    await expect(viewer.locator(".tb-graph .react-flow")).toBeVisible();
+    await expect.poll(() => viewer.locator(".react-flow__node-turn").count()).toBeGreaterThan(0);
+    await expect(viewer).not.toContainText("no graph engine");
+    await expect(viewer).not.toContainText("graphSlot");
+    await viewer.getByRole("button", { name: "list", exact: true }).click();
+    await viewer.getByRole("tab", { name: /full trace/ }).click();
+    await expect(viewer.locator(".txn-turn").first()).toBeVisible();
+  });
+}
+
 test("the landing reads in order and carries none of the removed sections", async ({ page }) => {
   const response = await page.goto("/");
   const html = (await response!.text()).toLowerCase();
