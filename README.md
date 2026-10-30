@@ -1,5 +1,35 @@
 # Landing section composition review
 
+## Final wrapped-heading confirmation
+
+Final source `1766d71bafe9aaa6c8b41812b081461c16be28d1`, production build `6a9ZLKOjR30BBjxOIQpzR`.
+
+The only delta from the initial composition source below is readable leading for the wrapped hero and final CTA titles, plus computed mounted assertions. Both use 1.4: 40px/56px at desktop and 28px/39.2px on phone, in both themes. The selected phrase groups and all placements/actions remain intact.
+
+The normal production build, TypeScript and touched-test ESLint pass. The existing section test passes across all six fixture layouts (desktop/tablet/phone, light/dark). Twelve refreshed desktop/phone images were inspected: zero overflow, page errors or WCAG-tagged axe findings; transcript windows remain at scroll offset zero. The original 23-test result and six-state audit below remain retained; broad route suites were not repeated for these two line-height rules.
+
+[Final report](landing/leading-confirmation/report.json), [provenance](landing/leading-confirmation/provenance.json), [section test](landing/leading-confirmation/section-test.log), [build](landing/leading-confirmation/build.log), [TypeScript](landing/leading-confirmation/tsc.log), [touched-test ESLint](landing/leading-confirmation/lint-delta.log).
+
+### Final hero
+
+| View | Light | Dark |
+|---|---|---|
+| desktop | ![desktop light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/leading-confirmation/desktop-light-hero.png) | ![desktop dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/leading-confirmation/desktop-dark-hero.png) |
+| phone | ![phone light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/leading-confirmation/phone-light-hero.png) | ![phone dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/leading-confirmation/phone-dark-hero.png) |
+
+### Final mission and CTA
+
+| View | Light | Dark |
+|---|---|---|
+| desktop | ![desktop light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/leading-confirmation/desktop-light-outro.png) | ![desktop dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/leading-confirmation/desktop-dark-outro.png) |
+| phone | ![phone light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/leading-confirmation/phone-light-outro.png) | ![phone dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/leading-confirmation/phone-dark-outro.png) |
+
+Full-page confirmation: [desktop light](landing/leading-confirmation/desktop-light-full.png), [desktop dark](landing/leading-confirmation/desktop-dark-full.png), [phone light](landing/leading-confirmation/phone-light-full.png), [phone dark](landing/leading-confirmation/phone-dark-full.png).
+
+---
+
+# Initial composition evidence
+
 Mounted production evidence for source `a293a068bfb9738fe1f4ba6f2905bf4bc9d6309b`, build `8jhGSyembN8sdlIKq1r5d`.
 
 The selected direction combines a centered Open field hero, Paired canvas mission with text left and illustration right, and a centered Quiet column final invitation. These are the real production components and original artwork, including the animated card journey. The static captures use the supported reduced-motion finished frame.

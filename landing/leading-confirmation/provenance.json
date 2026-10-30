@@ -1,0 +1,35 @@
+{
+  "sourceCommit": "1766d71bafe9aaa6c8b41812b081461c16be28d1",
+  "baseSourceCommit": "a293a068bfb9738fe1f4ba6f2905bf4bc9d6309b",
+  "buildId": "6a9ZLKOjR30BBjxOIQpzR",
+  "url": "http://127.0.0.1:3382/",
+  "cwd": "/Users/vitorhugo/Documents/Projects/polyrepo/website/website-60--fix--landing-section-composition",
+  "fairtrade": "0.0.56",
+  "httpHtmlSha256": "80f6b67010f3d401d7093fe8bf1f9fa067bfd5ef2a2e7ff3724460da2a3eb92e",
+  "servedCssSha256": {
+    "/_next/static/css/fc905a01d8ee354d.css": "79ff0ba39e3198e99b4e8878c32bb540d9e1b38d73bc184e3bd8098239829072",
+    "/_next/static/css/f505c5205671eb79.css": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+    "/_next/static/css/6d9d8256903444dc.css": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+    "/_next/static/css/756aee017256b120.css": "129dc3f9054a73f96f398ec22c5d1ca1a7e821cf3dc0db1a613c75a474c6a17f",
+    "/_next/static/css/e1ca4a7f35ff7017.css": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+    "/_next/static/css/59f1d625a66d3d70.css": "6846453176474b59ca07d46b1115e15aca5d24d4511403311ab99e0d0b27b4eb"
+  },
+  "committedDeltaFiles": {
+    "app/landing.css": "58f42e32d6f85c99a3343bce1bf848288b427b265c80395aad9f0c5213730714",
+    "tests/landing.spec.ts": "4a353ec01de276fb6702f3f83b96eba121b2c5c960e41b6bb99062d1e27749a1"
+  },
+  "screenshots": {
+    "desktop-dark-hero.png": "081acb7ce464e84e6e3f8e8540e757779814b41445648243fa41a0acae8cae70",
+    "phone-dark-full.png": "87380a53f433ceda3f628cca746711dd5f95a80e4190f29f215a94e723b28c0d",
+    "desktop-dark-outro.png": "bded8f47801359929d4135c9cb5d25438382a108fd16b3249b50a6eb8565ec4c",
+    "phone-light-full.png": "76b19699b29821cbb6b813bdb1322847f4286011b6972b76afdc3f1f00d301a1",
+    "desktop-light-full.png": "a240668ca577b1f168fce40479d18a54ace4e1ca704e233157a456b00eef8a07",
+    "phone-dark-outro.png": "4195be6306d365ab92c28e23030166e20f8789d8e5c0c87b6797cd7a828dfc63",
+    "phone-light-hero.png": "251647ea33f97a66ec6d130292198addb137af3c4979adfaec0ce14756eea480",
+    "desktop-light-outro.png": "ad8130d424d8119c6016433ab10ca1fb5c84050bd80974a5f4034c528f1c6ee4",
+    "phone-light-outro.png": "deaca54305454ef67acfb3629e687dca41890d8c1417c687fbd18a83d966385d",
+    "desktop-light-hero.png": "65cb17eb3d18ee0c3b88e486698f98efc9ceb3c2f125329ad7788bf71750221e",
+    "desktop-dark-full.png": "78b81144a66666c9c6a757f82f3ba4d6ec792b47c1932c72d333cb52f24862bd",
+    "phone-dark-hero.png": "7b264eaff0669c34b6bbc26af8d26863d6273a4bac68887de9403b86d517b3db"
+  }
+}
