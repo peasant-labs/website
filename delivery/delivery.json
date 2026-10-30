@@ -1,0 +1,34 @@
+{
+  "source": "5922319928204ad1c1bb05b0fb40a1d274ef16e8",
+  "reviewedSource": "30c33111066d4690db831830f3812942e028b868",
+  "tree": "96f25e7bf23bf9d4f6cbb7b4f4ab5f9e217088c4",
+  "treeEqualsReviewed": true,
+  "normalDefaultBuild": "passed",
+  "runtime": {
+    "pid": 33952,
+    "cwd": "<workspace>/website/main",
+    "port": 3314,
+    "source": "5922319928204ad1c1bb05b0fb40a1d274ef16e8",
+    "fairtrade": "0.0.56",
+    "log": "<workspace>/.agents.local/website-preview.log",
+    "mode": "production",
+    "buildId": "diAccx8y3NxH9Sm6WZpvp"
+  },
+  "mountedReadback": "six theme/width observations passed; two actual merged-build desktop outro captures inspected",
+  "all23LocalAssetsMatchBuild": true,
+  "publicProof": "production.json; all six CSS assets match inspected artifact on both public domains",
+  "deployments": "both actual-merge Railway deployments succeeded; deployments.json",
+  "retiredTemporaryRuntime": {
+    "pid": 22574,
+    "cwd": "<workspace>/website/website-60--fix--landing-section-rhythm",
+    "port": 3383,
+    "buildId": "lK0NSTHoM8xutuJOl0WAy",
+    "retired": true,
+    "replacement": "http://localhost:3314",
+    "mergedSource": "5922319928204ad1c1bb05b0fb40a1d274ef16e8"
+  },
+  "mergedFeatureWorktreeRemoved": true,
+  "remoteFeatureBranchRemoved": true,
+  "preservedPreview": "http://localhost:3395/selected-landing-layout-preview.html",
+  "updatedAt": "2026-10-30T17:22:08.897888+00:00"
+}

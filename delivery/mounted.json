@@ -1,0 +1,128 @@
+[
+  {
+    "width": 1440,
+    "theme": "light",
+    "metrics": {
+      "missionToClosing": 259.1875,
+      "heroArtWidth": 1080,
+      "missionWidth": 448,
+      "overflow": 0,
+      "headingLeading": "56px",
+      "viewerScroll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "errors": []
+  },
+  {
+    "width": 1440,
+    "theme": "dark",
+    "metrics": {
+      "missionToClosing": 259.1875,
+      "heroArtWidth": 1080,
+      "missionWidth": 448,
+      "overflow": 0,
+      "headingLeading": "56px",
+      "viewerScroll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "errors": []
+  },
+  {
+    "width": 768,
+    "theme": "light",
+    "metrics": {
+      "missionToClosing": 144,
+      "heroArtWidth": 704,
+      "missionWidth": 295.125,
+      "overflow": 0,
+      "headingLeading": "39.2px",
+      "viewerScroll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "errors": []
+  },
+  {
+    "width": 768,
+    "theme": "dark",
+    "metrics": {
+      "missionToClosing": 144,
+      "heroArtWidth": 704,
+      "missionWidth": 295.125,
+      "overflow": 0,
+      "headingLeading": "39.2px",
+      "viewerScroll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "errors": []
+  },
+  {
+    "width": 390,
+    "theme": "light",
+    "metrics": {
+      "missionToClosing": 144,
+      "heroArtWidth": 300,
+      "missionWidth": 224,
+      "overflow": 0,
+      "headingLeading": "39.2px",
+      "viewerScroll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "errors": []
+  },
+  {
+    "width": 390,
+    "theme": "dark",
+    "metrics": {
+      "missionToClosing": 144,
+      "heroArtWidth": 300,
+      "missionWidth": 224,
+      "overflow": 0,
+      "headingLeading": "39.2px",
+      "viewerScroll": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "errors": []
+  }
+]
