@@ -25,8 +25,8 @@ export type SourceScope =
   | "bundle-definition";
 
 export const EVIDENCE_IDS = [
-  "peasant-rc2-private-release",
-  "peasant-current-corpus-2026-07-28",
+  "peasant-public-release",
+  "peasant-current-corpus-2026-10-30",
   "peasant-readme",
   "peasant-adapters",
   "peasant-selection-redaction",
@@ -38,15 +38,15 @@ export const EVIDENCE_IDS = [
   "village-collectives",
   "village-governance",
   "village-schema-pin",
-  "schema-rc10",
+  "schema-public-release",
   "schema-current",
-  "fairtrade-0.0.9",
+  "fairtrade-package",
   "bundle-definition",
   "entire-home",
   "entire-projects",
   "entire-docs-index",
   "entire-cli-repo",
-  "entire-cli-v0.9.0",
+  "entire-cli-release",
   "entire-quickstart",
   "entire-agents",
   "entire-security",
@@ -61,7 +61,7 @@ export const EVIDENCE_IDS = [
   "entire-repository-limitations",
   "entire-privacy",
   "entire-terms",
-  "entire-declared-corpus-2026-07-28",
+  "entire-declared-corpus-2026-10-30",
 ] as const;
 
 export type EvidenceId = (typeof EVIDENCE_IDS)[number];
@@ -87,34 +87,34 @@ export type EvidenceRecord = Readonly<{
 }>;
 
 const REVIEW = {
-  verifiedOn: "2026-09-01",
-  reverifyBy: "2026-10-01",
+  verifiedOn: "2026-10-30",
+  reverifyBy: "2026-11-30",
   reviewOwner: "peasant labs website maintainers",
 } as const;
 
 export const EVIDENCE = {
-  "peasant-rc2-private-release": {
-    id: "peasant-rc2-private-release",
+  "peasant-public-release": {
+    id: "peasant-public-release",
     label: "peasant public release",
-    claim: "The observed peasant product release is the public v0.4.0 release.",
+    claim: "The cited official Peasant release is public.",
     sourceScope: "public-release",
     advertisedState: "public-release",
     revisionOrVersion:
-      "v0.4.0 at c2b2aeeb7c9d8c82de7ac560da62d0aa4689ca7f",
+      "v0.13.5 at be9e385ad386e41cd6b80a17dac25c0e4b3b2d20",
     internalProvenance: "peasant public release tag and commit",
     sourceIds: [],
-    publicHref: "https://github.com/peasant-labs/peasant/releases/tag/v0.4.0",
-    publishedOn: "2026-08-26T23:32:54Z",
+    publicHref: "https://github.com/peasant-labs/peasant/releases/tag/v0.13.5",
+    publishedOn: "2026-10-29T03:38:38Z",
     ...REVIEW,
   },
-  "peasant-current-corpus-2026-07-28": {
-    id: "peasant-current-corpus-2026-07-28",
+  "peasant-current-corpus-2026-10-30": {
+    id: "peasant-current-corpus-2026-10-30",
     label: "peasant current-source corpus",
     claim:
       "The reviewed peasant corpus covers its README, adapter registry, search, Kickstart, pull, and license state.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "d0eebce058e8fb170bc6f4d730f990d3a8aab569",
+    revisionOrVersion: "9351199458243ce506a1f14cab1338659003846f",
     internalProvenance: "peasant current source reviewed at the pinned revision",
     sourceIds: [],
     ...REVIEW,
@@ -126,21 +126,21 @@ export const EVIDENCE = {
       "peasant documents local SQLite storage, normalized transcript detail, explicit village push and pull, analytics, and Git associations where observed.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "d0eebce058e8fb170bc6f4d730f990d3a8aab569",
+    revisionOrVersion: "9351199458243ce506a1f14cab1338659003846f",
     internalProvenance: "peasant/develop/README.md",
-    sourceIds: ["peasant-current-corpus-2026-07-28"],
+    sourceIds: ["peasant-current-corpus-2026-10-30"],
     ...REVIEW,
   },
   "peasant-adapters": {
     id: "peasant-adapters",
     label: "peasant adapter registry",
     claim:
-      "Current source registers adapters for Claude Code, OpenCode, Codex, Cursor, and Strike.",
+      "Current source registers adapters for Claude Code, OpenCode, Codex, Cursor, Strike, and Pi.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "d0eebce058e8fb170bc6f4d730f990d3a8aab569",
-    internalProvenance: "peasant/develop/internal/ingest/adapter.go:251-268",
-    sourceIds: ["peasant-current-corpus-2026-07-28"],
+    revisionOrVersion: "9351199458243ce506a1f14cab1338659003846f",
+    internalProvenance: "peasant/internal/ingest/adapter.go:343-361",
+    sourceIds: ["peasant-current-corpus-2026-10-30"],
     ...REVIEW,
   },
   "peasant-selection-redaction": {
@@ -150,9 +150,9 @@ export const EVIDENCE = {
       "Kickstart persists selected projects, branches, and sessions and documents Standard redaction for later explicit sharing.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "d0eebce058e8fb170bc6f4d730f990d3a8aab569",
-    internalProvenance: "peasant/develop/docs/KICKSTART.md:20-35",
-    sourceIds: ["peasant-current-corpus-2026-07-28"],
+    revisionOrVersion: "9351199458243ce506a1f14cab1338659003846f",
+    internalProvenance: "peasant/docs/KICKSTART.md",
+    sourceIds: ["peasant-current-corpus-2026-10-30"],
     ...REVIEW,
   },
   "peasant-search": {
@@ -162,10 +162,10 @@ export const EVIDENCE = {
       "Current source provides local FTS5 full-text search over recorded message entries.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "d0eebce058e8fb170bc6f4d730f990d3a8aab569",
+    revisionOrVersion: "9351199458243ce506a1f14cab1338659003846f",
     internalProvenance:
       "peasant/develop/internal/store/schema_v35.go and internal/api/provider.go",
-    sourceIds: ["peasant-current-corpus-2026-07-28"],
+    sourceIds: ["peasant-current-corpus-2026-10-30"],
     ...REVIEW,
   },
   "peasant-pull": {
@@ -175,9 +175,9 @@ export const EVIDENCE = {
       "Pulled foreign transcripts use a separate one-way namespace and do not become owned analytics or re-push candidates.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "d0eebce058e8fb170bc6f4d730f990d3a8aab569",
+    revisionOrVersion: "9351199458243ce506a1f14cab1338659003846f",
     internalProvenance: "peasant/develop/docs/pull.md",
-    sourceIds: ["peasant-current-corpus-2026-07-28"],
+    sourceIds: ["peasant-current-corpus-2026-10-30"],
     ...REVIEW,
   },
   "peasant-license": {
@@ -187,32 +187,32 @@ export const EVIDENCE = {
       "peasant is licensed under Apache-2.0; content licenses attached to published data are separate.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "d0eebce058e8fb170bc6f4d730f990d3a8aab569",
-    internalProvenance: "peasant/develop/LICENSE and README.md:884-891",
-    sourceIds: ["peasant-current-corpus-2026-07-28"],
+    revisionOrVersion: "9351199458243ce506a1f14cab1338659003846f",
+    internalProvenance: "peasant/LICENSE and README.md",
+    sourceIds: ["peasant-current-corpus-2026-10-30"],
     publicHref: "https://github.com/peasant-labs/peasant/blob/develop/LICENSE",
     ...REVIEW,
   },
   "peasant-schema-pin": {
     id: "peasant-schema-pin",
     label: "peasant schema consumer pin",
-    claim: "peasant consumes github.com/peasant-labs/schema v0.1.2.",
+    claim: "peasant consumes the canonical schema module pinned in its inspected go.mod.",
     sourceScope: "current-source",
     advertisedState: "current-source",
     revisionOrVersion:
-      "peasant d0eebce058e8fb170bc6f4d730f990d3a8aab569, schema v0.1.2",
-    internalProvenance: "peasant/develop/go.mod:15",
-    sourceIds: ["peasant-current-corpus-2026-07-28"],
+      "peasant 9351199458243ce506a1f14cab1338659003846f, schema v0.36.0",
+    internalProvenance: "peasant/go.mod:23",
+    sourceIds: ["peasant-current-corpus-2026-10-30"],
     ...REVIEW,
   },
   "village-readme": {
     id: "village-readme",
     label: "village current README",
     claim:
-      "village stores selected published copies and documents a private contributor Docker Compose stack and peasant-driven publishing.",
+      "village stores selected published copies and documents a contributor Docker Compose stack and peasant-driven publishing.",
     sourceScope: "current-source",
-    advertisedState: "private-contributor-development",
-    revisionOrVersion: "652390acfdff46379d2ea489fb4b178780a1982e",
+    advertisedState: "current-source",
+    revisionOrVersion: "3982cbf7d0a573cc5951dfdd88db73d2811f477b",
     internalProvenance: "village/develop/README.md",
     sourceIds: [],
     ...REVIEW,
@@ -224,7 +224,7 @@ export const EVIDENCE = {
       "Current source describes collectives as groups governing shared data with open and curated contribution modes.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "652390acfdff46379d2ea489fb4b178780a1982e",
+    revisionOrVersion: "3982cbf7d0a573cc5951dfdd88db73d2811f477b",
     internalProvenance:
       "village/develop/frontend/src/app/groups and collective settings routes",
     sourceIds: ["village-readme"],
@@ -237,7 +237,7 @@ export const EVIDENCE = {
       "village documents optional CC licensing, public/private/shared visibility, trigger-written append-only governance events, and SQL-enforced pull authorization.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "652390acfdff46379d2ea489fb4b178780a1982e",
+    revisionOrVersion: "3982cbf7d0a573cc5951dfdd88db73d2811f477b",
     internalProvenance: "village/develop/docs/database-invariants.md",
     sourceIds: ["village-readme"],
     ...REVIEW,
@@ -245,75 +245,75 @@ export const EVIDENCE = {
   "village-schema-pin": {
     id: "village-schema-pin",
     label: "village schema consumer pin",
-    claim: "village consumes github.com/peasant-labs/schema v0.1.2.",
+    claim: "village consumes the canonical schema module pinned in its inspected go.mod.",
     sourceScope: "current-source",
     advertisedState: "current-source",
     revisionOrVersion:
-      "village 652390acfdff46379d2ea489fb4b178780a1982e, schema v0.1.2",
+      "village 3982cbf7d0a573cc5951dfdd88db73d2811f477b, schema v0.38.0",
     internalProvenance: "village/develop/backend/go.mod:18",
     sourceIds: ["village-readme"],
     ...REVIEW,
   },
-  "schema-rc10": {
-    id: "schema-rc10",
-    label: "Public schema v0.1.3-rc1 release",
+  "schema-public-release": {
+    id: "schema-public-release",
+    label: "Public schema v0.38.0 release",
     claim:
       "The public Apache-2.0 schema release provides canonical Go, TypeScript, Zod, and OpenAPI contracts.",
     sourceScope: "public-release",
     advertisedState: "public-release",
     revisionOrVersion:
-      "v0.1.3-rc1 at acc978020f1daf94bcfd12014af8a004c7155e94",
+      "v0.38.0 at c8bb219cd169dec41256c352e93b736263246eea",
     internalProvenance: "schema release and commit-pinned README",
     sourceIds: [],
     publicHref:
-      "https://github.com/peasant-labs/schema/releases/tag/v0.1.3-rc1",
-    publishedOn: "2026-08-30T14:57:15Z",
+      "https://github.com/peasant-labs/schema/releases/tag/v0.38.0",
+    publishedOn: "2026-10-29T08:26:43Z",
     ...REVIEW,
   },
   "schema-current": {
     id: "schema-current",
     label: "schema current source",
     claim:
-      "Current schema source identifies Village API 0.14.0, Peasant Local API 0.9.0, and Types 0.14.0.",
+      "Current schema source declares the Village API, Peasant Local API, and Types spec versions in versions.go.",
     sourceScope: "current-source",
     advertisedState: "current-source",
-    revisionOrVersion: "89265812bb7856e97f2c213ee1c97128a27d7d48",
+    revisionOrVersion: "c8bb219cd169dec41256c352e93b736263246eea",
     internalProvenance: "schema/develop/README.md and versions.go",
-    sourceIds: ["schema-rc10"],
+    sourceIds: ["schema-public-release"],
     publicHref: "https://github.com/peasant-labs/schema",
     ...REVIEW,
   },
-  "fairtrade-0.0.9": {
-    id: "fairtrade-0.0.9",
-    label: "fairtrade 0.0.9 package",
+  "fairtrade-package": {
+    id: "fairtrade-package",
+    label: "fairtrade package used by this site",
     claim:
       "The published package provides the canonical tokens, base styles, component CSS, icons, and React UI exports used by these pages.",
     sourceScope: "public-release",
     advertisedState: "public-release",
     revisionOrVersion:
-      "0.0.9, tag fairtrade-v0.0.9 at ba3ff1e1c1558e250c54c215589acba2dfdbad87",
+      "0.0.55 at a603828eac77da0cb22ea565820dda6d7fc597b2",
     internalProvenance:
-      "npm tarball sha512-roEJAbbZyed5WlkxI/sAZGa+1Ve9NyVLZ6I9Df4xuVeAVUQgVyHIh1WxJcMKYejMbOwWM9jKo3LS3sW1EDpRUw==",
+      "npm tarball sha512-r87wn9itUtV3kwHGBKScQuF4cd7z0EPH1CE4nX3IOJMYS6ucOBFyP1UpSJpm3J4lngR4BUh/Bprx3ZxAe4bXnA==",
     sourceIds: [],
     publicHref:
-      "https://registry.npmjs.org/@peasant-labs/fairtrade/-/fairtrade-0.0.9.tgz",
-    publishedOn: "2026-07-27T06:26:09.770Z",
+      "https://registry.npmjs.org/@peasant-labs/fairtrade/-/fairtrade-0.0.55.tgz",
+    publishedOn: "2026-10-30T06:41:06.746Z",
     ...REVIEW,
   },
   "bundle-definition": {
     id: "bundle-definition",
     label: "Comparison bundle definition",
     claim:
-      "peasant labs means peasant plus village plus schema; Entire means Entire CLI plus Entire.io and its documented repository service.",
+      "peasant labs means peasant plus village plus schema; Entire means Entire CLI plus entire.com and its documented repository service.",
     sourceScope: "bundle-definition",
-    revisionOrVersion: "comparison scope verified 2026-09-01",
+    revisionOrVersion: "comparison scope verified 2026-10-30",
     internalProvenance:
       "project comparison research, balanced comparison scope",
     sourceIds: [
-      "peasant-current-corpus-2026-07-28",
+      "peasant-current-corpus-2026-10-30",
       "village-readme",
-      "schema-rc10",
-      "entire-declared-corpus-2026-07-28",
+      "schema-public-release",
+      "entire-declared-corpus-2026-10-30",
     ],
     ...REVIEW,
   },
@@ -322,10 +322,10 @@ export const EVIDENCE = {
     label: "Entire homepage",
     claim: "Entire describes checkpoint capture, search, review, resume, and Git mirror product positioning.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire homepage",
     sourceIds: [],
-    publicHref: "https://entire.io/",
+    publicHref: "https://entire.com/",
     ...REVIEW,
   },
   "entire-projects": {
@@ -333,10 +333,10 @@ export const EVIDENCE = {
     label: "Entire projects access page",
     claim: "The Entire projects URL is sign-in gated for signed-out review.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire projects page",
     sourceIds: [],
-    publicHref: "https://entire.io/projects",
+    publicHref: "https://entire.com/projects",
     ...REVIEW,
   },
   "entire-docs-index": {
@@ -344,10 +344,10 @@ export const EVIDENCE = {
     label: "Entire documentation index",
     claim: "The official documentation index defines the reviewed documentation corpus.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor docs index reviewed 2026-09-01",
+    revisionOrVersion: "vendor docs index reviewed 2026-10-30",
     internalProvenance: "Official Entire llms.txt index",
     sourceIds: [],
-    publicHref: "https://docs.entire.io/llms.txt",
+    publicHref: "https://docs.entire.com/llms.txt",
     ...REVIEW,
   },
   "entire-cli-repo": {
@@ -356,24 +356,24 @@ export const EVIDENCE = {
     claim: "Entire publishes its CLI repository and MIT license context.",
     sourceScope: "public-release",
     advertisedState: "public-release",
-    revisionOrVersion: "public repository reviewed 2026-09-01",
+    revisionOrVersion: "public repository reviewed 2026-10-30",
     internalProvenance: "Official Entire CLI repository",
     sourceIds: [],
     publicHref: "https://github.com/entireio/cli",
     ...REVIEW,
   },
-  "entire-cli-v0.9.0": {
-    id: "entire-cli-v0.9.0",
-    label: "Entire CLI v0.10.2",
-    claim: "Entire CLI v0.10.2 is a stable public release.",
+  "entire-cli-release": {
+    id: "entire-cli-release",
+    label: "Entire CLI v0.12.2",
+    claim: "The cited official Entire CLI release is public and is not marked prerelease.",
     sourceScope: "public-release",
     advertisedState: "public-release",
     revisionOrVersion:
-      "v0.10.2 at bc990baa5bd37a6cb9d1becb02fe0bd83afdb3de",
+      "v0.12.2 at c4f103d8dfed1f1549db9b2c793f2d7e10f65eb8",
     internalProvenance: "Official Entire CLI release",
     sourceIds: ["entire-cli-repo"],
-    publicHref: "https://github.com/entireio/cli/releases/tag/v0.10.2",
-    publishedOn: "2026-08-19T20:18:45Z",
+    publicHref: "https://github.com/entireio/cli/releases/tag/v0.12.2",
+    publishedOn: "2026-10-26T11:35:17Z",
     ...REVIEW,
   },
   "entire-quickstart": {
@@ -381,22 +381,22 @@ export const EVIDENCE = {
     label: "Entire quickstart",
     claim: "Entire documents checkpoint setup and a Git-linked workflow.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire quickstart",
     sourceIds: [],
-    publicHref: "https://docs.entire.io/quickstart",
+    publicHref: "https://docs.entire.com/quickstart",
     ...REVIEW,
   },
   "entire-agents": {
     id: "entire-agents",
     label: "Entire agent integrations",
     claim:
-      "Entire documents eight named built-ins, executable plugins, captured context, and agent-specific resume limits.",
+      "Entire documents built-in agent integrations, executable agent plugins, captured context, and agent-specific resume and import limits.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire agents overview",
     sourceIds: [],
-    publicHref: "https://docs.entire.io/agents/overview",
+    publicHref: "https://docs.entire.com/agents/overview",
     ...REVIEW,
   },
   "entire-security": {
@@ -405,10 +405,10 @@ export const EVIDENCE = {
     claim:
       "Entire documents built-in secret detection, custom patterns, optional PII layers, and best-effort redaction limits.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire security page",
     sourceIds: [],
-    publicHref: "https://docs.entire.io/security",
+    publicHref: "https://docs.entire.com/security",
     ...REVIEW,
   },
   "entire-checkpoint-storage": {
@@ -417,11 +417,11 @@ export const EVIDENCE = {
     claim:
       "Entire documents checkpoint storage with code, local operation, and separate-repository options.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire checkpoint storage guide",
     sourceIds: [],
     publicHref:
-      "https://docs.entire.io/guides/checkpoints/checkpoint-storage",
+      "https://docs.entire.com/guides/checkpoints/checkpoint-storage",
     ...REVIEW,
   },
   "entire-keep-local": {
@@ -429,24 +429,24 @@ export const EVIDENCE = {
     label: "Entire local checkpoint mode",
     claim: "Entire documents keeping checkpoints local with push disabled.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire local checkpoint guide",
     sourceIds: [],
     publicHref:
-      "https://docs.entire.io/guides/checkpoints/keep-checkpoints-local",
+      "https://docs.entire.com/guides/checkpoints/keep-checkpoints-local",
     ...REVIEW,
   },
   "entire-separate-repo": {
     id: "entire-separate-repo",
     label: "Entire separate repository storage",
     claim:
-      "Entire documents storing checkpoints in a separate same-owner GitHub repository.",
+      "Entire documents a separate checkpoint repository on GitHub or GitLab, same-owner defaults, and an explicit local override.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire separate repository guide",
     sourceIds: [],
     publicHref:
-      "https://docs.entire.io/guides/checkpoints/store-checkpoints-in-another-repo",
+      "https://docs.entire.com/guides/checkpoints/store-checkpoints-in-another-repo",
     ...REVIEW,
   },
   "entire-import-history": {
@@ -455,36 +455,36 @@ export const EVIDENCE = {
     claim:
       "Entire documents read-only searchable historical imports that are not Git-linked or rewindable.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire historical import guide",
     sourceIds: [],
     publicHref:
-      "https://docs.entire.io/guides/sessions/import-past-agent-history",
+      "https://docs.entire.com/guides/sessions/import-past-agent-history",
     ...REVIEW,
   },
   "entire-platform": {
     id: "entire-platform",
-    label: "Entire.io platform",
+    label: "Entire web platform",
     claim:
       "Entire documents repository, checkpoint, session, activity, search, dispatch, and shared-summary browsing.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
-    internalProvenance: "Official Entire.io platform guide",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
+    internalProvenance: "Official Entire web platform guide",
     sourceIds: [],
-    publicHref: "https://docs.entire.io/platforms/entire-io",
+    publicHref: "https://docs.entire.com/platforms/cli-and-entire-com",
     ...REVIEW,
   },
   "entire-search": {
     id: "entire-search",
     label: "Entire semantic search",
     claim:
-      "Entire documents hybrid semantic and keyword search across checkpoints, sessions, and commits.",
+      "Entire documents semantic and keyword search across commits and sessions, plus literal code search.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire semantic search guide",
     sourceIds: [],
     publicHref:
-      "https://docs.entire.io/guides/search/overview",
+      "https://docs.entire.com/guides/search/overview",
     ...REVIEW,
   },
   "entire-dispatches": {
@@ -493,22 +493,22 @@ export const EVIDENCE = {
     claim:
       "Entire documents shareable Markdown summaries across repositories, branches, and time windows.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire dispatches guide",
     sourceIds: [],
-    publicHref: "https://docs.entire.io/guides/dispatches/overview",
+    publicHref: "https://docs.entire.com/guides/dispatches/overview",
     ...REVIEW,
   },
   "entire-repositories": {
     id: "entire-repositories",
     label: "Entire repository service",
     claim:
-      "Entire documents regional EntireDB Git repositories and GitHub-backed mirrors while GitHub remains the upstream repository.",
+      "Entire documents regional native Git hosting and GitHub-backed mirrors; GitHub remains upstream for mirrors.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire repositories overview",
     sourceIds: [],
-    publicHref: "https://docs.entire.io/guides/repositories/overview",
+    publicHref: "https://docs.entire.com/guides/repositories/overview",
     ...REVIEW,
   },
   "entire-repository-limitations": {
@@ -517,10 +517,10 @@ export const EVIDENCE = {
     claim:
       "Entire documents a current Git LFS limitation and a GitHub LFS workaround.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire mirrors guide",
     sourceIds: [],
-    publicHref: "https://docs.entire.io/guides/repositories/mirrors",
+    publicHref: "https://docs.entire.com/guides/repositories/mirrors",
     ...REVIEW,
   },
   "entire-privacy": {
@@ -528,10 +528,10 @@ export const EVIDENCE = {
     label: "Entire privacy policy",
     claim: "The Entire privacy policy is part of the declared review corpus.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire privacy policy",
     sourceIds: [],
-    publicHref: "https://entire.io/privacy",
+    publicHref: "https://entire.com/privacy",
     ...REVIEW,
   },
   "entire-terms": {
@@ -539,19 +539,19 @@ export const EVIDENCE = {
     label: "Entire terms",
     claim: "The Entire terms are part of the declared review corpus.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "vendor page reviewed 2026-09-01",
+    revisionOrVersion: "vendor page reviewed 2026-10-30",
     internalProvenance: "Official Entire terms",
     sourceIds: [],
-    publicHref: "https://entire.io/terms",
+    publicHref: "https://entire.com/terms",
     ...REVIEW,
   },
-  "entire-declared-corpus-2026-07-28": {
-    id: "entire-declared-corpus-2026-07-28",
+  "entire-declared-corpus-2026-10-30": {
+    id: "entire-declared-corpus-2026-10-30",
     label: "Entire declared corpus",
     claim:
       "The reviewed official corpus found no affirmative equivalent for specific licensing, collective, policy-history, or one-way ownership semantics.",
     sourceScope: "vendor-documented",
-    revisionOrVersion: "declared official corpus reviewed 2026-09-01",
+    revisionOrVersion: "declared official corpus reviewed 2026-10-30",
     internalProvenance:
       "Entire homepage, projects, legal pages, public CLI, release notes, and indexed product documentation",
     sourceIds: [
@@ -559,7 +559,7 @@ export const EVIDENCE = {
       "entire-projects",
       "entire-docs-index",
       "entire-cli-repo",
-      "entire-cli-v0.9.0",
+      "entire-cli-release",
       "entire-quickstart",
       "entire-agents",
       "entire-security",
@@ -575,7 +575,7 @@ export const EVIDENCE = {
       "entire-privacy",
       "entire-terms",
     ],
-    publicHref: "https://docs.entire.io/llms.txt",
+    publicHref: "https://docs.entire.com/llms.txt",
     ...REVIEW,
   },
 } as const satisfies Record<EvidenceId, EvidenceRecord>;
@@ -858,7 +858,7 @@ export const SUITE = {
       {
         id: "ingest",
         title: "bring your sessions in",
-        body: "Reads the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already saved on your computer, and keeps them there.",
+        body: "Reads the sessions Claude Code, Codex, Cursor, OpenCode, Strike, and Pi already saved on your computer, and keeps them there.",
         command: "peasant ingest",
       },
       {
@@ -899,7 +899,7 @@ export const SUITE = {
         id: "agents",
         question: "which coding agents does it read?",
         answer:
-          "It reads sessions from Claude Code, Codex, Cursor, OpenCode, and Strike. Sessions your tools have already deleted cannot be recovered.",
+          "It reads sessions from Claude Code, Codex, Cursor, OpenCode, Strike, and Pi. Sessions your tools have already deleted cannot be recovered.",
       },
       {
         id: "uploads",
@@ -944,7 +944,7 @@ export const PROJECTS = {
       kind: "local",
       outcome: "saves the sessions from the coding agents you use to your own machine.",
       proof: [
-        "reads Claude Code, Codex, Cursor, OpenCode, and Strike",
+        "reads Claude Code, Codex, Cursor, OpenCode, Strike, and Pi",
         "search and reread everything locally",
         "nothing is shared unless you say so",
       ],
@@ -954,7 +954,7 @@ export const PROJECTS = {
     hero: {
       title: "keep your coding-agent transcripts. share the ones you choose.",
       body:
-        "Peasant gathers the sessions Claude Code, Codex, Cursor, OpenCode, and Strike already save on your computer, in one place you can search and read back. Nothing goes anywhere else unless you send it.",
+        "Peasant gathers the sessions Claude Code, Codex, Cursor, OpenCode, Strike, and Pi already save on your computer, in one place you can search and read back. Nothing goes anywhere else unless you send it.",
     },
     start: {
       title: "get started",
@@ -1057,7 +1057,7 @@ export const PROJECTS = {
         "pull other people's work in, one way",
       ],
       action: "explore online",
-      availability: "private contributor development",
+      availability: "source available; run locally",
     },
     hero: {
       title: "a shared home for the agent sessions people publish",
@@ -1282,7 +1282,7 @@ export const COMPARISON = {
       peasantLabs: {
         status: "yes",
         qualification:
-          "Reads Claude Code, OpenCode, Codex, Cursor, and Strike sessions into one record.",
+          "Reads Claude Code, OpenCode, Codex, Cursor, Strike, and Pi sessions into one record.",
         evidence: ["peasant-adapters", "peasant-readme"],
       },
       entire: {
@@ -1311,14 +1311,14 @@ export const COMPARISON = {
       capability: "publish only the sessions you pick",
       peasantLabs: {
         status: "yes",
-        qualification: "Publishing is one command per copy, and the original stays local.",
+        qualification: "The developer chooses the sessions and collectives to publish; originals stay local.",
         evidence: ["peasant-readme", "village-readme"],
       },
       entire: {
-        status: "yes",
+        status: "partial",
         qualification:
-          "Entire documents sharing through Entire.io and its repository service.",
-        evidence: ["entire-platform", "entire-dispatches"],
+          "Entire documents repository-level checkpoint sync and shareable Markdown summaries; these do not establish per-session publication approval.",
+        evidence: ["entire-platform", "entire-keep-local", "entire-dispatches"],
       },
     },
     {
@@ -1334,7 +1334,7 @@ export const COMPARISON = {
         status: "not-documented",
         qualification:
           "We found no per-session reuse license in Entire's public docs.",
-        evidence: ["entire-declared-corpus-2026-07-28"],
+        evidence: ["entire-declared-corpus-2026-10-30"],
       },
     },
     {
@@ -1350,7 +1350,7 @@ export const COMPARISON = {
         status: "not-documented",
         qualification:
           "We found no equivalent group moderation model in Entire's public docs.",
-        evidence: ["entire-declared-corpus-2026-07-28"],
+        evidence: ["entire-declared-corpus-2026-10-30"],
       },
     },
     /*
