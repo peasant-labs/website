@@ -291,13 +291,13 @@ export const EVIDENCE = {
     sourceScope: "public-release",
     advertisedState: "public-release",
     revisionOrVersion:
-      "0.0.55 at a603828eac77da0cb22ea565820dda6d7fc597b2",
+      "0.0.56 at 0b5b5d82a4e408de75edf5e8dff0dd926001f9fb",
     internalProvenance:
-      "npm tarball sha512-r87wn9itUtV3kwHGBKScQuF4cd7z0EPH1CE4nX3IOJMYS6ucOBFyP1UpSJpm3J4lngR4BUh/Bprx3ZxAe4bXnA==",
+      "npm tarball sha512-NPbkRmvr7qxq5/8aJcfis7sftxm1he8kEIES6+vvhDU+SqWfgc9jFfCGbeVgfpp8gPxCHzdjzRGUdU7ohe779g==",
     sourceIds: [],
     publicHref:
-      "https://registry.npmjs.org/@peasant-labs/fairtrade/-/fairtrade-0.0.55.tgz",
-    publishedOn: "2026-10-30T06:41:06.746Z",
+      "https://registry.npmjs.org/@peasant-labs/fairtrade/-/fairtrade-0.0.56.tgz",
+    publishedOn: "2026-10-30T11:21:34.467Z",
     ...REVIEW,
   },
   "bundle-definition": {

@@ -129,9 +129,9 @@ records:
   - id: fairtrade-package
     finding: npm metadata integrity and gitHead match the package used by the website manifest; its
       exports provide canonical CSS, icons and UI.
-    revisionOrVersion: 0.0.55 at a603828eac77da0cb22ea565820dda6d7fc597b2
+    revisionOrVersion: 0.0.56 at 0b5b5d82a4e408de75edf5e8dff0dd926001f9fb
     sources:
-      - href: https://registry.npmjs.org/@peasant-labs/fairtrade/-/fairtrade-0.0.55.tgz
+      - href: https://registry.npmjs.org/@peasant-labs/fairtrade/-/fairtrade-0.0.56.tgz
   - id: bundle-definition
     finding: Retained the same product bundles, with the Entire web product now linked at its canonical
       .com domain.
@@ -298,7 +298,7 @@ releaseReceipts:
     href: https://github.com/entireio/cli/releases/tag/v0.12.2
 packageReceipt:
   name: "@peasant-labs/fairtrade"
-  version: 0.0.55
-  gitHead: a603828eac77da0cb22ea565820dda6d7fc597b2
-  integrity: sha512-r87wn9itUtV3kwHGBKScQuF4cd7z0EPH1CE4nX3IOJMYS6ucOBFyP1UpSJpm3J4lngR4BUh/Bprx3ZxAe4bXnA==
-  publishedAt: 2026-10-30T06:41:06.746Z
+  version: 0.0.56
+  gitHead: 0b5b5d82a4e408de75edf5e8dff0dd926001f9fb
+  integrity: sha512-NPbkRmvr7qxq5/8aJcfis7sftxm1he8kEIES6+vvhDU+SqWfgc9jFfCGbeVgfpp8gPxCHzdjzRGUdU7ohe779g==
+  publishedAt: 2026-10-30T11:21:34.467Z
