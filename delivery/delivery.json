@@ -1,0 +1,29 @@
+{
+  "mergedSource": "a55869ca78c9928f749fd684d1cc5285e275d0a1",
+  "reviewedSource": "1766d71bafe9aaa6c8b41812b081461c16be28d1",
+  "sourceTree": "e34c95267edd2cc6862bffdd1149e9144d2464aa",
+  "treeMatchesReviewed": true,
+  "normalDefaultBuild": "passed",
+  "local": {
+    "pid": 9735,
+    "cwd": "/Users/vitorhugo/Documents/Projects/polyrepo/website/main",
+    "port": 3314,
+    "source": "a55869ca78c9928f749fd684d1cc5285e275d0a1",
+    "fairtrade": "0.0.56",
+    "log": "/Users/vitorhugo/Documents/Projects/polyrepo/.agents.local/website-preview.log",
+    "mode": "production",
+    "buildId": "M7vnRH3Y8XEvUDviMs-w9"
+  },
+  "deployments": [
+    {
+      "id": 7440743196,
+      "status": "success"
+    },
+    {
+      "id": 7440743282,
+      "status": "success"
+    }
+  ],
+  "production": "Both domains: all CSS matches, selected phrase marker present,18of23rootassets byte-identical; remaining environment-dependent JS differs.",
+  "reviews": "Three fresh layout/runtime/safety ACCEPT; wrapped-heading1.4 correction independently verified; user-selected combined layout implemented."
+}
