@@ -1,0 +1,180 @@
+{
+  "checkedAt": "2026-10-30T07:46:36.589Z",
+  "source": "d37fac61fc0b7ef76f3731b038ff3dc4ce4e301a",
+  "sourceTreeMatchesInspected": true,
+  "fairtrade": "0.0.55",
+  "mergedBuildID": "q_e8dYWW3RUyCPMSblp6N",
+  "githubStatus": {
+    "sha": "d37fac61fc0b7ef76f3731b038ff3dc4ce4e301a",
+    "state": "success",
+    "statuses": [
+      {
+        "context": "adaptable-motivation - website",
+        "description": "Success - website-production-165b.up.railway.app",
+        "state": "success",
+        "target_url": "https://railway.com/project/13899d33-ccb2-419b-b240-d7577317ec5f/service/479c814b-db63-4299-b950-8cedb0245f49?id=7b0564d3-cded-427c-9837-f5ce2b5c0f84&environmentId=139ec968-add3-4489-9250-ca5913de3e24",
+        "updated_at": "2026-10-30T07:44:32Z"
+      },
+      {
+        "context": "peasant-labs - website",
+        "description": "Success - peasantlabs.org",
+        "state": "success",
+        "target_url": "https://railway.com/project/47e906cb-aef9-4c1f-a42e-e6e7edb82381/service/2149c35a-d2ab-4292-9271-fe42ebccb25d?id=405dfdcc-dca7-4889-a6b8-3d52deccc9b6&environmentId=d320722b-16ef-437d-a680-de88396dc65d",
+        "updated_at": "2026-10-30T07:44:49Z"
+      }
+    ]
+  },
+  "deployments": [
+    {
+      "id": 7433282269,
+      "environment": "peasant-labs / production",
+      "latestStatus": {
+        "created_at": "2026-10-30T07:44:53Z",
+        "description": "",
+        "environment_url": "https://railway.com/project/47e906cb-aef9-4c1f-a42e-e6e7edb82381?environmentId=d320722b-16ef-437d-a680-de88396dc65d",
+        "id": 20977628845,
+        "state": "success"
+      }
+    },
+    {
+      "id": 7433282292,
+      "environment": "adaptable-motivation / production",
+      "latestStatus": {
+        "created_at": "2026-10-30T07:44:36Z",
+        "description": "",
+        "environment_url": "https://railway.com/project/13899d33-ccb2-419b-b240-d7577317ec5f?environmentId=139ec968-add3-4489-9250-ca5913de3e24",
+        "id": 20977614844,
+        "state": "success"
+      }
+    }
+  ],
+  "publicVerification": {
+    "primary": {
+      "url": "https://peasantlabs.org/?verify=d37fac61fc0b7ef76f3731b038ff3dc4ce4e301a&at=1793346374617",
+      "status": 200,
+      "headers": {
+        "cf-cache-status": "DYNAMIC",
+        "date": "Fri, 30 Oct 2026 07:46:15 GMT",
+        "x-nextjs-cache": "HIT",
+        "x-railway-edge": "sin1",
+        "x-railway-request-id": "v1Q0oGGTQ8SeP_VB9fVATg"
+      },
+      "css": [
+        {
+          "url": "https://peasantlabs.org/_next/static/css/e1ca4a7f35ff7017.css",
+          "status": 200,
+          "sha256": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+          "separatorFix": false,
+          "matchesInspectedFiles": [
+            "e1ca4a7f35ff7017.css"
+          ]
+        },
+        {
+          "url": "https://peasantlabs.org/_next/static/css/3c26fdba4950bfa9.css",
+          "status": 200,
+          "sha256": "3960b6cbd890298e57ed194bd72ba2fcc39674030dd0b37bea74c37c5295daa9",
+          "separatorFix": true,
+          "matchesInspectedFiles": [
+            "3c26fdba4950bfa9.css"
+          ]
+        },
+        {
+          "url": "https://peasantlabs.org/_next/static/css/f505c5205671eb79.css",
+          "status": 200,
+          "sha256": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+          "separatorFix": false,
+          "matchesInspectedFiles": [
+            "f505c5205671eb79.css"
+          ]
+        },
+        {
+          "url": "https://peasantlabs.org/_next/static/css/979f57c9c923ceff.css",
+          "status": 200,
+          "sha256": "e48b1386ab33307e5560da94f88adcd8e84728bf1fe4c3284c67102e4179fe3d",
+          "separatorFix": false,
+          "matchesInspectedFiles": [
+            "979f57c9c923ceff.css"
+          ]
+        }
+      ],
+      "verified": true
+    },
+    "secondary": {
+      "url": "https://website-production-165b.up.railway.app/?verify=d37fac61fc0b7ef76f3731b038ff3dc4ce4e301a&at=1793346397405",
+      "status": 200,
+      "headers": {
+        "date": "Fri, 30 Oct 2026 07:46:37 GMT",
+        "x-nextjs-cache": "HIT",
+        "x-railway-edge": "sin1",
+        "x-railway-request-id": "7vcMPiJnRoyo9aXSY53eZw"
+      },
+      "css": [
+        {
+          "url": "https://website-production-165b.up.railway.app/_next/static/css/e1ca4a7f35ff7017.css",
+          "status": 200,
+          "sha256": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+          "separatorFix": false,
+          "matchesInspectedFiles": [
+            "e1ca4a7f35ff7017.css"
+          ]
+        },
+        {
+          "url": "https://website-production-165b.up.railway.app/_next/static/css/3c26fdba4950bfa9.css",
+          "status": 200,
+          "sha256": "3960b6cbd890298e57ed194bd72ba2fcc39674030dd0b37bea74c37c5295daa9",
+          "separatorFix": true,
+          "matchesInspectedFiles": [
+            "3c26fdba4950bfa9.css"
+          ]
+        },
+        {
+          "url": "https://website-production-165b.up.railway.app/_next/static/css/f505c5205671eb79.css",
+          "status": 200,
+          "sha256": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+          "separatorFix": false,
+          "matchesInspectedFiles": [
+            "f505c5205671eb79.css"
+          ]
+        },
+        {
+          "url": "https://website-production-165b.up.railway.app/_next/static/css/979f57c9c923ceff.css",
+          "status": 200,
+          "sha256": "e48b1386ab33307e5560da94f88adcd8e84728bf1fe4c3284c67102e4179fe3d",
+          "separatorFix": false,
+          "matchesInspectedFiles": [
+            "979f57c9c923ceff.css"
+          ]
+        }
+      ],
+      "verified": true
+    }
+  },
+  "artifactCSSHashes": {
+    "09337ff26b53e5cd.css": "d259ad05f4ba3a2741ef968c08ae46e96c6877e632c6c8668877dd6c56c7144b",
+    "3c26fdba4950bfa9.css": "3960b6cbd890298e57ed194bd72ba2fcc39674030dd0b37bea74c37c5295daa9",
+    "6d9d8256903444dc.css": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+    "979f57c9c923ceff.css": "e48b1386ab33307e5560da94f88adcd8e84728bf1fe4c3284c67102e4179fe3d",
+    "e1ca4a7f35ff7017.css": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+    "f505c5205671eb79.css": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5"
+  },
+  "previewSmoke": {
+    "port": 3314,
+    "source": "d37fac61fc0b7ef76f3731b038ff3dc4ce4e301a",
+    "fairtrade": "0.0.55",
+    "checkedAt": "2026-10-30T07:47:16.244Z",
+    "endpoints": [
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/docs",
+        "status": 200
+      },
+      {
+        "path": "/blog",
+        "status": 200
+      }
+    ]
+  }
+}
