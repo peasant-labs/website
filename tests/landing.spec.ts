@@ -1044,124 +1044,78 @@ test("every section opens on its title alone on a row, in one style at one edge,
   }
 });
 
-test("the mission keeps a readable proportional lead with its explanation and illustration", async ({
-  page,
-}) => {
-  for (const width of [1440, 1280, 390]) {
+test("the selected landing sections share an open ground and coherent responsive reading order", async ({ page }) => {
+  for (const layout of fixture.hero.flow.layouts) {
+    const { width, colorScheme, missionBeside, missionArtMax, titleLines } = layout;
+    const at = `${width}, ${colorScheme}`;
+    await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
-    const panel = page.locator(".lp-vision-inner");
-    await expect(panel.locator("#vision-line")).toHaveText(fixture.vision.line);
-    // the owner's statement in full, word for word
-    await expect(panel.locator(".lp-vision-story")).toHaveText(fixture.vision.story);
-    const layout = await panel.evaluate((element) => {
-      const style = getComputedStyle(element);
-      const art = element.querySelector(".lp-vision-art")!.getBoundingClientRect();
-      const words = element.querySelector(".lp-vision-words")!.getBoundingClientRect();
-      const line = element.querySelector("#vision-line")!;
-      const title = document.querySelector("#install h2")!;
-      const cta = element.querySelector(".lp-vision-cta")!;
-      // the text of the last line of every paragraph, read character by character
-      const lastLines = [...element.querySelectorAll("#vision-line, .lp-vision-story")].map((paragraph) => {
+    const mission = page.locator(".lp-vision-inner");
+    await expect(mission.locator("#vision-line")).toHaveText(fixture.vision.line);
+    await expect(mission.locator(".lp-vision-story")).toHaveText(fixture.vision.story);
+    await expect(page.locator(".lp-lede")).toHaveText(fixture.hero.lede);
+    const composition = await page.evaluate(() => {
+      const rect = (selector: string) => document.querySelector(selector)!.getBoundingClientRect().toJSON();
+      const midpoint = (selector: string) => { const box = rect(selector); return (box.left + box.right) / 2; };
+      const lines = (selector: string) => {
+        const root = document.querySelector(selector)!;
         const range = document.createRange();
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         const rows = new Map<number, string>();
-        const walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT);
         while (walker.nextNode()) {
           const text = walker.currentNode as Text;
           for (let index = 0; index < text.length; index += 1) {
-            range.setStart(text, index);
-            range.setEnd(text, index + 1);
+            range.setStart(text, index); range.setEnd(text, index + 1);
             const top = Math.round(range.getBoundingClientRect().top);
             rows.set(top, (rows.get(top) ?? "") + text.data[index]);
           }
         }
-        return [...rows.values()].at(-1)!.trim();
-      });
+        return [...rows.values()].map((row) => row.trim()).filter(Boolean);
+      };
+      const unframed = (selector: string) => {
+        const style = getComputedStyle(document.querySelector(selector)!);
+        return style.backgroundColor === "rgba(0, 0, 0, 0)" && style.borderTopWidth === "0px";
+      };
+      const lead = document.querySelector("#vision-line")!;
+      const story = document.querySelector(".lp-vision-story")!;
       return {
-        open: style.backgroundColor === "rgba(0, 0, 0, 0)" && style.borderRightWidth === "0px",
-        border: style.borderTopWidth,
-        // no rule runs under the picture
-        rule: getComputedStyle(element.querySelector(".lp-vision-art")!, "::after").content,
-        beside: art.right <= words.left + 1,
-        // side by side, the illustration and explanation share a baseline
-        aligned: Math.abs((art.top + art.bottom) / 2 - (words.top + words.bottom) / 2) < 2,
-        statementLeads: line.parentElement === element.querySelector(".lp-vision-words"),
-        // stacked, the picture's left edge is the words' left edge
-        stackedEdge: Math.abs(art.left - words.left) < 2 && words.bottom <= art.top,
-        evenPadding: Math.abs(parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)) < 1,
-        lineFace: getComputedStyle(line).fontFamily === getComputedStyle(element.querySelector(".lp-vision-story")!).fontFamily,
-        lineScale: parseFloat(getComputedStyle(line).fontSize) <= 28,
-        readableLeading: parseFloat(getComputedStyle(line).lineHeight) / parseFloat(getComputedStyle(line).fontSize),
-        filledCta: cta.classList.contains("btn-primary"),
-        lastLines,
-        art: { width: art.width, height: art.height },
+        titleLines: lines("#hero-title"),
+        centered: ["#hero-title", ".lp-lede", ".lp-ctas", ".site-foot-close-art", ".site-foot-close-words"].map((selector) => Math.abs(midpoint(selector) - innerWidth / 2)),
+        open: [".hf-panel", ".lp-vision-inner", ".site-foot-close-panel"].map(unframed),
+        missionWords: rect(".lp-vision-words"), missionArt: rect(".lp-vision-art"),
+        closeArt: rect(".site-foot-close-art"), closeWords: rect(".site-foot-close-words"),
+        closeButtons: [...document.querySelectorAll(".site-foot-close .site-foot-actions .btn")].map((button) => button.getBoundingClientRect().toJSON()),
+        leadFace: getComputedStyle(lead).fontFamily === getComputedStyle(story).fontFamily,
+        leadSize: parseFloat(getComputedStyle(lead).fontSize),
+        leading: parseFloat(getComputedStyle(lead).lineHeight) / parseFloat(getComputedStyle(lead).fontSize),
+        reading: [...document.querySelectorAll(".lp-lede, .lp-vision-story")].map((element) => parseFloat(getComputedStyle(element).fontSize)),
+        paragraphEndings: ["#vision-line", ".lp-vision-story:nth-of-type(2)", ".lp-vision-story:nth-of-type(3)"].map((selector) => lines(selector).at(-1)),
+        pageOverflow: document.documentElement.scrollWidth - innerWidth,
       };
     });
-    expect(layout.open && layout.border === "1px", `the vision is not an open section at ${width}`).toBe(true);
-    expect(layout.statementLeads, `the statement does not lead at ${width}`).toBe(true);
-    expect(layout.rule === "none" || layout.rule === "normal", `a rule runs under the picture at ${width}`).toBe(true);
-    if (width >= 1280) expect(layout.beside && layout.aligned, `the illustration and explanation are detached at ${width}`).toBe(true);
-    else expect(layout.stackedEdge, `the picture does not follow the story at ${width}`).toBe(true);
-    expect(layout.evenPadding, `the vision's padding is uneven at ${width}`).toBe(true);
-    expect(layout.lineFace && layout.lineScale, `the lead does not use a readable proportional scale at ${width}`).toBe(true);
-    expect(layout.readableLeading, `the lead is cramped at ${width}`).toBeGreaterThanOrEqual(1.5);
-    expect(layout.filledCta, "the vision's button is filled amber").toBe(false);
-    for (const line of layout.lastLines) {
-      expect(line, `a paragraph leaves one word alone on its last line at ${width}`).toContain(" ");
-    }
-    // the picture keeps its square ratio and its supporting size
-    expect(Math.abs(layout.art.width - layout.art.height), `the picture is not square at ${width}`).toBeLessThan(1);
-    expect(layout.art.width).toBeLessThanOrEqual(fixture.vision.artMax);
-  }
-  await page.setViewportSize({ width: 1440, height: 900 });
-
-  // the close: its line at the section titles' size and two buttons of one height, beside a whole picture on a panel
-  for (const width of [1440, 390]) {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
-    const close = await page.evaluate(() => {
-      const band = document.querySelector("footer [data-footer-cta]")!;
-      const rect = (element: Element) => element.getBoundingClientRect();
-      const [primary, secondary] = [...band.querySelectorAll(".site-foot-actions .btn")].map(rect);
-      const panel = band.querySelector(".site-foot-close-panel")!;
-      const shown = [...panel.querySelectorAll<HTMLImageElement>(".art-img")].find(
-        (image) => getComputedStyle(image).display !== "none",
-      )!;
-      return {
-        lineSize: getComputedStyle(band.querySelector(".site-foot-line")!).fontSize,
-        titleSize: getComputedStyle(document.querySelector("#install h2")!).fontSize,
-        buttons: band.querySelectorAll(".site-foot-actions .btn").length,
-        sameHeight: Math.abs(primary!.height - secondary!.height) < 1,
-        sameRow: Math.abs(primary!.top - secondary!.top) < 1,
-        stacked: primary!.top < secondary!.top - 1,
-        panelGround: getComputedStyle(panel).backgroundColor !== getComputedStyle(document.body).backgroundColor,
-        panelBorder: getComputedStyle(panel).borderTopWidth,
-        whole: (() => {
-          const box = rect(panel);
-          const art = rect(shown);
-          return art.left >= box.left && art.right <= box.right && art.top >= box.top && art.bottom <= box.bottom;
-        })(),
-        pictureFirst: rect(panel).bottom <= rect(band.querySelector(".site-foot-line")!).top + 1,
-        beside: rect(panel).left >= rect(band.querySelector(".site-foot-line")!).right - 1,
-        extras: band.querySelectorAll("[data-install-line], .site-foot-close-mark").length,
-      };
-    });
-    expect(close.lineSize, `the closing line is not at the section titles' size at ${width}`).toBe(close.titleSize);
-    expect(close.buttons).toBe(2);
-    expect(close.sameHeight, `the closing buttons differ in height at ${width}`).toBe(true);
-    if (width === 1440) {
-      expect(close.sameRow, "the closing buttons do not share a row").toBe(true);
-      expect(close.beside, "the picture is not beside the words").toBe(true);
+    expect(composition.titleLines, at).toEqual(titleLines);
+    for (const offset of composition.centered) expect(offset, `centered hero and final CTA ${at}`).toBeLessThanOrEqual(1);
+    expect(composition.open, `the sections share the page ground ${at}`).toEqual([true, true, true]);
+    if (missionBeside) {
+      expect(composition.missionWords.right, `mission text leads left ${at}`).toBeLessThan(composition.missionArt.left);
+      expect(Math.abs((composition.missionWords.top + composition.missionWords.bottom - composition.missionArt.top - composition.missionArt.bottom) / 2), `mission stays together ${at}`).toBeLessThan(2);
     } else {
-      expect(close.stacked, "the closing buttons do not stack on a phone").toBe(true);
-      expect(close.pictureFirst, "the picture does not come first on a phone").toBe(true);
+      expect(composition.missionWords.bottom, `mission reads before its picture ${at}`).toBeLessThan(composition.missionArt.top);
     }
-    expect(close.panelGround && close.panelBorder === "1px", `the picture has no panel at ${width}`).toBe(true);
-    expect(close.whole, `the closing picture is cropped at ${width}`).toBe(true);
-    expect(close.extras, "the close repeats the install command or floats the mark").toBe(0);
+    expect(composition.missionArt.width, at).toBeLessThanOrEqual(missionArtMax);
+    expect(Math.abs(composition.missionArt.width - composition.missionArt.height), at).toBeLessThan(1);
+    expect(composition.closeArt.bottom, `house precedes final invitation ${at}`).toBeLessThan(composition.closeWords.top);
+    expect(composition.closeArt.width, `quiet closing illustration ${at}`).toBeLessThan(composition.missionArt.width);
+    expect(composition.closeButtons).toHaveLength(2);
+    expect(Math.abs(composition.closeButtons[0]!.height - composition.closeButtons[1]!.height), at).toBeLessThan(1);
+    expect(Math.abs(composition.closeButtons[0]!.top - composition.closeButtons[1]!.top), `compact CTA row ${at}`).toBeLessThan(1);
+    expect(composition.leadFace && composition.leadSize <= 28, `readable proportional mission lead ${at}`).toBe(true);
+    expect(composition.leading, at).toBeGreaterThanOrEqual(1.5);
+    expect(Math.min(...composition.reading), at).toBeGreaterThanOrEqual(16);
+    for (const ending of composition.paragraphEndings) expect(ending, `no single-word paragraph endings ${at}`).toContain(" ");
+    expect(composition.pageOverflow, at).toBe(0);
   }
-
-  // other pages keep the compact row, with no picture in it
   await page.goto("/about");
   await expect(page.locator("footer .site-foot-close-panel")).toHaveCount(0);
 });

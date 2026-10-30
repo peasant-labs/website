@@ -310,44 +310,44 @@ type Layout = Readonly<{
   shadow: number;
 }>;
 
-/* The raised transcript leads a shallow triangle: private work below-left,
- * a gathered commons below-right. Back figures are smaller on the same cell grid. */
+/* An open field: the raised transcript connects private work below-left with
+ * the gathered commons below-right. Everything shares the same pixel grid. */
 const WIDE: Layout = {
   name: "wide",
-  width: 333,
-  height: 104,
+  width: 360,
+  height: 122,
   card: WIDE_CARD,
-  laptop: { x: 20, ground: 88, w: 70, depth: 7, deck: 3, screen: 40, bezel: 3 },
-  marks: [21, 14],
+  laptop: { x: 8, ground: 112, w: 77, depth: 8, deck: 3, screen: 44, bezel: 3 },
+  marks: [23, 15],
   onScreen: 0.78,
   crest: 28,
-  stack: { left: 135, ground: 65, base: 4, depth: 2, notch: 3 },
+  stack: { left: 148, ground: 58, base: 4, depth: 2, notch: 3 },
   commons: [
-    { id: "wheat-left", sheaf: WIDE_SHEAF, x: 218, ground: 83, scale: 0.7 },
-    { id: "wheat-right", sheaf: WIDE_SHEAF, x: 304, ground: 84, scale: 0.7 },
-    { id: "rake", figure: WIDE_FIGURES.rake, x: 238, ground: 80, scale: 0.9 },
-    { id: "wave", figure: WIDE_FIGURES.wave, x: 285, ground: 82, scale: 0.9 },
-    { id: "basket", figure: WIDE_FIGURES.basket, x: 263, ground: 91, noticed: true },
+    { id: "wheat-left", sheaf: WIDE_SHEAF, x: 270, ground: 108, scale: 0.6 },
+    { id: "wheat-right", sheaf: WIDE_SHEAF, x: 345, ground: 109, scale: 0.6 },
+    { id: "rake", figure: WIDE_FIGURES.rake, x: 287, ground: 105, scale: 0.8 },
+    { id: "wave", figure: WIDE_FIGURES.wave, x: 328, ground: 107, scale: 0.8 },
+    { id: "basket", figure: WIDE_FIGURES.basket, x: 309, ground: 117, scale: 0.9, noticed: true },
   ],
   shadow: 3,
 };
 
-/* On a phone the card remains above its source. The people gather below its
- * destination, with a front figure rather than a second straight row. */
+/* The same triangle fits a phone in fewer rows, keeping its source, destination
+ * and planted people separate without a tall enclosing panel. */
 const PHONE: Layout = {
   name: "phone",
   width: 100,
-  height: 114,
+  height: 82,
   card: PHONE_CARD,
-  laptop: { x: 3, ground: 56, w: 36, depth: 4, deck: 2, screen: 24, bezel: 2 },
+  laptop: { x: 3, ground: 62, w: 36, depth: 4, deck: 2, screen: 24, bezel: 2 },
   marks: [10, 6],
   onScreen: 0.82,
   crest: 16,
-  stack: { left: 62, ground: 44, base: 3, depth: 1, notch: 2 },
+  stack: { left: 62, ground: 38, base: 3, depth: 1, notch: 2 },
   commons: [
-    { id: "rake", figure: PHONE_FIGURES.rake, x: 34, ground: 88, scale: 0.9 },
-    { id: "wave", figure: PHONE_FIGURES.wave, x: 73, ground: 91, scale: 0.9 },
-    { id: "basket", figure: PHONE_FIGURES.basket, x: 54, ground: 101, noticed: true },
+    { id: "rake", figure: PHONE_FIGURES.rake, x: 61, ground: 64, scale: 0.7 },
+    { id: "wave", figure: PHONE_FIGURES.wave, x: 88, ground: 66, scale: 0.7 },
+    { id: "basket", figure: PHONE_FIGURES.basket, x: 76, ground: 74, scale: 0.8, noticed: true },
   ],
   shadow: 2,
 };
@@ -680,7 +680,7 @@ const RESTING = [
 
 /*
  * A phone shows its layout 300px wide, at 3px a cell; from a tablet up the
- * wide layout fills its frame, up to 999px, also 3px a cell.
+ * wide layout fills its frame, up to 1080px, also 3px a cell.
  */
 const STYLESHEET = [
   RESTING,

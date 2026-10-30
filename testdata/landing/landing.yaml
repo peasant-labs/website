@@ -49,12 +49,12 @@ hero:
       - { name: settled, time: 3250 }
     # Relative geometry protects a raised transcript and a planted group in depth.
     layouts:
-      - { name: phone-light, interaction: true, width: 390, colorScheme: light, raisedGap: 0.07, frontDepth: 0.07 }
-      - { name: phone-dark, interaction: true, width: 390, colorScheme: dark, raisedGap: 0.07, frontDepth: 0.07 }
-      - { name: tablet-light, interaction: false, width: 768, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06 }
-      - { name: tablet-dark, interaction: false, width: 768, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06 }
-      - { name: desktop-light, interaction: true, width: 1440, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06 }
-      - { name: desktop-dark, interaction: true, width: 1440, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06 }
+      - { name: phone-light, interaction: true, width: 390, colorScheme: light, raisedGap: 0.07, frontDepth: 0.07, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
+      - { name: phone-dark, interaction: true, width: 390, colorScheme: dark, raisedGap: 0.07, frontDepth: 0.07, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
+      - { name: tablet-light, interaction: false, width: 768, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: tablet-dark, interaction: false, width: 768, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: desktop-light, interaction: true, width: 1440, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: desktop-dark, interaction: true, width: 1440, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
 # the band under the hero: the harnesses peasant reads, each led by its mark
@@ -236,7 +236,7 @@ thread:
   phone: { postText: 12, cardPrompt: 11, promptWord: hey }
 # the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:
-  artMax: 392
+  artMax: 448
   line: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.
   story:
     - "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's capital."
