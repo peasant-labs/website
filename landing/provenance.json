@@ -1,0 +1,46 @@
+{
+  "sourceCommit": "a293a068bfb9738fe1f4ba6f2905bf4bc9d6309b",
+  "buildId": "8jhGSyembN8sdlIKq1r5d",
+  "url": "http://127.0.0.1:3382/",
+  "cwd": "/Users/vitorhugo/Documents/Projects/polyrepo/website/website-60--fix--landing-section-composition",
+  "fairtrade": "0.0.56",
+  "httpHtmlSha256": "66994b39fef6e7f0f9632724b5758f2ecc014bde1bbbd37ebc941e413e25c6b0",
+  "servedCssSha256": {
+    "/_next/static/css/f505c5205671eb79.css": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+    "/_next/static/css/756aee017256b120.css": "129dc3f9054a73f96f398ec22c5d1ca1a7e821cf3dc0db1a613c75a474c6a17f",
+    "/_next/static/css/6d9d8256903444dc.css": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+    "/_next/static/css/e1ca4a7f35ff7017.css": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+    "/_next/static/css/59f1d625a66d3d70.css": "6846453176474b59ca07d46b1115e15aca5d24d4511403311ab99e0d0b27b4eb",
+    "/_next/static/css/e5d96102af70be8b.css": "2d714e4f68fbded5990b5819628c041ae4b7e625c0630ab16550a50ef856c7d0"
+  },
+  "committedSourceFiles": {
+    "app/landing.css": "c3ff2b42b512e0035546c2cd453fd91fd443bacb88476454c867e5acd2a9e06b",
+    "app/page.tsx": "5252a54b461b354563154d2934b7c775013b459aa41b2aa2f8c1616c73db15f8",
+    "components/landing/hero-flow.tsx": "3d0d5517b6b272f1111699e17e81f0f2a76c620ad5546737b69af4a4fec90a1d",
+    "components/site-footer.tsx": "aec244aa1afaa21091887a94c7e170148e540f7bb6958093b4dfb4ad56a5e88f",
+    "lib/landing.ts": "5262eba8c901c6dcb343bfec25f6fe9f8c7acb15863592948a15db2eec28f09f",
+    "testdata/landing/landing.yaml": "12613515b9d9a56b3db3a46705f81139b720b869b6ffcdc46808870b9bfcf046",
+    "tests/landing-fixture.ts": "545f78042f37eb33af0e1640ddea7309a4babe6046930b812f0adb5bc631544c",
+    "tests/landing.spec.ts": "2638733763b63c620625f2a8ca8854106554dbf4697bf29d8fdce3416a33cec4"
+  },
+  "screenshots": {
+    "desktop-dark-hero.png": "fa1da6e8068f67894f25f6e88120d01076af6445f897fed97f516ee4a2855162",
+    "phone-dark-full.png": "7ac2682fc361bb9789a1ef827cd3dfb66efd074b8fd76e6b605c7647fdddb3b7",
+    "desktop-dark-outro.png": "e570fbcec078dc5fdf5c156a7086112c7aaa61c0acf5374a8d3a6399cebcc876",
+    "phone-light-full.png": "3178db2c6ebab98e70ad5cd1db5d3380393d6dca4ba3c0ad6055e1eaed5d050b",
+    "desktop-light-full.png": "2f823b2f7000ea32feef607e95bb769f4165fa6449aa226f0d7eecbbdc15f59c",
+    "tablet-dark-hero.png": "8ee690efe4448a248d8fbeb39e774bcfe0ed4d77081504132f31c9eaec8abd44",
+    "phone-dark-outro.png": "c468bfcd1a8e7d135357dd4bf1b50b0bb23212401a70105e5256322133cc1ac8",
+    "tablet-light-hero.png": "9c3f80aeec9178f9c1585a7a7996adb8def26ee85d9c67918c97c3c6a385d726",
+    "phone-light-hero.png": "3229f97d6fe18a559f888f7ba773b18ca69b83b4f03301a4f1ba7524c2bcf310",
+    "tablet-light-outro.png": "6adc37357d1e4d6f1b6c8ae46de6298c55ec3a63e8c7fa6409dc839b2445abde",
+    "tablet-dark-outro.png": "b6793116db0cd1a5ce9c919c83d2c3d1b7bbb734cdb9a8f99a92a16cea590d38",
+    "tablet-light-full.png": "ad65c8022df315dd4f54ac498c21d20c0a5fa828399861e5be4253934f7215d0",
+    "desktop-light-outro.png": "59c843a6e72b69781c2df5c11cb8668dc80702a5a566ce461517d40e09a3f7f7",
+    "tablet-dark-full.png": "00804621564fb56aaa53ad3ee40ae2952af5ad85dc10b2123a6037222dba0c40",
+    "phone-light-outro.png": "7f9f38252b469bb6ae659ebdef2c6a43c09c389364095cd0a360cbdf0b569c37",
+    "desktop-light-hero.png": "352a97ea90931239330038fa58e491ae7882475c0b1db50dbfd3f00612840883",
+    "desktop-dark-full.png": "8598e2b8f60e338dcbbacb6a74333479fc6e5fb60727cb89460dbae61b5d5f19",
+    "phone-dark-hero.png": "87b1e7b2d68f4e5018149f925fbf5f6999fbb12786d4a760b2cc341a5cd42d6a"
+  }
+}

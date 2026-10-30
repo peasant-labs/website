@@ -1,0 +1,214 @@
+{
+  "buildId": "8jhGSyembN8sdlIKq1r5d",
+  "records": [
+    {
+      "name": "phone-light",
+      "interaction": true,
+      "width": 390,
+      "colorScheme": "light",
+      "raisedGap": 0.07,
+      "frontDepth": 0.07,
+      "titleLines": [
+        "the open-source",
+        "commons for",
+        "agent transcripts"
+      ],
+      "missionBeside": false,
+      "missionArtMax": 224,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "phone-dark",
+      "interaction": true,
+      "width": 390,
+      "colorScheme": "dark",
+      "raisedGap": 0.07,
+      "frontDepth": 0.07,
+      "titleLines": [
+        "the open-source",
+        "commons for",
+        "agent transcripts"
+      ],
+      "missionBeside": false,
+      "missionArtMax": 224,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "tablet-light",
+      "interaction": false,
+      "width": 768,
+      "colorScheme": "light",
+      "raisedGap": 0.12,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "tablet-dark",
+      "interaction": false,
+      "width": 768,
+      "colorScheme": "dark",
+      "raisedGap": 0.12,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "desktop-light",
+      "interaction": true,
+      "width": 1440,
+      "colorScheme": "light",
+      "raisedGap": 0.12,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    },
+    {
+      "name": "desktop-dark",
+      "interaction": true,
+      "width": 1440,
+      "colorScheme": "dark",
+      "raisedGap": 0.12,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "errors": [],
+      "violations": [],
+      "metrics": {
+        "overflow": 0,
+        "heroPanel": {
+          "border": "0px",
+          "background": "rgba(0, 0, 0, 0)"
+        },
+        "viewerScroll": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "font": "\"Atkinson Hyperlegible Mono\", ui-monospace, Menlo, Consolas, monospace",
+        "bodyFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+      }
+    }
+  ],
+  "sourceCommit": "a293a068bfb9738fe1f4ba6f2905bf4bc9d6309b",
+  "inspected": true,
+  "inspection": "Initial whole-page six-state pass, one phone CTA padding correction, then final exact-build six-state confirmation. Full-page transitions inspected in both themes at desktop/tablet/phone; changed phone hero and closing details inspected at readable size. Original collage retained."
+}

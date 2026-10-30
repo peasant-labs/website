@@ -1,49 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Landing section composition review
 
-## Package manager
+Mounted production evidence for source `a293a068bfb9738fe1f4ba6f2905bf4bc9d6309b`, build `8jhGSyembN8sdlIKq1r5d`.
 
-**This is a pnpm-only project.** `pnpm-lock.yaml` is the single committed lockfile, and `package.json` pins `packageManager` to an exact pnpm version.
+The selected direction combines a centered Open field hero, Paired canvas mission with text left and illustration right, and a centered Quiet column final invitation. These are the real production components and original artwork, including the animated card journey. The static captures use the supported reduced-motion finished frame.
 
-Do not use npm, yarn, or bun. `npm install` fails outright: `node_modules` is a pnpm symlink store, and npm's dependency resolver crashes while walking `node_modules/.pnpm`. Note that `npm run dev` appears to work only because it reuses whatever pnpm already installed.
+## Validation
 
-This is a convention, not a programmatic guard, so please follow it.
+- Normal frozen install, production build and TypeScript check pass.
+- ESLint: zero errors; six existing warnings in untouched project tests.
+- 23 focused production checks pass, including six hero geometry cases with every named flight stage, pause/reduced-motion, selected section relationships and phrase wrapping, real CTA exits, four graph host/theme cases, phone transcript cards and keyboard window access.
+- Six whole landing states inspected: 1440, 768 and 390 pixels, each in light and dark. Zero page errors, page overflow or WCAG 2 A/AA / 2.1 A/AA tagged axe violations. All transcript window body scroll offsets remain zero.
+- One correction batch reduced phone button padding while retaining 52px targets. Final full-page transitions and affected phone details were inspected again. Other route coverage remains recorded in the preceding [full route audit](https://github.com/peasant-labs/website/tree/website-37--screenshots); it was not repeated for this landing-only change.
 
-## Getting Started
+Source/build/served CSS and image hashes: [provenance](landing/provenance.json). Per-state metrics: [report](landing/report.json). [Focused tests](landing/focused-tests.log), [build](landing/build.log), [TypeScript](landing/tsc.log), [ESLint](landing/lint.log).
 
-Install dependencies, then run the development server:
+## Mounted captures
 
-```bash
-pnpm install
-pnpm dev
-```
+### Hero and site header
 
-Other project scripts:
+| View | Light | Dark |
+|---|---|---|
+| Desktop 1440 | ![Desktop 1440 light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/desktop-light-hero.png) | ![Desktop 1440 dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/desktop-dark-hero.png) |
+| Tablet 768 | ![Tablet 768 light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/tablet-light-hero.png) | ![Tablet 768 dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/tablet-dark-hero.png) |
+| Phone 390 | ![Phone 390 light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/phone-light-hero.png) | ![Phone 390 dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/phone-dark-hero.png) |
 
-```bash
-pnpm lint      # eslint
-pnpm build     # production build
-pnpm validate  # mounted production checks: landing, docs, blog and the project pages
-```
+### Mission through final CTA and footer
 
-`pnpm validate` builds and serves the site on port 3100; set `PLAYWRIGHT_PORT` to use another port when 3100 is taken.
+| View | Light | Dark |
+|---|---|---|
+| Desktop 1440 | ![Desktop 1440 light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/desktop-light-outro.png) | ![Desktop 1440 dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/desktop-dark-outro.png) |
+| Tablet 768 | ![Tablet 768 light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/tablet-light-outro.png) | ![Tablet 768 dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/tablet-dark-outro.png) |
+| Phone 390 | ![Phone 390 light](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/phone-light-outro.png) | ![Phone 390 dark](https://raw.githubusercontent.com/peasant-labs/website/website-38--screenshots/landing/phone-dark-outro.png) |
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Full shell and page transitions
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-Fonts and every visual value come from the fairtrade design system (`@peasant-labs/fairtrade`); Atkinson Hyperlegible is loaded from the root layout.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Desktop 1440: [light](landing/desktop-light-full.png), [dark](landing/desktop-dark-full.png)
+- Tablet 768: [light](landing/tablet-light-full.png), [dark](landing/tablet-dark-full.png)
+- Phone 390: [light](landing/phone-light-full.png), [dark](landing/phone-dark-full.png)

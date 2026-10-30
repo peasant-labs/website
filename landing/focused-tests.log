@@ -1,0 +1,31 @@
+
+Running 23 tests using 1 worker
+
+(node:83419) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/23] [chromium] › tests/landing-motion.spec.ts:82:5 › the agents drift past under the hero, hold when hovered, and stand still for reduced motion
+[2/23] [chromium] › tests/landing-motion.spec.ts:200:5 › on a phone the session is a short slice at the column's width, its redacted key read whole
+[3/23] [chromium] › tests/landing-motion.spec.ts:265:5 › on a phone the shared thread follows the slice at the column's width, readable and dark in both themes
+[4/23] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps its raised transcript and planted figures: phone-light
+[5/23] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps its raised transcript and planted figures: phone-dark
+[6/23] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps its raised transcript and planted figures: tablet-light
+[7/23] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps its raised transcript and planted figures: tablet-dark
+[8/23] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps its raised transcript and planted figures: desktop-light
+[9/23] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps its raised transcript and planted figures: desktop-dark
+[10/23] [chromium] › tests/landing-motion.spec.ts:388:5 › the hero picture loops while on screen, holds while a pointer moves onto it, and holds still for reduced motion
+[11/23] [chromium] › tests/landing.spec.ts:14:7 › the sample graph renders transcript nodes and returns to reading: landing-light
+[12/23] [chromium] › tests/landing.spec.ts:14:7 › the sample graph renders transcript nodes and returns to reading: landing-dark
+[13/23] [chromium] › tests/landing.spec.ts:14:7 › the sample graph renders transcript nodes and returns to reading: projects-light
+[14/23] [chromium] › tests/landing.spec.ts:14:7 › the sample graph renders transcript nodes and returns to reading: projects-dark
+[15/23] [chromium] › tests/landing.spec.ts:35:5 › the landing reads in order and carries none of the removed sections
+[16/23] [chromium] › tests/landing.spec.ts:62:5 › the hero's tags sit in one row, two and two, or one column, and its lede ends on a full line
+[17/23] [chromium] › tests/landing.spec.ts:128:5 › every page ends with the footer's call to action
+[18/23] [chromium] › tests/landing.spec.ts:164:5 › the hero buttons move to their sections, smoothly unless motion is reduced
+[19/23] [chromium] › tests/landing.spec.ts:1047:5 › the selected landing sections share an open ground and coherent responsive reading order
+[20/23] [chromium] › tests/landing.spec.ts:1520:5 › a scene plays only while it can be seen, and keyboard focus holds it, and the stepping, where it is
+[21/23] [chromium] › tests/landing.spec.ts:1890:5 › a keyboard user's focus in the transcript is never hidden under the thread over it
+[22/23] [chromium] › tests/landing.spec.ts:1925:5 › the shared thread can be reached and scrolled by keyboard
+[23/23] [chromium] › tests/landing.spec.ts:2057:5 › the transcript browser rests where it opens, and only the reader's own input changes it
+  23 passed (1.1m)

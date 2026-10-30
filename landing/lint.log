@@ -1,0 +1,12 @@
+$ eslint
+
+/Users/vitorhugo/Documents/Projects/polyrepo/website/website-60--fix--landing-section-composition/tests/projects.spec.ts
+   466:10  warning  'parseEvidenceRef' is defined but never used         @typescript-eslint/no-unused-vars
+   474:10  warning  'parseInstruction' is defined but never used         @typescript-eslint/no-unused-vars
+   512:10  warning  'parseHeroFigure' is defined but never used          @typescript-eslint/no-unused-vars
+  1225:7   warning  'evidenceById' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  1233:16  warning  'expectEvidenceReference' is defined but never used  @typescript-eslint/no-unused-vars
+  1291:29  warning  '_route' is defined but never used                   @typescript-eslint/no-unused-vars
+
+✖ 6 problems (0 errors, 6 warnings)
+
