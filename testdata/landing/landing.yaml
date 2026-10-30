@@ -185,6 +185,7 @@ session:
   # on a phone, the slice shown instead of the windows: the prompt, the redacted line of the .env it read, and the commit
   phone:
     widths: [360, 390]
+    headingLevel: 3
     prompt: hey claude, run our billing retry suite against each model, same seed, and write a table of pass rate, tokens and wall time per model
     tool: .env
     key: AWS_ACCESS_KEY_ID=

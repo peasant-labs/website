@@ -212,6 +212,10 @@ test("on a phone the session is a short slice at the column's width, its redacte
     await expect(section.locator(".lp-windows-term")).toBeHidden();
     await expect(section.locator(".mac-win").filter({ visible: true })).toHaveCount(0);
     await expect(slice).toBeVisible();
+    const turnHeadings = slice.locator(".txn-turn-heading");
+    await expect(turnHeadings).not.toHaveCount(0);
+    expect(await turnHeadings.evaluateAll((headings) => headings.map((heading) => heading.tagName)))
+      .toEqual(Array(await turnHeadings.count()).fill(`H${fixture.session.phone.headingLevel}`));
     await expect(section.locator("[data-x-thread]").filter({ visible: true })).toHaveCount(1);
     // the prompt, the tool call that read .env open on its redacted key, and the commit with its churn
     await expect(slice.locator(".txn-turn.user")).toContainText(fixture.session.phone.prompt);

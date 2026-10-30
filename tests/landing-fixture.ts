@@ -65,6 +65,7 @@ export type LandingFixture = {
     figures: { model: string; inputSubmissionCount: number; totalTokens: number };
     phone: {
       widths: number[];
+      headingLevel: number;
       prompt: string;
       tool: string;
       key: string;
