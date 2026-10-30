@@ -1079,8 +1079,13 @@ test("the selected landing sections share an open ground and coherent responsive
       };
       const lead = document.querySelector("#vision-line")!;
       const story = document.querySelector(".lp-vision-story")!;
+      const titleStyle = getComputedStyle(document.querySelector("#hero-title")!);
+      const closingStyle = getComputedStyle(document.querySelector(".site-foot-close .site-foot-line")!);
       return {
         titleLines: lines("#hero-title"),
+        titleLeading: parseFloat(titleStyle.lineHeight) / parseFloat(titleStyle.fontSize),
+        closingLines: lines(".site-foot-close .site-foot-line"),
+        closingLeading: parseFloat(closingStyle.lineHeight) / parseFloat(closingStyle.fontSize),
         centered: ["#hero-title", ".lp-lede", ".lp-ctas", ".site-foot-close-art", ".site-foot-close-words"].map((selector) => Math.abs(midpoint(selector) - innerWidth / 2)),
         open: [".hf-panel", ".lp-vision-inner", ".site-foot-close-panel"].map(unframed),
         missionWords: rect(".lp-vision-words"), missionArt: rect(".lp-vision-art"),
@@ -1095,6 +1100,8 @@ test("the selected landing sections share an open ground and coherent responsive
       };
     });
     expect(composition.titleLines, at).toEqual(titleLines);
+    if (composition.titleLines.length > 1) expect(composition.titleLeading, `wrapped hero leading ${at}`).toBeGreaterThanOrEqual(1.4);
+    if (composition.closingLines.length > 1) expect(composition.closingLeading, `wrapped closing leading ${at}`).toBeGreaterThanOrEqual(1.4);
     for (const offset of composition.centered) expect(offset, `centered hero and final CTA ${at}`).toBeLessThanOrEqual(1);
     expect(composition.open, `the sections share the page ground ${at}`).toEqual([true, true, true]);
     if (missionBeside) {
