@@ -1,0 +1,96 @@
+{
+  "source": "532e0ec423570888a050d2144028480a9e0cb65b",
+  "checkedAt": "2026-10-31T10:18:59.979Z",
+  "domains": [
+    {
+      "host": "https://peasantlabs.org",
+      "css": [
+        {
+          "asset": "/_next/static/css/e1ca4a7f35ff7017.css",
+          "sha256": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/756aee017256b120.css",
+          "sha256": "129dc3f9054a73f96f398ec22c5d1ca1a7e821cf3dc0db1a613c75a474c6a17f",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/59f1d625a66d3d70.css",
+          "sha256": "6846453176474b59ca07d46b1115e15aca5d24d4511403311ab99e0d0b27b4eb",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/f505c5205671eb79.css",
+          "sha256": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/05d7e2f0cae1704c.css",
+          "sha256": "05010aecc5cdabdc6cfccdf6b9b403afbd4ef30cad2983008bc649b446b055ec",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/6d9d8256903444dc.css",
+          "sha256": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+          "matchesInspected": true
+        }
+      ],
+      "allSixCssMatch": true,
+      "installer": {
+        "url": "https://peasantlabs.org/install",
+        "status": 200,
+        "sha256": "8fa3095453682dfc1cbe893a232b71cd656dbad47fcba6c87ab25f8aa2d265fd",
+        "matchesReviewed": true,
+        "kickstartMarker": true,
+        "bytes": 11163,
+        "cacheControl": "public, max-age=300, must-revalidate"
+      }
+    },
+    {
+      "host": "https://website-production-165b.up.railway.app",
+      "css": [
+        {
+          "asset": "/_next/static/css/e1ca4a7f35ff7017.css",
+          "sha256": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/756aee017256b120.css",
+          "sha256": "129dc3f9054a73f96f398ec22c5d1ca1a7e821cf3dc0db1a613c75a474c6a17f",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/59f1d625a66d3d70.css",
+          "sha256": "6846453176474b59ca07d46b1115e15aca5d24d4511403311ab99e0d0b27b4eb",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/f505c5205671eb79.css",
+          "sha256": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/05d7e2f0cae1704c.css",
+          "sha256": "05010aecc5cdabdc6cfccdf6b9b403afbd4ef30cad2983008bc649b446b055ec",
+          "matchesInspected": true
+        },
+        {
+          "asset": "/_next/static/css/6d9d8256903444dc.css",
+          "sha256": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+          "matchesInspected": true
+        }
+      ],
+      "allSixCssMatch": true,
+      "installer": {
+        "url": "https://website-production-165b.up.railway.app/install",
+        "status": 200,
+        "sha256": "8fa3095453682dfc1cbe893a232b71cd656dbad47fcba6c87ab25f8aa2d265fd",
+        "matchesReviewed": true,
+        "kickstartMarker": true,
+        "bytes": 11163,
+        "cacheControl": "public, max-age=300, must-revalidate"
+      }
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+$ next build --webpack
+▲ Next.js 16.2.1 (webpack)
+
+  Creating an optimized production build ...
+(node:72006) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✓ Compiled successfully in 5.9s
+  Running TypeScript ...
+  Finished TypeScript in 2.1s ...
+  Collecting page data using 17 workers ...
+  Generating static pages using 17 workers (0/21) ...
+  Generating static pages using 17 workers (5/21) 
+  Generating static pages using 17 workers (10/21) 
+  Generating static pages using 17 workers (15/21) 
+(node:72036) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✓ Generating static pages using 17 workers (21/21) in 518ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ƒ /api/subscribe
+├ ○ /blog
+├ ● /blog/[slug]
+│ └ /blog/reclaiming-data-autonomy-as-a-peasant
+├ ○ /contact
+├ ○ /docs
+├ ○ /docs/guides/evals
+├ ○ /docs/guides/reviews
+├ ○ /docs/search-index.json
+├ ○ /icon.svg
+├ ○ /install
+├ ○ /install.ps1
+├ ○ /opengraph-image
+├ ○ /projects
+├ ○ /projects/peasant
+├ ○ /projects/village
+├ ○ /sitemap.xml
+└ ○ /twitter-image
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
