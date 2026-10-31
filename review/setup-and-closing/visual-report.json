@@ -1,0 +1,114 @@
+[
+  {
+    "width": 1440,
+    "colorScheme": "light",
+    "errors": [],
+    "overflow": 0,
+    "handle": [],
+    "borders": [
+      {
+        "class": "txn-header",
+        "top": "0px",
+        "right": "0px",
+        "bottom": "1px",
+        "left": "0px"
+      },
+      {
+        "class": "txn-disclosure txn-rail txn-rail-left",
+        "top": "0px",
+        "right": "1px",
+        "bottom": "0px",
+        "left": "0px"
+      },
+      {
+        "class": "txn-disclosure txn-rail-strip txn-rail-strip-right",
+        "top": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "left": "1px"
+      },
+      {
+        "class": "tabs txn-tabs",
+        "top": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "left": "0px"
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "colorScheme": "dark",
+    "errors": [],
+    "overflow": 0,
+    "handle": [],
+    "borders": [
+      {
+        "class": "txn-header",
+        "top": "0px",
+        "right": "0px",
+        "bottom": "1px",
+        "left": "0px"
+      },
+      {
+        "class": "txn-disclosure txn-rail txn-rail-left",
+        "top": "0px",
+        "right": "1px",
+        "bottom": "0px",
+        "left": "0px"
+      },
+      {
+        "class": "txn-disclosure txn-rail-strip txn-rail-strip-right",
+        "top": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "left": "1px"
+      },
+      {
+        "class": "tabs txn-tabs",
+        "top": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "left": "0px"
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "colorScheme": "light",
+    "errors": [],
+    "overflow": 0,
+    "handle": [],
+    "borders": []
+  },
+  {
+    "width": 390,
+    "colorScheme": "dark",
+    "errors": [],
+    "overflow": 0,
+    "handle": [],
+    "borders": []
+  },
+  {
+    "width": 320,
+    "colorScheme": "light",
+    "errors": [],
+    "overflow": 0,
+    "handle": [],
+    "borders": []
+  },
+  {
+    "width": 320,
+    "colorScheme": "dark",
+    "errors": [],
+    "overflow": 0,
+    "handle": [],
+    "borders": []
+  },
+  {
+    "readoutOnly": true,
+    "handle": [],
+    "viewportWidth": 1920,
+    "viewerWidth": 968
+  }
+]

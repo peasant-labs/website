@@ -1,0 +1,99 @@
+{
+  "source": "f5a13624a369c5757c01bca1091186b2b4c7de4b",
+  "buildId": "AqXvh9P3Z6Xu4DOJxMopZ",
+  "inspected": [
+    {
+      "file": "closing-1440-dark.png",
+      "sha256": "4df566e81bd5893d0225299eb5bfa9ffbbaa3176df0f184f326861db631bb494"
+    },
+    {
+      "file": "closing-1440-light.png",
+      "sha256": "908c43b893bfde17728b303c2e9bd9093b7f909afb834ed0654132b4216630e2"
+    },
+    {
+      "file": "closing-320-dark.png",
+      "sha256": "af29ce37f16f8c2ac4a33a1f0abc9532ce1e205d1b8c473d285ea298989c0375"
+    },
+    {
+      "file": "closing-320-light.png",
+      "sha256": "382f19b367287ab6da0a6caa5ccfbc3b5c03e97984fe139e73b2d4fd795179b9"
+    },
+    {
+      "file": "closing-390-dark.png",
+      "sha256": "01d81a112b18f418a3b32c92fb6cdd8e742331cffbc9c5f7e76e7ad454e2491e"
+    },
+    {
+      "file": "closing-390-light.png",
+      "sha256": "ee8a02f8b5a812c0e0d32b73402cfed6473c031eb8f18ae83cfa04a5ddaae34e"
+    },
+    {
+      "file": "install-1440-dark.png",
+      "sha256": "4d3693a41fe452ec69f239b103a1f32cbbfbd3b19ede9dac783961c47021b994"
+    },
+    {
+      "file": "install-1440-light.png",
+      "sha256": "8de8021dfe8c35259ff0638d2da87466f45bea76be1e5892f100e6bea5c09b93"
+    },
+    {
+      "file": "install-320-dark.png",
+      "sha256": "f01399bb34b714b9daf4c81990637fdc22a28c33d46df8dc8f966a36aeae3b2d"
+    },
+    {
+      "file": "install-320-light.png",
+      "sha256": "4b97de4110cfea26a561d5ff4afdf9c6ee32953c62a343201fd251dd531718f6"
+    },
+    {
+      "file": "install-390-dark.png",
+      "sha256": "130932604c906ade14069cbf425ee0c94f161562da34ffb0331122b3a5300ecd"
+    },
+    {
+      "file": "install-390-light.png",
+      "sha256": "63ff34c154ce5d826fcfe4f5e4b39e6379fe9bd9576be14ea70f68b2919770b2"
+    },
+    {
+      "file": "viewer-1440-dark.png",
+      "sha256": "5c64fc11656cbebc3152feadbb0fbf804bddc4e4a72da21ba535d5476a25aa61"
+    },
+    {
+      "file": "viewer-1440-light.png",
+      "sha256": "da94a445250afe27aecea3655a03154b4a11b8c99ca27ddfc3b594d412b234a6"
+    },
+    {
+      "file": "viewer-320-dark.png",
+      "sha256": "430bfa8a9f8738a200c8790090693a5a59e5aeaee55b2841760e7cc0b0057e5d"
+    },
+    {
+      "file": "viewer-320-light.png",
+      "sha256": "93e6599b562451841e63743ed512edf26481ac21617d16ae1a62c31cacba0288"
+    },
+    {
+      "file": "viewer-390-dark.png",
+      "sha256": "9c0d879b0da2c2efefd56ff735fe10e113963816ddbeeda14ecf0aace1bda7f1"
+    },
+    {
+      "file": "viewer-390-light.png",
+      "sha256": "d8e8be10c4419b6d2d1f16e088d82db98fb98327df3224031eb4752051ee97af"
+    }
+  ],
+  "result": "Inspected install, closing and actual embedded viewer/mobile session slice at1440/390/320 in both themes. No layout overflow, clipped controls, or page errors. Terminal line scrolls inside its region; agent prompt wraps; closing has only title and two exits. No inert reading-width handle mounted at1440 or actual1920 viewport. Viewer header and side rails keep1px borders.",
+  "captureMethod": "Viewer section uses document-coordinate clipping from scroll0, preserving all UI while avoiding sticky-header compositing inside a tall element screenshot.",
+  "tests": {
+    "fullLandingSuites": {
+      "passed": 76,
+      "fixtureFailure": 1,
+      "total": 77
+    },
+    "fixtureCorrection": {
+      "passed": 1,
+      "change": "quote existing comma-containing YAML heading"
+    },
+    "all77ChecksVerified": true
+  },
+  "checks": [
+    "pnpm build passed",
+    "pnpm exec tsc --noEmit passed",
+    "23 served static assets byte-identical to build",
+    "tokens/base/components CSS byte-identical to0.0.56",
+    "no Mermaid fixture exists in the website sample; existing graph/list/tool/tab coverage passed"
+  ]
+}
