@@ -1,0 +1,40 @@
+{
+  "verdict": "ACCEPT",
+  "base": "51887a0726e3fafd8942d09a516068db16aa6e56",
+  "head": "dc267f229934a21dfd51d6a8914805c7b0996647",
+  "changedFiles": 9,
+  "schema": {
+    "version": "v0.39.0",
+    "tagCommit": "2b443ca51f3b7cbfba487c433a441b9df3881beb",
+    "releaseWorkflow": 41177423066,
+    "releaseWorkflowStatus": "success",
+    "goSum": "h1:rEL9pNUdIDEfWnhzR0y2MLs4MNZEQ646IBagiwHUQyo=",
+    "goOriginMatchesTag": true,
+    "npmIntegrity": "sha512-o1DsfVkbFOcRS+7b7kNQXSC+9/MSZn3TGbMo2alc8Sfufe4zeP4vYrQaSaJPARcfFtyOoaP1mkO9mH/vJBLqWg==",
+    "downloadedTarballMatches": true,
+    "npmSLSAAttestationMatchesRepositoryTagCommitAndSubject": true,
+    "independentSigstoreSignatureVerification": false,
+    "frozenOldSpecFilesChanged": false
+  },
+  "village": {
+    "pr": 353,
+    "merge": "a1311206ab80fe917a70c6d0cc39c4be2c68ce76",
+    "deployment": 7456671555,
+    "deploymentStatus": "success",
+    "liveOpenAPI": "https://api.village.peasantlabs.org/api/v1/openapi.json",
+    "status": 200,
+    "version": "0.34.0",
+    "authoritativeModel": {}
+  },
+  "focusedTest": {
+    "command": "GOTOOLCHAIN=go1.25.8 go test -race -run ^TestPublicationRoundTrip_ .",
+    "source": "released immutable schema v0.39.0",
+    "result": "PASS",
+    "seconds": 3.207
+  },
+  "ci": "Reviewed unchanged head: normal Linux makecheck, Windows, built-binary, license, lockfile and real web build SUCCESS. Release-specific/full-stack jobs are skipped, not claimed as passes.",
+  "policyAndUI": "No runtime source/UI/policy/license/migration changes in consumer; published authoritative-model key correction only. Existing ModelInfo and SessionDetail unaffected; existing canonical Fairtrade pin unchanged.",
+  "postMergeNote": "The documented Nix Vendor Hash workflow will run after these dependency files merge. Wait for its hash update or prove freshness before claiming Nix-source readiness.",
+  "mutation": "No publishing, force-upload, code edits, worktree checkout or source changes; fetched remote Git objects and public immutable artifacts only.",
+  "checkedAt": "2026-10-31T09:51:05.601363+00:00"
+}

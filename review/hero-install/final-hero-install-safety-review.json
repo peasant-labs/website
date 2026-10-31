@@ -1,0 +1,38 @@
+{
+  "verdict": "ACCEPT",
+  "findings": [],
+  "website": {
+    "source": "1ecf8ae262ded1e5f268f42b38c2d5600daae258",
+    "tree": "acbb7c6de079ba4e3c81196b71e768d85c367400",
+    "buildId": "DLLzxXaQi-CLOXpwx3kDN",
+    "servedInstallAndPowerShellBoth200AndByteMatchSource": true,
+    "unixInstallerSha256": "8fa3095453682dfc1cbe893a232b71cd656dbad47fcba6c87ab25f8aa2d265fd",
+    "eightRealProcessFixtureChecks": "independently passed",
+    "bashSyntax": "passed",
+    "reviewedLatestDelta": "margin-inline-start:auto on reserved copy slot only"
+  },
+  "installerBoundary": "Only known optional --kickstart flag; terminal precondition before install; approval/checksum/installed-binary gates precede absolute installed binary launch; setup exit propagates; bare installer and Windows source retain prior behavior; no PATH profile/login/hooks/publication effect added.",
+  "doc": {
+    "source": "379601058f40c69df251ebb2bd29f1a6254be935",
+    "reviewed": "terminal setup plus separate explicit publishing prompt; no native project-picker claim; Windows manual setup truthful"
+  },
+  "site": {
+    "sha256": "5e716b4a2f54ce34dd9fb8a9f9168c52989adf0f2dbdb103b6573033f5b27d60",
+    "servedMatchesSource": true,
+    "canonicalTokensAndCspUnchanged": true,
+    "reviewedLatestDelta": "16px primary command and canonical proportional prose spacing only",
+    "behavior": "fixed text copied on explicit button click using textContent/native clipboard; no forms/dialogs/installer execution/API/storage writes"
+  },
+  "peasant803": {
+    "head": "dc267f229934a21dfd51d6a8914805c7b0996647",
+    "base": "51887a0726e3fafd8942d09a516068db16aa6e56",
+    "sourceDiff": "nine coherent schema/lock/notices/e2e expectations only; no policy/visibility/migration/UI changes",
+    "dependencyProof": "/tmp/publish-compatibility-803-review.json; official schema0.39 tag/module/npm SLSA and deployed Village353/API0.34 verified by independent review",
+    "freshState": "MERGED"
+  },
+  "remainingDeliveryGates": [
+    "Deploy and verify public website installer flag before publishing working command in Site/doc.",
+    "Wait for existing Nix Vendor Hash workflow before claiming post-803 Nix source freshness."
+  ],
+  "mutationsPerformed": "No source edits, installations, logins, uploads, force publication, hook changes, service lifecycle actions or credential inspection. Only isolated fixture checks and public/local GET reads."
+}

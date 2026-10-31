@@ -1,0 +1,443 @@
+{
+  "siteSha": "5e716b4a2f54ce34dd9fb8a9f9168c52989adf0f2dbdb103b6573033f5b27d60",
+  "rows": [
+    {
+      "width": 1440,
+      "theme": "light",
+      "hero": {
+        "stage": {
+          "x": 300,
+          "y": 545.59375,
+          "width": 840,
+          "height": 228,
+          "top": 545.59375,
+          "right": 1140,
+          "bottom": 773.59375,
+          "left": 300
+        },
+        "laptop": {
+          "x": 315,
+          "y": 566.59375,
+          "width": 285,
+          "height": 174,
+          "top": 566.59375,
+          "right": 600,
+          "bottom": 740.59375,
+          "left": 315
+        },
+        "card": {
+          "x": 623.999755859375,
+          "y": 578.593994140625,
+          "width": 180,
+          "height": 126,
+          "top": 578.593994140625,
+          "right": 803.999755859375,
+          "bottom": 704.593994140625,
+          "left": 623.999755859375
+        },
+        "base": {
+          "x": 621,
+          "y": 731.59375,
+          "width": 186,
+          "height": 12,
+          "top": 731.59375,
+          "right": 807,
+          "bottom": 743.59375,
+          "left": 621
+        },
+        "commons": {
+          "x": 843,
+          "y": 611.59375,
+          "width": 279,
+          "height": 150,
+          "top": 611.59375,
+          "right": 1122,
+          "bottom": 761.59375,
+          "left": 843
+        },
+        "overflow": 0
+      },
+      "install": {
+        "copyEdgeDelta": 1,
+        "rows": 2,
+        "command": "$ curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart",
+        "commandFont": "16px",
+        "prompt": "Publish this session with Peasant. Ask which collective if needed.",
+        "promptFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+        "promptSize": "16px",
+        "promptLetter": "0.48px",
+        "promptWord": "2.56px",
+        "promptBounds": {
+          "x": 234,
+          "y": 819.078125,
+          "width": 601.34375,
+          "height": 24,
+          "top": 819.078125,
+          "right": 835.34375,
+          "bottom": 843.078125,
+          "left": 234
+        },
+        "copyBounds": {
+          "x": 1194,
+          "y": 819.078125,
+          "width": 44,
+          "height": 44,
+          "top": 819.078125,
+          "right": 1238,
+          "bottom": 863.078125,
+          "left": 1194
+        },
+        "overflow": 0,
+        "tabNotes": [
+          "run in your terminal to install and start kickstart",
+          "then ask your coding agent to publish this session"
+        ]
+      },
+      "windows": "install on windows, then run the kickstart command printed in your terminal",
+      "site": {
+        "overflow": 0,
+        "commandFont": "16px",
+        "commandLine": "22.4px",
+        "promptSize": "18px",
+        "promptLetter": "0.54px",
+        "promptWord": "2.88px",
+        "dialogs": 0,
+        "buttonCount": 2,
+        "command": "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart"
+      },
+      "errors": []
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "hero": {
+        "stage": {
+          "x": 300,
+          "y": 545.59375,
+          "width": 840,
+          "height": 228,
+          "top": 545.59375,
+          "right": 1140,
+          "bottom": 773.59375,
+          "left": 300
+        },
+        "laptop": {
+          "x": 315,
+          "y": 566.59375,
+          "width": 285,
+          "height": 174,
+          "top": 566.59375,
+          "right": 600,
+          "bottom": 740.59375,
+          "left": 315
+        },
+        "card": {
+          "x": 623.999755859375,
+          "y": 578.593994140625,
+          "width": 180,
+          "height": 126,
+          "top": 578.593994140625,
+          "right": 803.999755859375,
+          "bottom": 704.593994140625,
+          "left": 623.999755859375
+        },
+        "base": {
+          "x": 621,
+          "y": 731.59375,
+          "width": 186,
+          "height": 12,
+          "top": 731.59375,
+          "right": 807,
+          "bottom": 743.59375,
+          "left": 621
+        },
+        "commons": {
+          "x": 843,
+          "y": 611.59375,
+          "width": 279,
+          "height": 150,
+          "top": 611.59375,
+          "right": 1122,
+          "bottom": 761.59375,
+          "left": 843
+        },
+        "overflow": 0
+      },
+      "install": {
+        "copyEdgeDelta": 1,
+        "rows": 2,
+        "command": "$ curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart",
+        "commandFont": "16px",
+        "prompt": "Publish this session with Peasant. Ask which collective if needed.",
+        "promptFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+        "promptSize": "16px",
+        "promptLetter": "0.48px",
+        "promptWord": "2.56px",
+        "promptBounds": {
+          "x": 234,
+          "y": 819.078125,
+          "width": 601.34375,
+          "height": 24,
+          "top": 819.078125,
+          "right": 835.34375,
+          "bottom": 843.078125,
+          "left": 234
+        },
+        "copyBounds": {
+          "x": 1194,
+          "y": 819.078125,
+          "width": 44,
+          "height": 44,
+          "top": 819.078125,
+          "right": 1238,
+          "bottom": 863.078125,
+          "left": 1194
+        },
+        "overflow": 0,
+        "tabNotes": [
+          "run in your terminal to install and start kickstart",
+          "then ask your coding agent to publish this session"
+        ]
+      },
+      "windows": "install on windows, then run the kickstart command printed in your terminal",
+      "site": {
+        "overflow": 0,
+        "commandFont": "16px",
+        "commandLine": "22.4px",
+        "promptSize": "18px",
+        "promptLetter": "0.54px",
+        "promptWord": "2.88px",
+        "dialogs": 0,
+        "buttonCount": 2,
+        "command": "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart"
+      },
+      "errors": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "hero": {
+        "stage": {
+          "x": 45,
+          "y": 626.5625,
+          "width": 300,
+          "height": 246,
+          "top": 626.5625,
+          "right": 345,
+          "bottom": 872.5625,
+          "left": 45
+        },
+        "laptop": {
+          "x": 54,
+          "y": 725.5625,
+          "width": 138,
+          "height": 96,
+          "top": 725.5625,
+          "right": 192,
+          "bottom": 821.5625,
+          "left": 54
+        },
+        "card": {
+          "x": 231,
+          "y": 650.5625,
+          "width": 90,
+          "height": 66,
+          "top": 650.5625,
+          "right": 321,
+          "bottom": 716.5625,
+          "left": 231
+        },
+        "base": {
+          "x": 228,
+          "y": 734.5625,
+          "width": 96,
+          "height": 9,
+          "top": 734.5625,
+          "right": 324,
+          "bottom": 743.5625,
+          "left": 228
+        },
+        "commons": {
+          "x": 216,
+          "y": 755.5625,
+          "width": 114,
+          "height": 102,
+          "top": 755.5625,
+          "right": 330,
+          "bottom": 857.5625,
+          "left": 216
+        },
+        "overflow": 0
+      },
+      "install": {
+        "copyEdgeDelta": 1,
+        "rows": 2,
+        "command": "$ curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart",
+        "commandFont": "16px",
+        "prompt": "Publish this session with Peasant. Ask which collective if needed.",
+        "promptFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+        "promptSize": "16px",
+        "promptLetter": "0.48px",
+        "promptWord": "2.56px",
+        "promptBounds": {
+          "x": 33,
+          "y": 896.0625,
+          "width": 264,
+          "height": 48,
+          "top": 896.0625,
+          "right": 297,
+          "bottom": 944.0625,
+          "left": 33
+        },
+        "copyBounds": {
+          "x": 313,
+          "y": 896.0625,
+          "width": 44,
+          "height": 44,
+          "top": 896.0625,
+          "right": 357,
+          "bottom": 940.0625,
+          "left": 313
+        },
+        "overflow": 0,
+        "tabNotes": [
+          "run in your terminal to install and start kickstart",
+          "then ask your coding agent to publish this session"
+        ]
+      },
+      "windows": "install on windows, then run the kickstart command printed in your terminal",
+      "site": {
+        "overflow": 0,
+        "commandFont": "16px",
+        "commandLine": "22.4px",
+        "promptSize": "18px",
+        "promptLetter": "0.54px",
+        "promptWord": "2.88px",
+        "dialogs": 0,
+        "buttonCount": 2,
+        "command": "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart"
+      },
+      "errors": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "hero": {
+        "stage": {
+          "x": 45,
+          "y": 626.5625,
+          "width": 300,
+          "height": 246,
+          "top": 626.5625,
+          "right": 345,
+          "bottom": 872.5625,
+          "left": 45
+        },
+        "laptop": {
+          "x": 54,
+          "y": 725.5625,
+          "width": 138,
+          "height": 96,
+          "top": 725.5625,
+          "right": 192,
+          "bottom": 821.5625,
+          "left": 54
+        },
+        "card": {
+          "x": 231,
+          "y": 650.5625,
+          "width": 90,
+          "height": 66,
+          "top": 650.5625,
+          "right": 321,
+          "bottom": 716.5625,
+          "left": 231
+        },
+        "base": {
+          "x": 228,
+          "y": 734.5625,
+          "width": 96,
+          "height": 9,
+          "top": 734.5625,
+          "right": 324,
+          "bottom": 743.5625,
+          "left": 228
+        },
+        "commons": {
+          "x": 216,
+          "y": 755.5625,
+          "width": 114,
+          "height": 102,
+          "top": 755.5625,
+          "right": 330,
+          "bottom": 857.5625,
+          "left": 216
+        },
+        "overflow": 0
+      },
+      "install": {
+        "copyEdgeDelta": 1,
+        "rows": 2,
+        "command": "$ curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart",
+        "commandFont": "16px",
+        "prompt": "Publish this session with Peasant. Ask which collective if needed.",
+        "promptFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+        "promptSize": "16px",
+        "promptLetter": "0.48px",
+        "promptWord": "2.56px",
+        "promptBounds": {
+          "x": 33,
+          "y": 896.0625,
+          "width": 264,
+          "height": 48,
+          "top": 896.0625,
+          "right": 297,
+          "bottom": 944.0625,
+          "left": 33
+        },
+        "copyBounds": {
+          "x": 313,
+          "y": 896.0625,
+          "width": 44,
+          "height": 44,
+          "top": 896.0625,
+          "right": 357,
+          "bottom": 940.0625,
+          "left": 313
+        },
+        "overflow": 0,
+        "tabNotes": [
+          "run in your terminal to install and start kickstart",
+          "then ask your coding agent to publish this session"
+        ]
+      },
+      "windows": "install on windows, then run the kickstart command printed in your terminal",
+      "site": {
+        "overflow": 0,
+        "commandFont": "16px",
+        "commandLine": "22.4px",
+        "promptSize": "18px",
+        "promptLetter": "0.54px",
+        "promptWord": "2.88px",
+        "dialogs": 0,
+        "buttonCount": 2,
+        "command": "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart"
+      },
+      "errors": []
+    }
+  ],
+  "verdict": "ACCEPT",
+  "websiteSource": "1ecf8ae262ded1e5f268f42b38c2d5600daae258",
+  "websiteTree": "acbb7c6de079ba4e3c81196b71e768d85c367400",
+  "reviewedCaptures": [
+    "install-1440-light",
+    "install-390-dark",
+    "site-1440-dark",
+    "site-390-light"
+  ],
+  "findingsResolved": [
+    "primary code font16px",
+    "canonical prose spacing",
+    "copy control at shared right edge"
+  ]
+}

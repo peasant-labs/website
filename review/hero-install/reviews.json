@@ -1,0 +1,18 @@
+{
+  "websiteSource": "1ecf8ae262ded1e5f268f42b38c2d5600daae258",
+  "websiteTree": "acbb7c6de079ba4e3c81196b71e768d85c367400",
+  "layout": "ACCEPT",
+  "runtime": "ACCEPT",
+  "safety": "ACCEPT",
+  "remainingFindings": [],
+  "doc": "45a03d64cb0c8ad37da574613ebbd262e5fe20a0",
+  "siteSha256": "5e716b4a2f54ce34dd9fb8a9f9168c52989adf0f2dbdb103b6573033f5b27d60",
+  "reconciledPublishCompatibility": {
+    "pr": 803,
+    "state": "MERGED",
+    "merge": "285c605d1354e97bce3ae087e112642e3fcd2635",
+    "nixVendorHash": "f60621a8ad86876c2fb92e57307f372ca927b746",
+    "nixWorkflow": 41190394111,
+    "nixStatus": "SUCCESS"
+  }
+}

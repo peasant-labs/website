@@ -1,0 +1,120 @@
+{
+  "source": "1ecf8ae262ded1e5f268f42b38c2d5600daae258",
+  "tree": "acbb7c6de079ba4e3c81196b71e768d85c367400",
+  "buildId": "DLLzxXaQi-CLOXpwx3kDN",
+  "runtime3385": {
+    "pid": 70930,
+    "pgid": 70930,
+    "cwd": "<workspace>/website/website-60--fix--hero-and-install",
+    "port": 3386,
+    "source": "1ecf8ae262ded1e5f268f42b38c2d5600daae258",
+    "tree": "acbb7c6de079ba4e3c81196b71e768d85c367400",
+    "buildId": "DLLzxXaQi-CLOXpwx3kDN",
+    "log": "/tmp/hero-install-integration-server.log"
+  },
+  "installerSha256": "8fa3095453682dfc1cbe893a232b71cd656dbad47fcba6c87ab25f8aa2d265fd",
+  "rows": [
+    {
+      "name": "phone-light",
+      "interaction": true,
+      "width": 390,
+      "colorScheme": "light",
+      "raisedGap": 0.07,
+      "frontDepth": 0.07,
+      "titleLines": [
+        "the open-source",
+        "commons for",
+        "agent transcripts"
+      ],
+      "missionBeside": false,
+      "missionArtMax": 224,
+      "metrics": {
+        "overflow": 0,
+        "promptWrapped": true,
+        "promptFont": "16px",
+        "promptCopyHeight": 44,
+        "promptHasSigil": false,
+        "title": "install, then ask your agent"
+      },
+      "errors": [],
+      "axe": 0
+    },
+    {
+      "name": "phone-dark",
+      "interaction": true,
+      "width": 390,
+      "colorScheme": "dark",
+      "raisedGap": 0.07,
+      "frontDepth": 0.07,
+      "titleLines": [
+        "the open-source",
+        "commons for",
+        "agent transcripts"
+      ],
+      "missionBeside": false,
+      "missionArtMax": 224,
+      "metrics": {
+        "overflow": 0,
+        "promptWrapped": true,
+        "promptFont": "16px",
+        "promptCopyHeight": 44,
+        "promptHasSigil": false,
+        "title": "install, then ask your agent"
+      },
+      "errors": [],
+      "axe": 0
+    },
+    {
+      "name": "desktop-light",
+      "interaction": true,
+      "width": 1440,
+      "colorScheme": "light",
+      "baselineSpread": 0.16,
+      "subjectGap": 0.12,
+      "topInset": 0.35,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "metrics": {
+        "overflow": 0,
+        "promptWrapped": true,
+        "promptFont": "16px",
+        "promptCopyHeight": 44,
+        "promptHasSigil": false,
+        "title": "install, then ask your agent"
+      },
+      "errors": [],
+      "axe": 0
+    },
+    {
+      "name": "desktop-dark",
+      "interaction": true,
+      "width": 1440,
+      "colorScheme": "dark",
+      "baselineSpread": 0.16,
+      "subjectGap": 0.12,
+      "topInset": 0.35,
+      "frontDepth": 0.06,
+      "titleLines": [
+        "the open-source commons",
+        "for agent transcripts"
+      ],
+      "missionBeside": true,
+      "missionArtMax": 448,
+      "metrics": {
+        "overflow": 0,
+        "promptWrapped": true,
+        "promptFont": "16px",
+        "promptCopyHeight": 44,
+        "promptHasSigil": false,
+        "title": "install, then ask your agent"
+      },
+      "errors": [],
+      "axe": 0
+    }
+  ]
+}

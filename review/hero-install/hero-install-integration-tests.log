@@ -1,0 +1,19 @@
+
+Running 11 tests using 1 worker
+
+(node:70945) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/11] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps one compact scene and planted figures: phone-light
+[2/11] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps one compact scene and planted figures: phone-dark
+[3/11] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps one compact scene and planted figures: tablet-light
+[4/11] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps one compact scene and planted figures: tablet-dark
+[5/11] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps one compact scene and planted figures: desktop-light
+[6/11] [chromium] › tests/landing-motion.spec.ts:347:7 › the hero composition keeps one compact scene and planted figures: desktop-dark
+[7/11] [chromium] › tests/landing-motion.spec.ts:405:5 › the hero picture loops while on screen, holds while a pointer moves onto it, and holds still for reduced motion
+[8/11] [chromium] › tests/landing.spec.ts:180:5 › the install card is fairtrade's tabs and CommandBlocks, one terminal command and one agent prompt
+[9/11] [chromium] › tests/landing.spec.ts:272:5 › on a wide screen the install card keeps every command whole on its line, with the docs link beside the title
+[10/11] [chromium] › tests/landing.spec.ts:288:5 › on a phone each install step is a small step label, its words, then its command on one line that scrolls sideways inside its block
+[11/11] [chromium] › tests/landing.spec.ts:1061:5 › the selected landing sections share an open ground and coherent responsive reading order
+  11 passed (25.3s)

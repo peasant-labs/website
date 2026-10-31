@@ -1,0 +1,125 @@
+{
+  "sourceSha256": "5e716b4a2f54ce34dd9fb8a9f9168c52989adf0f2dbdb103b6573033f5b27d60",
+  "results": [
+    {
+      "name": "desktop-light",
+      "width": 1440,
+      "theme": "light",
+      "metrics": {
+        "overflow": 0,
+        "body": "16px",
+        "commandScroll": 0,
+        "buttonHeights": [
+          44,
+          44
+        ],
+        "storage": 0,
+        "cookies": ""
+      },
+      "errors": [],
+      "downloads": [],
+      "mutations": [],
+      "axe": 0
+    },
+    {
+      "name": "desktop-dark",
+      "width": 1440,
+      "theme": "dark",
+      "metrics": {
+        "overflow": 0,
+        "body": "16px",
+        "commandScroll": 0,
+        "buttonHeights": [
+          44,
+          44
+        ],
+        "storage": 0,
+        "cookies": ""
+      },
+      "errors": [],
+      "downloads": [],
+      "mutations": [],
+      "axe": 0
+    },
+    {
+      "name": "phone-light",
+      "width": 390,
+      "theme": "light",
+      "metrics": {
+        "overflow": 0,
+        "body": "16px",
+        "commandScroll": 0,
+        "buttonHeights": [
+          44,
+          44
+        ],
+        "storage": 0,
+        "cookies": ""
+      },
+      "errors": [],
+      "downloads": [],
+      "mutations": [],
+      "axe": 0
+    },
+    {
+      "name": "phone-dark",
+      "width": 390,
+      "theme": "dark",
+      "metrics": {
+        "overflow": 0,
+        "body": "16px",
+        "commandScroll": 0,
+        "buttonHeights": [
+          44,
+          44
+        ],
+        "storage": 0,
+        "cookies": ""
+      },
+      "errors": [],
+      "downloads": [],
+      "mutations": [],
+      "axe": 0
+    },
+    {
+      "name": "narrow-light",
+      "width": 320,
+      "theme": "light",
+      "metrics": {
+        "overflow": 0,
+        "body": "16px",
+        "commandScroll": 0,
+        "buttonHeights": [
+          44,
+          44
+        ],
+        "storage": 0,
+        "cookies": ""
+      },
+      "errors": [],
+      "downloads": [],
+      "mutations": [],
+      "axe": 0
+    },
+    {
+      "name": "narrow-dark",
+      "width": 320,
+      "theme": "dark",
+      "metrics": {
+        "overflow": 0,
+        "body": "16px",
+        "commandScroll": 0,
+        "buttonHeights": [
+          44,
+          44
+        ],
+        "storage": 0,
+        "cookies": ""
+      },
+      "errors": [],
+      "downloads": [],
+      "mutations": [],
+      "axe": 0
+    }
+  ]
+}

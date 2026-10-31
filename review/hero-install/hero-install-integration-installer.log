@@ -1,0 +1,9 @@
+$ node scripts/test-install-kickstart.mjs
+PASS bare-install
+PASS kickstart-approved
+PASS kickstart-declined
+PASS checksum-failure
+PASS missing-binary
+PASS missing-terminal
+PASS setup-failure
+PASS unknown-option

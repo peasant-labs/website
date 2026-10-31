@@ -1,0 +1,462 @@
+{
+  "verdict": "ACCEPT",
+  "source": "1ecf8ae262ded1e5f268f42b38c2d5600daae258",
+  "tree": "acbb7c6de079ba4e3c81196b71e768d85c367400",
+  "buildId": "DLLzxXaQi-CLOXpwx3kDN",
+  "assets": [
+    {
+      "asset": "/_next/static/css/e1ca4a7f35ff7017.css",
+      "sha256": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b"
+    },
+    {
+      "asset": "/_next/static/css/756aee017256b120.css",
+      "sha256": "129dc3f9054a73f96f398ec22c5d1ca1a7e821cf3dc0db1a613c75a474c6a17f"
+    },
+    {
+      "asset": "/_next/static/css/59f1d625a66d3d70.css",
+      "sha256": "6846453176474b59ca07d46b1115e15aca5d24d4511403311ab99e0d0b27b4eb"
+    },
+    {
+      "asset": "/_next/static/css/f505c5205671eb79.css",
+      "sha256": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5"
+    },
+    {
+      "asset": "/_next/static/css/05d7e2f0cae1704c.css",
+      "sha256": "05010aecc5cdabdc6cfccdf6b9b403afbd4ef30cad2983008bc649b446b055ec"
+    },
+    {
+      "asset": "/_next/static/chunks/webpack-7e300385966e9021.js",
+      "sha256": "03da1307da4c123777b641c3d6930a4bfdf86961e53f987e60e85ab05039d0ba"
+    },
+    {
+      "asset": "/_next/static/chunks/18bad13d-801de1ca2fb94551.js",
+      "sha256": "b91198d73599cb60bf5795912a75f284e125aa0c50415123468f1e5c04702b28"
+    },
+    {
+      "asset": "/_next/static/chunks/368-ce6821a876415a95.js",
+      "sha256": "f96dc70fc8fdb29f59a0c78f98fef9825a9049610760a81a3c275c77a3569c79"
+    },
+    {
+      "asset": "/_next/static/chunks/main-app-ff0c3fb5efa88f67.js",
+      "sha256": "96e0f4a41f4202519535de4765e35509d44e3f9857b00985f9c2b988ea13b5e8"
+    },
+    {
+      "asset": "/_next/static/chunks/app/layout-c39c2b62fb9b052b.js",
+      "sha256": "d954951d02a911b8760fbd5dae229220e1221eab6eefa91c905f301ca122a9e9"
+    },
+    {
+      "asset": "/_next/static/chunks/7ea6f091-29a6a873fe147e20.js",
+      "sha256": "cb2411c238ce10c2414b10b8f98c7c594275c351b359d93989f8b8d8356cfaa1"
+    },
+    {
+      "asset": "/_next/static/chunks/d56ac8e1-db15b4045c4c5926.js",
+      "sha256": "1b778926112709e9c7455548dba68f60d152f91f28a46d71ed49ee90de20155f"
+    },
+    {
+      "asset": "/_next/static/chunks/77d3b4b7-0a729972948fb933.js",
+      "sha256": "ad82774d90e788369445f49065c50ef5b7e4d2ae8244eb5e9934b21f65754c51"
+    },
+    {
+      "asset": "/_next/static/chunks/5121-f6381344ef962c62.js",
+      "sha256": "0f553355ef0adb25c80a4b92754626c074ad9a35d6d4a180e9e1ec0704c3d007"
+    },
+    {
+      "asset": "/_next/static/chunks/2167-e2a28884c56d2c6d.js",
+      "sha256": "b40a510225f66908c7102d2472807b3ee434f411d284c1307b02a026f7889fe4"
+    },
+    {
+      "asset": "/_next/static/chunks/9216-f8398bede6a99f77.js",
+      "sha256": "4a1996899eca169a8fb3e302f5a1a11ec728ccf0e56ff0f2c3fb9b57fb663467"
+    },
+    {
+      "asset": "/_next/static/chunks/7686-ba701e3d46af113b.js",
+      "sha256": "6ed0a9791fd626bad42303a5ff5ea92bb43e0adb6bc450ec0760c814497463af"
+    },
+    {
+      "asset": "/_next/static/chunks/app/error-72ae3f1a50db84b6.js",
+      "sha256": "6305e5c0e454c8d03f3dde7f728396df5136d3fa5cf1d75722cbe53d4e5d4356"
+    },
+    {
+      "asset": "/_next/static/chunks/7734-2db73a174bcdb61c.js",
+      "sha256": "8b220965897aa05961c57b0c3bd5cdf2e084234901750979d56dc0b361ac318d"
+    },
+    {
+      "asset": "/_next/static/chunks/app/page-86ad319786c0177b.js",
+      "sha256": "86fb86024da4815ae913b572c572ee98f3b0af2f7301afa25d1e2571ce1d8477"
+    },
+    {
+      "asset": "/_next/static/chunks/app/global-error-75c28f018e9fd0e2.js",
+      "sha256": "38c047acaeaf88f2f6aa4aa60b951ace09ae41dffa704db2069fe61d8c2ebeea"
+    },
+    {
+      "asset": "/_next/static/css/6d9d8256903444dc.css",
+      "sha256": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf"
+    },
+    {
+      "asset": "/_next/static/chunks/polyfills-42372ed130431b0a.js",
+      "sha256": "0973c1d64c88adc8e3c950410cb58b288f72118d5965b78049438deb8f2f9683"
+    }
+  ],
+  "observations": [
+    {
+      "name": "phone-light",
+      "platforms": [
+        {
+          "metrics": {
+            "rightGap": 1,
+            "promptOverflow": 0,
+            "height": 44,
+            "font": "16px",
+            "bodyFace": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+            "shellSigils": 0
+          }
+        },
+        {
+          "metrics": {
+            "rightGap": 1,
+            "promptOverflow": 0,
+            "height": 44,
+            "font": "16px",
+            "bodyFace": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+            "shellSigils": 0
+          }
+        }
+      ],
+      "rest": {
+        "height": 246,
+        "width": 300,
+        "overflow": 0,
+        "people": {
+          "x": 216,
+          "y": 200.5625,
+          "width": 114,
+          "height": 102,
+          "top": 200.5625,
+          "right": 330,
+          "bottom": 302.5625,
+          "left": 216
+        }
+      },
+      "frames": [
+        {
+          "name": "screen",
+          "outside": 0
+        },
+        {
+          "name": "scan",
+          "outside": 0
+        },
+        {
+          "name": "flight",
+          "outside": 0
+        },
+        {
+          "name": "crest",
+          "outside": 0
+        },
+        {
+          "name": "landed",
+          "outside": 0
+        },
+        {
+          "name": "settled",
+          "outside": 0
+        }
+      ],
+      "errors": [],
+      "requests": []
+    },
+    {
+      "name": "phone-dark",
+      "platforms": [
+        {
+          "metrics": {
+            "rightGap": 1,
+            "promptOverflow": 0,
+            "height": 44,
+            "font": "16px",
+            "bodyFace": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+            "shellSigils": 0
+          }
+        },
+        {
+          "metrics": {
+            "rightGap": 1,
+            "promptOverflow": 0,
+            "height": 44,
+            "font": "16px",
+            "bodyFace": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+            "shellSigils": 0
+          }
+        }
+      ],
+      "rest": {
+        "height": 246,
+        "width": 300,
+        "overflow": 0,
+        "people": {
+          "x": 216,
+          "y": 200.5625,
+          "width": 114,
+          "height": 102,
+          "top": 200.5625,
+          "right": 330,
+          "bottom": 302.5625,
+          "left": 216
+        }
+      },
+      "frames": [
+        {
+          "name": "screen",
+          "outside": 0
+        },
+        {
+          "name": "scan",
+          "outside": 0
+        },
+        {
+          "name": "flight",
+          "outside": 0
+        },
+        {
+          "name": "crest",
+          "outside": 0
+        },
+        {
+          "name": "landed",
+          "outside": 0
+        },
+        {
+          "name": "settled",
+          "outside": 0
+        }
+      ],
+      "errors": [],
+      "requests": []
+    },
+    {
+      "name": "desktop-light",
+      "platforms": [
+        {
+          "metrics": {
+            "rightGap": 1,
+            "promptOverflow": 0,
+            "height": 44,
+            "font": "16px",
+            "bodyFace": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+            "shellSigils": 0
+          }
+        },
+        {
+          "metrics": {
+            "rightGap": 1,
+            "promptOverflow": 0,
+            "height": 44,
+            "font": "16px",
+            "bodyFace": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+            "shellSigils": 0
+          }
+        }
+      ],
+      "rest": {
+        "height": 228,
+        "width": 840,
+        "overflow": 0,
+        "people": {
+          "x": 843,
+          "y": 487.59375,
+          "width": 279,
+          "height": 150,
+          "top": 487.59375,
+          "right": 1122,
+          "bottom": 637.59375,
+          "left": 843
+        }
+      },
+      "frames": [
+        {
+          "name": "screen",
+          "outside": 0
+        },
+        {
+          "name": "scan",
+          "outside": 0
+        },
+        {
+          "name": "flight",
+          "outside": 0
+        },
+        {
+          "name": "crest",
+          "outside": 0
+        },
+        {
+          "name": "landed",
+          "outside": 0
+        },
+        {
+          "name": "settled",
+          "outside": 0
+        }
+      ],
+      "errors": [],
+      "requests": []
+    },
+    {
+      "name": "desktop-dark",
+      "platforms": [
+        {
+          "metrics": {
+            "rightGap": 1,
+            "promptOverflow": 0,
+            "height": 44,
+            "font": "16px",
+            "bodyFace": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+            "shellSigils": 0
+          }
+        },
+        {
+          "metrics": {
+            "rightGap": 1,
+            "promptOverflow": 0,
+            "height": 44,
+            "font": "16px",
+            "bodyFace": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+            "shellSigils": 0
+          }
+        }
+      ],
+      "rest": {
+        "height": 228,
+        "width": 840,
+        "overflow": 0,
+        "people": {
+          "x": 843,
+          "y": 487.59375,
+          "width": 279,
+          "height": 150,
+          "top": 487.59375,
+          "right": 1122,
+          "bottom": 637.59375,
+          "left": 843
+        }
+      },
+      "frames": [
+        {
+          "name": "screen",
+          "outside": 0
+        },
+        {
+          "name": "scan",
+          "outside": 0
+        },
+        {
+          "name": "flight",
+          "outside": 0
+        },
+        {
+          "name": "crest",
+          "outside": 0
+        },
+        {
+          "name": "landed",
+          "outside": 0
+        },
+        {
+          "name": "settled",
+          "outside": 0
+        }
+      ],
+      "errors": [],
+      "requests": []
+    }
+  ],
+  "installerFixtureCommand": "pnpm test:installer independently passed8 named production-script fixtures",
+  "site": [
+    {
+      "width": 1440,
+      "sourceSha256": "5e716b4a2f54ce34dd9fb8a9f9168c52989adf0f2dbdb103b6573033f5b27d60",
+      "metrics": {
+        "overflow": 0,
+        "interactiveScreens": 0,
+        "buttonCount": 2,
+        "storage": 0,
+        "cookies": "",
+        "buttonHeights": [
+          44,
+          44
+        ]
+      },
+      "errors": [],
+      "network": []
+    },
+    {
+      "width": 390,
+      "sourceSha256": "5e716b4a2f54ce34dd9fb8a9f9168c52989adf0f2dbdb103b6573033f5b27d60",
+      "metrics": {
+        "overflow": 0,
+        "interactiveScreens": 0,
+        "buttonCount": 2,
+        "storage": 0,
+        "cookies": "",
+        "buttonHeights": [
+          44,
+          44
+        ]
+      },
+      "errors": [],
+      "network": []
+    }
+  ],
+  "doc": {
+    "source": "45a03d64cb0c8ad37da574613ebbd262e5fe20a0",
+    "tree": "1c262e34d5bc75f831a2372c28fa834a142dbee1",
+    "reviewedOriginal": "379601058f40c69df251ebb2bd29f1a6254be935",
+    "contentByteIdentical": true
+  },
+  "publishCompatibility": {
+    "verdict": "ACCEPT",
+    "base": "51887a0726e3fafd8942d09a516068db16aa6e56",
+    "head": "dc267f229934a21dfd51d6a8914805c7b0996647",
+    "changedFiles": 9,
+    "schema": {
+      "version": "v0.39.0",
+      "tagCommit": "2b443ca51f3b7cbfba487c433a441b9df3881beb",
+      "releaseWorkflow": 41177423066,
+      "releaseWorkflowStatus": "success",
+      "goSum": "h1:rEL9pNUdIDEfWnhzR0y2MLs4MNZEQ646IBagiwHUQyo=",
+      "goOriginMatchesTag": true,
+      "npmIntegrity": "sha512-o1DsfVkbFOcRS+7b7kNQXSC+9/MSZn3TGbMo2alc8Sfufe4zeP4vYrQaSaJPARcfFtyOoaP1mkO9mH/vJBLqWg==",
+      "downloadedTarballMatches": true,
+      "npmSLSAAttestationMatchesRepositoryTagCommitAndSubject": true,
+      "independentSigstoreSignatureVerification": false,
+      "frozenOldSpecFilesChanged": false
+    },
+    "village": {
+      "pr": 353,
+      "merge": "a1311206ab80fe917a70c6d0cc39c4be2c68ce76",
+      "deployment": 7456671555,
+      "deploymentStatus": "success",
+      "liveOpenAPI": "https://api.village.peasantlabs.org/api/v1/openapi.json",
+      "status": 200,
+      "version": "0.34.0",
+      "authoritativeModel": {}
+    },
+    "focusedTest": {
+      "command": "GOTOOLCHAIN=go1.25.8 go test -race -run ^TestPublicationRoundTrip_ .",
+      "source": "released immutable schema v0.39.0",
+      "result": "PASS",
+      "seconds": 3.207
+    },
+    "ci": "Reviewed unchanged head: normal Linux makecheck, Windows, built-binary, license, lockfile and real web build SUCCESS. Release-specific/full-stack jobs are skipped, not claimed as passes.",
+    "policyAndUI": "No runtime source/UI/policy/license/migration changes in consumer; published authoritative-model key correction only. Existing ModelInfo and SessionDetail unaffected; existing canonical Fairtrade pin unchanged.",
+    "postMergeNote": "The documented Nix Vendor Hash workflow will run after these dependency files merge. Wait for its hash update or prove freshness before claiming Nix-source readiness.",
+    "mutation": "No publishing, force-upload, code edits, worktree checkout or source changes; fetched remote Git objects and public immutable artifacts only.",
+    "checkedAt": "2026-10-31T09:51:05.601363+00:00"
+  },
+  "mountedInstaller": {
+    "status": 200,
+    "matchesReviewedSource": true,
+    "sha256": "8fa3095453682dfc1cbe893a232b71cd656dbad47fcba6c87ab25f8aa2d265fd"
+  }
+}
