@@ -2274,6 +2274,7 @@
 
 .gs-prompt-copy-slot {
   flex: none;
+  margin-inline-start: auto;
   width: var(--target-comfortable);
   min-height: var(--target-comfortable);
 }
