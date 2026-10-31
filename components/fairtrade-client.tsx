@@ -13,6 +13,7 @@ export {
   CardImg,
   CliSteps,
   CommandBlock,
+  CopyIconButton,
   EmptyState,
   ConsentDialog,
   ConsentSummary,

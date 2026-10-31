@@ -3,6 +3,7 @@
 # peasant installer — served at https://peasantlabs.org/install
 #
 #   curl -fsSL https://peasantlabs.org/install | bash
+#   curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart
 #
 # Says what it is about to do and waits for a yes before doing any of it. Then
 # downloads the release build for this machine, verifies it against the
@@ -29,6 +30,7 @@ BIN_DIR="${HOME}/.local/bin"
 # an unset name — an "unbound variable" error on the way out of a good install,
 # and a temp directory left behind every time.
 WORK_DIR=""
+RUN_KICKSTART=0
 
 say() { printf '%s\n' "$*"; }
 err() { printf '%s\n' "$*" >&2; }
@@ -121,6 +123,9 @@ show_plan() {
   say "    1. download  ${asset}"
   say "    2. verify    against checksums.txt published with the release"
   say "    3. ${verb}   ${BIN_DIR}/${BIN}"
+  if [ "$RUN_KICKSTART" = "1" ]; then
+    say "    4. open      interactive local setup (nothing published)"
+  fi
   say ""
 }
 
@@ -215,6 +220,12 @@ show_result() {
   say "  verified   sha256 ${sum:0:16}…"
   say ""
 
+  if [ "$RUN_KICKSTART" = "1" ]; then
+    say "  starting local setup…"
+    say ""
+    return 0
+  fi
+
   case ":${PATH}:" in
     *":${BIN_DIR}:"*)
       say "  next:  ${BIN} kickstart"
@@ -249,6 +260,18 @@ show_result() {
 }
 
 main() {
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --kickstart) RUN_KICKSTART=1 ;;
+      *) err "peasant: unknown installer option: $1"; exit 2 ;;
+    esac
+    shift
+  done
+  if [ "$RUN_KICKSTART" = "1" ] && { [ ! -t 1 ] || [ ! -r /dev/tty ]; }; then
+    err "peasant: --kickstart needs an interactive terminal; nothing was changed"
+    exit 1
+  fi
+
   need curl
   need tar
   need uname
@@ -312,6 +335,9 @@ main() {
 
   size="$(du -h "${BIN_DIR}/${BIN}" 2>/dev/null | awk '{ print $1 }' || true)"
   show_result "$sum" "$size"
+  if [ "$RUN_KICKSTART" = "1" ]; then
+    "${BIN_DIR}/${BIN}" kickstart </dev/tty >/dev/tty 2>&1
+  fi
 }
 
 main "$@"

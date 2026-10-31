@@ -177,7 +177,7 @@ test("the hero buttons move to their sections, smoothly unless motion is reduced
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe("auto");
 });
 
-test("the install card is fairtrade's tabs and CommandBlocks, three numbered commands each with what it does", async ({
+test("the install card is fairtrade's tabs and CommandBlocks, one terminal command and one agent prompt", async ({
   page,
 }) => {
   for (const width of [1440, 390]) {
@@ -194,16 +194,18 @@ test("the install card is fairtrade's tabs and CommandBlocks, three numbered com
       await expect(tab).toHaveAttribute("aria-selected", "true");
       const panel = shell.locator('[role="tabpanel"]:not([hidden])');
       const lines = panel.locator(".gs-line");
-      await expect(lines).toHaveCount(3);
+      await expect(lines).toHaveCount(2);
       // fairtrade draws its muted "$" before each command; the line's characters are the command's, so a selection copies it
       const drawn = await lines.locator(".cli-cmd code").evaluateAll((codes) => codes.map((code) => code.textContent));
       expect(drawn).toEqual(
-        [platform.command, fixture.install.kickstart, fixture.install.push].map((command) => `$ ${command}`),
+        [`$ ${platform.command}`],
       );
-      await expect(lines.locator(".gs-note")).toHaveText(fixture.install.notes);
-      await expect(lines.locator(".gs-n")).toHaveText(["1", "2", "3"]);
+      await expect(lines.locator(".gs-note")).toHaveText([platform.note, fixture.install.notes[1]!]);
+      await expect(lines.locator(".gs-n")).toHaveText(["1", "2"]);
 
-      const rows = await lines.evaluateAll((items) =>
+      await expect(lines.last().locator(".gs-agent-prompt p")).toHaveText(fixture.install.prompt);
+      await expect(lines.last().locator(".cli-cmd, .cli-cmd-sigil")).toHaveCount(0);
+      const rows = await lines.first().evaluateAll((items) =>
         items.map((item) => {
           const block = item.querySelector(".cli-cmd")!.getBoundingClientRect();
           const line = item.querySelector<HTMLElement>(".cli-cmd-line")!;
@@ -242,6 +244,11 @@ test("the install card is fairtrade's tabs and CommandBlocks, three numbered com
         .evaluateAll((rows) => rows.filter((row) => getComputedStyle(row).borderTopWidth !== "0px").length),
     ).toBe(0);
 
+    // The prompt copies as plain text for the agent, never an executable terminal action.
+    const promptLine = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').last();
+    await promptLine.getByRole("button").click();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(fixture.install.prompt);
+
     // every command copies exactly, and says so
     const command = fixture.install.platforms.at(-1)!.command;
     const first = shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').first();
@@ -270,7 +277,7 @@ test("on a wide screen the install card keeps every command whole on its line, w
   const lines = await section
     .locator('[role="tabpanel"]:not([hidden]) .cli-cmd-line')
     .evaluateAll((items) => items.map((line) => line.scrollWidth <= line.clientWidth + 1));
-  expect(lines).toEqual([true, true, true]);
+  expect(lines).toEqual([true]);
 });
 
 test("on a phone each install step is a small step label, its words, then its command on one line that scrolls sideways inside its block", async ({
@@ -329,8 +336,8 @@ test("on a phone each install step is a small step label, its words, then its co
       probe.remove();
       const card = element.getBoundingClientRect();
       const edge = document.querySelector("#install-title")!.getBoundingClientRect().left;
-      const blocks = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) .cli-cmd')];
-      const rows = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) .gs-line')].map((row) => {
+      const blocks = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) :is(.cli-cmd, .gs-agent-prompt)')];
+      const rows = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) .gs-line:first-child')].map((row) => {
         const n = row.querySelector(".gs-n")!.getBoundingClientRect();
         const note = row.querySelector(".gs-note")!.getBoundingClientRect();
         const block = row.querySelector(".cli-cmd")!.getBoundingClientRect();

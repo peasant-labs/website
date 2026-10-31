@@ -2254,6 +2254,30 @@
   min-width: 0;
 }
 
+.gs-agent-prompt {
+  display: flex;
+  align-items: start;
+  gap: var(--sp-4);
+  min-width: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: var(--bd);
+  background: var(--surface);
+}
+
+.gs-agent-prompt p {
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.gs-prompt-copy {
+  flex: none;
+  min-width: var(--target-comfortable);
+  min-height: var(--target-comfortable);
+}
+
 /* what the command does, in the docs' label style, across the block's width */
 .gs-note {
   max-inline-size: none;

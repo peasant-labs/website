@@ -1,7 +1,7 @@
 "use client";
 
 import { DocCommand } from "@/components/docs/doc-command";
-import { Tabs } from "@/components/fairtrade-client";
+import { CopyIconButton, Tabs } from "@/components/fairtrade-client";
 import { INSTALL } from "@/lib/landing";
 import { ArrowRight } from "@peasant-labs/fairtrade/icons";
 import Link from "next/link";
@@ -15,20 +15,7 @@ function detectPlatform(): PlatformId {
   return /windows/i.test(navigator.userAgent) ? "windows" : "unix";
 }
 
-/**
- * The three commands on one card, in fairtrade's own parts, the same ones the
- * docs use: its tabs for the systems, then a numbered row per command, each
- * a CommandBlock with its copy button and, under it, what it does in the docs'
- * label style. The first command follows the chosen system; a Windows visitor
- * lands on the PowerShell tab. Nothing moves.
- *
- * On a phone each row reads as the docs' captioned commands do: a small step
- * label, what it does, then the command on one line that scrolls sideways
- * inside its block; and under the card, a quiet link to the install guide.
- * A command that scrolls is a scroll area a keyboard can reach, named the way
- * fairtrade names its own one-line commands; one that shows whole stays out of
- * the tab order.
- */
+/** A terminal command and an agent prompt, using the docs' copyable blocks. */
 export function GetStarted() {
   const detected = useSyncExternalStore(noSubscription, detectPlatform, () => "unix" as const);
   const [chosen, setPlatform] = useState<PlatformId | null>(null);
@@ -73,14 +60,19 @@ export function GetStarted() {
             label: item.label,
             content: (
               <ol className="gs-lines">
-                {[item.command, INSTALL.kickstart, INSTALL.push].map((command, index) => (
+                {[item.command, INSTALL.prompt].map((command, index) => (
                   <li key={command} className="gs-line">
                     <span className="gs-n" aria-hidden="true">
                       {index + 1}
                     </span>
                     <div className="gs-text">
-                      <DocCommand command={command} />
-                      <p className="gs-note">{INSTALL.notes[index]}</p>
+                      {index === 0 ? <DocCommand command={command} /> : (
+                        <div className="gs-agent-prompt">
+                          <p>{command}</p>
+                          <CopyIconButton value={command} label="copy prompt for your coding agent" size="md" className="gs-prompt-copy" />
+                        </div>
+                      )}
+                      <p className="gs-note">{index === 0 ? item.note : INSTALL.notes[index]}</p>
                     </div>
                   </li>
                 ))}
