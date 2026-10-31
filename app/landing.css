@@ -2264,6 +2264,7 @@
 }
 
 .gs-agent-prompt p {
+  flex: 1;
   min-width: 0;
   margin: 0;
   font-family: var(--font-body);

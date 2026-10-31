@@ -205,6 +205,11 @@ test("the install card is fairtrade's tabs and CommandBlocks, one terminal comma
 
       await expect(lines.last().locator(".gs-agent-prompt p")).toHaveText(fixture.install.prompt);
       await expect(lines.last().locator(".cli-cmd, .cli-cmd-sigil")).toHaveCount(0);
+      expect(await lines.last().locator(".gs-agent-prompt").evaluate((prompt) => {
+        const box = prompt.getBoundingClientRect();
+        const copy = prompt.querySelector("button")!.getBoundingClientRect();
+        return Math.abs(box.right - parseFloat(getComputedStyle(prompt).paddingRight) - copy.right) <= 2;
+      }), "the prompt copy action aligns with the right edge").toBe(true);
       const rows = await lines.first().evaluateAll((items) =>
         items.map((item) => {
           const block = item.querySelector(".cli-cmd")!.getBoundingClientRect();
