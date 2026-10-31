@@ -47,14 +47,14 @@ hero:
       - { name: crest, time: 2000 }
       - { name: landed, time: 3000 }
       - { name: settled, time: 3250 }
-    # Relative geometry protects a raised transcript and a planted group in depth.
+    # Relative geometry protects a compact wide scene and the readable phone arrangement.
     layouts:
       - { name: phone-light, interaction: true, width: 390, colorScheme: light, raisedGap: 0.07, frontDepth: 0.07, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
       - { name: phone-dark, interaction: true, width: 390, colorScheme: dark, raisedGap: 0.07, frontDepth: 0.07, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
-      - { name: tablet-light, interaction: false, width: 768, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
-      - { name: tablet-dark, interaction: false, width: 768, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
-      - { name: desktop-light, interaction: true, width: 1440, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
-      - { name: desktop-dark, interaction: true, width: 1440, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: tablet-light, interaction: false, width: 768, colorScheme: light, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: tablet-dark, interaction: false, width: 768, colorScheme: dark, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: desktop-light, interaction: true, width: 1440, colorScheme: light, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: desktop-dark, interaction: true, width: 1440, colorScheme: dark, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
 # the band under the hero: the harnesses peasant reads, each led by its mark

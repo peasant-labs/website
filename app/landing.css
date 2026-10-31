@@ -282,14 +282,13 @@
 }
 
 /*
- * From a tablet up the stage fills the panel, which spans the frame on the
- * page's one left edge, up to the wide layout's full size: the stage keeps its
- * own air at every side, so the panel adds only a gutter.
+ * From a tablet up the drawing forms one compact group. Its maximum size
+ * keeps the original three-pixel grid without spreading the objects apart.
  */
 @media (min-width: 48rem) {
   .hf {
     width: 100%;
-    max-width: 1080px;
+    max-width: 840px;
   }
 }
 
