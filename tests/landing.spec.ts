@@ -416,8 +416,10 @@ test("on a phone each install step is a small step label, its words, then its co
     await curl.focus();
     await page.keyboard.press("ArrowRight");
     await expect.poll(() => curl.evaluate((line) => line.scrollLeft)).toBeGreaterThan(0);
-    // one that shows whole stays out of the tab order
-    await expect(shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').nth(1).locator(".cli-cmd-line")).not.toHaveAttribute("tabindex", "0");
+    // The agent's prose wraps rather than pretending to be a terminal scroll area.
+    const prompt = shell.locator('[role="tabpanel"]:not([hidden]) .gs-agent-prompt');
+    await expect(prompt.locator(".cli-cmd-line, code, pre")).toHaveCount(0);
+    expect(await prompt.locator("p").evaluate((text) => text.scrollWidth <= text.clientWidth)).toBe(true);
     const axe = await new AxeBuilder({ page }).include("#install").withRules(["scrollable-region-focusable"]).analyze();
     expect(axe.violations, `a scrolling command cannot be reached ${at}`).toEqual([]);
     // the copy button gives the exact bytes
