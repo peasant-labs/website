@@ -343,9 +343,9 @@ test("a heading that mounts after load is still revealed", async ({ page }) => {
   await expect(page.locator("#late")).toHaveAttribute("data-shown", "true");
 });
 
-for (const { name, width, colorScheme, raisedGap, frontDepth } of fixture.hero.flow.layouts) {
-  test(`the hero composition keeps its raised transcript and planted figures: ${name}`, async ({ page }) => {
-    await page.emulateMedia({ colorScheme });
+for (const { name, width, colorScheme, raisedGap, baselineSpread, subjectGap, topInset, frontDepth } of fixture.hero.flow.layouts) {
+  test(`the hero composition keeps one compact scene and planted figures: ${name}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     const flow = page.locator(".hf");
@@ -356,17 +356,34 @@ for (const { name, width, colorScheme, raisedGap, frontDepth } of fixture.hero.f
       const rect = (selector: string) => art.querySelector(selector)!.getBoundingClientRect().toJSON();
       return {
         height: root.getBoundingClientRect().height,
+        width: root.getBoundingClientRect().width,
+        top: root.getBoundingClientRect().top,
+        card: visible(".hf-card").getBoundingClientRect().toJSON(),
+        commons: rect(".hf-commons"),
         laptop: rect(".hf-laptop"),
         stack: visible(".hf-base").getBoundingClientRect().toJSON(),
         rake: rect('[data-member="rake"]'), wave: rect('[data-member="wave"]'), basket: rect('[data-member="basket"]'),
         backBody: rect('[data-member="wave"] .hf-person-body'), frontBody: rect('[data-member="basket"] .hf-person-body'),
       };
     });
-    expect(composition.laptop.bottom - composition.stack.bottom, `raised transcript at ${width}`).toBeGreaterThan(composition.height * raisedGap);
+    if (raisedGap !== undefined) {
+      expect(composition.laptop.bottom - composition.stack.bottom, `phone transcript separation at ${width}`).toBeGreaterThan(composition.height * raisedGap);
+    }
+    if (baselineSpread !== undefined && subjectGap !== undefined && topInset !== undefined) {
+      const bottoms = [composition.laptop.bottom, composition.stack.bottom, composition.basket.bottom];
+      expect(Math.max(...bottoms) - Math.min(...bottoms), `the center stack shares the scene's ground at ${width}`).toBeLessThan(composition.height * baselineSpread);
+      const gaps = [composition.stack.left - composition.laptop.right, composition.commons.left - composition.card.right];
+      expect(Math.min(...gaps), `the resting subjects remain distinct at ${width}`).toBeGreaterThan(0);
+      expect(Math.max(...gaps), `the subjects form one group at ${width}`).toBeLessThan(composition.width * subjectGap);
+      const tops = [composition.laptop.top, composition.card.top, composition.commons.top];
+      expect(Math.max(...tops) - composition.top, `the upper corners do not become empty pockets at ${width}`).toBeLessThan(composition.height * topInset);
+    }
     expect(composition.basket.bottom - Math.max(composition.rake.bottom, composition.wave.bottom), `front figure at ${width}`).toBeGreaterThan(composition.height * frontDepth);
     expect(composition.basket.left, `the people gather around the front figure at ${width}`).toBeGreaterThan(composition.rake.left);
     expect(composition.basket.right, `the people gather around the front figure at ${width}`).toBeLessThan(composition.wave.right);
     expect(composition.backBody.height / composition.frontBody.height, `back figures are smaller at ${width}`).toBeLessThan(0.96);
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await expect.poll(() => flow.evaluate((root) => root.getAnimations({ subtree: true }).length)).toBeGreaterThan(0);
     for (const frame of fixture.hero.flow.journeyFrames) {
       const escaped = await flow.evaluate((root, time) => {
         const animations = root.getAnimations({ subtree: true });
