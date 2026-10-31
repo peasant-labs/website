@@ -134,7 +134,7 @@ test("every page ends with the footer's call to action", async ({ page }) => {
   ] as const) {
     await page.goto(path);
     const band = page.locator("footer [data-footer-cta]");
-    await expect(band).toContainText(cta.line);
+    await expect(band).toContainText(path === "/" ? cta.landingLine : cta.line);
     await expect(band.getByRole("link", { name: cta.primary.label, exact: true })).toHaveAttribute(
       "href",
       installHref,
@@ -200,7 +200,10 @@ test("the install card is fairtrade's tabs and CommandBlocks, one terminal comma
       expect(drawn).toEqual(
         [`$ ${platform.command}`],
       );
-      await expect(lines.locator(".gs-note")).toHaveText([platform.note, fixture.install.notes[1]!]);
+      await expect(lines.locator(".gs-note")).toHaveText([platform.note]);
+      await expect(lines.locator(".gs-action")).toHaveText(fixture.install.actions);
+      await expect(lines.locator(".gs-agents li")).toHaveText(fixture.install.agents);
+      await expect(lines.locator(".gs-agents li svg")).toHaveCount(fixture.install.agents.length);
       await expect(lines.locator(".gs-n")).toHaveText(["1", "2"]);
 
       await expect(lines.last().locator(".gs-agent-prompt p")).toHaveText(fixture.install.prompt);
@@ -344,6 +347,7 @@ test("on a phone each install step is a small step label, its words, then its co
       const blocks = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) :is(.cli-cmd, .gs-agent-prompt)')];
       const rows = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) .gs-line:first-child')].map((row) => {
         const n = row.querySelector(".gs-n")!.getBoundingClientRect();
+        const action = row.querySelector(".gs-action")!.getBoundingClientRect();
         const note = row.querySelector(".gs-note")!.getBoundingClientRect();
         const block = row.querySelector(".cli-cmd")!.getBoundingClientRect();
         const line = row.querySelector<HTMLElement>(".cli-cmd-line")!;
@@ -352,12 +356,12 @@ test("on a phone each install step is a small step label, its words, then its co
         return {
           // the number leads the words on their first line, and both stand above the command
           // the step's label on its own line, then the words, then the command
-          order: n.bottom <= note.top + 1 && note.bottom <= block.top + 1,
+          order: n.bottom <= action.top + 1 && action.bottom <= note.top + 1 && note.bottom <= block.top + 1,
           label: `${getComputedStyle(row.querySelector(".gs-n")!, "::before").content}${row.querySelector(".gs-n")!.textContent}`,
-          labelGap: Math.round(note.top - n.bottom - label),
+          labelGap: Math.round(action.top - n.bottom - label),
           mark: getComputedStyle(row.querySelector(".gs-n")!, "::after").content,
           // the label, the words and the command share the page's one edge, the title's: no hanging indent
-          edge: [n.left, note.left, block.left].every((left) => Math.abs(left - edge) < 1),
+          edge: [n.left, action.left, note.left, block.left].every((left) => Math.abs(left - edge) < 1),
           captionGap: Math.round(block.top - note.bottom - caption),
           blockTop: block.top,
           blockBottom: block.bottom,
@@ -1100,10 +1104,14 @@ test("the selected landing sections share an open ground and coherent responsive
         titleLeading: parseFloat(titleStyle.lineHeight) / parseFloat(titleStyle.fontSize),
         closingLines: lines(".site-foot-close .site-foot-line"),
         closingLeading: parseFloat(closingStyle.lineHeight) / parseFloat(closingStyle.fontSize),
-        centered: ["#hero-title", ".lp-lede", ".lp-ctas", ".site-foot-close-art", ".site-foot-close-words"].map((selector) => Math.abs(midpoint(selector) - innerWidth / 2)),
-        open: [".hf-panel", ".lp-vision-inner", ".site-foot-close-panel"].map(unframed),
+        centered: ["#hero-title", ".lp-lede", ".lp-ctas"].map((selector) => Math.abs(midpoint(selector) - innerWidth / 2)),
+        open: [".hf-panel", ".lp-vision-inner"].map(unframed),
         missionWords: rect(".lp-vision-words"), missionArt: rect(".lp-vision-art"),
-        closeArt: rect(".site-foot-close-art"), closeWords: rect(".site-foot-close-words"),
+        closeWords: rect(".site-foot-close .site-foot-line"),
+        closeActions: rect(".site-foot-close .site-foot-actions"),
+        closeContents: [...document.querySelector(".site-foot-close .site-foot-cta")!.children].map((element) => element.tagName),
+        closeText: document.querySelector(".site-foot-close .site-foot-line")!.textContent,
+        closeArtwork: document.querySelectorAll(".site-foot-close .art-img").length,
         closeButtons: [...document.querySelectorAll(".site-foot-close .site-foot-actions .btn")].map((button) => button.getBoundingClientRect().toJSON()),
         leadFace: getComputedStyle(lead).fontFamily === getComputedStyle(story).fontFamily,
         leadSize: parseFloat(getComputedStyle(lead).fontSize),
@@ -1117,7 +1125,7 @@ test("the selected landing sections share an open ground and coherent responsive
     if (composition.titleLines.length > 1) expect(composition.titleLeading, `wrapped hero leading ${at}`).toBeGreaterThanOrEqual(1.4);
     if (composition.closingLines.length > 1) expect(composition.closingLeading, `wrapped closing leading ${at}`).toBeGreaterThanOrEqual(1.4);
     for (const offset of composition.centered) expect(offset, `centered hero and final CTA ${at}`).toBeLessThanOrEqual(1);
-    expect(composition.open, `the sections share the page ground ${at}`).toEqual([true, true, true]);
+    expect(composition.open, `the hero and mission share the page ground ${at}`).toEqual([true, true]);
     if (missionBeside) {
       expect(composition.missionWords.right, `mission text leads left ${at}`).toBeLessThan(composition.missionArt.left);
       expect(Math.abs((composition.missionWords.top + composition.missionWords.bottom - composition.missionArt.top - composition.missionArt.bottom) / 2), `mission stays together ${at}`).toBeLessThan(2);
@@ -1126,8 +1134,16 @@ test("the selected landing sections share an open ground and coherent responsive
     }
     expect(composition.missionArt.width, at).toBeLessThanOrEqual(missionArtMax);
     expect(Math.abs(composition.missionArt.width - composition.missionArt.height), at).toBeLessThan(1);
-    expect(composition.closeArt.bottom, `house precedes final invitation ${at}`).toBeLessThan(composition.closeWords.top);
-    expect(composition.closeArt.width, `quiet closing illustration ${at}`).toBeLessThan(composition.missionArt.width);
+    expect(composition.closeContents, `closing band contains only invitation and actions ${at}`).toEqual(["H2", "DIV"]);
+    expect(composition.closeArtwork, `closing band has no floating artwork ${at}`).toBe(0);
+    expect(composition.closeText, at).toBe(fixture.footer.cta.landingLine);
+    if (width >= 1024) {
+      expect(composition.closeWords.right, `invitation leads left ${at}`).toBeLessThan(composition.closeActions.left);
+      expect(Math.abs((composition.closeWords.top + composition.closeWords.bottom - composition.closeActions.top - composition.closeActions.bottom) / 2), `closing actions center on invitation ${at}`).toBeLessThan(2);
+    } else {
+      expect(composition.closeWords.bottom, `invitation precedes actions ${at}`).toBeLessThan(composition.closeActions.top);
+      expect(Math.abs(composition.closeWords.left - composition.closeActions.left), `closing content shares one edge ${at}`).toBeLessThan(1);
+    }
     expect(composition.closeButtons).toHaveLength(2);
     expect(Math.abs(composition.closeButtons[0]!.height - composition.closeButtons[1]!.height), at).toBeLessThan(1);
     expect(Math.abs(composition.closeButtons[0]!.top - composition.closeButtons[1]!.top), `compact CTA row ${at}`).toBeLessThan(1);

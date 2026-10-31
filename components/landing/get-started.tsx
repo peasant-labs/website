@@ -1,8 +1,8 @@
 "use client";
 
 import { DocCommand } from "@/components/docs/doc-command";
-import { CopyIconButton, Tabs } from "@/components/fairtrade-client";
-import { INSTALL } from "@/lib/landing";
+import { BrandMark, CopyIconButton, Tabs } from "@/components/fairtrade-client";
+import { AGENTS, INSTALL } from "@/lib/landing";
 import { ArrowRight } from "@peasant-labs/fairtrade/icons";
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -15,7 +15,7 @@ function detectPlatform(): PlatformId {
   return /windows/i.test(navigator.userAgent) ? "windows" : "unix";
 }
 
-/** A terminal command and an agent prompt, using the docs' copyable blocks. */
+/** Install in the terminal, then copy a message into the coding agent. */
 export function GetStarted() {
   const detected = useSyncExternalStore(noSubscription, detectPlatform, () => "unix" as const);
   const mounted = useSyncExternalStore(noSubscription, () => true, () => false);
@@ -61,24 +61,31 @@ export function GetStarted() {
             label: item.label,
             content: (
               <ol className="gs-lines">
-                {[item.command, INSTALL.prompt].map((command, index) => (
-                  <li key={command} className="gs-line">
-                    <span className="gs-n" aria-hidden="true">
-                      {index + 1}
-                    </span>
-                    <div className="gs-text">
-                      {index === 0 ? <DocCommand command={command} /> : (
-                        <div className="gs-agent-prompt">
-                          <p>{command}</p>
-                          <span className="gs-prompt-copy-slot">
-                            {mounted && <CopyIconButton value={command} label="copy prompt for your coding agent" size="md" className="gs-prompt-copy" />}
-                          </span>
-                        </div>
-                      )}
-                      <p className="gs-note">{index === 0 ? item.note : INSTALL.notes[index]}</p>
+                <li className="gs-line">
+                  <span className="gs-n" aria-hidden="true">1</span>
+                  <div className="gs-text">
+                    <h3 className="gs-action">{INSTALL.actions[0]}</h3>
+                    <p className="gs-note">{item.note}</p>
+                    <DocCommand command={item.command} />
+                  </div>
+                </li>
+                <li className="gs-line">
+                  <span className="gs-n" aria-hidden="true">2</span>
+                  <div className="gs-text">
+                    <h3 className="gs-action">{INSTALL.actions[1]}</h3>
+                    <ul className="gs-agents" aria-label="supported coding agents">
+                      {AGENTS.list.map((agent) => (
+                        <li key={agent.mark}><BrandMark name={agent.mark} /><span>{agent.name}</span></li>
+                      ))}
+                    </ul>
+                    <div className="gs-agent-prompt">
+                      <p>{INSTALL.prompt}</p>
+                      <span className="gs-prompt-copy-slot">
+                        {mounted && <CopyIconButton value={INSTALL.prompt} label="copy prompt for your coding agent" size="md" className="gs-prompt-copy" />}
+                      </span>
                     </div>
-                  </li>
-                ))}
+                  </div>
+                </li>
               </ol>
             ),
           }))}

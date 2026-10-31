@@ -8,7 +8,7 @@ export type LandingFixture = {
   version: 1;
   header: { nav: Link[]; login: Link; menu: Link[] };
   footer: {
-    cta: { line: string; primary: Link & { landingHref: string }; secondary: Link };
+    cta: { line: string; landingLine: string; primary: Link & { landingHref: string }; secondary: Link };
     nav: Link[];
   };
   hero: {
@@ -44,7 +44,8 @@ export type LandingFixture = {
   install: {
     platforms: Array<{ label: string; command: string; note: string }>;
     prompt: string;
-    notes: string[];
+    actions: string[];
+    agents: string[];
     guide: Link;
     installGuide: Link;
     phoneWidths: number[];

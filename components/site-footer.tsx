@@ -1,4 +1,3 @@
-import { Art } from "@/components/art";
 import { Mark } from "@/components/mark";
 import { CLOSE } from "@/lib/landing";
 import { FOOTER_CTA, FOOTER_NAV } from "@/lib/site";
@@ -8,14 +7,14 @@ import Link from "next/link";
  * The footer: first the call to action every page ends with, then the mark and
  * every destination that is not in the header.
  *
- * Other pages end on a compact row. The landing ends on one centered column:
- * the house, its invitation, then the two actions before the footer's links.
+ * The landing closes with a quiet band: one invitation and its two actions.
+ * Other pages keep the compact footer row.
  */
 export function SiteFooter({ landing = false }: { landing?: boolean }) {
   const size = landing ? "site-btn-xl" : "site-btn-lg";
   const words = (
     <>
-      <p className="site-foot-line">{FOOTER_CTA.line}</p>
+      {landing ? <h2 className="site-foot-line">{CLOSE.line}</h2> : <p className="site-foot-line">{FOOTER_CTA.line}</p>}
       <div className="site-foot-actions">
         <a
           className={`btn btn-primary site-btn ${size}`}
@@ -33,16 +32,7 @@ export function SiteFooter({ landing = false }: { landing?: boolean }) {
     <footer className="site-foot">
       <div className={`site-foot-cta-row${landing ? " site-foot-close" : ""}`} data-footer-cta>
         <div className="site-wrap site-foot-cta">
-          {landing ? (
-            <>
-              <div className="site-foot-close-panel">
-                <Art art={CLOSE.art} className="site-foot-close-art" />
-              </div>
-              <div className="site-foot-close-words">{words}</div>
-            </>
-          ) : (
-            words
-          )}
+          {words}
         </div>
       </div>
       <div className="site-wrap site-foot-inner">
