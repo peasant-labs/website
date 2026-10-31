@@ -2271,8 +2271,13 @@
   line-height: var(--lh-body);
 }
 
-.gs-prompt-copy {
+.gs-prompt-copy-slot {
   flex: none;
+  width: var(--target-comfortable);
+  min-height: var(--target-comfortable);
+}
+
+.gs-prompt-copy {
   min-width: var(--target-comfortable);
   min-height: var(--target-comfortable);
 }

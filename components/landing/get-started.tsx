@@ -18,6 +18,7 @@ function detectPlatform(): PlatformId {
 /** A terminal command and an agent prompt, using the docs' copyable blocks. */
 export function GetStarted() {
   const detected = useSyncExternalStore(noSubscription, detectPlatform, () => "unix" as const);
+  const mounted = useSyncExternalStore(noSubscription, () => true, () => false);
   const [chosen, setPlatform] = useState<PlatformId | null>(null);
   const platform = chosen ?? detected;
   const cardRef = useRef<HTMLDivElement>(null);
@@ -69,7 +70,9 @@ export function GetStarted() {
                       {index === 0 ? <DocCommand command={command} /> : (
                         <div className="gs-agent-prompt">
                           <p>{command}</p>
-                          <CopyIconButton value={command} label="copy prompt for your coding agent" size="md" className="gs-prompt-copy" />
+                          <span className="gs-prompt-copy-slot">
+                            {mounted && <CopyIconButton value={command} label="copy prompt for your coding agent" size="md" className="gs-prompt-copy" />}
+                          </span>
                         </div>
                       )}
                       <p className="gs-note">{index === 0 ? item.note : INSTALL.notes[index]}</p>
