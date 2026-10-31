@@ -2200,6 +2200,10 @@
   letter-spacing: 0;
 }
 
+#install .lp-title {
+  line-height: var(--lh-mono);
+}
+
 .gs {
   --gs-row-x: var(--sp-6);
 
@@ -2237,9 +2241,9 @@
   align-items: start;
 }
 
-/* the number sits on the command's line: mono 14, muted, tabular */
+/* the numbers lead the two actions, keeping their reading order clear */
 .gs-n {
-  padding-block-start: var(--sp-2);
+  padding-block-start: var(--sp-1);
   color: var(--ink-4);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
@@ -2253,14 +2257,63 @@
   min-width: 0;
 }
 
+.gs-action {
+  margin: 0;
+  color: var(--ink-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: var(--lh-body);
+}
+
+.gs-agents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-5);
+  margin: 0;
+  padding: var(--sp-1) 0 var(--sp-3);
+  list-style: none;
+}
+
+.gs-agents li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-body);
+}
+
+.gs-agents svg {
+  flex: none;
+  width: var(--ic-md);
+  height: var(--ic-md);
+}
+
 .gs-agent-prompt {
+  position: relative;
   display: flex;
   align-items: start;
   gap: var(--sp-4);
   min-width: 0;
   padding: var(--sp-3) var(--sp-4);
   border: var(--bd);
-  background: var(--surface);
+  background: var(--surface-2);
+}
+
+/* A square speech cue joins the agent identities to the message to paste. */
+.gs-agent-prompt::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--sp-2) * -1);
+  left: var(--sp-5);
+  width: var(--sp-3);
+  height: var(--sp-3);
+  border-inline-start: var(--bd);
+  border-block-start: var(--bd);
+  background: var(--surface-2);
+  transform: rotate(45deg);
 }
 
 .gs-agent-prompt p {
@@ -2286,6 +2339,7 @@
 
 /* what the command does, in the docs' label style, across the block's width */
 .gs-note {
+  margin: 0;
   max-inline-size: none;
   color: var(--ink-3);
   font-family: var(--font-mono);
@@ -2393,11 +2447,22 @@
     content: "step ";
   }
 
-  /* what it does, under its label and over its command; set as the docs set their mono captions */
+  .gs-text {
+    gap: var(--sp-2);
+  }
+
+  .gs-action {
+    margin-block-start: var(--sp-1);
+  }
+
   .gs-note {
-    order: -1;
-    margin-block: var(--sp-1) var(--sp-2);
     word-spacing: normal;
+  }
+
+  .gs-agents {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--sp-3);
   }
 
   .gs .cli-cmd-wrap .cli-cmd-line {
@@ -3061,35 +3126,31 @@
   margin-block-start: var(--sp-6);
 }
 
-/* The final invitation is one quiet column: house, words, then actions. */
+/* A quiet full-width closing band pairs the invitation with its two exits. */
 .site-foot-close {
   margin-block-end: var(--sp-7);
   padding-block: var(--site-sec-y);
+  background: var(--surface-2);
 }
 
 .site-foot-close .site-foot-cta {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  justify-items: center;
-  gap: var(--sp-5);
-}
-
-.site-foot-close-words {
-  display: grid;
-  justify-items: center;
-  gap: var(--sp-5);
-  text-align: center;
+  align-items: center;
+  justify-items: start;
+  gap: var(--sp-6) var(--sp-8);
 }
 
 .site-foot-close .site-foot-line {
-  max-inline-size: 25ch;
-  font-size: clamp(var(--fs-xl), 3.4vw, var(--fs-hero));
+  margin: 0;
+  max-inline-size: 23ch;
+  font-size: clamp(var(--fs-xl), 3vw, var(--fs-hero));
   line-height: 1.4;
 }
 
 .site-foot-close .site-foot-actions {
   flex: initial;
-  justify-content: center;
+  justify-content: start;
   gap: var(--sp-3);
 }
 
@@ -3097,12 +3158,18 @@
   flex: initial;
 }
 
-.site-foot-close-panel {
-  display: grid;
-  place-items: center;
+@media (min-width: 64rem) {
+  .site-foot-close .site-foot-cta {
+    grid-template-columns: minmax(0, 1fr) max-content;
+  }
 }
 
-.site-foot-close-art {
-  width: calc(var(--sp-8) * 3);
-  max-width: 100%;
+@media (max-width: 22rem) {
+  .site-foot-close .site-foot-actions {
+    width: 100%;
+  }
+
+  .site-foot-close .site-foot-actions .btn {
+    flex: 1 1 100%;
+  }
 }

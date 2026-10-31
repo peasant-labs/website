@@ -292,14 +292,11 @@ export const INSTALL = {
   guide: { label: "read our docs", href: "/docs" },
   installGuide: { label: "read the install guide", href: "/docs#install" },
   platforms: [
-    { id: "unix", label: "macos and linux", command: "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart", note: "run in your terminal to install and start kickstart" },
-    { id: "windows", label: "windows", command: "irm https://peasantlabs.org/install.ps1 | iex", note: "install on windows, then run the kickstart command printed in your terminal" },
+    { id: "unix", label: "macos and linux", command: "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart", note: "installs Peasant and starts setup" },
+    { id: "windows", label: "windows", command: "irm https://peasantlabs.org/install.ps1 | iex", note: "then run the kickstart command printed in your terminal" },
   ],
   prompt: "Publish this session with Peasant. Ask which collective if needed.",
-  notes: [
-    "run in your terminal to install and start kickstart",
-    "then ask your coding agent to publish this session",
-  ],
+  actions: ["paste in your terminal", "ask your agent"],
 } as const;
 
 /*
@@ -391,10 +388,7 @@ export const VISION = {
   ),
 } as const;
 
-/*
- * The picture that closes the landing, beside its last line and its two
- * buttons: a cottage door open on warm light, drawn like the hero and the use-case pictures.
- */
+/** The landing's closing invitation, followed only by installation and docs. */
 export const CLOSE = {
-  art: art("closing", "a cottage with its door swung open on warm amber light", 704, 528),
+  line: "start with the work you’ve already done.",
 } as const;
