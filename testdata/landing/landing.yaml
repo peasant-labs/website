@@ -47,14 +47,14 @@ hero:
       - { name: crest, time: 2000 }
       - { name: landed, time: 3000 }
       - { name: settled, time: 3250 }
-    # Relative geometry protects a raised transcript and a planted group in depth.
+    # Relative geometry protects a compact wide scene and the readable phone arrangement.
     layouts:
       - { name: phone-light, interaction: true, width: 390, colorScheme: light, raisedGap: 0.07, frontDepth: 0.07, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
       - { name: phone-dark, interaction: true, width: 390, colorScheme: dark, raisedGap: 0.07, frontDepth: 0.07, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
-      - { name: tablet-light, interaction: false, width: 768, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
-      - { name: tablet-dark, interaction: false, width: 768, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
-      - { name: desktop-light, interaction: true, width: 1440, colorScheme: light, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
-      - { name: desktop-dark, interaction: true, width: 1440, colorScheme: dark, raisedGap: 0.12, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: tablet-light, interaction: false, width: 768, colorScheme: light, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: tablet-dark, interaction: false, width: 768, colorScheme: dark, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: desktop-light, interaction: true, width: 1440, colorScheme: light, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: desktop-dark, interaction: true, width: 1440, colorScheme: dark, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
 # the band under the hero: the harnesses peasant reads, each led by its mark
@@ -63,7 +63,7 @@ agents:
   names: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
 # the sections after the hero, in reading order: id and heading
 sections:
-  - { id: install, heading: get started in three commands }
+  - { id: install, heading: install, then ask your agent }
   - { id: uses, heading: find your use case }
   - { id: how, heading: how it works }
   - { id: session, heading: "a new standard for transcript sharing, viewing, and attribution" }
@@ -147,23 +147,20 @@ how:
     - { scene: record, texts: ["Welcome to Claude Code!", "> /peasant", 'peasant: opened "fix the staging 403" · not published', "fix the staging 403", "not published"] }
     - { scene: review, texts: ["3 matches", "<AWS_ACCESS_KEY>", "<EMAIL>", "/Users/<USER>/src/shop/.env"] }
     - { scene: publish, texts: ["fix the staging 403", "published", "eval-crowd"] }
-# the commands as scripts/install.sh and scripts/install.ps1 document themselves, then the two that are
-# the same on every system, each with what it does in plain words (docs: kickstart, publishing from the terminal)
+# One terminal command starts installation and local setup; the second block is
+# a prompt for the agent, never another command the terminal executes.
 install:
   platforms:
-    - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash" }
-    - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex" }
-  kickstart: peasant kickstart
-  push: peasant village push
+    - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart", note: run in your terminal to install and start kickstart }
+    - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex", note: "install on windows, then run the kickstart command printed in your terminal" }
+  prompt: Publish this session with Peasant. Ask which collective if needed.
   notes:
-    - installs peasant on your computer
-    - finds your sessions, asks what to record, and can sign you in
-    - publishes your chosen sessions to peasant online, secrets hidden, private to you
+    - run in your terminal to install and start kickstart
+    - then ask your coding agent to publish this session
   guide: { label: read our docs, href: /docs }
-  # on a phone, under the card, in place of the link beside the title
   installGuide: { label: read the install guide, href: "/docs#install" }
-  # the phone widths where each command keeps to one line and scrolls sideways
   phoneWidths: [390, 360, 320]
+
 session:
   windows:
     widths: [1440, 1024, 768]

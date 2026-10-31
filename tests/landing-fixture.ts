@@ -16,7 +16,7 @@ export type LandingFixture = {
     lede: string;
     pillars: string[];
     tagRows: Array<{ width: number; rows: number[] }>;
-    flow: { agents: string[]; groundedFrames: number[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; raisedGap: number; frontDepth: number; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
+    flow: { agents: string[]; groundedFrames: number[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; raisedGap?: number; baselineSpread?: number; subjectGap?: number; topInset?: number; frontDepth: number; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };
@@ -42,9 +42,8 @@ export type LandingFixture = {
     finals: Array<{ scene: string; texts: string[] }>;
   };
   install: {
-    platforms: Array<{ label: string; command: string }>;
-    kickstart: string;
-    push: string;
+    platforms: Array<{ label: string; command: string; note: string }>;
+    prompt: string;
     notes: string[];
     guide: Link;
     installGuide: Link;

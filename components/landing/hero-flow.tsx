@@ -310,29 +310,29 @@ type Layout = Readonly<{
   shadow: number;
 }>;
 
-/* An open field: the raised transcript connects private work below-left with
- * the gathered commons below-right. Everything shares the same pixel grid. */
+/* One compact scene: the laptop, transcript and commons share shallow ground.
+ * Their drawing sizes stay on the same pixel grid. */
 const WIDE: Layout = {
   name: "wide",
-  width: 360,
-  height: 122,
+  width: 280,
+  height: 76,
   card: WIDE_CARD,
-  laptop: { x: 8, ground: 112, w: 77, depth: 8, deck: 3, screen: 44, bezel: 3 },
+  laptop: { x: 5, ground: 61, w: 77, depth: 8, deck: 3, screen: 44, bezel: 3 },
   marks: [23, 15],
   onScreen: 0.78,
-  crest: 28,
-  stack: { left: 148, ground: 58, base: 4, depth: 2, notch: 3 },
+  crest: 24,
+  stack: { left: 108, ground: 65, base: 4, depth: 2, notch: 3 },
   commons: [
-    { id: "wheat-left", sheaf: WIDE_SHEAF, x: 270, ground: 108, scale: 0.6 },
-    { id: "wheat-right", sheaf: WIDE_SHEAF, x: 345, ground: 109, scale: 0.6 },
-    { id: "rake", figure: WIDE_FIGURES.rake, x: 287, ground: 105, scale: 0.8 },
-    { id: "wave", figure: WIDE_FIGURES.wave, x: 328, ground: 107, scale: 0.8 },
-    { id: "basket", figure: WIDE_FIGURES.basket, x: 309, ground: 117, scale: 0.9, noticed: true },
+    { id: "wheat-left", sheaf: WIDE_SHEAF, x: 185, ground: 60, scale: 0.6 },
+    { id: "wheat-right", sheaf: WIDE_SHEAF, x: 267, ground: 64, scale: 0.6 },
+    { id: "rake", figure: WIDE_FIGURES.rake, x: 200, ground: 60, scale: 0.8 },
+    { id: "wave", figure: WIDE_FIGURES.wave, x: 246, ground: 62, scale: 0.8 },
+    { id: "basket", figure: WIDE_FIGURES.basket, x: 224, ground: 68, scale: 0.9, noticed: true },
   ],
   shadow: 3,
 };
 
-/* The same triangle fits a phone in fewer rows, keeping its source, destination
+/* A phone keeps its denser staggered arrangement, keeping source, destination
  * and planted people separate without a tall enclosing panel. */
 const PHONE: Layout = {
   name: "phone",

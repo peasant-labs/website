@@ -12,7 +12,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:projects": "playwright test tests/projects.spec.ts",
-    "validate": "playwright test"
+    "validate": "playwright test",
+    "test:installer": "node scripts/test-install-kickstart.mjs"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",

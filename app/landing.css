@@ -282,14 +282,13 @@
 }
 
 /*
- * From a tablet up the stage fills the panel, which spans the frame on the
- * page's one left edge, up to the wide layout's full size: the stage keeps its
- * own air at every side, so the panel adds only a gutter.
+ * From a tablet up the drawing forms one compact group. Its maximum size
+ * keeps the original three-pixel grid without spreading the objects apart.
  */
 @media (min-width: 48rem) {
   .hf {
     width: 100%;
-    max-width: 1080px;
+    max-width: 840px;
   }
 }
 
@@ -2252,6 +2251,37 @@
   display: grid;
   gap: var(--sp-2);
   min-width: 0;
+}
+
+.gs-agent-prompt {
+  display: flex;
+  align-items: start;
+  gap: var(--sp-4);
+  min-width: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: var(--bd);
+  background: var(--surface);
+}
+
+.gs-agent-prompt p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.gs-prompt-copy-slot {
+  flex: none;
+  margin-inline-start: auto;
+  width: var(--target-comfortable);
+  min-height: var(--target-comfortable);
+}
+
+.gs-prompt-copy {
+  min-width: var(--target-comfortable);
+  min-height: var(--target-comfortable);
 }
 
 /* what the command does, in the docs' label style, across the block's width */

@@ -286,29 +286,19 @@ export const HOW = {
   ],
 } as const;
 
-/** The two commands, exactly as the installer scripts document themselves. */
+/** Install and start local setup, then ask the agent to publish deliberately. */
 export const INSTALL = {
-  title: "get started in three commands",
+  title: "install, then ask your agent",
   guide: { label: "read our docs", href: "/docs" },
-  /* on a phone, under the card, in place of the link beside the title */
   installGuide: { label: "read the install guide", href: "/docs#install" },
-  /* the first command, for each system; the other two are the same on both */
   platforms: [
-    { id: "unix", label: "macos and linux", command: "curl -fsSL https://peasantlabs.org/install | bash" },
-    { id: "windows", label: "windows", command: "irm https://peasantlabs.org/install.ps1 | iex" },
+    { id: "unix", label: "macos and linux", command: "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart", note: "run in your terminal to install and start kickstart" },
+    { id: "windows", label: "windows", command: "irm https://peasantlabs.org/install.ps1 | iex", note: "install on windows, then run the kickstart command printed in your terminal" },
   ],
-  kickstart: "peasant kickstart",
-  push: "peasant village push",
-  /*
-   * What each command does, in plain words, under it. Kickstart asks what to
-   * record and can connect peasant online; a push from the terminal publishes
-   * the chosen sessions with secrets hidden and private, shared with no one
-   * until you pick who can read them (docs: kickstart, publishing from the terminal).
-   */
+  prompt: "Publish this session with Peasant. Ask which collective if needed.",
   notes: [
-    "installs peasant on your computer",
-    "finds your sessions, asks what to record, and can sign you in",
-    "publishes your chosen sessions to peasant online, secrets hidden, private to you",
+    "run in your terminal to install and start kickstart",
+    "then ask your coding agent to publish this session",
   ],
 } as const;
 

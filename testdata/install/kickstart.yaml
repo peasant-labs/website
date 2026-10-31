@@ -1,0 +1,11 @@
+version: 1
+requiredNames: [bare-install, kickstart-approved, kickstart-declined, checksum-failure, missing-binary, missing-terminal, setup-failure, unknown-option]
+cases:
+  - { name: bare-install, tty: false, yes: true, args: [], installed: true, setup: false, exit: 0 }
+  - { name: kickstart-approved, tty: true, reply: y, args: [--kickstart], installed: true, setup: true, exit: 0 }
+  - { name: kickstart-declined, tty: true, reply: n, args: [--kickstart], installed: false, setup: false, exit: 0 }
+  - { name: checksum-failure, tty: true, reply: y, args: [--kickstart], badChecksum: true, installed: false, setup: false, exit: 1 }
+  - { name: missing-binary, tty: true, reply: y, args: [--kickstart], missingBinary: true, installed: false, setup: false, exit: 1 }
+  - { name: missing-terminal, tty: false, yes: true, args: [--kickstart], installed: false, setup: false, exit: 1 }
+  - { name: setup-failure, tty: true, reply: y, args: [--kickstart], setupExit: 7, installed: true, setup: true, exit: 7 }
+  - { name: unknown-option, tty: false, args: [--unknown], installed: false, setup: false, exit: 2 }
