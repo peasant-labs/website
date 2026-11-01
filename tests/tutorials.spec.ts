@@ -7,6 +7,7 @@ import { loadLandingFixture } from "./landing-fixture";
 type Tutorials = {
   version: 1;
   quickstart: { prompt: string; command: string };
+  nextSteps: { primary: { label: string; href: string }; peers: string[] };
   guides: Array<{ label: string; path: string; heading: string }>;
 };
 const fixture = parse(readFileSync(resolve("testdata/docs/tutorials.yaml"), "utf8")) as Tutorials;
@@ -44,6 +45,9 @@ test("quick setup comes before the detailed reference and copies the exact openi
 test("use-case guides open from the mounted sidebar and are searchable", async ({ page, request }) => {
   const index = await (await request.get("/docs/search-index.json")).json() as { docs: Array<{ href: string }> };
   await page.goto("/docs");
+  const nextSteps = page.locator("#guides");
+  await expect(nextSteps.getByRole("link", { name: fixture.nextSteps.primary.label, exact: true })).toHaveAttribute("href", fixture.nextSteps.primary.href);
+  expect(await nextSteps.locator(".dx-guides a").evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(fixture.nextSteps.peers);
   for (const guide of fixture.guides) {
     const sidebar = page.getByRole("complementary", { name: "docs" });
     await sidebar.getByRole("link", { name: guide.label, exact: true }).click();

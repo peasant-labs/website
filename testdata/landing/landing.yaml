@@ -245,6 +245,9 @@ docsNav:
   - { label: overview, href: /docs }
   - { label: agent evals, href: /docs/guides/evals }
   - { label: pr reviews, href: /docs/guides/reviews }
+  - { label: classroom, href: /docs/guides/classroom }
+  - { label: onboarding, href: /docs/guides/onboarding }
+  - { label: past sessions, href: /docs/guides/find-sessions }
   - { label: blog, href: /blog }
 # Pages lead; search sits near the account footer. The docs app has no other app in its switcher.
 docsNavigation: [docs pages, guides, more, shortcuts]

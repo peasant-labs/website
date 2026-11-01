@@ -44,6 +44,7 @@ export default function DocsHome() {
   const { quickstart, install, kickstart, record, signIn, publish, autoPublish, codeMap, changes, agents, redaction, access } =
     DOCS_HOME;
   const { prune, configuration, cli } = DOCS_HOME;
+  const [publishStart, ...guideStarts] = DOCS_START;
 
   return (
     <main id="content" className="dx-page" tabIndex={-1}>
@@ -87,8 +88,11 @@ export default function DocsHome() {
 
           <section className="dx-sec dx-prose" id={DOCS_NEXT.id} aria-labelledby={`${DOCS_NEXT.id}-title`}>
             <h2 id={`${DOCS_NEXT.id}-title`}>{DOCS_NEXT.title}</h2>
+            <p>
+              <Link className="dx-link" href={publishStart.href}>{publishStart.title}</Link>. <Rich text={publishStart.summary} />
+            </p>
             <div className="dx-guides">
-              {DOCS_START.map((guide) => (
+              {guideStarts.map((guide) => (
                 <Link key={guide.id} className="dx-guide" href={guide.href}>
                   <Art art={guide.art} className="dx-pic dx-guide-art" />
                   <span className="dx-guide-text">
