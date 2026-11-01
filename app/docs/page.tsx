@@ -40,7 +40,7 @@ function Paragraphs({ items }: { items: readonly string[] }) {
 }
 
 export default function DocsHome() {
-  const { install, kickstart, record, signIn, publish, autoPublish, codeMap, changes, agents, redaction, access } =
+  const { quickstart, install, kickstart, record, signIn, publish, autoPublish, codeMap, changes, agents, redaction, access } =
     DOCS_HOME;
   const { prune, configuration, cli } = DOCS_HOME;
 
@@ -51,6 +51,18 @@ export default function DocsHome() {
 
       <div className="dx-columns">
         <div className="dx-article">
+          <section className="dx-sec dx-prose" id={quickstart.id} aria-labelledby={`${quickstart.id}-title`}>
+            <h2 id={`${quickstart.id}-title`}>{quickstart.title}</h2>
+            {quickstart.platforms.map((platform) => (
+              <DocCaptionedCommand key={platform.label} caption={platform.label} command={platform.command} />
+            ))}
+            <p><Rich text={quickstart.windows} /></p>
+            <p><Rich text={quickstart.setup} /></p>
+            <DocCaptionedCommand caption="ask your agent" command={quickstart.prompt} />
+            <p><Rich text={quickstart.after} /></p>
+            <p>{quickstart.details}</p>
+          </section>
+
           <section className="dx-sec dx-prose" id={install.id} aria-labelledby={`${install.id}-title`}>
             <h2 id={`${install.id}-title`}>{install.title}</h2>
             <p>
