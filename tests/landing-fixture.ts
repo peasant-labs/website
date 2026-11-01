@@ -115,6 +115,8 @@ export function loadLandingFixture(): LandingFixture {
   if (root?.version !== 1) {
     throw new Error("testdata/landing/landing.yaml: expected version 1; update the loader with the fixture.");
   }
+  if (JSON.stringify([...root.hero.flow.marks].sort()) !== JSON.stringify(["claude", "cursor", "openai"])) throw new Error("The computer must retain its three canonical provider marks.");
+  if (JSON.stringify(root.hero.flow.agents) !== JSON.stringify(["Claude Code", "Codex", "Cursor"])) throw new Error("The illustration must name the three identities shown on its computer.");
   const requiredJourneyFrames = ["feed", "travel", "press", "delivery", "stamp", "settled"];
   if (JSON.stringify([...root.hero.flow.members].sort()) !== JSON.stringify(["back-reader", "front-reader", "printer"])) throw new Error("The village must retain its printer and both readers.");
   const requiredGraphs = ["landing-light", "landing-dark", "projects-light", "projects-dark"];
