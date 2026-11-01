@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { loadLandingFixture, PHONE } from "./landing-fixture";
+import { openViewerFilters } from "./landing-viewer";
 
 const fixture = loadLandingFixture();
 
@@ -338,148 +339,133 @@ test("a heading that mounts after load is still revealed", async ({ page }) => {
   await expect(page.locator("#late")).toHaveAttribute("data-shown", "true");
 });
 
-for (const { name, width, colorScheme, raisedGap, baselineSpread, subjectGap, topInset, frontDepth } of fixture.hero.flow.layouts) {
-  test(`the hero composition keeps one compact scene and planted figures: ${name}`, async ({ page }) => {
-    await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+for (const { name, width, colorScheme, compact } of fixture.hero.flow.layouts) {
+  test(`the village handoff keeps its two anchors and grounded readers: ${name}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme, reducedMotion: "no-preference" });
     await page.setViewportSize({ width, height: 900 });
+    await page.clock.install();
     await page.goto("/");
-    const flow = page.locator(".hf");
-    await flow.scrollIntoViewIfNeeded();
-    const composition = await flow.evaluate((root) => {
-      const visible = (selector: string) => [...root.querySelectorAll(selector)].find((element) => getComputedStyle(element).display !== "none" && element.getBoundingClientRect().width > 0)!;
-      const art = visible(".hf-art");
-      const rect = (selector: string) => art.querySelector(selector)!.getBoundingClientRect().toJSON();
-      return {
-        height: root.getBoundingClientRect().height,
-        width: root.getBoundingClientRect().width,
-        top: root.getBoundingClientRect().top,
-        card: visible(".hf-card").getBoundingClientRect().toJSON(),
-        commons: rect(".hf-commons"),
-        laptop: rect(".hf-laptop"),
-        stack: visible(".hf-base").getBoundingClientRect().toJSON(),
-        rake: rect('[data-member="rake"]'), wave: rect('[data-member="wave"]'), basket: rect('[data-member="basket"]'),
-        backBody: rect('[data-member="wave"] .hf-person-body'), frontBody: rect('[data-member="basket"] .hf-person-body'),
-      };
+    const panel = page.locator(".hf-panel"), flow = panel.locator(".hf");
+    await panel.getByRole("button").scrollIntoViewIfNeeded();
+    await expect(page.locator(".lp-hero-flow")).toHaveAttribute("data-shown", "true");
+    await page.clock.runFor(1000); // finish the existing section reveal before measuring planted geometry
+    const art = flow.locator(".hf-art:visible");
+    await expect(art).toHaveAttribute("viewBox", compact ? "0 0 480 360" : "0 0 960 360");
+    const picture = flow.getByRole("img");
+    for (const agent of fixture.hero.flow.agents) await expect(picture).toHaveAttribute("aria-label", new RegExp(agent));
+    expect((await picture.innerText()).trim()).toBe("");
+    expect((await art.locator(".hf-screen-marks [data-brand]").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-brand")))).sort()).toEqual(fixture.hero.flow.marks);
+    await expect(art.locator(".hf-screen-marks")).not.toContainText(/./);
+    const members = art.locator("[data-member]");
+    expect((await members.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-member")))).sort()).toEqual([...fixture.hero.flow.members].sort());
+    const anchored = await members.evaluateAll((nodes) => nodes.map((node) => { const svg = node as SVGGraphicsElement, matrix = svg.getCTM()!, bounds = svg.getBBox(); return { bounds: [bounds.x, bounds.y, bounds.width, bounds.height], matrix: [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f] }; }));
+    const composition = await art.evaluate((svg) => {
+      const computer = svg.querySelector(".hf-laptop")!.getBoundingClientRect();
+      const press = svg.querySelector(".hf-workshop")!.getBoundingClientRect();
+      const frame = svg.getBoundingClientRect();
+      return { computerCenter: (computer.left + computer.width / 2 - frame.left) / frame.width, pressCenter: (press.left + press.width / 2 - frame.left) / frame.width, ratio: frame.width / frame.height };
     });
-    if (raisedGap !== undefined) {
-      expect(composition.laptop.bottom - composition.stack.bottom, `phone transcript separation at ${width}`).toBeGreaterThan(composition.height * raisedGap);
-    }
-    if (baselineSpread !== undefined && subjectGap !== undefined && topInset !== undefined) {
-      const bottoms = [composition.laptop.bottom, composition.stack.bottom, composition.basket.bottom];
-      expect(Math.max(...bottoms) - Math.min(...bottoms), `the center stack shares the scene's ground at ${width}`).toBeLessThan(composition.height * baselineSpread);
-      const gaps = [composition.stack.left - composition.laptop.right, composition.commons.left - composition.card.right];
-      expect(Math.min(...gaps), `the resting subjects remain distinct at ${width}`).toBeGreaterThan(0);
-      expect(Math.max(...gaps), `the subjects form one group at ${width}`).toBeLessThan(composition.width * subjectGap);
-      const tops = [composition.laptop.top, composition.card.top, composition.commons.top];
-      expect(Math.max(...tops) - composition.top, `the upper corners do not become empty pockets at ${width}`).toBeLessThan(composition.height * topInset);
-    }
-    expect(composition.basket.bottom - Math.max(composition.rake.bottom, composition.wave.bottom), `front figure at ${width}`).toBeGreaterThan(composition.height * frontDepth);
-    expect(composition.basket.left, `the people gather around the front figure at ${width}`).toBeGreaterThan(composition.rake.left);
-    expect(composition.basket.right, `the people gather around the front figure at ${width}`).toBeLessThan(composition.wave.right);
-    expect(composition.backBody.height / composition.frontBody.height, `back figures are smaller at ${width}`).toBeLessThan(0.96);
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await expect.poll(() => flow.evaluate((root) => root.getAnimations({ subtree: true }).length)).toBeGreaterThan(0);
+    expect(composition.computerCenter, "computer remains the left anchor").toBeLessThan(.5);
+    expect(composition.pressCenter, "village workshop remains the right anchor").toBeGreaterThan(.5);
+    expect(composition.ratio).toBeCloseTo(compact ? 480 / 360 : 960 / 360, 2);
+    const before = await flow.evaluate((node) => ({ width: node.clientWidth, height: node.clientHeight }));
+    await expect(flow).toHaveAttribute("data-progress", fixture.hero.flow.rest.toFixed(3));
+    await page.clock.runFor(1000);
+    await expect(flow).toHaveAttribute("data-progress", fixture.hero.flow.rest.toFixed(3));
+    await panel.getByRole("button", { name: fixture.hero.flow.motionLabels[0], exact: true }).click();
+    let elapsed = 0;
     for (const frame of fixture.hero.flow.journeyFrames) {
-      const escaped = await flow.evaluate((root, time) => {
-        const animations = root.getAnimations({ subtree: true });
-        const originalTimes = animations.map((animation) => animation.currentTime);
-        for (const animation of animations) animation.currentTime = time;
-        const bounds = root.getBoundingClientRect();
-        const outside = [...root.querySelectorAll(".hf-card")].filter((element) => Number(getComputedStyle(element).opacity) > 0.01).filter((element) => {
-          const box = element.getBoundingClientRect();
-          return box.left < bounds.left - 1 || box.right > bounds.right + 1 || box.top < bounds.top - 1 || box.bottom > bounds.bottom + 1;
-        }).length;
-        animations.forEach((animation, index) => { animation.currentTime = originalTimes[index]; });
-        return outside;
-      }, frame.time);
-      expect(escaped, `cards stay in frame at ${width}, ${colorScheme}, ${frame.name}`).toBe(0);
+      await page.clock.runFor(frame.time - elapsed + (elapsed === 0 ? 32 : 0));
+      elapsed = frame.time;
+      const escaped = await art.evaluate((svg) => {
+        const bounds = (svg as SVGSVGElement).getBBox(), view = (svg as SVGSVGElement).viewBox.baseVal;
+        return bounds.x < -1 || bounds.y < -1 || bounds.x + bounds.width > view.width + 1 || bounds.y + bounds.height > view.height + 1;
+      });
+      expect(escaped, `the full artwork stays inside its viewBox at ${name}, ${frame.name}`).toBe(false);
+      expect(await members.evaluateAll((nodes) => nodes.map((node) => { const svg = node as SVGGraphicsElement, matrix = svg.getCTM()!, bounds = svg.getBBox(); return { bounds: [bounds.x, bounds.y, bounds.width, bounds.height], matrix: [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f] }; })), `people stay planted during ${frame.name}`).toEqual(anchored);
+      expect(await flow.evaluate((node) => ({ width: node.clientWidth, height: node.clientHeight })), `the picture does not resize during ${frame.name}`).toEqual(before);
+      if (frame.name === "press") await expect(art.locator('[data-part="press-platen"]')).not.toHaveAttribute("transform", "translate(0 0)");
+      if (frame.name === "stamp") {
+        await expect(art.locator('[data-part="approval-stamp"]')).toHaveAttribute("transform", "translate(0 3)");
+        await expect(art.locator('[data-part="approval-seal"]')).toHaveAttribute("opacity", "1");
+      }
     }
+    await expect(panel.getByRole("button", { name: fixture.hero.flow.motionLabels[2], exact: true })).toHaveAttribute("aria-pressed", "false");
+    await expect(flow).toHaveAttribute("data-progress", "1.000");
+    await page.clock.runFor(fixture.hero.flow.duration);
+    await expect(flow).toHaveAttribute("data-progress", "1.000");
   });
 }
 
-test("the hero picture loops while on screen, holds while a pointer moves onto it, and holds still for reduced motion", async ({
-  page,
-}) => {
-  const panel = page.locator(".hf-panel");
-  const flow = panel.locator(".hf");
-  const picture = flow.getByRole("img");
-  const card = flow.locator(".hf-card").first();
-  const running = () => card.evaluate((element) => element.getAnimations().map((animation) => animation.playState));
-
-  for (const { width, colorScheme } of fixture.hero.flow.layouts.filter((layout) => layout.interaction)) {
-    await page.emulateMedia({ colorScheme });
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
-    for (const agent of fixture.hero.flow.agents) {
-      await expect(picture).toHaveAttribute("aria-label", new RegExp(agent));
-    }
-    // the picture tells its story in shapes; the words are only in its accessible name, and it has no controls
-    await expect(picture.locator(".hf-card").first()).toBeVisible();
-    expect((await picture.innerText()).trim()).toBe("");
-    await expect(panel.getByRole("button")).toHaveCount(0);
-    await flow.scrollIntoViewIfNeeded();
-    await expect(page.locator(".lp-hero-flow")).toHaveCSS("opacity", "1");
-    const people = flow.locator(".hf-art:visible .hf-commons");
-    const grounded = await people.boundingBox();
-    for (const frame of fixture.hero.flow.groundedFrames) {
-      await flow.evaluate((element, time) => {
-        for (const animation of element.getAnimations({ subtree: true })) animation.currentTime = time;
-      }, frame);
-      expect(await people.boundingBox(), `the people remain grounded at ${width}, ${colorScheme}, ${frame}ms`).toEqual(grounded);
-    }
-    // the picture holds its height from the first paint: nothing below it moves
-    const layout = () =>
-      flow.evaluate((root) => ({
-        height: (root as HTMLElement).offsetHeight,
-        next: document.querySelector<HTMLElement>("#uses")!.offsetTop,
-      }));
-    const before = await layout();
-    expect(before.height).toBeGreaterThan(0);
-    await page.waitForTimeout(1500);
-    expect(await layout()).toEqual(before);
-    // every part stays inside the picture
-    const outside = await flow.evaluate((root) => {
-      const frame = root.getBoundingClientRect();
-      return [...root.querySelectorAll(".hf-stage > *")]
-        .map((element) => element.getBoundingClientRect())
-        .filter((box) => box.width > 0 && box.height > 0)
-        .filter((box) => box.left < frame.left - 1 || box.right > frame.right + 1 || box.top < frame.top - 1 || box.bottom > frame.bottom + 1)
-        .length;
-    });
-    expect(outside, `the picture overflows at ${width}`).toBe(0);
-  }
-
-  expect(await running()).toEqual(["running"]);
-  expect(await flow.locator(".hf-wide .hf-commons").evaluate((element) => element.getAnimations())).toEqual([]);
-  // scroll first: a scroll lets a hold go, and hover() would otherwise scroll after moving the pointer
-  await flow.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(300);
-  await flow.hover();
-  await expect(flow).toHaveAttribute("data-paused", "true");
-  expect(await running()).toEqual(["paused"]);
-  await page.mouse.move(0, 0);
-  await expect(flow).toHaveAttribute("data-paused", "false");
-
-  // scrolling the picture under a pointer that has not moved does not hold it
-  await page.evaluate(() => window.scrollTo(0, 0));
-  const box = (await flow.boundingBox())!;
-  const x = box.x + box.width / 2;
-  await page.mouse.move(x, Math.max(10, box.y - 200));
-  await page.mouse.wheel(0, 300);
-  await expect.poll(async () => (await flow.boundingBox())!.y).toBeLessThan(box.y - 200);
-  await page.waitForTimeout(300);
-  await expect(flow).toHaveAttribute("data-paused", "false");
-  // moving the pointer over it does, and scrolling again lets it go
-  await page.mouse.move(x + 4, Math.max(10, box.y - 200) + 4);
-  await expect(flow).toHaveAttribute("data-paused", "true");
-  await page.mouse.wheel(0, 40);
-  await expect(flow).toHaveAttribute("data-paused", "false");
-
+test("the village composition and frame share the same container boundary", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  expect(await running()).toEqual([]);
-  expect(await flow.locator(".hf-wide .hf-commons").evaluate((element) => element.getAnimations())).toEqual([]);
-  await expect(card).toHaveCSS("opacity", "1");
+  for (const width of fixture.hero.flow.boundaryWidths) {
+    await page.setViewportSize({ width, height: 900 });
+    const flow = page.locator(".hf"), art = flow.locator(".hf-art:visible");
+    const hostWidth = await flow.evaluate((node) => node.clientWidth);
+    const compact = hostWidth < fixture.hero.flow.compositionBoundary;
+    await expect(art).toHaveAttribute("viewBox", compact ? "0 0 480 360" : "0 0 960 360");
+    const box = (await art.boundingBox())!;
+    expect(box.width / box.height, `viewBox and aspect ratio agree at host width${hostWidth}`).toBeCloseTo(compact ? 480 / 360 : 960 / 360, 2);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBe(0);
+  }
+});
+
+test("the village motion is opt-in, pausable and bounded, with static reduced-motion steps", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.clock.install();
+  await page.goto("/");
+  const panel = page.locator(".hf-panel"), flow = panel.locator(".hf");
+  await panel.scrollIntoViewIfNeeded();
+  const play = panel.getByRole("button");
+  await expect(play).toHaveText(fixture.hero.flow.motionLabels[0]);
+  const target = (await play.boundingBox())!;
+  expect(target.height).toBeGreaterThanOrEqual(fixture.hero.flow.buttonTarget);
+  await play.focus();
+  await page.keyboard.press("Enter");
+  await expect(play).toHaveText(fixture.hero.flow.motionLabels[1]);
+  await page.clock.runFor(1600);
+  const first = Number(await flow.getAttribute("data-progress"));
+  expect(first).toBeGreaterThan(0);
+  await play.click();
+  const paused = await flow.getAttribute("data-progress");
+  await page.clock.runFor(1000);
+  await expect(flow).toHaveAttribute("data-progress", paused!);
+  await play.click();
+  await page.clock.runFor(1000);
+  expect(Number(await flow.getAttribute("data-progress"))).toBeGreaterThan(Number(paused));
+  // Leaving the scene pauses it without restarting the timeline on return.
+  await page.locator("#install").scrollIntoViewIfNeeded();
+  await expect(play).toHaveAttribute("aria-pressed", "false");
+  const offscreen = await flow.getAttribute("data-progress");
+  await page.clock.runFor(1000);
+  await expect(flow).toHaveAttribute("data-progress", offscreen!);
+  await panel.scrollIntoViewIfNeeded();
+  await expect(play).toHaveAttribute("aria-pressed", "false");
+  await play.click();
+  await page.evaluate(() => { Object.defineProperty(document, "hidden", { configurable: true, value: true }); document.dispatchEvent(new Event("visibilitychange")); });
+  await expect(play).toHaveAttribute("aria-pressed", "false");
+  const hidden = await flow.getAttribute("data-progress");
+  await page.clock.runFor(1000);
+  await expect(flow).toHaveAttribute("data-progress", hidden!);
+  await page.evaluate(() => { delete (document as unknown as { hidden?: boolean }).hidden; document.dispatchEvent(new Event("visibilitychange")); });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(play).toHaveText(fixture.hero.flow.motionLabels[3]);
+  await page.goto("/");
+  await panel.scrollIntoViewIfNeeded();
+  await expect(play).toHaveText(fixture.hero.flow.motionLabels[3]);
+  await play.click();
+  await expect(flow).toHaveAttribute("data-progress", fixture.hero.flow.reducedStep.toFixed(3));
+  const stepped = await flow.getAttribute("data-progress");
+  await page.clock.runFor(fixture.hero.flow.duration);
+  await expect(flow).toHaveAttribute("data-progress", stepped!);
+  await play.click();
+  await expect(flow).toHaveAttribute("data-progress", (fixture.hero.flow.reducedStep * 2).toFixed(3));
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect(play).toHaveText(fixture.hero.flow.motionLabels[0]);
+  await play.click();
+  await expect(play).toHaveText(fixture.hero.flow.motionLabels[1]);
 });
 
 for (const theme of fixture.session.windows.themes) {
@@ -544,10 +530,8 @@ for (const theme of fixture.session.windows.themes) {
       }
       // The real viewer's native control still operates after returning it to front.
       await windows.locator(fixture.session.windows.switches.find(row => row.id === "front")!.focus).first().focus();
-      const expand = windows.getByRole("button", { name: "expand filters", exact: true });
-      await expand.click();
-      await expect(windows.getByRole("button", { name: "collapse filters", exact: true })).toBeVisible();
-      await windows.getByRole("button", { name: "collapse filters", exact: true }).click();
+      const filters = await openViewerFilters(windows.locator(".lp-windows-front"));
+      await filters.close();
       const shared = windows.locator(".lp-windows-x .mac-body");
       await shared.focus();
       await expect(windows).toHaveAttribute("data-front", "x");
@@ -596,7 +580,7 @@ test("the terminal can be brought forward by keyboard and virtual activation wit
 for (const theme of fixture.session.windows.themes) {
   test(`the demo reader keeps prose and keyboard-focused footer controls visible: ${theme}`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
-    for (const { width, filtersAvailable } of fixture.session.windows.controls.cases) {
+    for (const { name, width, filtersAvailable, filtersMode } of fixture.session.windows.controls.cases) {
       await page.setViewportSize({ width, height: 1000 });
       await page.mouse.move(5, 5);
       await page.goto("/");
@@ -604,22 +588,26 @@ for (const theme of fixture.session.windows.themes) {
       await viewer.scrollIntoViewIfNeeded();
       await expect(viewer.locator(".txn-app")).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
-      const open = viewer.getByRole("button", { name: "expand filters", exact: true });
-      const close = viewer.getByRole("button", { name: "collapse filters", exact: true });
-      if (filtersAvailable) {
-        await open.click();
-        await expect(close).toBeVisible();
-      } else {
-        await expect(open).not.toBeVisible();
-      }
+      expect(filtersAvailable, `${name} retains access to filters`).toBe(true);
+      const filters = await openViewerFilters(viewer);
+      expect(filters.mode, `${name} uses the canonical responsive controls`).toBe(filtersMode);
+      const responses = filters.panel.getByRole("checkbox", { name: /^responses/ });
+      await expect(responses).toBeChecked();
+      await responses.uncheck();
+      await expect(responses).not.toBeChecked();
       const prose = viewer.locator(".txn-turn.user .txn-md-prose").first();
       await expect(prose).toBeVisible();
+      expect(await prose.evaluate(element => getComputedStyle(element).fontFamily), `product prose keeps its canonical font inside the mock browser at ${width}`)
+        .toContain(fixture.session.windows.controls.bodyFont);
       expect(await prose.evaluate(element => element.getBoundingClientRect().width), `available reader layout retains readable prose at ${width}`)
         .toBeGreaterThanOrEqual(fixture.session.windows.controls.minProseWidth);
-      if (filtersAvailable) {
-        await close.click();
-        await expect(viewer.locator(".txn-body-grid")).toHaveAttribute("data-right-rail", "closed");
-      }
+      await filters.close();
+      const reopened = await openViewerFilters(viewer);
+      const savedResponses = reopened.panel.getByRole("checkbox", { name: /^responses/ });
+      await expect(savedResponses).not.toBeChecked();
+      await savedResponses.check();
+      await expect(savedResponses).toBeChecked();
+      await reopened.close();
       const tabs = viewer.locator(".txn-footer [role=tab]");
       await tabs.first().focus();
       await page.keyboard.press("End");

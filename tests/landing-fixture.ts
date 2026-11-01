@@ -16,7 +16,7 @@ export type LandingFixture = {
     lede: string;
     pillars: string[];
     tagRows: Array<{ width: number; rows: number[] }>;
-    flow: { agents: string[]; groundedFrames: number[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; raisedGap?: number; baselineSpread?: number; subjectGap?: number; topInset?: number; frontDepth: number; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
+    flow: { agents: string[]; members: string[]; duration: number; rest: number; reducedStep: number; buttonTarget: number; compositionBoundary: number; boundaryWidths: number[]; marks: string[]; motionLabels: string[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; compact: boolean; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };
@@ -60,7 +60,7 @@ export type LandingFixture = {
       frontMinRatio: number;
       frontMaxRatio: number;
       minLayeredWidth: number;
-      controls: { cases: Array<{ width: number; filtersAvailable: boolean }>; minProseWidth: number };
+      controls: { bodyFont: string; cases: Array<{ name: string; width: number; filtersAvailable: boolean; filtersMode: "drawer" | "rail" }>; minProseWidth: number };
       overlap: { minRatio: number; maxRatio: number };
       activationModes: Array<"hover" | "click" | "focus">;
       motion: Array<"no-preference" | "reduce">;
@@ -115,13 +115,16 @@ export function loadLandingFixture(): LandingFixture {
   if (root?.version !== 1) {
     throw new Error("testdata/landing/landing.yaml: expected version 1; update the loader with the fixture.");
   }
-  const requiredJourneyFrames = ["screen", "scan", "flight", "crest", "landed", "settled"];
+  if (JSON.stringify([...root.hero.flow.marks].sort()) !== JSON.stringify(["claude", "cursor", "openai"])) throw new Error("The computer must retain its three canonical provider marks.");
+  if (JSON.stringify(root.hero.flow.agents) !== JSON.stringify(["Claude Code", "Codex", "Cursor"])) throw new Error("The illustration must name the three identities shown on its computer.");
+  const requiredJourneyFrames = ["feed", "travel", "press", "delivery", "stamp", "settled"];
+  if (JSON.stringify([...root.hero.flow.members].sort()) !== JSON.stringify(["back-reader", "front-reader", "printer"])) throw new Error("The village must retain its printer and both readers.");
   const requiredGraphs = ["landing-light", "landing-dark", "projects-light", "projects-dark"];
   if (JSON.stringify(root.graphs?.map((graph) => graph.name)) !== JSON.stringify(requiredGraphs)) {
     throw new Error("The graph fixture must retain both real viewer hosts in both themes.");
   }
   if (JSON.stringify(root.hero.flow.journeyFrames?.map((frame) => frame.name)) !== JSON.stringify(requiredJourneyFrames)) {
-    throw new Error("The hero fixture must retain every named stage of the card journey.");
+    throw new Error("The hero fixture must retain every named stage of the village handoff.");
   }
   const requiredHeroLayouts = ["phone-light", "phone-dark", "tablet-light", "tablet-dark", "desktop-light", "desktop-dark"];
   if (JSON.stringify(root.hero.flow.layouts.map((layout) => layout.name)) !== JSON.stringify(requiredHeroLayouts)) {
@@ -136,6 +139,10 @@ export function loadLandingFixture(): LandingFixture {
     || JSON.stringify([...root.session.windows.motion].sort()) !== JSON.stringify(["no-preference", "reduce"])
     || JSON.stringify([...root.session.windows.themes].sort()) !== JSON.stringify(["dark", "light"])) {
     throw new Error("The demo fixture must retain pointer/focus activation, both motion preferences and both themes.");
+  }
+  const requiredReaderControls = ["layered reader", "stacked desktop", "compact laptop", "stacked tablet"];
+  if (JSON.stringify(root.session.windows.controls.cases.map((row) => row.name)) !== JSON.stringify(requiredReaderControls)) {
+    throw new Error("The reader fixture must retain layered, stacked desktop, compact laptop and tablet controls.");
   }
   const pictures = new Set<string>();
   for (const slide of root.useCases.slides) {

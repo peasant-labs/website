@@ -38,24 +38,31 @@ hero:
     - { width: 360, rows: [1, 1, 1, 1] }
   # the picture under the buttons shows no words; its accessible name names the agents peasant reads
   flow:
-    agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
-    # The people stay planted through every stage of the card journey.
-    groundedFrames: [0, 2400, 3000, 3500, 4300]
+    agents: [Claude Code, Codex, Cursor]
+    members: [back-reader, front-reader, printer]
+    duration: 8000
+    rest: 0.9
+    reducedStep: 0.2
+    buttonTarget: 44
+    compositionBoundary: 620
+    boundaryWidths: [599, 600, 619, 620, 651, 652, 684]
+    marks: [claude, cursor, openai]
+    motionLabels: [play motion, pause motion, replay motion, step motion]
     journeyFrames:
-      - { name: screen, time: 450 }
-      - { name: scan, time: 1000 }
-      - { name: flight, time: 1500 }
-      - { name: crest, time: 2000 }
-      - { name: landed, time: 3000 }
-      - { name: settled, time: 3250 }
+      - { name: feed, time: 1600 }
+      - { name: travel, time: 3200 }
+      - { name: press, time: 4800 }
+      - { name: delivery, time: 6400 }
+      - { name: stamp, time: 7200 }
+      - { name: settled, time: 8000 }
     # Relative geometry protects a compact wide scene and the readable phone arrangement.
     layouts:
-      - { name: phone-light, interaction: true, width: 390, colorScheme: light, raisedGap: 0.07, frontDepth: 0.07, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
-      - { name: phone-dark, interaction: true, width: 390, colorScheme: dark, raisedGap: 0.07, frontDepth: 0.07, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
-      - { name: tablet-light, interaction: false, width: 768, colorScheme: light, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
-      - { name: tablet-dark, interaction: false, width: 768, colorScheme: dark, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
-      - { name: desktop-light, interaction: true, width: 1440, colorScheme: light, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
-      - { name: desktop-dark, interaction: true, width: 1440, colorScheme: dark, baselineSpread: 0.16, subjectGap: 0.12, topInset: 0.35, frontDepth: 0.06, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: phone-light, interaction: true, width: 390, colorScheme: light, compact: true, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
+      - { name: phone-dark, interaction: true, width: 390, colorScheme: dark, compact: true, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
+      - { name: tablet-light, interaction: false, width: 768, colorScheme: light, compact: false, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: tablet-dark, interaction: false, width: 768, colorScheme: dark, compact: false, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: desktop-light, interaction: true, width: 1440, colorScheme: light, compact: false, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
+      - { name: desktop-dark, interaction: true, width: 1440, colorScheme: dark, compact: false, titleLines: [the open-source commons, for agent transcripts], missionBeside: true, missionArtMax: 448 }
   primary: { label: install now, target: install }
   secondary: { label: learn more, target: how }
 # the band under the hero: the harnesses peasant reads, each led by its mark
@@ -172,12 +179,13 @@ session:
     frontMaxRatio: 0.65
     minLayeredWidth: 700
     controls:
+      bodyFont: Atkinson Hyperlegible
       minProseWidth: 240
       cases:
-        - { width: 1280, filtersAvailable: true }
-        - { width: 1152, filtersAvailable: true }
-        - { width: 1024, filtersAvailable: false }
-        - { width: 768, filtersAvailable: false }
+        - { name: layered reader, width: 1280, filtersAvailable: true, filtersMode: drawer }
+        - { name: stacked desktop, width: 1152, filtersAvailable: true, filtersMode: rail }
+        - { name: compact laptop, width: 1024, filtersAvailable: true, filtersMode: drawer }
+        - { name: stacked tablet, width: 768, filtersAvailable: true, filtersMode: drawer }
     overlap: { minRatio: 0.05, maxRatio: 0.12 }
     activationModes: [hover, click, focus]
     motion: [no-preference, reduce]
