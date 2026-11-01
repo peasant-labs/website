@@ -41,13 +41,7 @@ export const HERO = {
   ],
   primary: { label: "install now", href: "#install" },
   secondary: { label: "learn more", href: "#how" },
-  /*
-   * The picture under the buttons tells its story without words, so its
-   * accessible name says it: a card comes up on the laptop's screen, is
-   * redacted there, lifts out, is stamped as it is published and settles on
-   * the shared stack, beside people standing on the ground, one carrying an amber basket. There is
-   * no reputation score: that person is the one the card is credited to.
-   */
+  /* The accessible description follows the computer-to-printing-workshop scene. */
   flow: {
     label:
       "A modern computer displays the Claude Code, Codex and Cursor logos. One manuscript travels low to a medieval timber printing press, where a printer stamps it beside two village readers.",
