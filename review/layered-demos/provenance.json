@@ -1,0 +1,224 @@
+{
+  "verdict": "SHIP for corrected layered demo geometry",
+  "builtHead": "cd70784fdf7af1b95f129edf321d931597d8da62",
+  "currentReviewedHead": "10bcd1455f90d2ac597d6008c0fa77db8341ae1a",
+  "buildId": "_IN1E5uZPgL4EKFdRJ2zN",
+  "servedAssetByteMatches": 24,
+  "inspectedRawImages": [
+    {
+      "file": "1600-light-front.png",
+      "sha256": "52d5c5f3a063f859eb00372f8657f8a3f466ec95e30d94ba18749ec2aea3dfb5"
+    },
+    {
+      "file": "1600-dark-front.png",
+      "sha256": "fa335fa12648aceda89795a5a3d971740295587bd918e96ec914cc893e913dbd"
+    },
+    {
+      "file": "1440-light-front.png",
+      "sha256": "7e00672a6a3b6d6109acd676330a6b1384f59cb8c2ce6b6a075a9ef75897ce45"
+    },
+    {
+      "file": "1440-dark-front.png",
+      "sha256": "7b0c74f1f1e74b0373ea3fd54ad3189a3bfcc80e734f5ea3f4ac36e09fa0b863"
+    },
+    {
+      "file": "1280-light-front.png",
+      "sha256": "d6e6ef8e589b4562e38391279a4fbd95bea6bde9caa156fb58e8ebe619582d0c"
+    },
+    {
+      "file": "1280-dark-front.png",
+      "sha256": "b9a6df5e84d925c981899cc80d16a2a7a774157a05f103a5774c88f8538d3ed5"
+    },
+    {
+      "file": "1440-light-term.png",
+      "sha256": "d2fc3517aa918c7814523fa5da4ffe2666cce04cf765c0c48adff46153126acd"
+    },
+    {
+      "file": "1440-dark-term.png",
+      "sha256": "b55817a70af13cae820781ec3c4b3ac1c00c12dd27127fdcde1653646a8d0413"
+    },
+    {
+      "file": "1280-light-term.png",
+      "sha256": "22b1332bd67f747858621f982f1db241136a108f454c269e341c5588b150cb00"
+    },
+    {
+      "file": "1280-dark-term.png",
+      "sha256": "838448e42496d9e56a4dff85601bbb3847341f91c594b83c4c0aad9376f48128"
+    },
+    {
+      "file": "1440-light-x.png",
+      "sha256": "9e6c6c65e34c039295b429cb9a41fd09dcd73ee1f52fd23c469ad1dd1bca48cd"
+    },
+    {
+      "file": "1440-dark-x.png",
+      "sha256": "4d377dc8a75b257d91518dcd48876ff1d40810d4443e52469affdeaa58c067fc"
+    },
+    {
+      "file": "1280-light-x.png",
+      "sha256": "888b5e6587428d8363fce4f0b7fce88b35022a92569ca7771705bbc1e5883bf4"
+    },
+    {
+      "file": "1280-dark-x.png",
+      "sha256": "037152c7a1a8ce7893735c992c9c12f5168510566207564d0c405e9c12594bc0"
+    },
+    {
+      "file": "1152-light-stacked.png",
+      "sha256": "bda9cd5d79e564654226f15fcbc0b489a14c5133324a5b7e305323e6c1b59325"
+    },
+    {
+      "file": "1152-dark-stacked.png",
+      "sha256": "c4def4f2578e708e45ddeca9749cf00544125ec48d253f1781f61ff1da8aa980"
+    },
+    {
+      "file": "1024-light-stacked.png",
+      "sha256": "54ec237b9658d05e4ec144a0303f33527ed3128878aeb84715c15a25c61d28f7"
+    },
+    {
+      "file": "1024-dark-stacked.png",
+      "sha256": "84581efe0895a950077d95d384752fe3e40eaeac35f81ca0098e953bbae097f6"
+    },
+    {
+      "file": "768-light-stacked.png",
+      "sha256": "88a8a4b61ab13dfb62c04507f6cc935d7df5fd50a81bee4d9072bdb0e5742284"
+    },
+    {
+      "file": "768-dark-stacked.png",
+      "sha256": "af95d4a54558d1cb7338af5ad8ff66fe6db0da105bd56c1d9ca9d02485f52420"
+    },
+    {
+      "file": "390-light-phone.png",
+      "sha256": "f375d577042336526a790d5ba41efb745248f324bcb6d7e7e263e7ae7158d32d"
+    },
+    {
+      "file": "390-dark-phone.png",
+      "sha256": "928b3697d1c8006cf71b8d4ca42c21bef2196fcc6d61db228d240a60ae771e30"
+    },
+    {
+      "file": "320-light-phone.png",
+      "sha256": "d6798d52fac8ea6da89a681d21a537d151e2ede9f6a80e61768ab7d0b7e4eb5a"
+    },
+    {
+      "file": "320-dark-phone.png",
+      "sha256": "12c3bc747466f5fcb513f82c50f368d7d8dee735b183cd5e3562eca9293a66ee"
+    },
+    {
+      "file": "1280-light-focus.png",
+      "sha256": "f5854f6c80443b4ddf942db0b351e871ded6450726b929ececcc64363a707282"
+    },
+    {
+      "file": "1280-dark-focus.png",
+      "sha256": "5111013650c9a2adb4a0911bbbde5fcade5ed9e7b07d0de0ae4f8d65ff9788c9"
+    },
+    {
+      "file": "1280-light-filters.png",
+      "sha256": "e3c0573e3c424658062fcbfbfeb4740897e0d29c62401efd5bfc7be27c066a6d"
+    },
+    {
+      "file": "1280-dark-filters.png",
+      "sha256": "40146ce6a0d9b8497a95f4974d12648cf7a229975716d52549a4df5cfd2fc5e7"
+    },
+    {
+      "file": "1152-light-filters-stacked.png",
+      "sha256": "84d2a81f58726165281317685b570daeb781b3ec3181049d4dfea3a2ee0d6ae2"
+    },
+    {
+      "file": "1152-dark-filters-stacked.png",
+      "sha256": "2ad50288b12842ad9fe5ce603d35b60c2f7b7813f7a6deac662329530aa12873"
+    }
+  ],
+  "imageCount": 30,
+  "functional": [
+    {
+      "width": 1280,
+      "theme": "light",
+      "nativeFilters": true,
+      "readingState": "filters-open",
+      "proseWidth": 272.609375,
+      "footerFocusedTabFullyVisible": true,
+      "threadScrollTop": 117
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "nativeFilters": true,
+      "readingState": "filters-open",
+      "proseWidth": 272.609375,
+      "footerFocusedTabFullyVisible": true,
+      "threadScrollTop": 126
+    },
+    {
+      "width": 1152,
+      "theme": "light",
+      "nativeFilters": true,
+      "readingState": "filters-open",
+      "proseWidth": 631,
+      "footerFocusedTabFullyVisible": true,
+      "threadScrollTop": 367
+    },
+    {
+      "width": 1152,
+      "theme": "dark",
+      "nativeFilters": true,
+      "readingState": "filters-open",
+      "proseWidth": 631,
+      "footerFocusedTabFullyVisible": true,
+      "threadScrollTop": 366
+    },
+    {
+      "width": 1024,
+      "theme": "light",
+      "nativeFilters": false,
+      "readingState": "existing compact mode; no native filter opener",
+      "proseWidth": 808,
+      "footerFocusedTabFullyVisible": true,
+      "threadScrollTop": 319
+    },
+    {
+      "width": 1024,
+      "theme": "dark",
+      "nativeFilters": false,
+      "readingState": "existing compact mode; no native filter opener",
+      "proseWidth": 808,
+      "footerFocusedTabFullyVisible": true,
+      "threadScrollTop": 313
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "nativeFilters": false,
+      "readingState": "existing compact mode; no native filter opener",
+      "proseWidth": 592,
+      "footerFocusedTabFullyVisible": true,
+      "threadScrollTop": 233
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "nativeFilters": false,
+      "readingState": "existing compact mode; no native filter opener",
+      "proseWidth": 592,
+      "footerFocusedTabFullyVisible": true,
+      "threadScrollTop": 235
+    }
+  ],
+  "resolvedFindings": [
+    "544px cramping avoided: minimum layered viewer729.6px at1280;1152 and narrower stack",
+    "footer End-focused annotations fully within clipping rectangle at1280/1152/1024/768 in both themes"
+  ],
+  "knownUnchangedLimitation": "At viewport1024/768 the existing compact canonical viewer has no visible filter/outline opener. Those four functional results measure closed-mode prose, not a fabricated filter-open state. Parent notified; not introduced by this geometry change.",
+  "priorChecklist": "Actual overlap ownership, fixed geometry, top baseline, terminal16px/wrapping/containment, no document overflow, no page errors, native keyboard terminal activation/focus ring, available filter/outline callbacks, real thread scroll, both themes, unchanged phone slice and viewer borders inspected.",
+  "durableCandidates": [
+    "1280-light-front.png",
+    "1280-dark-front.png",
+    "1280-light-term.png",
+    "1280-dark-x.png",
+    "1280-dark-focus.png",
+    "1280-light-filters.png",
+    "1152-dark-filters-stacked.png",
+    "390-light-phone.png",
+    "390-dark-phone.png"
+  ],
+  "scope": "One corrected confirmation batch:30 raw images directly inspected, no contact composites. No product edits, build or server actions.",
+  "runtimeTreeIdentical": true,
+  "runtimeIdentityCheck": "git diff --quiet cd70784 HEAD -- app components lib public; later commits change tests/fixtures only"
+}

@@ -1,0 +1,1 @@
+Original narrow embedding diagnostic, before website stage widening. Built website ef8d634; canonical viewer 0.0.58. Filter-open prose cramped and keyboard End tab clipped. Tracked in peasant-labs/fairtrade-design-system#225. These are not screenshots of the corrected website layout.
