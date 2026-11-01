@@ -219,7 +219,7 @@ export const DOCS_HOME = {
         { text: "Publish your selected sessions, redacted and private.", commands: ["peasant village push"] },
       ] satisfies readonly DocStep[],
       body: [
-        "A terminal push does not pick collectives. Add them in the publish window, or on peasant online from the transcript's **manage access**.",
+        "The unscoped push above does not pick collectives. Add them in the publish window, or on peasant online from the transcript's **manage access**.",
       ],
       flagsIntro: "Useful flags:",
       flags: [
