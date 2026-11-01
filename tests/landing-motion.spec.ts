@@ -157,6 +157,7 @@ test("the desktop demos overlap behind the main window on one baseline and stack
       expect(layout.viewer.width/layout.container.width).toBeGreaterThan(fixture.session.windows.frontMinRatio);
       expect(layout.viewer.width/layout.container.width).toBeLessThan(fixture.session.windows.frontMaxRatio);
       expect(layout.viewer.width).toBeGreaterThan(layout.term.width);
+      expect(layout.viewer.width, `layered reader stays usable at ${width}`).toBeGreaterThanOrEqual(fixture.session.windows.minLayeredWidth);
       expect(layout.thread.right).toBeLessThanOrEqual(layout.container.right+1);
     } else {
       expect(fixture.session.windows.stackedWidths).toContain(width);
@@ -591,3 +592,55 @@ test("the terminal can be brought forward by keyboard and virtual activation wit
   await terminal.evaluate((element: HTMLElement) => element.click());
   await expect(windows).toHaveAttribute("data-front", "term");
 });
+
+for (const theme of fixture.session.windows.themes) {
+  test(`the demo reader keeps prose and keyboard-focused footer controls visible: ${theme}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
+    for (const width of fixture.session.windows.controls.widths) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.mouse.move(5, 5);
+      await page.goto("/");
+      const viewer = page.locator("#session .lp-windows-front");
+      await viewer.scrollIntoViewIfNeeded();
+      await expect(viewer.locator(".txn-app")).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      await viewer.getByRole("button", { name: "expand filters", exact: true }).click();
+      const close = viewer.getByRole("button", { name: "collapse filters", exact: true });
+      await expect(close).toBeVisible();
+      const prose = viewer.locator(".txn-turn.user .txn-md-prose").first();
+      await expect(prose).toBeVisible();
+      expect(await prose.evaluate(element => element.getBoundingClientRect().width), `open filters retain readable prose at ${width}`)
+        .toBeGreaterThanOrEqual(fixture.session.windows.controls.minProseWidth);
+      await close.click();
+      await expect(viewer.locator(".txn-body-grid")).toHaveAttribute("data-right-rail", "closed");
+      const tabs = viewer.locator(".txn-footer [role=tab]");
+      await tabs.first().focus();
+      await page.keyboard.press("End");
+      const last = tabs.last();
+      await expect(last).toBeFocused();
+      await expect(last).toHaveAttribute("aria-selected", "true");
+      await expect(last).toContainText(fixture.session.tabs.at(-1)!);
+      const visibility = await last.evaluate(element => {
+        const box = element.getBoundingClientRect();
+        const list = element.closest('[role="tablist"]')!.getBoundingClientRect();
+        const frame = element.closest(".lp-windows-front")!.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        const ring = style.outlineStyle === "none" ? 0 : Math.max(0, parseFloat(style.outlineWidth) + parseFloat(style.outlineOffset));
+        return {
+          left: box.left - ring,
+          right: box.right + ring,
+          top: box.top,
+          bottom: box.bottom,
+          clipLeft: Math.max(0, list.left, frame.left),
+          clipRight: Math.min(innerWidth, list.right, frame.right),
+          clipTop: Math.max(0, frame.top),
+          clipBottom: Math.min(innerHeight, frame.bottom),
+        };
+      });
+      expect(visibility.left, `footer focus starts inside the visible area at ${width}`).toBeGreaterThanOrEqual(visibility.clipLeft - 1);
+      expect(visibility.right, `footer label and focus ring stay inside the visible area at ${width}`).toBeLessThanOrEqual(visibility.clipRight + 1);
+      expect(visibility.top, `footer focus stays below the clipped top at ${width}`).toBeGreaterThanOrEqual(visibility.clipTop - 1);
+      expect(visibility.bottom, `footer focus stays above the clipped bottom at ${width}`).toBeLessThanOrEqual(visibility.clipBottom + 1);
+    }
+  });
+}

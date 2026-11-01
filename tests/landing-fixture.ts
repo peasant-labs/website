@@ -59,6 +59,8 @@ export type LandingFixture = {
       stackedWidths: number[];
       frontMinRatio: number;
       frontMaxRatio: number;
+      minLayeredWidth: number;
+      controls: { widths: number[]; minProseWidth: number };
       overlap: { minRatio: number; maxRatio: number };
       activationModes: Array<"hover" | "click" | "focus">;
       motion: Array<"no-preference" | "reduce">;

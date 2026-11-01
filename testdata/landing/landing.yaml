@@ -166,10 +166,12 @@ session:
   windows:
     order: [term, front, x]
     widths: [1600, 1440, 1280, 1152, 1024, 768]
-    layeredWidths: [1600, 1440, 1280, 1152]
-    stackedWidths: [1024, 768]
-    frontMinRatio: 0.4
-    frontMaxRatio: 0.55
+    layeredWidths: [1600, 1440, 1280]
+    stackedWidths: [1152, 1024, 768]
+    frontMinRatio: 0.55
+    frontMaxRatio: 0.65
+    minLayeredWidth: 700
+    controls: { widths: [1280, 1152, 1024, 768], minProseWidth: 240 }
     overlap: { minRatio: 0.05, maxRatio: 0.12 }
     activationModes: [hover, click, focus]
     motion: [no-preference, reduce]
