@@ -2210,7 +2210,7 @@
 
 /* a published session */
 
-/* The three mounted demos share a row when their container has room.
+/* The side demos tuck behind the main transcript along one horizontal row.
  * A narrower container stacks them without scaling their reading content. */
 .lp-session { max-width: 100rem; }
 .lp-session > .lp-head {
@@ -2227,13 +2227,24 @@
   align-items: start;
   gap: var(--sp-5);
   min-width: 0;
+  isolation: isolate;
 }
-@container session-demos (min-width: 68rem) {
-  .lp-windows { grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr) minmax(0, 1fr); }
+@container session-demos (min-width: 75rem) {
+  .lp-windows {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 0;
+  }
+  .lp-windows-term { grid-area: 1 / 1 / 2 / 4; }
+  .lp-windows-front { grid-area: 1 / 3 / 2 / 9; }
+  .lp-windows-x { grid-area: 1 / 8 / 2 / 11; }
 }
 
 /* The recording retains its own scroll area beside the published viewer. */
-.lp-windows-term { min-width: 0; }
+.lp-windows-term {
+  position: relative;
+  z-index: 0;
+  min-width: 0;
+}
 .lp-windows-term .mac-win {
   block-size: var(--lp-windows-body);
 }
@@ -2287,8 +2298,12 @@
   block-size: var(--lp-windows-body);
 }
 
-/* The shared thread is a separate, top-aligned reading column. */
-.lp-windows-x { min-width: 0; }
+/* Both side windows retain an exposed area from which they can be raised. */
+.lp-windows-x {
+  position: relative;
+  z-index: 0;
+  min-width: 0;
+}
 .lp-windows-x .mac-win {
   block-size: var(--lp-windows-social-h);
 }

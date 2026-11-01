@@ -52,7 +52,23 @@ export type LandingFixture = {
     copyTarget: number;
   };
   session: {
-    windows: { order: string[]; widths: number[]; columnWidths: number[]; stackedWidths: number[]; frontMinRatio: number; frontMaxRatio: number };
+    windows: {
+      order: string[];
+      widths: number[];
+      layeredWidths: number[];
+      stackedWidths: number[];
+      frontMinRatio: number;
+      frontMaxRatio: number;
+      minLayeredWidth: number;
+      controls: { cases: Array<{ width: number; filtersAvailable: boolean }>; minProseWidth: number };
+      overlap: { minRatio: number; maxRatio: number };
+      activationModes: Array<"hover" | "click" | "focus">;
+      motion: Array<"no-preference" | "reduce">;
+      themes: Array<"light" | "dark">;
+      terminalButton: string;
+      terminalKeys: string[];
+      switches: Array<{ id: string; selector: string; exposed: [number, number]; focus: string; overlaps: string }>;
+    };
     terminalBodyMin: number;
     terminalTextMin: number;
     sharedBodyMin: number;
@@ -110,6 +126,16 @@ export function loadLandingFixture(): LandingFixture {
   const requiredHeroLayouts = ["phone-light", "phone-dark", "tablet-light", "tablet-dark", "desktop-light", "desktop-dark"];
   if (JSON.stringify(root.hero.flow.layouts.map((layout) => layout.name)) !== JSON.stringify(requiredHeroLayouts)) {
     throw new Error("The hero fixture must retain both themes on phone, tablet and desktop.");
+  }
+  const requiredDemoWindows = ["term", "front", "x"];
+  if (JSON.stringify(root.session.windows.order) !== JSON.stringify(requiredDemoWindows)
+    || JSON.stringify(root.session.windows.switches.map((window) => window.id).sort()) !== JSON.stringify([...requiredDemoWindows].sort())) {
+    throw new Error("The demo fixture must retain the terminal, transcript and shared thread, including switching to each.");
+  }
+  if (JSON.stringify([...root.session.windows.activationModes].sort()) !== JSON.stringify(["click", "focus", "hover"])
+    || JSON.stringify([...root.session.windows.motion].sort()) !== JSON.stringify(["no-preference", "reduce"])
+    || JSON.stringify([...root.session.windows.themes].sort()) !== JSON.stringify(["dark", "light"])) {
+    throw new Error("The demo fixture must retain pointer/focus activation, both motion preferences and both themes.");
   }
   const pictures = new Set<string>();
   for (const slide of root.useCases.slides) {

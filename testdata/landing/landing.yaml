@@ -165,11 +165,29 @@ install:
 session:
   windows:
     order: [term, front, x]
-    widths: [1440, 1024, 768]
-    columnWidths: [1440]
-    stackedWidths: [1024, 768]
-    frontMinRatio: 0.4
-    frontMaxRatio: 0.55
+    widths: [1600, 1440, 1280, 1152, 1024, 768]
+    layeredWidths: [1600, 1440, 1280]
+    stackedWidths: [1152, 1024, 768]
+    frontMinRatio: 0.55
+    frontMaxRatio: 0.65
+    minLayeredWidth: 700
+    controls:
+      minProseWidth: 240
+      cases:
+        - { width: 1280, filtersAvailable: true }
+        - { width: 1152, filtersAvailable: true }
+        - { width: 1024, filtersAvailable: false }
+        - { width: 768, filtersAvailable: false }
+    overlap: { minRatio: 0.05, maxRatio: 0.12 }
+    activationModes: [hover, click, focus]
+    motion: [no-preference, reduce]
+    themes: [light, dark]
+    terminalButton: bring terminal demo forward
+    terminalKeys: [Enter, Space]
+    switches:
+      - { id: term, selector: .lp-windows-term, exposed: [0.2, 0.15], focus: .lp-windows-term, overlaps: .lp-windows-front }
+      - { id: x, selector: .lp-windows-x, exposed: [0.9, 0.15], focus: '.lp-windows-x .mac-body[tabindex="0"]', overlaps: .lp-windows-front }
+      - { id: front, selector: .lp-windows-front, exposed: [0.5, 0.5], focus: '.lp-windows-front .txn-stream :is(a, button, [tabindex])', overlaps: .lp-windows-term }
   terminalBodyMin: 240
   terminalTextMin: 16
   sharedBodyMin: 380
