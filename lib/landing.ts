@@ -50,7 +50,7 @@ export const HERO = {
    */
   flow: {
     label:
-      "A modern computer displays the Claude Code, Codex and Cursor logos. One manuscript travels low to a medieval timber printing press, where a printer stamps it beside two village readers. This illustration does not publish a session.",
+      "A modern computer displays the Claude Code, Codex and Cursor logos. One manuscript travels low to a medieval timber printing press, where a printer stamps it beside two village readers.",
     agents: [
       { mark: "claude", name: "Claude Code" },
       { mark: "codex", name: "Codex" },
