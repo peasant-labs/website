@@ -118,9 +118,28 @@ test("the desktop demos align in separate columns and stack when the container i
     await expect(windows.locator(".txn-app")).toBeVisible();
     const layout=await windows.evaluate(group=>{
       const box=(selector:string)=>group.querySelector(selector)!.getBoundingClientRect();
-      return {term:box(".lp-windows-term"),viewer:box(".lp-windows-front"),thread:box(".lp-windows-x"),container:group.getBoundingClientRect(),overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1};
+      return {
+        term: box(".lp-windows-term"),
+        viewer: box(".lp-windows-front"),
+        thread: box(".lp-windows-x"),
+        container: group.getBoundingClientRect(),
+        terminalBody: box(".lp-windows-term .mac-body"),
+        terminalOverflow: [...group.querySelectorAll(".lp-windows-term :is(.mac-body, .cc, .cc-welcome)")]
+          .map((element) => element.scrollWidth - element.clientWidth),
+        terminalWelcome: box(".lp-windows-term .cc-welcome"),
+        terminalText: parseFloat(getComputedStyle(group.querySelector(".lp-windows-term .cc")!).fontSize),
+        sharedBody: box(".lp-windows-x .mac-body"),
+        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+      };
     });
     expect(layout.overflow).toBe(false);
+    expect(layout.terminalBody.height, `terminal body at ${width}`).toBeGreaterThanOrEqual(fixture.session.terminalBodyMin);
+    for (const overflow of layout.terminalOverflow) {
+      expect(overflow, `terminal content fits at ${width}`).toBeLessThanOrEqual(1);
+    }
+    expect(layout.terminalWelcome.right, `welcome fits at ${width}`).toBeLessThanOrEqual(layout.terminalBody.right);
+    expect(layout.terminalText, `terminal text at ${width}`).toBeGreaterThanOrEqual(fixture.session.terminalTextMin);
+    expect(layout.sharedBody.height, `shared body at ${width}`).toBeGreaterThanOrEqual(fixture.session.sharedBodyMin);
     if(fixture.session.windows.columnWidths.includes(width)) {
       expect(Math.abs(layout.term.top-layout.viewer.top)).toBeLessThanOrEqual(1);
       expect(Math.abs(layout.thread.top-layout.viewer.top)).toBeLessThanOrEqual(1);

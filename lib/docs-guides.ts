@@ -617,7 +617,7 @@ export const FIND_SESSIONS_GUIDE: GuideData = {
         },
         {
           "cmds": [
-            "peasant sessions list --project billing --since 2w --limit 50"
+            "peasant sessions list --project billing --since 14d --limit 50"
           ]
         },
         {
