@@ -596,7 +596,7 @@ test("the terminal can be brought forward by keyboard and virtual activation wit
 for (const theme of fixture.session.windows.themes) {
   test(`the demo reader keeps prose and keyboard-focused footer controls visible: ${theme}`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
-    for (const width of fixture.session.windows.controls.widths) {
+    for (const { width, filtersAvailable } of fixture.session.windows.controls.cases) {
       await page.setViewportSize({ width, height: 1000 });
       await page.mouse.move(5, 5);
       await page.goto("/");
@@ -604,15 +604,22 @@ for (const theme of fixture.session.windows.themes) {
       await viewer.scrollIntoViewIfNeeded();
       await expect(viewer.locator(".txn-app")).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
-      await viewer.getByRole("button", { name: "expand filters", exact: true }).click();
+      const open = viewer.getByRole("button", { name: "expand filters", exact: true });
       const close = viewer.getByRole("button", { name: "collapse filters", exact: true });
-      await expect(close).toBeVisible();
+      if (filtersAvailable) {
+        await open.click();
+        await expect(close).toBeVisible();
+      } else {
+        await expect(open).not.toBeVisible();
+      }
       const prose = viewer.locator(".txn-turn.user .txn-md-prose").first();
       await expect(prose).toBeVisible();
-      expect(await prose.evaluate(element => element.getBoundingClientRect().width), `open filters retain readable prose at ${width}`)
+      expect(await prose.evaluate(element => element.getBoundingClientRect().width), `available reader layout retains readable prose at ${width}`)
         .toBeGreaterThanOrEqual(fixture.session.windows.controls.minProseWidth);
-      await close.click();
-      await expect(viewer.locator(".txn-body-grid")).toHaveAttribute("data-right-rail", "closed");
+      if (filtersAvailable) {
+        await close.click();
+        await expect(viewer.locator(".txn-body-grid")).toHaveAttribute("data-right-rail", "closed");
+      }
       const tabs = viewer.locator(".txn-footer [role=tab]");
       await tabs.first().focus();
       await page.keyboard.press("End");

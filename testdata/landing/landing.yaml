@@ -171,7 +171,13 @@ session:
     frontMinRatio: 0.55
     frontMaxRatio: 0.65
     minLayeredWidth: 700
-    controls: { widths: [1280, 1152, 1024, 768], minProseWidth: 240 }
+    controls:
+      minProseWidth: 240
+      cases:
+        - { width: 1280, filtersAvailable: true }
+        - { width: 1152, filtersAvailable: true }
+        - { width: 1024, filtersAvailable: false }
+        - { width: 768, filtersAvailable: false }
     overlap: { minRatio: 0.05, maxRatio: 0.12 }
     activationModes: [hover, click, focus]
     motion: [no-preference, reduce]
