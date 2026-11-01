@@ -15,17 +15,19 @@ const ANSWER_TEXT = String(ANSWER?.content ?? "").replace(/<thinking>[\s\S]*?<\/
 type Window = "term" | "front" | "x";
 
 /**
- * Recording, published transcript and shared link occupy separate desktop
- * columns. Narrower containers stack them; phones retain the readable slice.
- * The Terminal repeats the transcript and is decorative for screen readers.
+ * The recording and shared link sit partly behind the main transcript on a
+ * horizontal desktop stage. Activating a window changes only its layer.
+ * Narrower containers stack them; phones retain the readable slice.
  */
 export function SessionWindows({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const [fanned, setFanned] = useState(false);
-  const [front, setFront] = useState<Window | null>(null);
+  const [front, setFront] = useState<Window>("front");
   const raise = (which: Window) => ({
     onPointerEnter: () => setFront(which),
-    onFocus: () => setFront(which),
+    onPointerDownCapture: () => setFront(which),
+    onFocusCapture: () => setFront(which),
+    onClick: () => setFront(which),
   });
 
   // They fan out once, the first time a fifth of the group is on screen.
@@ -45,31 +47,44 @@ export function SessionWindows({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div ref={ref} className="lp-windows" data-fanned={fanned ? "true" : "false"} data-front={front ?? undefined}>
-      <div className="lp-windows-term" aria-hidden="true" {...raise("term")}>
-        <TerminalWindow title={SESSION.terminal} active={false}>
-          <div className="cc">
-            <div>you@macbook billing % claude</div>
-            <div className="cc-welcome">
-              <div>
-                <span className="cc-accent">✻</span> <b>Welcome to Claude Code!</b>
+    <div ref={ref} className="lp-windows" data-fanned={fanned ? "true" : "false"} data-front={front}>
+      <div
+        className="lp-windows-term"
+        role="button"
+        tabIndex={0}
+        aria-label="bring terminal demo forward"
+        onKeyDown={(event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          setFront("term");
+        }}
+        {...raise("term")}
+      >
+        <div aria-hidden="true">
+          <TerminalWindow title={SESSION.terminal} active={front === "term"}>
+            <div className="cc">
+              <div>you@macbook billing % claude</div>
+              <div className="cc-welcome">
+                <div>
+                  <span className="cc-accent">✻</span> <b>Welcome to Claude Code!</b>
+                </div>
+                <div className="cc-gap" />
+                <div className="cc-dim">cwd: /Users/you/src/billing</div>
               </div>
-              <div className="cc-gap" />
-              <div className="cc-dim">cwd: /Users/you/src/billing</div>
-            </div>
-            <div className="cc-out">
-              <div className="cc-dim">&gt; {ASK_TEXT}</div>
-              <div className="cc-gap" />
-              <div className="cc-reply lp-windows-reply">
-                <span className="cc-accent">⏺</span>
-                <div>{ANSWER_TEXT}</div>
+              <div className="cc-out">
+                <div className="cc-dim">&gt; {ASK_TEXT}</div>
+                <div className="cc-gap" />
+                <div className="cc-reply lp-windows-reply">
+                  <span className="cc-accent">⏺</span>
+                  <div>{ANSWER_TEXT}</div>
+                </div>
+              </div>
+              <div className="cc-input">
+                <span className="cc-dim">&gt;</span>
               </div>
             </div>
-            <div className="cc-input">
-              <span className="cc-dim">&gt;</span>
-            </div>
-          </div>
-        </TerminalWindow>
+          </TerminalWindow>
+        </div>
       </div>
       <div className="lp-windows-front" {...raise("front")}>
         {children}
