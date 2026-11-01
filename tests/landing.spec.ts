@@ -1948,8 +1948,10 @@ test("a sample session opens in the real transcript browser, in a wide window th
   await expect(section.locator(".txn-crumb a, .txn-crumb li")).toHaveCount(0);
   // no explainer beside it: the markers in the transcript say what was redacted
   await expect(section.locator(".lp-note")).toHaveCount(0);
-  // behind it, Claude Code where the session was recorded, hidden from assistive technology
-  await expect(section.locator(".lp-windows-term")).toHaveAttribute("aria-hidden", "true");
+  // The terminal can be raised by keyboard; only its repeated transcript is hidden.
+  const terminal = section.getByRole("button", { name: fixture.session.windows.terminalButton });
+  await expect(terminal).toBeVisible();
+  await expect(terminal.locator(":scope > [aria-hidden]")).toHaveAttribute("aria-hidden", "true");
   await expect(section.locator(".lp-windows-term .mac-win-terminal")).toBeVisible();
   // the values peasant redacted show as their markers
   for (const marker of fixture.session.markers) {
