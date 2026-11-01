@@ -16,7 +16,7 @@ export type LandingFixture = {
     lede: string;
     pillars: string[];
     tagRows: Array<{ width: number; rows: number[] }>;
-    flow: { agents: string[]; groundedFrames: number[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; raisedGap?: number; baselineSpread?: number; subjectGap?: number; topInset?: number; frontDepth: number; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
+    flow: { agents: string[]; members: string[]; duration: number; rest: number; reducedStep: number; buttonTarget: number; compositionBoundary: number; boundaryWidths: number[]; marks: string[]; motionLabels: string[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; compact: boolean; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };
@@ -115,13 +115,14 @@ export function loadLandingFixture(): LandingFixture {
   if (root?.version !== 1) {
     throw new Error("testdata/landing/landing.yaml: expected version 1; update the loader with the fixture.");
   }
-  const requiredJourneyFrames = ["screen", "scan", "flight", "crest", "landed", "settled"];
+  const requiredJourneyFrames = ["feed", "travel", "press", "delivery", "stamp", "settled"];
+  if (JSON.stringify([...root.hero.flow.members].sort()) !== JSON.stringify(["back-reader", "front-reader", "printer"])) throw new Error("The village must retain its printer and both readers.");
   const requiredGraphs = ["landing-light", "landing-dark", "projects-light", "projects-dark"];
   if (JSON.stringify(root.graphs?.map((graph) => graph.name)) !== JSON.stringify(requiredGraphs)) {
     throw new Error("The graph fixture must retain both real viewer hosts in both themes.");
   }
   if (JSON.stringify(root.hero.flow.journeyFrames?.map((frame) => frame.name)) !== JSON.stringify(requiredJourneyFrames)) {
-    throw new Error("The hero fixture must retain every named stage of the card journey.");
+    throw new Error("The hero fixture must retain every named stage of the village handoff.");
   }
   const requiredHeroLayouts = ["phone-light", "phone-dark", "tablet-light", "tablet-dark", "desktop-light", "desktop-dark"];
   if (JSON.stringify(root.hero.flow.layouts.map((layout) => layout.name)) !== JSON.stringify(requiredHeroLayouts)) {

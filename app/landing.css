@@ -249,195 +249,35 @@
   color: var(--ink-3);
 }
 
-/*
- * The hero's picture (components/landing/hero-flow.tsx). That file owns where
- * everything sits, how it is drawn and when it moves; this owns the inks, the
- * pictures' own: warm-grey dots and hairlines over the panel's surface, a
- * darker scatter on the ground, and amber.
- */
-.lp-hero-flow {
-  margin-block-start: var(--sp-6);
-}
-
-/* The page is the illustration's ground; only the drawn objects have a fill. */
+/* The open ground and token inks belong to the page; the SVG owns its grid. */
+.lp-hero-flow { margin-block-start: var(--sp-6); }
 .hf-panel {
   --hf-ink: var(--ink-strong);
-
-  position: relative;
-  box-sizing: border-box;
   display: grid;
   justify-items: center;
+  gap: var(--sp-3);
   padding: 0;
 }
-
-:root:not([data-theme="light"]) .hf-panel {
-  --hf-ink: var(--ink);
+:root:not([data-theme="light"]) .hf-panel { --hf-ink: var(--ink); }
+.hf { width: 100%; max-width: 960px; container-type: inline-size; }
+.hf-picture { position: relative; aspect-ratio: 480 / 360; width: 100%; }
+.hf-art { display: block; width: 100%; height: 100%; overflow: visible; shape-rendering: crispEdges; }
+.hf-wide { display: none; }
+.hf-screen-marks { color: var(--hf-ink); }
+.hf-screen-marks .brand { fill: currentColor; }
+.hf-play {
+  min-height: var(--target-comfortable);
+  padding: var(--sp-2) var(--sp-5);
+  border: var(--bd-strong);
+  background: var(--canvas);
+  color: var(--ink);
+  font: 400 var(--fs-label) / var(--lh-body) var(--font-mono);
 }
-
-.hf {
-  position: relative;
-  container-type: inline-size;
-  width: 300px;
-  max-width: 100%;
-}
-
-/*
- * From a tablet up the drawing forms one compact group. Its maximum size
- * keeps the original three-pixel grid without spreading the objects apart.
- */
-@media (min-width: 48rem) {
-  .hf {
-    width: 100%;
-    max-width: 840px;
-  }
-}
-
-.hf-defs {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-}
-
-.hf-stage {
-  position: absolute;
-  inset: 0;
-}
-
-.hf-stage > * {
-  position: absolute;
-}
-
-.hf-art {
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.hf-art,
-.hf-card-art,
-.hf-base,
-.hf-scan,
-.hf-mask svg,
-.hf-stamp svg {
-  display: block;
-  overflow: visible;
-  shape-rendering: crispEdges;
-}
-
-.hf-fill {
-  fill: var(--surface-2);
-}
-
-.hf-ink {
-  fill: var(--hf-ink);
-}
-
-.hf-amber {
-  fill: var(--amber-fill);
-}
-
-/* the ground's scatter sits back, lighter than anything standing on it */
-.hf-scatter {
-  opacity: 0.45;
-}
-
-/* each face's light, lit to deep: dots, plusses, checkers, solid squares */
-.hf-light-lit {
-  fill: url(#hf-light);
-}
-
-.hf-light-mid {
-  fill: url(#hf-plus);
-}
-
-.hf-light-shade {
-  fill: url(#hf-checker);
-}
-
-.hf-light-deep {
-  fill: url(#hf-solid);
-}
-
-.hf-light-amber {
-  fill: url(#hf-amber);
-}
-
-.hf-tone-shade {
-  fill: url(#hf-shade);
-}
-
-.hf-tone-shade-core {
-  fill: url(#hf-shade-core);
-}
-
-.hf-tone-ground {
-  fill: url(#hf-ground);
-}
-
-/* the scan line that runs down the laptop's screen */
-.hf-scan {
-  z-index: 11;
-  opacity: 0;
-}
-
-/* the agents' marks on the laptop's screen */
-.hf-marks {
-  inset: 0;
-}
-
-.hf-marks > .hf-mark {
-  position: absolute;
-}
-
-.hf-mark,
-.hf-card-mark {
-  display: grid;
-  place-items: center;
-  color: var(--hf-ink);
-}
-
-.hf-mark .brand,
-.hf-card-mark .brand {
-  width: 100%;
-  height: 100%;
-}
-
-/* a card travels on two layers, across and down, so its path can bend */
-.hf-card-x {
-  inset-block-start: 0;
-  inset-inline-start: 0;
-}
-
-.hf-card {
-  position: relative;
-}
-
-.hf-card-face {
-  position: absolute;
-  inset: 0;
-}
-
-.hf-card-art {
-  width: 100%;
-  height: 100%;
-}
-
-.hf-card-mark,
-.hf-mask,
-.hf-stamp {
-  position: absolute;
-}
-
-.hf-mask svg,
-.hf-stamp svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* the base is drawn over the cards that have sunk into it */
-.hf-base {
-  z-index: 5;
+.hf-play[aria-pressed="true"], .hf-play:hover { background: var(--surface-2); }
+@container (min-width: 38.75rem) {
+  .hf-picture { aspect-ratio: 960 / 360; }
+  .hf-wide { display: block; }
+  .hf-narrow { display: none; }
 }
 
 /* use cases */

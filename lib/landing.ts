@@ -50,14 +50,11 @@ export const HERO = {
    */
   flow: {
     label:
-      "A transcript card comes up on the screen of a laptop running Claude Code, Codex, Cursor, OpenCode, Pi and Strike, and a scan line turns its secret line into an amber block while it is still on the computer. The card lifts out, glides over to the commons, is stamped as you publish it, and settles on a shared stack beside three peasants standing on the ground, one of them, you, carrying an amber basket.",
+      "A modern computer displays the Claude Code, Codex and Cursor logos. One manuscript travels low to a medieval timber printing press, where a printer stamps it beside two village readers. This illustration does not publish a session.",
     agents: [
       { mark: "claude", name: "Claude Code" },
       { mark: "codex", name: "Codex" },
       { mark: "cursor", name: "Cursor" },
-      { mark: "opencode", name: "OpenCode" },
-      { mark: "pi", name: "Pi" },
-      { mark: "strike", name: "Strike" },
     ],
   },
 } as const;
