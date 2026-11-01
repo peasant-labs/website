@@ -108,10 +108,11 @@ test("the agents drift past under the hero, hold when hovered, and stand still f
   expect(await track.evaluate((element) => getComputedStyle(element).animationName)).toBe("none");
 });
 
-test("the desktop demos align in separate columns and stack when the container is narrower", async ({ page }) => {
+test("the desktop demos overlap behind the main window on one baseline and stack in narrower containers", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const width of fixture.session.windows.widths) {
-    await page.setViewportSize({width,height:900});
+    await page.setViewportSize({ width, height: 900 });
+    await page.mouse.move(5, 5);
     await page.goto("/");
     const windows=page.locator(".lp-windows");
     await windows.scrollIntoViewIfNeeded();
@@ -140,11 +141,19 @@ test("the desktop demos align in separate columns and stack when the container i
     expect(layout.terminalWelcome.right, `welcome fits at ${width}`).toBeLessThanOrEqual(layout.terminalBody.right);
     expect(layout.terminalText, `terminal text at ${width}`).toBeGreaterThanOrEqual(fixture.session.terminalTextMin);
     expect(layout.sharedBody.height, `shared body at ${width}`).toBeGreaterThanOrEqual(fixture.session.sharedBodyMin);
-    if(fixture.session.windows.columnWidths.includes(width)) {
+    if(fixture.session.windows.layeredWidths.includes(width)) {
       expect(Math.abs(layout.term.top-layout.viewer.top)).toBeLessThanOrEqual(1);
       expect(Math.abs(layout.thread.top-layout.viewer.top)).toBeLessThanOrEqual(1);
-      expect(layout.term.right).toBeLessThan(layout.viewer.left);
-      expect(layout.viewer.right).toBeLessThan(layout.thread.left);
+      const terminalOverlap = (layout.term.right - layout.viewer.left) / layout.container.width;
+      const threadOverlap = (layout.viewer.right - layout.thread.left) / layout.container.width;
+      expect(terminalOverlap, `terminal has controlled overlap at ${width}`).toBeGreaterThanOrEqual(fixture.session.windows.overlap.minRatio);
+      expect(terminalOverlap, `terminal stays exposed at ${width}`).toBeLessThanOrEqual(fixture.session.windows.overlap.maxRatio);
+      expect(threadOverlap, `thread has controlled overlap at ${width}`).toBeGreaterThanOrEqual(fixture.session.windows.overlap.minRatio);
+      expect(threadOverlap, `thread stays exposed at ${width}`).toBeLessThanOrEqual(fixture.session.windows.overlap.maxRatio);
+      expect(layout.term.left).toBeLessThan(layout.viewer.left);
+      expect(layout.term.right).toBeLessThan(layout.viewer.right);
+      expect(layout.thread.left).toBeGreaterThan(layout.viewer.left);
+      expect(layout.thread.right).toBeGreaterThan(layout.viewer.right);
       expect(layout.viewer.width/layout.container.width).toBeGreaterThan(fixture.session.windows.frontMinRatio);
       expect(layout.viewer.width/layout.container.width).toBeLessThan(fixture.session.windows.frontMaxRatio);
       expect(layout.viewer.width).toBeGreaterThan(layout.term.width);
@@ -472,53 +481,112 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   await expect(card).toHaveCSS("opacity", "1");
 });
 
-test("the separate demo columns preserve pointer and keyboard access without moving their layout", async ({ page }) => {
+for (const theme of fixture.session.windows.themes) {
+  for (const motion of fixture.session.windows.motion) {
+    test(`the layered demos switch by pointer and focus without moving: ${theme}, ${motion}`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: theme, reducedMotion: motion });
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.mouse.move(5, 5);
+      await page.goto("/");
+      const windows = page.locator("#session .lp-windows");
+      await windows.scrollIntoViewIfNeeded();
+      await expect(windows).toHaveAttribute("data-fanned", "true");
+      await expect(windows).toHaveAttribute("data-front", "front");
+      const geometry = () => windows.evaluate(group => {
+        const origin = group.getBoundingClientRect();
+        return [...group.children].map(child => {
+          const box = child.getBoundingClientRect();
+          return { left: box.left - origin.left, top: box.top - origin.top, width: box.width, height: box.height };
+        });
+      });
+      const before = await geometry();
+      expect(await windows.evaluate(group => [...group.children].map(child => child.className.replace("lp-windows-", ""))))
+        .toEqual(fixture.session.windows.order);
+      const overlapOwner = async (selector: string, other: string) => {
+        const target = (await windows.locator(selector).boundingBox())!;
+        const peer = (await windows.locator(other).boundingBox())!;
+        const x = (Math.max(target.x, peer.x) + Math.min(target.x + target.width, peer.x + peer.width)) / 2;
+        const top = Math.max(target.y, peer.y);
+        const bottom = Math.min(target.y + target.height, peer.y + peer.height);
+        const y = top + Math.min(96, (bottom - top) / 3);
+        expect(Math.min(target.x + target.width, peer.x + peer.width) - Math.max(target.x, peer.x)).toBeGreaterThan(0);
+        return page.evaluate(([px, py]) => document.elementFromPoint(px, py)?.closest(".lp-windows > div")?.className, [x, y]);
+      };
+      // A z-index attribute alone is insufficient: the main reader must actually
+      // cover both supporting windows in their shared painted area.
+      for (const row of fixture.session.windows.switches.filter(row => row.id !== "front")) {
+        expect(await overlapOwner(row.selector, row.overlaps)).toBe("lp-windows-front");
+      }
+      for (const mode of fixture.session.windows.activationModes) {
+        for (const row of fixture.session.windows.switches) {
+          await page.mouse.move(5, 5);
+          const target = windows.locator(row.selector);
+          const box = (await target.boundingBox())!;
+          const x = box.x + box.width * row.exposed[0];
+          const y = box.y + box.height * row.exposed[1];
+          expect(await page.evaluate(({ px, py, selector }) => !!document.elementFromPoint(px, py)?.closest(selector),
+            { px: x, py: y, selector: row.selector }), `${row.id} retains an exposed activation area`).toBe(true);
+          if (mode === "focus") {
+            await windows.locator(row.focus).first().focus();
+            expect(await target.evaluate(element => element.contains(document.activeElement))).toBe(true);
+          } else if (mode === "click") {
+            await page.mouse.click(x, y);
+          } else {
+            await page.mouse.move(x, y);
+          }
+          await expect(windows).toHaveAttribute("data-front", row.id);
+          expect(await overlapOwner(row.selector, row.overlaps), `${mode} paints ${row.id} above its neighbour`).toBe(`lp-windows-${row.id}`);
+          await page.mouse.move(5, 5);
+          await expect(windows).toHaveAttribute("data-front", row.id);
+          expect(await geometry(), `${mode} leaves every window's geometry fixed`).toEqual(before);
+        }
+      }
+      // The real viewer's native control still operates after returning it to front.
+      await windows.locator(fixture.session.windows.switches.find(row => row.id === "front")!.focus).first().focus();
+      const expand = windows.getByRole("button", { name: "expand filters", exact: true });
+      await expand.click();
+      await expect(windows.getByRole("button", { name: "collapse filters", exact: true })).toBeVisible();
+      await windows.getByRole("button", { name: "collapse filters", exact: true }).click();
+      const shared = windows.locator(".lp-windows-x .mac-body");
+      await shared.focus();
+      await expect(windows).toHaveAttribute("data-front", "x");
+      await page.keyboard.press("PageDown");
+      await expect.poll(() => shared.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+      expect(await geometry()).toEqual(before);
+    });
+  }
+}
+
+test("the terminal can be brought forward by keyboard and virtual activation without page scrolling", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.mouse.move(5, 5);
   await page.goto("/");
   const windows = page.locator("#session .lp-windows");
   await windows.scrollIntoViewIfNeeded();
-  // hydrated: the group has seen itself come into view
   await expect(windows).toHaveAttribute("data-fanned", "true");
-  const geometry = () => windows.evaluate(group => {
-    const origin = group.getBoundingClientRect();
-    return [...group.children].map(child => {
-      const box = child.getBoundingClientRect();
-      return { left: box.left-origin.left, top: box.top-origin.top, width: box.width, height: box.height };
-    });
-  });
-  const before = await geometry();
-  expect(await windows.evaluate(group => [...group.children].map(child => child.className.replace("lp-windows-", "")))).toEqual(fixture.session.windows.order);
-  // Every column is directly hit-testable; focus and pointer entry retain their
-  // native controls and context, without the collage's initial z-order premise.
-  const point = async (selector: string, fx: number, fy: number) => {
-    await windows.locator(selector).scrollIntoViewIfNeeded();
-    const box = (await windows.locator(selector).boundingBox())!;
-    const [x, y] = [box.x + box.width * fx, box.y + box.height * fy];
-    expect(await page.evaluate(({ px, py, target }) => !!document.elementFromPoint(px, py)?.closest(target), { px: x, py: y, target: selector })).toBe(true);
-    await page.mouse.move(x, y);
-  };
-  await point(".lp-windows-term", 0.3, 0.15);
-  await expect(windows).toHaveAttribute("data-front", "term");
-  await point(".lp-windows-front", 0.3, 0.6);
+  const terminal = windows.getByRole("button", { name: fixture.session.windows.terminalButton, exact: true });
+  const main = windows.locator(".lp-windows-front");
+  for (const key of fixture.session.windows.terminalKeys) {
+    await terminal.focus();
+    await expect(terminal).toBeFocused();
+    await expect(windows).toHaveAttribute("data-front", "term");
+    // Pointer activation changes the layer while keyboard focus stays on the
+    // terminal. Enter/Space must reactivate that focused window, not scroll.
+    const box = (await main.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(windows).toHaveAttribute("data-front", "front");
+    await expect(terminal).toBeFocused();
+    const top = await page.evaluate(() => window.scrollY);
+    await page.keyboard.press(key);
+    await expect(windows).toHaveAttribute("data-front", "term");
+    expect(await page.evaluate(() => window.scrollY)).toBe(top);
+  }
+  await page.keyboard.press("Tab");
   await expect(windows).toHaveAttribute("data-front", "front");
-  // The transcript's reading controls remain unobstructed.
-  const strip = windows.locator(".txn-rail-strip-right");
-  const box = (await strip.boundingBox())!;
-  const hit = await page.evaluate(
-    ([x, y]) => !!document.elementFromPoint(x, y)?.closest(".txn-rail-strip-right"),
-    [box.x + box.width / 2, box.y + box.height * 0.6],
-  );
-  expect(hit, "the filters' strip is directly reachable in its own column").toBe(true);
-  // Pointer context persists after leaving; no other column moves over it.
+  expect(await main.evaluate(element => element.contains(document.activeElement))).toBe(true);
   await page.mouse.move(5, 5);
-  await expect(windows).toHaveAttribute("data-front", "front");
-  // The thread stays directly reachable in its own column.
-  await point(".lp-windows-x", 0.95, 0.1);
-  await expect(windows).toHaveAttribute("data-front", "x");
-  // Keyboard focus reaches the real transcript controls too.
-  await windows.locator(".lp-windows-front .txn-stream").evaluate((stream) => stream.querySelector<HTMLElement>("a, button, [tabindex]")!.focus());
-  await expect(windows).toHaveAttribute("data-front", "front");
-  expect(await windows.locator(".lp-windows-front").evaluate(column => column.contains(document.activeElement))).toBe(true);
-  expect(await geometry()).toEqual(before);
+  // Assistive technology can activate a role button without a pointer event.
+  await terminal.evaluate((element: HTMLElement) => element.click());
+  await expect(windows).toHaveAttribute("data-front", "term");
 });
