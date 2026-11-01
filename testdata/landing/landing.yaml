@@ -179,6 +179,7 @@ session:
     frontMaxRatio: 0.65
     minLayeredWidth: 700
     controls:
+      bodyFont: Atkinson Hyperlegible
       minProseWidth: 240
       cases:
         - { name: layered reader, width: 1280, filtersAvailable: true, filtersMode: drawer }

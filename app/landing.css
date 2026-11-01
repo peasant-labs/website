@@ -2219,6 +2219,7 @@
 }
 
 .lp-viewer {
+  font-family: var(--font-body);
   position: relative;
   inline-size: 100%;
   block-size: 100%;

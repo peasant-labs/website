@@ -597,6 +597,8 @@ for (const theme of fixture.session.windows.themes) {
       await expect(responses).not.toBeChecked();
       const prose = viewer.locator(".txn-turn.user .txn-md-prose").first();
       await expect(prose).toBeVisible();
+      expect(await prose.evaluate(element => getComputedStyle(element).fontFamily), `product prose keeps its canonical font inside the mock browser at ${width}`)
+        .toContain(fixture.session.windows.controls.bodyFont);
       expect(await prose.evaluate(element => element.getBoundingClientRect().width), `available reader layout retains readable prose at ${width}`)
         .toBeGreaterThanOrEqual(fixture.session.windows.controls.minProseWidth);
       await filters.close();

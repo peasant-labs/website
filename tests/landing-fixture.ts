@@ -60,7 +60,7 @@ export type LandingFixture = {
       frontMinRatio: number;
       frontMaxRatio: number;
       minLayeredWidth: number;
-      controls: { cases: Array<{ name: string; width: number; filtersAvailable: boolean; filtersMode: "drawer" | "rail" }>; minProseWidth: number };
+      controls: { bodyFont: string; cases: Array<{ name: string; width: number; filtersAvailable: boolean; filtersMode: "drawer" | "rail" }>; minProseWidth: number };
       overlap: { minRatio: number; maxRatio: number };
       activationModes: Array<"hover" | "click" | "focus">;
       motion: Array<"no-preference" | "reduce">;
