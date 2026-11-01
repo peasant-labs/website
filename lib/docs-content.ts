@@ -30,7 +30,7 @@ export const DOCS_GUIDES = [
     id: "evals",
     href: "/docs/guides/evals",
     title: "run an agent eval",
-    summary: "Collect real sessions from many people into one collective, then pull the approved set.",
+    summary: "Run a repeatable coding task, score it, and collect the sessions behind the results.",
     art: art("docs-evals", "a round glass flask half full of amber liquid, on a ring stand"),
   },
   {
@@ -40,9 +40,24 @@ export const DOCS_GUIDES = [
     summary: "Show reviewers the agent sessions behind a change, from the pull request.",
     art: art("docs-reviews", "a pair of round reading spectacles with amber frames"),
   },
+  {
+    id: "classroom", href: "/docs/guides/classroom", title: "run a class with agent use",
+    summary: "Collect assignment sessions, review a student's decisions, and keep submissions private.",
+    art: art("uc-slate", "a slate on an easel with an amber apple on its ledge"),
+  },
+  {
+    id: "onboarding", href: "/docs/guides/onboarding", title: "onboard from real history",
+    summary: "Trace a past pull request through its prompts, decisions and tests.",
+    art: art("uc-signpost", "a signpost with three arrows, the top one amber"),
+  },
+  {
+    id: "find-sessions", href: "/docs/guides/find-sessions", title: "find a past session",
+    summary: "Recover the context behind a change from sessions kept on your computer.",
+    art: art("uc-lantern", "a lantern with amber glass"),
+  },
 ] as const;
 
-/** the overview's next steps: the two guides, and the two sections most people look for */
+/** the overview's next steps: the use-case guides and the two sections most people look for */
 export const DOCS_START = [
   {
     id: "publish",
@@ -51,8 +66,7 @@ export const DOCS_START = [
     summary: "From Claude Code with `/peasant`, or from the terminal.",
     art: art("docs-publish", "a pole flying a swallow-tailed amber banner"),
   },
-  DOCS_GUIDES[0],
-  DOCS_GUIDES[1],
+  ...DOCS_GUIDES,
   {
     id: "access",
     href: "/docs#access",
@@ -69,7 +83,13 @@ export type DocStep = Readonly<{ text: string; commands: readonly string[] }>;
 
 export const DOCS_HOME = {
   title: "docs",
-  lede: "Install peasant, publish a session, then pick a guide.",
+  lede: "Install peasant, open a local session, then pick a guide.",
+
+  quickstart: {
+    id: "quickstart",
+    title: "install, then open a session",
+    after: "Review locally, then publish when ready.",
+  },
 
   // scripts/install.sh header and platform checks; scripts/install.ps1 header and arch checks
   install: {
@@ -199,7 +219,7 @@ export const DOCS_HOME = {
         { text: "Publish your selected sessions, redacted and private.", commands: ["peasant village push"] },
       ] satisfies readonly DocStep[],
       body: [
-        "A terminal push does not pick collectives. Add them in the publish window, or on peasant online from the transcript's **manage access**.",
+        "The unscoped push above does not pick collectives. Add them in the publish window, or on peasant online from the transcript's **manage access**.",
       ],
       flagsIntro: "Useful flags:",
       flags: [
@@ -442,6 +462,7 @@ export const DOCS_HOME = {
 
 /** the overview's sections, in reading order: the page, its "on this page" list and search all follow it */
 export const DOCS_HOME_SECTIONS = [
+  DOCS_HOME.quickstart,
   DOCS_HOME.install,
   DOCS_HOME.kickstart,
   DOCS_HOME.record,

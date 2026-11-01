@@ -1,3 +1,4 @@
+import { GetStarted } from "@/components/landing/get-started";
 import { Art } from "@/components/art";
 import {
   DocCaptionedCommand,
@@ -40,9 +41,10 @@ function Paragraphs({ items }: { items: readonly string[] }) {
 }
 
 export default function DocsHome() {
-  const { install, kickstart, record, signIn, publish, autoPublish, codeMap, changes, agents, redaction, access } =
+  const { quickstart, install, kickstart, record, signIn, publish, autoPublish, codeMap, changes, agents, redaction, access } =
     DOCS_HOME;
   const { prune, configuration, cli } = DOCS_HOME;
+  const [publishStart, ...guideStarts] = DOCS_START;
 
   return (
     <main id="content" className="dx-page" tabIndex={-1}>
@@ -51,6 +53,12 @@ export default function DocsHome() {
 
       <div className="dx-columns">
         <div className="dx-article">
+          <section className="dx-sec dx-quickstart" id={quickstart.id} aria-labelledby={`${quickstart.id}-title`}>
+            <div className="dx-prose"><h2 id={`${quickstart.id}-title`}>{quickstart.title}</h2></div>
+            <GetStarted showGuide={false} />
+            <div className="dx-prose"><p>{quickstart.after} <Link href="#install">detailed setup</Link></p></div>
+          </section>
+
           <section className="dx-sec dx-prose" id={install.id} aria-labelledby={`${install.id}-title`}>
             <h2 id={`${install.id}-title`}>{install.title}</h2>
             <p>
@@ -80,8 +88,11 @@ export default function DocsHome() {
 
           <section className="dx-sec dx-prose" id={DOCS_NEXT.id} aria-labelledby={`${DOCS_NEXT.id}-title`}>
             <h2 id={`${DOCS_NEXT.id}-title`}>{DOCS_NEXT.title}</h2>
+            <p>
+              <Link className="dx-link" href={publishStart.href}>{publishStart.title}</Link>. <Rich text={publishStart.summary} />
+            </p>
             <div className="dx-guides">
-              {DOCS_START.map((guide) => (
+              {guideStarts.map((guide) => (
                 <Link key={guide.id} className="dx-guide" href={guide.href}>
                   <Art art={guide.art} className="dx-pic dx-guide-art" />
                   <span className="dx-guide-text">

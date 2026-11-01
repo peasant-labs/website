@@ -1133,3 +1133,8 @@
 .dx-nowrap {
   white-space: nowrap;
 }
+
+.dx-quickstart {
+  display: grid;
+  gap: var(--sp-5);
+}

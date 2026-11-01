@@ -1,0 +1,17 @@
+version: 1
+quickstart:
+  prompt: Open this session in Peasant.
+  command: curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart
+nextSteps:
+  primary: { label: publish your first session, href: "/docs#publish" }
+  peers:
+    - /docs/guides/evals
+    - /docs/guides/reviews
+    - /docs/guides/classroom
+    - /docs/guides/onboarding
+    - /docs/guides/find-sessions
+    - /docs#access
+guides:
+  - { label: classroom, path: /docs/guides/classroom, heading: run a class with agent use }
+  - { label: onboarding, path: /docs/guides/onboarding, heading: onboard from real history }
+  - { label: past sessions, path: /docs/guides/find-sessions, heading: find a past session }

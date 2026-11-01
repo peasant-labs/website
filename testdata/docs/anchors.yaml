@@ -4,8 +4,14 @@
 version: 1
 pages:
   - path: /docs
-    ids: [install, kickstart, record, sign-in, publish, auto-publish, code-map, changes, agents, redaction, access, prune, configuration, cli]
+    ids: [quickstart, install, kickstart, record, sign-in, publish, auto-publish, code-map, changes, agents, redaction, access, prune, configuration, cli]
   - path: /docs/guides/evals
-    ids: [collective, install, invite, publish, approve, pull]
+    ids: [task, score, collective, install, invite, publish, approve, pull, inspect]
   - path: /docs/guides/reviews
-    ids: [link, show, publish, attach, review]
+    ids: [example, link, show, publish, attach, review, troubleshooting]
+  - path: /docs/guides/classroom
+    ids: [assignment, collective, submit, review]
+  - path: /docs/guides/onboarding
+    ids: [choose, trace, reuse, offline]
+  - path: /docs/guides/find-sessions
+    ids: [import, narrow, read, missing]

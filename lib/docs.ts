@@ -34,6 +34,9 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
     items: [
       { id: "evals", label: "agent evals", href: "/docs/guides/evals", icon: "evals" },
       { id: "reviews", label: "pr reviews", href: "/docs/guides/reviews", icon: "reviews" },
+      { id: "classroom", label: "classroom", href: "/docs/guides/classroom", icon: "overview" },
+      { id: "onboarding", label: "onboarding", href: "/docs/guides/onboarding", icon: "overview" },
+      { id: "find-sessions", label: "past sessions", href: "/docs/guides/find-sessions", icon: "overview" },
     ],
   },
   {
@@ -47,8 +50,8 @@ export const DOCS_NAV: readonly DocsNavGroup[] = [
 /** The page a pathname belongs to. */
 export function currentDocsItem(pathname: string): string | null {
   if (pathname === "/docs") return "overview";
-  if (pathname.startsWith("/docs/guides/evals")) return "evals";
-  if (pathname.startsWith("/docs/guides/reviews")) return "reviews";
+  const guide = DOCS_NAV.find((group) => group.id === "guides")?.items.find((item) => pathname === item.href);
+  if (guide) return guide.id;
   if (pathname === "/blog" || pathname.startsWith("/blog/")) return "blog";
   return null;
 }

@@ -114,6 +114,7 @@ export function SessionViewer({
   const rootRef = useRef<HTMLDivElement>(null);
   const near = useNear(rootRef);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [outlineOpen, setOutlineOpen] = useState(false);
   // The browser's heavier changes (a tab, a tool call opening) render as transitions, so they never hold a frame.
   const [tab, setTab] = useState<Tab>(FIRST_TAB);
   const [openTools, setOpenTools] = useState<OpenTools>({});
@@ -128,6 +129,8 @@ export function SessionViewer({
           breadcrumb={NO_CRUMBS}
           showTail={false}
           showOutcome={false}
+          leftRailOpen={outlineOpen}
+          onLeftRailOpenChange={setOutlineOpen}
           rightRailOpen={filtersOpen}
           onRightRailOpenChange={setFiltersOpen}
           activeTab={tab}

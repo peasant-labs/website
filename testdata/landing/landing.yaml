@@ -64,7 +64,7 @@ agents:
   names: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
 # the sections after the hero, in reading order: id and heading
 sections:
-  - { id: install, heading: "install, then ask your agent" }
+  - { id: install, heading: "install, then open a session" }
   - { id: uses, heading: find your use case }
   - { id: how, heading: how it works }
   - { id: session, heading: "a new standard for transcript sharing, viewing, and attribution" }
@@ -154,20 +154,22 @@ install:
   platforms:
     - { label: macos and linux, command: "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart", note: installs Peasant and starts setup }
     - { label: windows, command: "irm https://peasantlabs.org/install.ps1 | iex", note: "then run the kickstart command printed in your terminal" }
-  prompt: Publish this session with Peasant. Ask which collective if needed.
+  prompt: Open this session in Peasant.
   actions: [paste in your terminal, ask your agent]
   agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
   guide: { label: read our docs, href: /docs }
   installGuide: { label: read the install guide, href: "/docs#install" }
   phoneWidths: [390, 360, 320]
+  copyTarget: 44
 
 session:
   windows:
+    order: [term, front, x]
     widths: [1440, 1024, 768]
-    frontMinRatio: 0.8
-    frontMaxRatio: 0.95
-    terminalExposedMin: 144
-    socialOverlapMax: 112
+    columnWidths: [1440]
+    stackedWidths: [1024, 768]
+    frontMinRatio: 0.4
+    frontMaxRatio: 0.55
   terminalBodyMin: 240
   terminalTextMin: 16
   sharedBodyMin: 380
@@ -243,6 +245,9 @@ docsNav:
   - { label: overview, href: /docs }
   - { label: agent evals, href: /docs/guides/evals }
   - { label: pr reviews, href: /docs/guides/reviews }
+  - { label: classroom, href: /docs/guides/classroom }
+  - { label: onboarding, href: /docs/guides/onboarding }
+  - { label: past sessions, href: /docs/guides/find-sessions }
   - { label: blog, href: /blog }
 # Pages lead; search sits near the account footer. The docs app has no other app in its switcher.
 docsNavigation: [docs pages, guides, more, shortcuts]

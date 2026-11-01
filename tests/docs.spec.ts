@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parse } from "yaml";
-import { PHONE } from "./landing-fixture";
+import { loadLandingFixture, PHONE } from "./landing-fixture";
 
 type AnchorsFixture = { version: 1; pages: Array<{ path: string; ids: string[] }> };
 type SearchFixture = {
@@ -85,33 +85,52 @@ test("a blog post's \"on this page\" lists exactly its headings", async ({ page 
   }
 });
 
+async function assertPhoneCommandWrap(page: Page, address: string) {
+  // Tabs retain hidden panels. Measure the rendered commands after selecting
+  // each platform below, including all of the detailed reference commands.
+  const commands = page.locator(".dx-cmd .cli-cmd-line code:visible");
+  await expect(commands.first(), `${address}: no command is rendered`).toBeVisible();
+  for (const lines of await commands.evaluateAll((codes) =>
+    codes.map((code) => {
+      const range = document.createRange();
+      const rows = new Map<number, string>();
+      const walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        const text = walker.currentNode as Text;
+        for (let index = 0; index < text.length; index += 1) {
+          range.setStart(text, index);
+          range.setEnd(text, index + 1);
+          const top = Math.round(range.getBoundingClientRect().top);
+          rows.set(top, (rows.get(top) ?? "") + text.data[index]);
+        }
+      }
+      return [...rows.values()].map((row) => row.trim());
+    }),
+  )) {
+    for (const line of lines.slice(0, -1)) {
+      expect(line, `${address}: "${lines.join(" / ")}" wraps inside a word`).not.toMatch(/-$/);
+    }
+  }
+}
+
 test("on a phone no docs command wraps at a hyphen inside a word", async ({ browser }) => {
   const context = await browser.newContext(PHONE);
   const page = await context.newPage();
   for (const { path } of anchors.pages) {
     await page.goto(path);
-    const commands = page.locator(".dx-cmd .cli-cmd-line code");
-    await expect(commands.first()).toBeVisible();
-    for (const lines of await commands.evaluateAll((codes) =>
-      codes.map((code) => {
-        const range = document.createRange();
-        const rows = new Map<number, string>();
-        const walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT);
-        while (walker.nextNode()) {
-          const text = walker.currentNode as Text;
-          for (let index = 0; index < text.length; index += 1) {
-            range.setStart(text, index);
-            range.setEnd(text, index + 1);
-            const top = Math.round(range.getBoundingClientRect().top);
-            rows.set(top, (rows.get(top) ?? "") + text.data[index]);
-          }
-        }
-        return [...rows.values()].map((row) => row.trim());
-      }),
-    )) {
-      for (const line of lines.slice(0, -1)) {
-        expect(line, `${path}: "${lines.join(" / ")}" wraps inside a word`).not.toMatch(/-$/);
+    const tabs = page.getByRole("tablist", { name: "operating system" });
+    if (await tabs.count()) {
+      for (const platform of loadLandingFixture().install.platforms) {
+        const tab = tabs.getByRole("tab", { name: platform.label, exact: true });
+        await tab.click();
+        await expect(tab).toHaveAttribute("aria-selected", "true");
+        const panel = page.getByRole("tabpanel", { name: platform.label, exact: true });
+        await expect(panel).toBeVisible();
+        await expect(panel.locator(".cli-cmd-line code")).toContainText(platform.command);
+        await assertPhoneCommandWrap(page, `${path}: ${platform.label}`);
       }
+    } else {
+      await assertPhoneCommandWrap(page, path);
     }
   }
   await context.close();

@@ -92,33 +92,33 @@ site:
       h1: docs
       metadata:
         title: docs | peasant
-        description: Install peasant, publish a session, then pick a guide.
+        description: Install peasant, open a local session, then pick a guide.
         canonical: https://peasantlabs.org/docs
         openGraph:
           title: docs | peasant
-          description: Install peasant, publish a session, then pick a guide.
+          description: Install peasant, open a local session, then pick a guide.
           url: https://peasantlabs.org/docs
           type: website
         twitter:
           card: summary_large_image
           title: docs | peasant
-          description: Install peasant, publish a session, then pick a guide.
+          description: Install peasant, open a local session, then pick a guide.
     - id: guide-evals
       path: /docs/guides/evals
       h1: run an agent eval
       metadata:
         title: run an agent eval | peasant docs
-        description: Collect real coding-agent sessions from many people into one collective, with secrets and personal details hidden on each computer. Then pull the approved set to yours.
+        description: Run a small coding task, measure the result independently, then collect the approved sessions that explain it.
         canonical: https://peasantlabs.org/docs/guides/evals
         openGraph:
           title: run an agent eval | peasant docs
-          description: Collect real coding-agent sessions from many people into one collective, with secrets and personal details hidden on each computer. Then pull the approved set to yours.
+          description: Run a small coding task, measure the result independently, then collect the approved sessions that explain it.
           url: https://peasantlabs.org/docs/guides/evals
           type: website
         twitter:
           card: summary_large_image
           title: run an agent eval | peasant docs
-          description: Collect real coding-agent sessions from many people into one collective, with secrets and personal details hidden on each computer. Then pull the approved set to yours.
+          description: Run a small coding task, measure the result independently, then collect the approved sessions that explain it.
     - id: guide-reviews
       path: /docs/guides/reviews
       h1: review pull requests
