@@ -1,0 +1,8 @@
+version: 1
+quickstart:
+  prompt: Open this session in Peasant.
+  command: curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart
+guides:
+  - { label: classroom, path: /docs/guides/classroom, heading: run a class with agent use }
+  - { label: onboarding, path: /docs/guides/onboarding, heading: onboard from real history }
+  - { label: past sessions, path: /docs/guides/find-sessions, heading: find a past session }

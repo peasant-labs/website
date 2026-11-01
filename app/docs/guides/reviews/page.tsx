@@ -16,7 +16,7 @@ export default function ReviewsGuide() {
     <Guide
       guide={REVIEWS_GUIDE}
       previous={{ label: "previous: run an agent eval", href: "/docs/guides/evals" }}
-      next={{ label: "docs home", href: "/docs" }}
+      next={{ label: "next: run a class", href: "/docs/guides/classroom" }}
     />
   );
 }
