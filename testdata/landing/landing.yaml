@@ -181,10 +181,10 @@ session:
     controls:
       minProseWidth: 240
       cases:
-        - { width: 1280, filtersAvailable: true }
-        - { width: 1152, filtersAvailable: true }
-        - { width: 1024, filtersAvailable: false }
-        - { width: 768, filtersAvailable: false }
+        - { name: layered reader, width: 1280, filtersAvailable: true, filtersMode: drawer }
+        - { name: stacked desktop, width: 1152, filtersAvailable: true, filtersMode: rail }
+        - { name: compact laptop, width: 1024, filtersAvailable: true, filtersMode: drawer }
+        - { name: stacked tablet, width: 768, filtersAvailable: true, filtersMode: drawer }
     overlap: { minRatio: 0.05, maxRatio: 0.12 }
     activationModes: [hover, click, focus]
     motion: [no-preference, reduce]

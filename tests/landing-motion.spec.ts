@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { loadLandingFixture, PHONE } from "./landing-fixture";
+import { openViewerFilters } from "./landing-viewer";
 
 const fixture = loadLandingFixture();
 
@@ -529,10 +530,8 @@ for (const theme of fixture.session.windows.themes) {
       }
       // The real viewer's native control still operates after returning it to front.
       await windows.locator(fixture.session.windows.switches.find(row => row.id === "front")!.focus).first().focus();
-      const expand = windows.getByRole("button", { name: "expand filters", exact: true });
-      await expand.click();
-      await expect(windows.getByRole("button", { name: "collapse filters", exact: true })).toBeVisible();
-      await windows.getByRole("button", { name: "collapse filters", exact: true }).click();
+      const filters = await openViewerFilters(windows.locator(".lp-windows-front"));
+      await filters.close();
       const shared = windows.locator(".lp-windows-x .mac-body");
       await shared.focus();
       await expect(windows).toHaveAttribute("data-front", "x");
@@ -581,7 +580,7 @@ test("the terminal can be brought forward by keyboard and virtual activation wit
 for (const theme of fixture.session.windows.themes) {
   test(`the demo reader keeps prose and keyboard-focused footer controls visible: ${theme}`, async ({ page }) => {
     await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
-    for (const { width, filtersAvailable } of fixture.session.windows.controls.cases) {
+    for (const { name, width, filtersAvailable, filtersMode } of fixture.session.windows.controls.cases) {
       await page.setViewportSize({ width, height: 1000 });
       await page.mouse.move(5, 5);
       await page.goto("/");
@@ -589,22 +588,24 @@ for (const theme of fixture.session.windows.themes) {
       await viewer.scrollIntoViewIfNeeded();
       await expect(viewer.locator(".txn-app")).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
-      const open = viewer.getByRole("button", { name: "expand filters", exact: true });
-      const close = viewer.getByRole("button", { name: "collapse filters", exact: true });
-      if (filtersAvailable) {
-        await open.click();
-        await expect(close).toBeVisible();
-      } else {
-        await expect(open).not.toBeVisible();
-      }
+      expect(filtersAvailable, `${name} retains access to filters`).toBe(true);
+      const filters = await openViewerFilters(viewer);
+      expect(filters.mode, `${name} uses the canonical responsive controls`).toBe(filtersMode);
+      const responses = filters.panel.getByRole("checkbox", { name: /^responses/ });
+      await expect(responses).toBeChecked();
+      await responses.uncheck();
+      await expect(responses).not.toBeChecked();
       const prose = viewer.locator(".txn-turn.user .txn-md-prose").first();
       await expect(prose).toBeVisible();
       expect(await prose.evaluate(element => element.getBoundingClientRect().width), `available reader layout retains readable prose at ${width}`)
         .toBeGreaterThanOrEqual(fixture.session.windows.controls.minProseWidth);
-      if (filtersAvailable) {
-        await close.click();
-        await expect(viewer.locator(".txn-body-grid")).toHaveAttribute("data-right-rail", "closed");
-      }
+      await filters.close();
+      const reopened = await openViewerFilters(viewer);
+      const savedResponses = reopened.panel.getByRole("checkbox", { name: /^responses/ });
+      await expect(savedResponses).not.toBeChecked();
+      await savedResponses.check();
+      await expect(savedResponses).toBeChecked();
+      await reopened.close();
       const tabs = viewer.locator(".txn-footer [role=tab]");
       await tabs.first().focus();
       await page.keyboard.press("End");

@@ -7,6 +7,7 @@ import { SAMPLE_CARD, SAMPLE_SESSION } from "../lib/sample-session";
 import { shareCardAlt, shareCardFromPayload } from "@peasant-labs/fairtrade/share";
 import { SESSION } from "../lib/landing";
 import { loadLandingFixture, PHONE } from "./landing-fixture";
+import { openViewerFilters } from "./landing-viewer";
 
 const fixture = loadLandingFixture();
 
@@ -1968,24 +1969,33 @@ test("a sample session opens in the real transcript browser, in a wide window th
     expect(time, "a turn's time reads as weeks old").not.toMatch(/\d+(d|w|mo|y) ago/);
   }
 
-  // the conversation has most of the window: the filters wait behind their rail's strip, which still opens them
+  // The conversation keeps most of the window; its native rail or compact drawer remains reachable.
   const grid = viewer.locator(".txn-body-grid");
   await expect(grid).toHaveAttribute("data-right-rail", "closed");
   const share = await viewer.evaluate(
     (element) => element.querySelector(".txn-stream")!.getBoundingClientRect().width / element.getBoundingClientRect().width,
   );
   expect(share, "the conversation's share of the window").toBeGreaterThanOrEqual(0.6);
-  // the thread stands over the strip until the reader points at the transcript, which brings it in front
+  // Returning to the reader brings it forward before opening its native filters.
   await viewer.locator(".txn-stream").hover({ position: { x: 40, y: 40 } });
-  await viewer.locator(".txn-rail-strip-right .txn-rail-reopen").click();
-  await expect(grid).not.toHaveAttribute("data-right-rail", "closed");
-  // nothing in it slides sideways out from under its column's edge
-  for (const column of [".txn-stream", ".txn-rail-right .txn-rail-body"]) {
-    const sideways = viewer.locator(column).first();
-    await sideways.hover();
-    await page.mouse.wheel(400, 0);
-    expect(await sideways.evaluate((element) => element.scrollLeft), `${column} slid sideways`).toBe(0);
-  }
+  const filters = await openViewerFilters(viewer);
+  const responses = filters.panel.getByRole("checkbox", { name: /^responses/ });
+  await expect(responses).toBeChecked();
+  await responses.uncheck();
+  await expect(responses).not.toBeChecked();
+  await responses.check();
+  await expect(responses).toBeChecked();
+  if (filters.mode === "rail") await expect(grid).not.toHaveAttribute("data-right-rail", "closed");
+  // The visible filter scroller stays contained. A modal closes before returning to the reader.
+  await filters.body.hover();
+  await page.mouse.wheel(400, 0);
+  expect(await filters.body.evaluate((element) => element.scrollLeft), "the native filter body slid sideways").toBe(0);
+  expect(await filters.panel.evaluate((element) => element.scrollWidth - element.clientWidth), "the native filter panel overflowed").toBe(0);
+  if (filters.mode === "drawer") await filters.close();
+  const sideways = viewer.locator(".txn-stream");
+  await sideways.hover();
+  await page.mouse.wheel(400, 0);
+  expect(await sideways.evaluate((element) => element.scrollLeft), "the reading pane slid sideways").toBe(0);
 
   // the browser's own tabs, each of which works, and the window keeps its height whichever is shown
   const tabs = viewer.getByRole("tab");

@@ -60,7 +60,7 @@ export type LandingFixture = {
       frontMinRatio: number;
       frontMaxRatio: number;
       minLayeredWidth: number;
-      controls: { cases: Array<{ width: number; filtersAvailable: boolean }>; minProseWidth: number };
+      controls: { cases: Array<{ name: string; width: number; filtersAvailable: boolean; filtersMode: "drawer" | "rail" }>; minProseWidth: number };
       overlap: { minRatio: number; maxRatio: number };
       activationModes: Array<"hover" | "click" | "focus">;
       motion: Array<"no-preference" | "reduce">;
@@ -139,6 +139,10 @@ export function loadLandingFixture(): LandingFixture {
     || JSON.stringify([...root.session.windows.motion].sort()) !== JSON.stringify(["no-preference", "reduce"])
     || JSON.stringify([...root.session.windows.themes].sort()) !== JSON.stringify(["dark", "light"])) {
     throw new Error("The demo fixture must retain pointer/focus activation, both motion preferences and both themes.");
+  }
+  const requiredReaderControls = ["layered reader", "stacked desktop", "compact laptop", "stacked tablet"];
+  if (JSON.stringify(root.session.windows.controls.cases.map((row) => row.name)) !== JSON.stringify(requiredReaderControls)) {
+    throw new Error("The reader fixture must retain layered, stacked desktop, compact laptop and tablet controls.");
   }
   const pictures = new Set<string>();
   for (const slide of root.useCases.slides) {
