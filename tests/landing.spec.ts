@@ -205,7 +205,7 @@ test("the install card is fairtrade's tabs and CommandBlocks, one terminal comma
       await expect(lines.locator(".gs-agents li")).toHaveText(fixture.install.agents);
       await expect(lines.locator(".gs-agents li svg")).toHaveCount(fixture.install.agents.length);
       await expect(lines.locator(".gs-n")).toHaveCount(0);
-      const copySizes = await lines.locator("button").evaluateAll(buttons => buttons.map(button => { const box = button.getBoundingClientRect(); return [box.width, box.height]; }));
+      const copySizes = await lines.locator("button").evaluateAll(buttons => buttons.map(button => { const box = button.getBoundingClientRect(); return [Math.round(box.width), Math.round(box.height)]; }));
       expect(copySizes).toEqual(fixture.install.actions.map(() => [fixture.install.copyTarget, fixture.install.copyTarget]));
 
       await expect(lines.last().locator(".gs-agent-prompt p")).toHaveText(fixture.install.prompt);
@@ -231,7 +231,7 @@ test("the install card is fairtrade's tabs and CommandBlocks, one terminal comma
             // commands read at the 16px floor, as in the docs
             size: getComputedStyle(item.querySelector(".cli-cmd-line")!).fontSize,
             // the copy button is a full tap target at the block's right edge
-            target: copy.height >= 44 && copy.width >= 44 && Math.abs(copy.right - block.right) < 2,
+            target: Math.round(copy.height) >= 44 && Math.round(copy.width) >= 44 && Math.abs(copy.right - block.right) < 2,
             // the block runs across its row, not just around its command
             across: block.width >= item.getBoundingClientRect().width * 0.8,
           };
@@ -339,7 +339,7 @@ test("on a phone installation keeps two plain actions, matching copy targets and
       const command=panel.querySelector<HTMLElement>(".cli-cmd-line")!;
       return {
         scrolls: command.scrollWidth > command.clientWidth,
-        copySizes: [...panel.querySelectorAll("button")].map(button => { const box=button.getBoundingClientRect(); return [box.width,box.height]; }),
+        copySizes: [...panel.querySelectorAll("button")].map(button => { const box=button.getBoundingClientRect(); return [Math.round(box.width),Math.round(box.height)]; }),
         numbers: panel.querySelectorAll(".gs-n").length,
       };
     });

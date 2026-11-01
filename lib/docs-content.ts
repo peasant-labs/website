@@ -88,15 +88,7 @@ export const DOCS_HOME = {
   quickstart: {
     id: "quickstart",
     title: "install, then open a session",
-    platforms: [
-      { label: "macos, linux and wsl", command: "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart" },
-      { label: "windows powershell", command: "irm https://peasantlabs.org/install.ps1 | iex" },
-    ],
-    windows: "On Windows, follow the installer's PATH instructions, then run `peasant kickstart`. The PowerShell installer does not start setup for you.",
-    setup: "In kickstart, choose the projects to track and save. Your sessions stay local. Then ask your coding agent:",
-    prompt: "Open this session in Peasant.",
-    after: "Opening a session is local. Read it first; choose **publish** when you want to review redaction and pick the collectives that can read it. If your agent needs help opening it, use [the agent and terminal instructions](#publish).",
-    details: "The detailed installation and setup reference follows below.",
+    after: "Review locally, then publish when ready.",
   },
 
   // scripts/install.sh header and platform checks; scripts/install.ps1 header and arch checks

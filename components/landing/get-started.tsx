@@ -1,5 +1,7 @@
 "use client";
 
+import "@/app/get-started.css";
+
 import { DocCommand } from "@/components/docs/doc-command";
 import { BrandMark, CopyIconButton, Tabs } from "@/components/fairtrade-client";
 import { AGENTS, INSTALL } from "@/lib/landing";
@@ -16,7 +18,7 @@ function detectPlatform(): PlatformId {
 }
 
 /** Install in the terminal, then copy a message into the coding agent. */
-export function GetStarted() {
+export function GetStarted({ showGuide = true }: { showGuide?: boolean } = {}) {
   const detected = useSyncExternalStore(noSubscription, detectPlatform, () => "unix" as const);
   const mounted = useSyncExternalStore(noSubscription, () => true, () => false);
   const [chosen, setPlatform] = useState<PlatformId | null>(null);
@@ -89,10 +91,10 @@ export function GetStarted() {
           }))}
         />
       </div>
-      <Link className="gs-guide" href={INSTALL.installGuide.href}>
+      {showGuide && <Link className="gs-guide" href={INSTALL.installGuide.href}>
         {INSTALL.installGuide.label}
         <ArrowRight aria-hidden="true" focusable="false" />
-      </Link>
+      </Link>}
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { GetStarted } from "@/components/landing/get-started";
 import { Art } from "@/components/art";
 import {
   DocCaptionedCommand,
@@ -51,16 +52,10 @@ export default function DocsHome() {
 
       <div className="dx-columns">
         <div className="dx-article">
-          <section className="dx-sec dx-prose" id={quickstart.id} aria-labelledby={`${quickstart.id}-title`}>
-            <h2 id={`${quickstart.id}-title`}>{quickstart.title}</h2>
-            {quickstart.platforms.map((platform) => (
-              <DocCaptionedCommand key={platform.label} caption={platform.label} command={platform.command} />
-            ))}
-            <p><Rich text={quickstart.windows} /></p>
-            <p><Rich text={quickstart.setup} /></p>
-            <DocCaptionedCommand caption="ask your agent" command={quickstart.prompt} />
-            <p><Rich text={quickstart.after} /></p>
-            <p>{quickstart.details}</p>
+          <section className="dx-sec dx-quickstart" id={quickstart.id} aria-labelledby={`${quickstart.id}-title`}>
+            <div className="dx-prose"><h2 id={`${quickstart.id}-title`}>{quickstart.title}</h2></div>
+            <GetStarted showGuide={false} />
+            <div className="dx-prose"><p>{quickstart.after} <Link href="#install">detailed setup</Link></p></div>
           </section>
 
           <section className="dx-sec dx-prose" id={install.id} aria-labelledby={`${install.id}-title`}>
