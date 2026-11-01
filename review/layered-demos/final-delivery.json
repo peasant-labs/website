@@ -1,0 +1,48 @@
+{
+  "reviewedHead": "ef1d542b06c2301947f43e9ab0fc0e90f9c55abe",
+  "builtHead": "cd70784fdf7af1b95f129edf321d931597d8da62",
+  "buildId": "_IN1E5uZPgL4EKFdRJ2zN",
+  "runtimeTreeIdentical": true,
+  "focusedLandingTests": 23,
+  "fullSuite": {
+    "startTime": "2026-11-01T15:55:17.706Z",
+    "duration": 352878.946,
+    "expected": 181,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "reviewAxes": {
+    "A": "clean",
+    "B": "clean",
+    "C": "clean"
+  },
+  "screenshots": 30,
+  "evidence": {
+    "repository": "peasant-labs/website",
+    "branch": "review/layered-demos-20261101-10bcd14",
+    "commit": "398d0df0dcb4d09c51cdca8916139472f9ad67b5",
+    "files": 36,
+    "url": "https://github.com/peasant-labs/website/tree/398d0df0dcb4d09c51cdca8916139472f9ad67b5/review"
+  },
+  "pr": "https://github.com/peasant-labs/website/pull/45",
+  "canonicalFollowup": "https://github.com/peasant-labs/fairtrade-design-system/issues/225",
+  "mergedHead": "4480cfba8f424cbabbf8ec7558aed0cf33fdaee5",
+  "state": "merged; synced main built and preview verified",
+  "mergedPreview": {
+    "source": "4480cfba8f424cbabbf8ec7558aed0cf33fdaee5",
+    "buildId": "9_6XO5hA92tYaw5Y6TT4b",
+    "routes200": [
+      "/",
+      "/docs",
+      "/docs/guides/evals",
+      "/docs/guides/reviews",
+      "/docs/guides/classroom",
+      "/docs/guides/onboarding",
+      "/docs/guides/find-sessions"
+    ],
+    "servedAssetsByteMatched": 34,
+    "defaultFrontMarker": true,
+    "layeredGridMarker": true
+  }
+}
