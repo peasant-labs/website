@@ -568,6 +568,7 @@ test("the terminal can be brought forward by keyboard and virtual activation wit
   const terminal = windows.getByRole("button", { name: fixture.session.windows.terminalButton, exact: true });
   const main = windows.locator(".lp-windows-front");
   for (const key of fixture.session.windows.terminalKeys) {
+    await page.mouse.move(5, 5);
     await terminal.focus();
     await expect(terminal).toBeFocused();
     await expect(windows).toHaveAttribute("data-front", "term");
