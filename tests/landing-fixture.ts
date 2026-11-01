@@ -52,7 +52,7 @@ export type LandingFixture = {
     copyTarget: number;
   };
   session: {
-    windows: { widths: number[]; columnWidths: number[]; stackedWidths: number[]; frontMinRatio: number; frontMaxRatio: number };
+    windows: { order: string[]; widths: number[]; columnWidths: number[]; stackedWidths: number[]; frontMinRatio: number; frontMaxRatio: number };
     terminalBodyMin: number;
     terminalTextMin: number;
     sharedBodyMin: number;

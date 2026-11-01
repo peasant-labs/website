@@ -453,7 +453,7 @@ test("the hero picture loops while on screen, holds while a pointer moves onto i
   await expect(card).toHaveCSS("opacity", "1");
 });
 
-test("the window a pointer moves onto or focus moves into comes to the front, and stays there", async ({ page }) => {
+test("the separate demo columns preserve pointer and keyboard access without moving their layout", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
@@ -461,30 +461,28 @@ test("the window a pointer moves onto or focus moves into comes to the front, an
   await windows.scrollIntoViewIfNeeded();
   // hydrated: the group has seen itself come into view
   await expect(windows).toHaveAttribute("data-fanned", "true");
-  const order = () =>
-    windows.evaluate((group) =>
-      ["term", "front", "x"].reduce(
-        (top, name) => {
-          const z = Number(getComputedStyle(group.querySelector(`.lp-windows-${name}`)!).zIndex);
-          return z > top.z ? { name, z } : top;
-        },
-        { name: "", z: -Infinity },
-      ).name,
-    );
-  // untouched, the thread is the window in front
-  await expect.poll(order).toBe("x");
-  // each window comes forward from a part of it that shows, wherever the page's own bar is not over it
+  const geometry = () => windows.evaluate(group => {
+    const origin = group.getBoundingClientRect();
+    return [...group.children].map(child => {
+      const box = child.getBoundingClientRect();
+      return { left: box.left-origin.left, top: box.top-origin.top, width: box.width, height: box.height };
+    });
+  });
+  const before = await geometry();
+  expect(await windows.evaluate(group => [...group.children].map(child => child.className.replace("lp-windows-", "")))).toEqual(fixture.session.windows.order);
+  // Every column is directly hit-testable; focus and pointer entry retain their
+  // native controls and context, without the collage's initial z-order premise.
   const point = async (selector: string, fx: number, fy: number) => {
     await windows.locator(selector).scrollIntoViewIfNeeded();
     const box = (await windows.locator(selector).boundingBox())!;
     const [x, y] = [box.x + box.width * fx, box.y + box.height * fy];
-    expect(await page.evaluate(([px, py]) => !!document.elementFromPoint(px, py)?.closest(".lp-windows"), [x, y])).toBe(true);
+    expect(await page.evaluate(({ px, py, target }) => !!document.elementFromPoint(px, py)?.closest(target), { px: x, py: y, target: selector })).toBe(true);
     await page.mouse.move(x, y);
   };
   await point(".lp-windows-term", 0.3, 0.15);
-  await expect.poll(order).toBe("term");
+  await expect(windows).toHaveAttribute("data-front", "term");
   await point(".lp-windows-front", 0.3, 0.6);
-  await expect.poll(order).toBe("front");
+  await expect(windows).toHaveAttribute("data-front", "front");
   // The transcript's reading controls remain unobstructed.
   const strip = windows.locator(".txn-rail-strip-right");
   const box = (await strip.boundingBox())!;
@@ -492,14 +490,16 @@ test("the window a pointer moves onto or focus moves into comes to the front, an
     ([x, y]) => !!document.elementFromPoint(x, y)?.closest(".txn-rail-strip-right"),
     [box.x + box.width / 2, box.y + box.height * 0.6],
   );
-  expect(hit, "the filters' strip is reachable once the transcript is in front").toBe(true);
-  // it stays in front after the pointer leaves the windows
+  expect(hit, "the filters' strip is directly reachable in its own column").toBe(true);
+  // Pointer context persists after leaving; no other column moves over it.
   await page.mouse.move(5, 5);
-  await expect.poll(order).toBe("front");
-  // The thread stays independently reachable below the transcript.
+  await expect(windows).toHaveAttribute("data-front", "front");
+  // The thread stays directly reachable in its own column.
   await point(".lp-windows-x", 0.95, 0.1);
-  await expect.poll(order).toBe("x");
-  // keyboard focus brings its window forward too
+  await expect(windows).toHaveAttribute("data-front", "x");
+  // Keyboard focus reaches the real transcript controls too.
   await windows.locator(".lp-windows-front .txn-stream").evaluate((stream) => stream.querySelector<HTMLElement>("a, button, [tabindex]")!.focus());
-  await expect.poll(order).toBe("front");
+  await expect(windows).toHaveAttribute("data-front", "front");
+  expect(await windows.locator(".lp-windows-front").evaluate(column => column.contains(document.activeElement))).toBe(true);
+  expect(await geometry()).toEqual(before);
 });

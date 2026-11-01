@@ -2213,6 +2213,11 @@
 /* The three mounted demos share a row when their container has room.
  * A narrower container stacks them without scaling their reading content. */
 .lp-session { max-width: 100rem; }
+.lp-session > .lp-head {
+  width: 100%;
+  max-width: calc(75rem - var(--sp-6) * 2);
+  margin-inline: auto;
+}
 .lp-session-body { container: session-demos / inline-size; }
 .lp-windows {
   --lp-windows-body: 36rem;

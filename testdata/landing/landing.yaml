@@ -164,6 +164,7 @@ install:
 
 session:
   windows:
+    order: [term, front, x]
     widths: [1440, 1024, 768]
     columnWidths: [1440]
     stackedWidths: [1024, 768]
