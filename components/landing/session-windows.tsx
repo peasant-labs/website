@@ -15,14 +15,9 @@ const ANSWER_TEXT = String(ANSWER?.content ?? "").replace(/<thinking>[\s\S]*?<\/
 type Window = "term" | "front" | "x";
 
 /**
- * One session in a layered desktop scene: its recording up to the left,
- * the published transcript leading in the centre, and the shared link over
- * its lower-right corner. Every support window exposes its title and context.
- * A phone keeps the existing transcript slice and thread without window chrome.
- *
- * Pointer entry or keyboard focus raises that window without changing its
- * size or opacity. The supports fan out once, with no hidden initial state.
- * The Terminal repeats the transcript, so it is decorative for screen readers.
+ * Recording, published transcript and shared link occupy separate desktop
+ * columns. Narrower containers stack them; phones retain the readable slice.
+ * The Terminal repeats the transcript and is decorative for screen readers.
  */
 export function SessionWindows({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);

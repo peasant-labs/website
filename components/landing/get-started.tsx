@@ -62,15 +62,13 @@ export function GetStarted() {
             content: (
               <ol className="gs-lines">
                 <li className="gs-line">
-                  <span className="gs-n" aria-hidden="true">1</span>
                   <div className="gs-text">
                     <h3 className="gs-action">{INSTALL.actions[0]}</h3>
-                    <p className="gs-note">{item.note}</p>
+                    {item.id === "windows" && <p className="gs-note">{item.note}</p>}
                     <DocCommand command={item.command} />
                   </div>
                 </li>
                 <li className="gs-line">
-                  <span className="gs-n" aria-hidden="true">2</span>
                   <div className="gs-text">
                     <h3 className="gs-action">{INSTALL.actions[1]}</h3>
                     <ul className="gs-agents" aria-label="supported coding agents">

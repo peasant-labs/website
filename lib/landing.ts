@@ -288,14 +288,14 @@ export const HOW = {
 
 /** Install and start local setup, then ask the agent to publish deliberately. */
 export const INSTALL = {
-  title: "install, then ask your agent",
+  title: "install, then open a session",
   guide: { label: "read our docs", href: "/docs" },
   installGuide: { label: "read the install guide", href: "/docs#install" },
   platforms: [
     { id: "unix", label: "macos and linux", command: "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart", note: "installs Peasant and starts setup" },
     { id: "windows", label: "windows", command: "irm https://peasantlabs.org/install.ps1 | iex", note: "then run the kickstart command printed in your terminal" },
   ],
-  prompt: "Publish this session with Peasant. Ask which collective if needed.",
+  prompt: "Open this session in Peasant.",
   actions: ["paste in your terminal", "ask your agent"],
 } as const;
 

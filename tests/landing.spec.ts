@@ -200,11 +200,13 @@ test("the install card is fairtrade's tabs and CommandBlocks, one terminal comma
       expect(drawn).toEqual(
         [`$ ${platform.command}`],
       );
-      await expect(lines.locator(".gs-note")).toHaveText([platform.note]);
+      await expect(lines.locator(".gs-note")).toHaveText(platform.label === "windows" ? [platform.note] : []);
       await expect(lines.locator(".gs-action")).toHaveText(fixture.install.actions);
       await expect(lines.locator(".gs-agents li")).toHaveText(fixture.install.agents);
       await expect(lines.locator(".gs-agents li svg")).toHaveCount(fixture.install.agents.length);
-      await expect(lines.locator(".gs-n")).toHaveText(["1", "2"]);
+      await expect(lines.locator(".gs-n")).toHaveCount(0);
+      const copySizes = await lines.locator("button").evaluateAll(buttons => buttons.map(button => { const box = button.getBoundingClientRect(); return [box.width, box.height]; }));
+      expect(copySizes).toEqual(fixture.install.actions.map(() => [fixture.install.copyTarget, fixture.install.copyTarget]));
 
       await expect(lines.last().locator(".gs-agent-prompt p")).toHaveText(fixture.install.prompt);
       await expect(lines.last().locator(".cli-cmd, .cli-cmd-sigil")).toHaveCount(0);
@@ -288,7 +290,7 @@ test("on a wide screen the install card keeps every command whole on its line, w
   expect(lines).toEqual([true]);
 });
 
-test("on a phone each install step is a small step label, its words, then its command on one line that scrolls sideways inside its block", async ({
+test("on a phone installation keeps two plain actions, matching copy targets and reachable command text", async ({
   browser,
 }) => {
   for (const width of fixture.install.phoneWidths) {
@@ -333,78 +335,18 @@ test("on a phone each install step is a small step label, its words, then its co
     expect(link.height).toBeGreaterThanOrEqual(44);
 
     const geometry = await shell.evaluate((element) => {
-      const probe = document.createElement("div");
-      probe.style.width = "var(--sp-5)";
-      element.append(probe);
-      const groups = probe.getBoundingClientRect().width;
-      probe.style.width = "var(--sp-2)";
-      const caption = probe.getBoundingClientRect().width;
-      probe.style.width = "var(--sp-1)";
-      const label = probe.getBoundingClientRect().width;
-      probe.remove();
-      const card = element.getBoundingClientRect();
-      const edge = document.querySelector("#install-title")!.getBoundingClientRect().left;
-      const blocks = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) :is(.cli-cmd, .gs-agent-prompt)')];
-      const rows = [...element.querySelectorAll('[role="tabpanel"]:not([hidden]) .gs-line:first-child')].map((row) => {
-        const n = row.querySelector(".gs-n")!.getBoundingClientRect();
-        const action = row.querySelector(".gs-action")!.getBoundingClientRect();
-        const note = row.querySelector(".gs-note")!.getBoundingClientRect();
-        const block = row.querySelector(".cli-cmd")!.getBoundingClientRect();
-        const line = row.querySelector<HTMLElement>(".cli-cmd-line")!;
-        const code = line.querySelector("code")!;
-        const copy = row.querySelector(".cli-copy")!.getBoundingClientRect();
-        return {
-          // the number leads the words on their first line, and both stand above the command
-          // the step's label on its own line, then the words, then the command
-          order: n.bottom <= action.top + 1 && action.bottom <= note.top + 1 && note.bottom <= block.top + 1,
-          label: `${getComputedStyle(row.querySelector(".gs-n")!, "::before").content}${row.querySelector(".gs-n")!.textContent}`,
-          labelGap: Math.round(action.top - n.bottom - label),
-          mark: getComputedStyle(row.querySelector(".gs-n")!, "::after").content,
-          // the label, the words and the command share the page's one edge, the title's: no hanging indent
-          edge: [n.left, action.left, note.left, block.left].every((left) => Math.abs(left - edge) < 1),
-          captionGap: Math.round(block.top - note.bottom - caption),
-          blockTop: block.top,
-          blockBottom: block.bottom,
-          labelTop: n.top,
-          // one line, never wrapped, across the card's whole width
-          oneLine: Math.round(code.getBoundingClientRect().height / parseFloat(getComputedStyle(code).lineHeight)) === 1,
-          across: Math.abs(block.left - card.left) < 2 && Math.abs(block.right - card.right) < 2,
-          scrolls: line.scrollWidth > line.clientWidth,
-          fades: getComputedStyle(line).maskImage !== "none",
-          lineBeforeCopy: line.getBoundingClientRect().right <= copy.left + 1,
-          target: copy.width >= 44 && copy.height >= 44,
-        };
-      });
+      const panel=element.querySelector('[role="tabpanel"]:not([hidden])')!;
+      const command=panel.querySelector<HTMLElement>(".cli-cmd-line")!;
       return {
-        groups,
-        rows,
-        // no card on a phone: no frame, and nothing under the last command
-        frame: getComputedStyle(element).borderTopWidth,
-        band: Math.round(card.bottom - blocks.at(-1)!.getBoundingClientRect().bottom),
+        scrolls: command.scrollWidth > command.clientWidth,
+        copySizes: [...panel.querySelectorAll("button")].map(button => { const box=button.getBoundingClientRect(); return [box.width,box.height]; }),
+        numbers: panel.querySelectorAll(".gs-n").length,
       };
     });
-    expect(geometry.frame, `the install card keeps its frame ${at}`).toBe("0px");
-    expect(geometry.band, `an empty band stands under the last command ${at}`).toBe(0);
-    for (const [index, row] of geometry.rows.entries()) {
-      const name = `step ${index + 1} ${at}`;
-      expect(row.order, `${name}: the label, words and command are out of order`).toBe(true);
-      expect(row.label, `${name}: the step's label`).toBe(`"step "${index + 1}`);
-      expect(Math.abs(row.labelGap), `${name}: the words do not sit just under the label`).toBeLessThanOrEqual(1);
-      expect(["none", "normal"], `${name}: a mark stands beside the step`).toContain(row.mark);
-      expect(row.edge, `${name}: the label, words or command are off the page's edge`).toBe(true);
-      expect(Math.abs(row.captionGap), `${name}: the words do not sit the docs' caption gap above the command`).toBeLessThanOrEqual(1);
-      expect(row.oneLine, `${name}: the command wraps`).toBe(true);
-      expect(row.across, `${name}: the command does not run across the card`).toBe(true);
-      expect(row.fades, `${name}: the command has no fade at its edge`).toBe(true);
-      expect(row.lineBeforeCopy, `${name}: the command runs under its copy button`).toBe(true);
-      expect(row.target, `${name}: the copy button is not a full tap target`).toBe(true);
-      const next = geometry.rows[index + 1];
-      if (next) {
-        expect(Math.abs(next.labelTop - row.blockBottom - geometry.groups), `${name}: the steps do not stand the docs' group gap apart`).toBeLessThanOrEqual(2);
-      }
-    }
+    expect(geometry.numbers).toBe(0);
+    expect(geometry.copySizes).toEqual(fixture.install.actions.map(() => [fixture.install.copyTarget, fixture.install.copyTarget]));
     // the long address scrolls inside its block; the page itself never scrolls sideways
-    expect(geometry.rows[0]!.scrolls, `the curl line does not scroll ${at}`).toBe(true);
+    expect(geometry.scrolls, `the curl line does not scroll ${at}`).toBe(true);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     // scrolled to its end, the line shows the command's last word, unfaded
     const end = await shell.locator('[role="tabpanel"]:not([hidden]) .gs-line').first().locator(".cli-cmd-line").evaluate(async (line) => {

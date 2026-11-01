@@ -49,9 +49,10 @@ export type LandingFixture = {
     guide: Link;
     installGuide: Link;
     phoneWidths: number[];
+    copyTarget: number;
   };
   session: {
-    windows: { widths: number[]; frontMinRatio: number; frontMaxRatio: number; terminalExposedMin: number; socialOverlapMax: number };
+    windows: { widths: number[]; columnWidths: number[]; stackedWidths: number[]; frontMinRatio: number; frontMaxRatio: number };
     terminalBodyMin: number;
     terminalTextMin: number;
     sharedBodyMin: number;

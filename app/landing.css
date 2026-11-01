@@ -2237,18 +2237,8 @@
 
 .gs-line {
   display: grid;
-  grid-template-columns: var(--sp-6) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
-}
-
-/* the numbers lead the two actions, keeping their reading order clear */
-.gs-n {
-  padding-block-start: var(--sp-1);
-  color: var(--ink-4);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  font-variant-numeric: tabular-nums;
-  line-height: var(--lh-mono);
 }
 
 .gs-text {
@@ -2294,10 +2284,10 @@
 .gs-agent-prompt {
   position: relative;
   display: flex;
-  align-items: start;
-  gap: var(--sp-4);
+  align-items: stretch;
+  gap: 0;
   min-width: 0;
-  padding: var(--sp-3) var(--sp-4);
+  padding: 0;
   border: var(--bd);
   background: var(--surface-2);
 }
@@ -2317,6 +2307,10 @@
 }
 
 .gs-agent-prompt p {
+  display: flex;
+  align-items: center;
+  min-height: var(--target-comfortable);
+  padding: var(--sp-2) var(--sp-4);
   flex: 1;
   min-width: 0;
   margin: 0;
@@ -2326,6 +2320,8 @@
 }
 
 .gs-prompt-copy-slot {
+  display: flex;
+  align-items: stretch;
   flex: none;
   margin-inline-start: auto;
   width: var(--target-comfortable);
@@ -2333,6 +2329,8 @@
 }
 
 .gs-prompt-copy {
+  border: 0;
+  border-inline-start: var(--bd);
   min-width: var(--target-comfortable);
   min-height: var(--target-comfortable);
 }
@@ -2350,7 +2348,19 @@
 
 /* the copy button is a full tap target; on a phone it keeps its icon, and its name for assistive technology */
 .gs .cli-copy {
+  width: var(--target-comfortable);
+  min-width: var(--target-comfortable);
+  padding: 0;
   min-height: var(--target-comfortable);
+}
+
+.gs .cli-copy-word {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @media (max-width: 47.99rem) {
@@ -2437,16 +2447,6 @@
     gap: 0;
   }
 
-  /* the step as a small label of its own: "step 1" */
-  .gs-n {
-    padding: 0;
-    line-height: 1.45;
-  }
-
-  .gs-n::before {
-    content: "step ";
-  }
-
   .gs-text {
     gap: var(--sp-2);
   }
@@ -2519,37 +2519,27 @@
 
 /* a published session */
 
-/*
- * The transcript leads the layered scene. Claude Code exposes its context
- * above the left edge; the shared thread extends beyond the lower-right.
- * The one last pointed at or focused stands in front (data-front).
- * From a tablet's width only: a phone shows a short slice of the session and
- * the thread without its window instead (.lp-phone and .lp-phone-x, below).
- */
+/* The three mounted demos share a row when their container has room.
+ * A narrower container stacks them without scaling their reading content. */
+.lp-session { max-width: 100rem; }
+.lp-session-body { container: session-demos / inline-size; }
 .lp-windows {
-  --lp-windows-body: clamp(28rem, 65svh, 36rem);
-  --lp-windows-reveal: calc(var(--sp-8) * 3);
-  --lp-windows-overlap: calc(var(--sp-6) * 3);
-  --lp-windows-social-h: calc(var(--sp-8) * 8);
-  position: relative;
-  isolation: isolate;
+  --lp-windows-body: 36rem;
+  --lp-windows-social-h: 36rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--sp-5);
   min-width: 0;
-  padding-block: var(--lp-windows-reveal) calc(var(--lp-windows-social-h) - var(--lp-windows-overlap));
-  padding-inline: var(--sp-5) var(--sp-6);
+}
+@container session-demos (min-width: 68rem) {
+  .lp-windows { grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr) minmax(0, 1fr); }
 }
 
-/* The recording is visible above the transcript: titlebar, command and
-   welcome. Its lower portion sits behind the main window until raised. */
-.lp-windows-term {
-  position: absolute;
-  z-index: 0;
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  width: min(56%, calc(var(--sp-8) * 8));
-  min-width: 0;
-}
+/* The recording retains its own scroll area beside the published viewer. */
+.lp-windows-term { min-width: 0; }
 .lp-windows-term .mac-win {
-  block-size: calc(var(--sp-8) * 5);
+  block-size: var(--lp-windows-body);
 }
 .lp-windows-term .mac-body {
   container: session-terminal / inline-size;
@@ -2601,16 +2591,8 @@
   block-size: var(--lp-windows-body);
 }
 
-/* The shared link stands beyond the transcript's lower-right corner.
-   Only the bottom strip overlaps; its title and opening turn stay clear. */
-.lp-windows-x {
-  position: absolute;
-  z-index: 2;
-  inset-block-end: 0;
-  inset-inline-end: 0;
-  width: min(54%, calc(var(--sp-8) * 8));
-  min-width: 0;
-}
+/* The shared thread is a separate, top-aligned reading column. */
+.lp-windows-x { min-width: 0; }
 .lp-windows-x .mac-win {
   block-size: var(--lp-windows-social-h);
 }
@@ -2619,12 +2601,6 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-@media (min-width: 64rem) {
-  .lp-windows {
-    padding-inline: var(--sp-8) calc(var(--sp-8) * 2);
-  }
-}
-
 /* Raising a window changes only its layer: no flicker, fade or resize. */
 .lp-windows[data-front="term"] > .lp-windows-term,
 .lp-windows[data-front="front"] > .lp-windows-front,
@@ -2725,20 +2701,6 @@
 /* the conversation has most of the window, so a turn's prose runs its width rather than wrapping early */
 .lp-viewer .txn-body > :is(.txn-md-prose, .txn-md-list, .txn-md-heading, .txn-md-blockquote) {
   max-inline-size: none;
-}
-
-/* A short fan-out once, from an already readable, fully opaque default. */
-@media (prefers-reduced-motion: no-preference) {
-  .lp-windows-term,
-  .lp-windows-x {
-    transition: transform var(--dur-3) var(--ease-out);
-  }
-  .js-reveal .lp-windows[data-fanned="false"] .lp-windows-term {
-    transform: translate3d(var(--sp-4), var(--sp-3), 0);
-  }
-  .js-reveal .lp-windows[data-fanned="false"] .lp-windows-x {
-    transform: translate3d(calc(-1 * var(--sp-4)), calc(-1 * var(--sp-3)), 0);
-  }
 }
 
 /*
@@ -2879,6 +2841,8 @@
 }
 
 .lp-x-text {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
   margin-block-start: 2px;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
