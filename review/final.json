@@ -1,0 +1,100 @@
+{
+  "mergeCommit": "39ac93250de1eea6f6179ee55abda767f29c33a3",
+  "productionDeployments": [
+    {
+      "deployment": 7502632787,
+      "environment": "peasant-labs / production",
+      "state": "in_progress",
+      "url": "https://railway.com/project/47e906cb-aef9-4c1f-a42e-e6e7edb82381?environmentId=d320722b-16ef-437d-a680-de88396dc65d"
+    },
+    {
+      "deployment": 7502632716,
+      "environment": "adaptable-motivation / production",
+      "state": "in_progress",
+      "url": "https://railway.com/project/13899d33-ccb2-419b-b240-d7577317ec5f?environmentId=139ec968-add3-4489-9250-ca5913de3e24"
+    }
+  ],
+  "localBuildId": "kLrC3y8y1TCzwNDo14wJq",
+  "loadedAssetMatches": 33,
+  "themeChecks": [
+    {
+      "theme": "light",
+      "screenOrigin": true,
+      "singlePersistentSheet": true,
+      "stableSheetEdges": true,
+      "positiveOrientation": true,
+      "softProviderTransition": true,
+      "providers": [
+        "claude",
+        "openai",
+        "cursor",
+        "claude"
+      ],
+      "noninteractive": true,
+      "reducedStatic": true,
+      "offscreenSuspension": true,
+      "nativeFilters": true,
+      "demoSwitches": true,
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "setupLink": {
+        "label": "more ways to install and run",
+        "href": "/docs#install"
+      },
+      "docsNavigation": true,
+      "overflow": 0
+    },
+    {
+      "theme": "dark",
+      "screenOrigin": true,
+      "singlePersistentSheet": true,
+      "stableSheetEdges": true,
+      "positiveOrientation": true,
+      "softProviderTransition": true,
+      "providers": [
+        "claude",
+        "openai",
+        "cursor",
+        "claude"
+      ],
+      "noninteractive": true,
+      "reducedStatic": true,
+      "offscreenSuspension": true,
+      "nativeFilters": true,
+      "demoSwitches": true,
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "setupLink": {
+        "label": "more ways to install and run",
+        "href": "/docs#install"
+      },
+      "docsNavigation": true,
+      "overflow": 0
+    }
+  ],
+  "independentReviews": {
+    "head": "5a2f5533da9841b3bd2f2c3d55bee704e45f62fa",
+    "axes": [
+      "A",
+      "B",
+      "C"
+    ],
+    "blockers": 0,
+    "important": 0,
+    "minor": 0,
+    "resolvedIssues": [
+      55
+    ]
+  },
+  "deploymentLimitations": [
+    {
+      "environment": "peasant-labs / production",
+      "state": "in_progress",
+      "note": "Deployment is still in progress."
+    },
+    {
+      "environment": "adaptable-motivation / production",
+      "state": "in_progress",
+      "note": "Deployment is still in progress."
+    }
+  ],
+  "cleanup": "Owned feature worktree, branch and proof server removed; synced and rebuilt main serves3314. Existing app/fixture services retained."
+}
