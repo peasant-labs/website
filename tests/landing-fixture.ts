@@ -16,7 +16,7 @@ export type LandingFixture = {
     lede: string;
     pillars: string[];
     tagRows: Array<{ width: number; rows: number[] }>;
-    flow: { agents: string[]; members: string[]; duration: number; rest: number; logoMinScreenRatio: { compact: number; wide: number }; sheetCount: number; providerOrder: string[]; visibilityCases: Array<{ name: string; target: string; property: string; value: string; hit: boolean; painted: boolean }>; compositionBoundary: number; boundaryWidths: number[]; marks: string[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; compact: boolean; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
+    flow: { agents: string[]; members: string[]; duration: number; rest: number; motionMaxStep: number; motionSampleMs: number; logoTransition: Array<{ name: string; time: number; provider: string; minOpacity: number; maxOpacity: number }>; logoMinScreenRatio: { compact: number; wide: number }; sheetCount: number; providerOrder: string[]; visibilityCases: Array<{ name: string; target: string; property: string; value: string; hit: boolean; painted: boolean }>; compositionBoundary: number; boundaryWidths: number[]; marks: string[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; compact: boolean; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };
@@ -117,6 +117,9 @@ export function loadLandingFixture(): LandingFixture {
   }
   if (JSON.stringify([...root.hero.flow.marks].sort()) !== JSON.stringify(["claude", "cursor", "openai"])) throw new Error("The computer must retain its three canonical provider marks.");
   if (JSON.stringify(root.hero.flow.agents) !== JSON.stringify(["Claude Code", "Codex", "Cursor"])) throw new Error("The illustration must name the three identities shown on its computer.");
+  if (JSON.stringify(root.hero.flow.logoTransition.map(row => row.name)) !== JSON.stringify(["outgoing", "faded", "seam", "entering", "returning", "ready"])) {
+    throw new Error("The provider fixture must retain the soft transition on both sides of the cycle seam.");
+  }
   const requiredJourneyFrames = ["screen", "emerging", "travel", "entered", "press", "delivery", "stamp", "settled"];
   if (JSON.stringify(root.hero.flow.visibilityCases.map((row) => row.name)) !== JSON.stringify(["transparent-sheet", "transparent-ancestor", "hidden-sheet"])) {
     throw new Error("The transcript fixture must reject transparent sheets, transparent ancestors and hidden sheets.");
