@@ -2,6 +2,7 @@
 
 import { BrandMark } from "@/components/fairtrade-client";
 import { HERO } from "@/lib/landing";
+import { useOnScreen, useReducedMotion } from "@/components/landing/use-motion";
 import { memo, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 
 type Point = readonly [number, number];
@@ -95,11 +96,13 @@ const Materials = memo(function Materials({ prefix }: { prefix: string }) {
 const Laptop = memo(function Laptop({ compact, draw }: { compact: boolean; draw: Drawing }) {
   const { face, box, shadow } = draw;
   const w = compact ? 47 : 96, h = compact ? 46 : 58, x = compact ? 13 : 30, y = compact ? 43 : 31, d = compact ? 4 : 6;
-  const size = compact ? 7 : 10, step = compact ? 13 : 21;
+  const size = compact ? 11 : 20, step = compact ? 13 : 25;
   return <g className="hf-laptop">
     {shadow(x - 6, 105, w + 17)}{box(x, y, w, h, 1, "cross")}
-    {face([[x + 4, y + 4], [x + w - 4, y + 4], [x + w - 4, y + h - 4], [x + 4, y + h - 4]], null)}
-    <g className="hf-screen-marks">{HERO.flow.agents.map((agent, i) => <g key={agent.mark} transform={`translate(${x + Math.round(w / 2) - step - Math.round(size / 2) + i * step} ${y + Math.round((h - size) / 2)})`}><BrandMark name={agent.mark} size={size} /></g>)}</g>
+    <g className="hf-screen">
+      {face([[x + 4, y + 4], [x + w - 4, y + 4], [x + w - 4, y + h - 4], [x + 4, y + h - 4]], null)}
+      <g className="hf-screen-marks">{HERO.flow.agents.map((agent, i) => <g key={agent.mark} transform={`translate(${x + Math.round(w / 2) - step - Math.round(size / 2) + i * step} ${y + Math.round((h - size) / 2)})`}><BrandMark name={agent.mark} size={size} /></g>)}</g>
+    </g>
     {face([[x, y + h + 1], [x + w, y + h + 1], [x + w - 2 * d, y + h + 2 * d + 1], [x - 2 * d, y + h + 2 * d + 1]], "dots")}
     {face([[x - 2 * d, y + h + 2 * d + 1], [x + w - 2 * d, y + h + 2 * d + 1], [x + w - 2 * d, y + h + 2 * d + 4], [x - 2 * d, y + h + 2 * d + 4]], "deep")}
     {face([[x + 9, y + h + 3], [x + w - 9, y + h + 3], [x + w - 15, y + h + 7], [x + 3, y + h + 7]], "check")}
@@ -153,7 +156,7 @@ function Workshop({ compact, draw, progress }: { compact: boolean; draw: Drawing
   const { x, w, px, pw, personX } = workshopPlan(compact), center = px + Math.round(pw * .5);
   const pressure = ease(phase(progress, .55, .64)) * (1 - ease(phase(progress, .68, .75)));
   const stamp = ease(phase(progress, .84, .89)) * (1 - ease(phase(progress, .92, .97)));
-  const turn = Math.sin(phase(progress, .52, .76) * Math.PI * 2) * 4, drop = Math.round(stamp * 3), reach = ease(phase(progress, .73, .82));
+  const turn = Math.sin(phase(progress, .52, .76) * Math.PI * 2) * 4, drop = Math.round(stamp * 3), reach = ease(phase(progress, .73, .82)) * (1 - ease(phase(progress, .95, 1)));
   const handX = Math.round(lerp(px + pw + 12, w + 4, reach)), handY = Math.round(lerp(75 - Math.round(turn), 93 + drop, reach));
   return <g className="hf-workshop" transform={`translate(${x} 0)`}>
     <WorkshopTimber compact={compact} draw={draw} />
@@ -182,53 +185,53 @@ function VillageScene({ compact, progress }: { compact: boolean; progress: numbe
     <Materials prefix={id} />
     <g className="hf-scene" transform={compact ? "scale(3)" : "translate(24 0) scale(3)"} shapeRendering="crispEdges">
       <Ground compact={compact} draw={draw} /><Laptop compact={compact} draw={draw} /><Workshop compact={compact} draw={draw} progress={progress} />
-      <g className="hf-manuscript" transform={`translate(${x} 100)`} opacity={progress > .02 ? 1 : 0}>
+      <g className="hf-manuscript" transform={`translate(${x} 100)`} opacity={ease(phase(progress, .02, .06)) * (1 - ease(phase(progress, .97, 1)))}>
         <Manuscript draw={draw} /><path data-part="approval-seal" d="M18 -2h3v2h-3z" fill={AMBER} opacity={progress >= .89 ? 1 : 0} />
       </g>
     </g>
   </svg>;
 }
 
-/** One bounded, opt-in handoff. The logo-only computer and village stay planted. */
+/** The printshop repeats while visible; the computer and villagers stay planted. */
 export function HeroFlow() {
-  const ref = useRef<HTMLDivElement>(null), frame = useRef(REST), last = useRef(0), raf = useRef(0);
-  const [progress, setProgress] = useState(REST), [playing, setPlaying] = useState(false), [played, setPlayed] = useState(false), [reduced, setReduced] = useState(false);
-  const update = (value: number) => { frame.current = value; setProgress(value); };
+  const ref = useRef<HTMLDivElement>(null), frame = useRef(0);
+  const [progress, setProgress] = useState(0), [paused, setPaused] = useState(false);
+  const reduced = useReducedMotion(), onScreen = useOnScreen(ref, 0);
+  const playing = onScreen && !reduced && !paused;
   useEffect(() => {
-    const media = matchMedia("(prefers-reduced-motion: reduce)");
-    const preference = () => { setReduced(media.matches); setPlaying(false); };
-    preference(); media.addEventListener("change", preference);
-    const visibility = () => { if (document.hidden) setPlaying(false); };
-    document.addEventListener("visibilitychange", visibility);
-    const observer = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting) setPlaying(false); }, { threshold: 0 });
-    if (ref.current) observer.observe(ref.current);
-    return () => { media.removeEventListener("change", preference); document.removeEventListener("visibilitychange", visibility); observer.disconnect(); };
-  }, []);
-  useEffect(() => {
-    last.current = 0;
-    if (!playing || reduced) return;
+    if (!playing) return;
+    let previous: number | undefined, raf = 0;
     const tick = (now: number) => {
-      if (last.current) {
-        frame.current = Math.min(1, frame.current + (now - last.current) / DURATION);
+      if (previous !== undefined) {
+        frame.current = (frame.current + (now - previous) / DURATION) % 1;
         setProgress(frame.current);
       }
-      last.current = now;
-      if (frame.current >= 1) setPlaying(false);
-      else raf.current = requestAnimationFrame(tick);
+      previous = now;
+      raf = requestAnimationFrame(tick);
     };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [playing, reduced]);
-  const activate = () => {
-    if (reduced) { setPlaying(false); update(!played ? .2 : frame.current >= .99 ? 0 : Math.min(1, frame.current + .2)); setPlayed(true); }
-    else if (playing) setPlaying(false);
-    else { if (!played || frame.current >= 1) update(0); setPlayed(true); setPlaying(true); }
-  };
-  const label = reduced ? "step motion" : playing ? "pause motion" : played && progress >= 1 ? "replay motion" : "play motion";
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [playing]);
+  const shown = reduced ? REST : progress;
   return <div className="hf-panel" ref={ref}>
-    <div className="hf" data-playing={playing ? "true" : "false"} data-progress={progress.toFixed(3)}>
-      <div className="hf-picture" role="img" aria-label={HERO.flow.label}><VillageScene compact={false} progress={progress} /><VillageScene compact progress={progress} /></div>
+    <div
+      className="hf"
+      data-playing={playing ? "true" : "false"}
+      data-progress={shown.toFixed(3)}
+      role={reduced ? undefined : "button"}
+      tabIndex={reduced ? undefined : 0}
+      aria-label={reduced ? undefined : paused ? "resume village animation" : "pause village animation"}
+      aria-description={reduced ? undefined : HERO.flow.label}
+      aria-pressed={reduced ? undefined : paused}
+      onClick={reduced ? undefined : () => setPaused((value) => !value)}
+      onKeyDown={reduced ? undefined : (event) => {
+        if (event.key === "Escape") setPaused(true);
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        setPaused((value) => !value);
+      }}
+    >
+      <div className="hf-picture" role="img" aria-label={HERO.flow.label}><VillageScene compact={false} progress={shown} /><VillageScene compact progress={shown} /></div>
     </div>
-    <button type="button" className="hf-play" aria-pressed={playing} onClick={activate}>{label}</button>
   </div>;
 }

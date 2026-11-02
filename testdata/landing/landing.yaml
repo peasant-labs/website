@@ -42,12 +42,11 @@ hero:
     members: [back-reader, front-reader, printer]
     duration: 8000
     rest: 0.9
-    reducedStep: 0.2
-    buttonTarget: 44
+    logoMinScreenRatio: { compact: 0.23, wide: 0.19 }
     compositionBoundary: 620
     boundaryWidths: [599, 600, 619, 620, 651, 652, 684]
     marks: [claude, cursor, openai]
-    motionLabels: [play motion, pause motion, replay motion, step motion]
+    motionLabels: [pause village animation, resume village animation]
     journeyFrames:
       - { name: feed, time: 1600 }
       - { name: travel, time: 3200 }
@@ -187,6 +186,7 @@ session:
         - { name: compact laptop, width: 1024, filtersAvailable: true, filtersMode: drawer }
         - { name: stacked tablet, width: 768, filtersAvailable: true, filtersMode: drawer }
     overlap: { minRatio: 0.05, maxRatio: 0.12 }
+    depth: { minTopGap: 24, minHeightGap: 64, minRaise: 8, maxRaise: 16, settle: 400, maxReducedDuration: 0.01 }
     activationModes: [hover, click, focus]
     motion: [no-preference, reduce]
     themes: [light, dark]

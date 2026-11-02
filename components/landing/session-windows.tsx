@@ -16,7 +16,7 @@ type Window = "term" | "front" | "x";
 
 /**
  * The recording and shared link sit partly behind the main transcript on a
- * horizontal desktop stage. Activating a window changes only its layer.
+ * staggered horizontal stage. Activating a window brings it up and forward.
  * Narrower containers stack them; phones retain the readable slice.
  */
 export function SessionWindows({ children }: { children: ReactNode }) {
@@ -30,7 +30,7 @@ export function SessionWindows({ children }: { children: ReactNode }) {
     onClick: () => setFront(which),
   });
 
-  // They fan out once, the first time a fifth of the group is on screen.
+  // The supporting windows fan out once as the group enters the screen.
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
