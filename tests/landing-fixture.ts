@@ -16,7 +16,7 @@ export type LandingFixture = {
     lede: string;
     pillars: string[];
     tagRows: Array<{ width: number; rows: number[] }>;
-    flow: { agents: string[]; members: string[]; duration: number; rest: number; reducedStep: number; buttonTarget: number; compositionBoundary: number; boundaryWidths: number[]; marks: string[]; motionLabels: string[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; compact: boolean; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
+    flow: { agents: string[]; members: string[]; duration: number; rest: number; logoMinScreenRatio: { compact: number; wide: number }; compositionBoundary: number; boundaryWidths: number[]; marks: string[]; motionLabels: string[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; compact: boolean; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };
@@ -62,6 +62,7 @@ export type LandingFixture = {
       minLayeredWidth: number;
       controls: { bodyFont: string; cases: Array<{ name: string; width: number; filtersAvailable: boolean; filtersMode: "drawer" | "rail" }>; minProseWidth: number };
       overlap: { minRatio: number; maxRatio: number };
+      depth: { minTopGap: number; minHeightGap: number; minRaise: number; maxRaise: number; settle: number; maxReducedDuration: number };
       activationModes: Array<"hover" | "click" | "focus">;
       motion: Array<"no-preference" | "reduce">;
       themes: Array<"light" | "dark">;
