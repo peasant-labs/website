@@ -16,7 +16,7 @@ export type LandingFixture = {
     lede: string;
     pillars: string[];
     tagRows: Array<{ width: number; rows: number[] }>;
-    flow: { agents: string[]; members: string[]; duration: number; rest: number; logoMinScreenRatio: { compact: number; wide: number }; feed: { earlyFrames: Array<{ name: string; time: number }>; lateFrames: Array<{ name: string; time: number }>; maxVisibleSheets: number; minVisibleWidth: number }; compositionBoundary: number; boundaryWidths: number[]; marks: string[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; compact: boolean; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
+    flow: { agents: string[]; members: string[]; duration: number; rest: number; logoMinScreenRatio: { compact: number; wide: number }; sheetCount: number; providerOrder: string[]; visibilityCases: Array<{ name: string; target: string; property: string; value: string; hit: boolean; painted: boolean }>; compositionBoundary: number; boundaryWidths: number[]; marks: string[]; journeyFrames: Array<{ name: string; time: number }>; layouts: Array<{ name: string; interaction: boolean; width: number; colorScheme: "light" | "dark"; compact: boolean; titleLines: string[]; missionBeside: boolean; missionArtMax: number }> };
     primary: { label: string; target: string };
     secondary: { label: string; target: string };
   };
@@ -47,7 +47,6 @@ export type LandingFixture = {
     actions: string[];
     agents: string[];
     guide: Link;
-    installGuide: Link;
     phoneWidths: number[];
     copyTarget: number;
   };
@@ -118,10 +117,12 @@ export function loadLandingFixture(): LandingFixture {
   }
   if (JSON.stringify([...root.hero.flow.marks].sort()) !== JSON.stringify(["claude", "cursor", "openai"])) throw new Error("The computer must retain its three canonical provider marks.");
   if (JSON.stringify(root.hero.flow.agents) !== JSON.stringify(["Claude Code", "Codex", "Cursor"])) throw new Error("The illustration must name the three identities shown on its computer.");
-  const requiredJourneyFrames = ["feed", "travel", "press", "delivery", "stamp", "settled"];
-  if (JSON.stringify(root.hero.flow.feed.earlyFrames.map((frame) => frame.name)) !== JSON.stringify(["tip", "emerging", "leaving"])
-    || JSON.stringify(root.hero.flow.feed.lateFrames.map((frame) => frame.name)) !== JSON.stringify(["during-press", "after-press"])) {
-    throw new Error("The feed fixture must retain visible emergence and continued flow through the print cycle.");
+  const requiredJourneyFrames = ["screen", "emerging", "travel", "entered", "press", "delivery", "stamp", "settled"];
+  if (JSON.stringify(root.hero.flow.visibilityCases.map((row) => row.name)) !== JSON.stringify(["transparent-sheet", "transparent-ancestor", "hidden-sheet"])) {
+    throw new Error("The transcript fixture must reject transparent sheets, transparent ancestors and hidden sheets.");
+  }
+  if (JSON.stringify(root.hero.flow.providerOrder) !== JSON.stringify(["claude", "openai", "cursor"])) {
+    throw new Error("Each completed transcript must advance the actual provider glyph in order.");
   }
   if (JSON.stringify([...root.hero.flow.members].sort()) !== JSON.stringify(["back-reader", "front-reader", "printer"])) throw new Error("The village must retain its printer and both readers.");
   const requiredGraphs = ["landing-light", "landing-dark", "projects-light", "projects-dark"];

@@ -43,26 +43,25 @@ hero:
     duration: 8000
     rest: 0.9
     logoMinScreenRatio: { compact: 0.23, wide: 0.19 }
-    feed:
-      earlyFrames:
-        - { name: tip, time: 96 }
-        - { name: emerging, time: 320 }
-        - { name: leaving, time: 640 }
-      lateFrames:
-        - { name: during-press, time: 5200 }
-        - { name: after-press, time: 5600 }
-      maxVisibleSheets: 2
-      minVisibleWidth: 1
+    # One physical sheet per cycle is the visual contract, from screen to stamp.
+    sheetCount: 1
+    providerOrder: [claude, openai, cursor]
+    visibilityCases:
+      - { name: transparent-sheet, target: .hf-transcript, property: opacity, value: "0", hit: true, painted: false }
+      - { name: transparent-ancestor, target: .hf-scene, property: opacity, value: "0", hit: true, painted: false }
+      - { name: hidden-sheet, target: .hf-transcript, property: visibility, value: hidden, hit: false, painted: false }
     compositionBoundary: 620
     boundaryWidths: [599, 600, 619, 620, 651, 652, 684]
     marks: [claude, cursor, openai]
     journeyFrames:
-      - { name: feed, time: 1600 }
+      - { name: screen, time: 960 }
+      - { name: emerging, time: 2400 }
       - { name: travel, time: 3200 }
+      - { name: entered, time: 4000 }
       - { name: press, time: 4800 }
       - { name: delivery, time: 6400 }
       - { name: stamp, time: 7200 }
-      - { name: settled, time: 8000 }
+      - { name: settled, time: 7600 }
     # Relative geometry protects a compact wide scene and the readable phone arrangement.
     layouts:
       - { name: phone-light, interaction: true, width: 390, colorScheme: light, compact: true, titleLines: [the open-source, commons for, agent transcripts], missionBeside: false, missionArtMax: 224 }
@@ -172,8 +171,7 @@ install:
   prompt: Open this session in Peasant.
   actions: [paste in your terminal, ask your agent]
   agents: [Claude Code, Codex, Cursor, OpenCode, Pi, Strike]
-  guide: { label: read our docs, href: /docs }
-  installGuide: { label: read the install guide, href: "/docs#install" }
+  guide: { label: more ways to install and run, href: "/docs#install" }
   phoneWidths: [390, 360, 320]
   copyTarget: 44
 

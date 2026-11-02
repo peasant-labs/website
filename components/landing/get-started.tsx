@@ -91,8 +91,8 @@ export function GetStarted({ showGuide = true }: { showGuide?: boolean } = {}) {
           }))}
         />
       </div>
-      {showGuide && <Link className="gs-guide" href={INSTALL.installGuide.href}>
-        {INSTALL.installGuide.label}
+      {showGuide && <Link className="gs-guide" href={INSTALL.guide.href}>
+        {INSTALL.guide.label}
         <ArrowRight aria-hidden="true" focusable="false" />
       </Link>}
     </>
