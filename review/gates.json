@@ -1,0 +1,19 @@
+{
+  "head": "d83fb26f6e6ce630ab9b7fde08d507374685b588",
+  "checks": {
+    "build": "pass",
+    "typescript": "pass",
+    "lint": "pass; six existing projects test warnings",
+    "installer": "pass",
+    "browser": "182 passed (6.7m), standard single-worker Chromium dark/clipboard settings on frozen build",
+    "visual": "12 mounted images individually inspected; desktop/phone, both themes;30 served asset matches; early and late visible feed; artwork has no interaction"
+  },
+  "existingDiagnostic": "The blog missing-post404 check logs Next NoFallbackError, also present on prior head; expected404 assertion passes. No branch-caused test failure.",
+  "logs": {
+    "build.log": "45b3f19315a89766f845e94340637de80e493be64274a6974fcb1157370f9f54",
+    "lint.log": "a578a14e8ec703510cd0b9c356be580002b1e3c49ecf68c5edd6f7e2fe19678f",
+    "tsc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "installer.log": "355515c00a183683bd9015245a2fbbf86256a8e0d09668ab57f11ce0664c104d",
+    "browser.log": "34518259234fcf4bc29a94ee34e49744dd45e1fc7128bcdf5503ce67990c5fec"
+  }
+}

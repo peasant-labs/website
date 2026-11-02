@@ -1,0 +1,249 @@
+{
+  "head": "d83fb26f6e6ce630ab9b7fde08d507374685b588",
+  "buildId": "8beoWg1X0hOknUtU2PB2Z",
+  "assets": {
+    "/_next/static/css/e1ca4a7f35ff7017.css": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+    "/_next/static/css/508d11f51c7fa509.css": "cb71b7bbdecce851ec4544732615e532ec2232e7d6805d7fb3a98e9657a335fa",
+    "/_next/static/css/d065d856523d0d9b.css": "2d57cf93e4bee096284f9b891088a2aee47acb708a090ba8d0bf32f4b41fd67a",
+    "/_next/static/css/f505c5205671eb79.css": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+    "/_next/static/css/279f976604053b12.css": "206a93648dcb8c33ffd2356363d597ae0ea36070e9fa6834f46000aeb3afd648",
+    "/_next/static/css/6d9d8256903444dc.css": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+    "/_next/static/css/acd68af486ce2177.css": "0a2e6f40933b7ee5a455fdf1577a3d1280f725c0674d84e738fa0659964450b2",
+    "/_next/static/chunks/webpack-fd248d5099ef9ade.js": "6fd6dbc59a171869117a8c7bd044d3b2eef4a42ff2fc199585d2abaa4f49ed0a",
+    "/_next/static/chunks/18bad13d-801de1ca2fb94551.js": "b91198d73599cb60bf5795912a75f284e125aa0c50415123468f1e5c04702b28",
+    "/_next/static/chunks/368-ce6821a876415a95.js": "f96dc70fc8fdb29f59a0c78f98fef9825a9049610760a81a3c275c77a3569c79",
+    "/_next/static/chunks/main-app-e6e6b62aa0266f07.js": "9b8c49e7c2d00f05cb8b77fcf49707209ebe1a8d74ab4cc9174236aa6b902d40",
+    "/_next/static/chunks/app/layout-553243c55ad8f724.js": "bf90447632aff9cc8b38208c1c5963f9487f1c14f1a1d23acc139d44c78251b1",
+    "/_next/static/chunks/335b9414-c3298510c80fa84c.js": "b804937546a4a95b6878e5799ecbeaaa73892e1c541d7314e01ad938524910a3",
+    "/_next/static/chunks/f777d375-e7c98ff759489d2c.js": "4fb0f61479b6cd0e91ba0a509e0ebfc346662fcf120da6fef33554cf391ef4ea",
+    "/_next/static/chunks/77d3b4b7-0a729972948fb933.js": "ad82774d90e788369445f49065c50ef5b7e4d2ae8244eb5e9934b21f65754c51",
+    "/_next/static/chunks/349-b2c0f7af17e850aa.js": "2fff72ebafc4a3fa5c489f51f4142beb9795e2dd4b4b29611334df8bcdd33eff",
+    "/_next/static/chunks/2167-e2a28884c56d2c6d.js": "b40a510225f66908c7102d2472807b3ee434f411d284c1307b02a026f7889fe4",
+    "/_next/static/chunks/7686-0706444e566035c8.js": "d526ccfdc9b0608cf42b067491ac567a0fce135dc00e098cd373b446eb6bc8a7",
+    "/_next/static/chunks/app/error-c5d63d623509e25e.js": "a24ae9fcee9bc0cd4766966e280e1251e0e20c0000f0503de8fb6dfb829f161d",
+    "/_next/static/chunks/9216-f8398bede6a99f77.js": "4a1996899eca169a8fb3e302f5a1a11ec728ccf0e56ff0f2c3fb9b57fb663467",
+    "/_next/static/chunks/6716-53ebfd668b8bd83e.js": "490c6af45a414ad6a644701c53d85157c2151e60e4aa07a7d65111b0e8fd85c9",
+    "/_next/static/chunks/9793-15faa5777e10f6a8.js": "fafff47d01d0bbb3f92eb5a546acb65a509fd9a44b8378b775766f815292bc44",
+    "/_next/static/chunks/app/page-e7c7f1e58615cc8a.js": "5646cd814cc31d59b0c22171afeede472b5613ba6be3cefbda3c5e272adc05a8",
+    "/_next/static/chunks/app/global-error-f6a57ef74b902cf3.js": "94328bd8ac4525c90896bb82a7186b7fd41a6dbb662fd4bec4d1a5c534adef4f",
+    "/_next/static/css/640d3b3894fc812f.css": "16b63888a36cd181093065e3e060058a96fd6bd256910545366ba0af14ecf72a",
+    "/_next/static/chunks/app/blog/layout-102f8f472bdf80c6.js": "6ad35b5da8adc45abdef350483dae50c9b0fe8ffc7e0f89ba1bc360f6ebaf4e4",
+    "/_next/static/chunks/app/blog/page-77f4bed6a1182642.js": "d601f27ac9372f3bd41198efada04873db5fd9dfcacf4c6e71cf86307d5ca675",
+    "/_next/static/chunks/1100-8425c44dd2fb05d7.js": "e007cada21d224fdb7082b27409a51cb292c481d30ebc29b28390711d239d420",
+    "/_next/static/chunks/app/docs/layout-9b7c4fcb1c7d6c60.js": "b74ba28f26fae4a504b1e9258ce6135229579be2804bddf39e6794758a47f03f",
+    "/_next/static/chunks/app/docs/page-3343800aa7b2c2c8.js": "1b8a94b61763bc8aaff8df42e0eb6a4fb50c30462c5f41bc5086dd34fb248f66"
+  },
+  "images": [
+    {
+      "file": "emergence-phone-light.png",
+      "sha256": "51cd28e603f196db25c0c5ebab53e52f3bc56f1d4d962ecd7ba4eacdba5286cd"
+    },
+    {
+      "file": "hero-phone-light.png",
+      "sha256": "67fcd09290619be42bc11c25501d8ede5d0dab607f49e63188d248679012a020"
+    },
+    {
+      "file": "flow-during-print-phone-light.png",
+      "sha256": "24f30f3daf9518f10a0213b044d5f397cddb2cd7f429c80e13b7f05133565bf7"
+    },
+    {
+      "file": "emergence-phone-dark.png",
+      "sha256": "7d6ee11c5c2d98bca301995eafd856d4733f56f54dedb6b2e33b9c389775db72"
+    },
+    {
+      "file": "hero-phone-dark.png",
+      "sha256": "8316f9c47282f7fa98d77d502cf0f1906b04f5f351f95031414401700206a9d2"
+    },
+    {
+      "file": "flow-during-print-phone-dark.png",
+      "sha256": "4165a0621a27b295eec5cfd356b63693b981ca5fd1e578eb5dc255741598fef0"
+    },
+    {
+      "file": "emergence-desktop-light.png",
+      "sha256": "6f0a624c9cdede385b8131e34f3d3495b92b9eb0d78cd8cd5258cb6710e0b189"
+    },
+    {
+      "file": "hero-desktop-light.png",
+      "sha256": "cc1bec41b4068c74b9d0c0a8080585ce084704d3f3ab83455d171fbc13394ffc"
+    },
+    {
+      "file": "flow-during-print-desktop-light.png",
+      "sha256": "54dbab19799ee979f285df3d591678580bf02618119e3c7864fbba4d12e524ab"
+    },
+    {
+      "file": "emergence-desktop-dark.png",
+      "sha256": "95551533b38d8cf78e70e818865add434e58ddbdf0fceb77f38e3558bed67254"
+    },
+    {
+      "file": "hero-desktop-dark.png",
+      "sha256": "9cf7174c0e520c9ac12dc3dcabb8c9a629807a36b7d2af04df2b5c402fcb7e54"
+    },
+    {
+      "file": "flow-during-print-desktop-dark.png",
+      "sha256": "588703f9a9a93e80e032b49247f6b56a52946ae89979ee71a174e2801143099f"
+    }
+  ],
+  "results": [
+    {
+      "case": "phone-light",
+      "geometry": {
+        "bounds": [
+          15,
+          33,
+          453,
+          314.1300048828125
+        ],
+        "viewBox": [
+          480,
+          360
+        ],
+        "feed": [
+          {
+            "transform": "translate(55.38475000000015 100) scale(0.6)",
+            "box": [
+              0,
+              -5,
+              36,
+              6
+            ]
+          },
+          {
+            "transform": "translate(85.88475000000015 100) scale(0.6)",
+            "box": [
+              0,
+              -5,
+              36,
+              6
+            ]
+          }
+        ]
+      },
+      "noninteractive": true,
+      "clickKeepsFlowing": true,
+      "latePhaseFeed": true,
+      "reducedStatic": true,
+      "overflow": 0
+    },
+    {
+      "case": "phone-dark",
+      "geometry": {
+        "bounds": [
+          15,
+          33,
+          453,
+          314.1300048828125
+        ],
+        "viewBox": [
+          480,
+          360
+        ],
+        "feed": [
+          {
+            "transform": "translate(55.354250000000164 100) scale(0.6)",
+            "box": [
+              0,
+              -5,
+              36,
+              6
+            ]
+          },
+          {
+            "transform": "translate(85.85425000000018 100) scale(0.6)",
+            "box": [
+              0,
+              -5,
+              36,
+              6
+            ]
+          }
+        ]
+      },
+      "noninteractive": true,
+      "clickKeepsFlowing": true,
+      "latePhaseFeed": true,
+      "reducedStatic": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-light",
+      "geometry": {
+        "bounds": [
+          45,
+          33,
+          903.8999633789062,
+          314.5199890136719
+        ],
+        "viewBox": [
+          960,
+          360
+        ],
+        "feed": [
+          {
+            "transform": "translate(131.74125000000032 100) scale(0.8)",
+            "box": [
+              0,
+              -5,
+              36,
+              6
+            ]
+          },
+          {
+            "transform": "translate(189.24125000000032 100) scale(0.8)",
+            "box": [
+              0,
+              -5,
+              36,
+              6
+            ]
+          }
+        ]
+      },
+      "noninteractive": true,
+      "clickKeepsFlowing": true,
+      "latePhaseFeed": true,
+      "reducedStatic": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-dark",
+      "geometry": {
+        "bounds": [
+          45,
+          33,
+          903.8999633789062,
+          314.5199890136719
+        ],
+        "viewBox": [
+          960,
+          360
+        ],
+        "feed": [
+          {
+            "transform": "translate(131.97125000000028 100) scale(0.8)",
+            "box": [
+              0,
+              -5,
+              36,
+              6
+            ]
+          },
+          {
+            "transform": "translate(189.47125000000028 100) scale(0.8)",
+            "box": [
+              0,
+              -5,
+              36,
+              6
+            ]
+          }
+        ]
+      },
+      "noninteractive": true,
+      "clickKeepsFlowing": true,
+      "latePhaseFeed": true,
+      "reducedStatic": true,
+      "overflow": 0
+    }
+  ],
+  "errors": []
+}
