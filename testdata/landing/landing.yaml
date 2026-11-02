@@ -43,10 +43,19 @@ hero:
     duration: 8000
     rest: 0.9
     logoMinScreenRatio: { compact: 0.23, wide: 0.19 }
+    feed:
+      earlyFrames:
+        - { name: tip, time: 96 }
+        - { name: emerging, time: 320 }
+        - { name: leaving, time: 640 }
+      lateFrames:
+        - { name: during-press, time: 5200 }
+        - { name: after-press, time: 5600 }
+      maxVisibleSheets: 2
+      minVisibleWidth: 1
     compositionBoundary: 620
     boundaryWidths: [599, 600, 619, 620, 651, 652, 684]
     marks: [claude, cursor, openai]
-    motionLabels: [pause village animation, resume village animation]
     journeyFrames:
       - { name: feed, time: 1600 }
       - { name: travel, time: 3200 }

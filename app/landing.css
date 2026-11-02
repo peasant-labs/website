@@ -265,7 +265,6 @@
 .hf-wide { display: none; }
 .hf-screen-marks { color: var(--hf-ink); }
 .hf-screen-marks .brand { fill: currentColor; }
-.hf[role="button"] { cursor: pointer; }
 @container (min-width: 38.75rem) {
   .hf-picture { aspect-ratio: 960 / 360; }
   .hf-wide { display: block; }

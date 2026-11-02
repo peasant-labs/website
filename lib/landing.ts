@@ -44,7 +44,7 @@ export const HERO = {
   /* The accessible description follows the computer-to-printing-workshop scene. */
   flow: {
     label:
-      "A modern computer displays the Claude Code, Codex and Cursor logos. One manuscript travels low to a medieval timber printing press, where a printer stamps it beside two village readers.",
+      "A modern computer displays the Claude Code, Codex and Cursor logos. Manuscript sheets flow from the computer into a medieval timber printing press, where a printer stamps a page beside two village readers.",
     agents: [
       { mark: "claude", name: "Claude Code" },
       { mark: "codex", name: "Codex" },

@@ -1,8 +1,35 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 import { loadLandingFixture, PHONE } from "./landing-fixture";
 import { openViewerFilters } from "./landing-viewer";
 
 const fixture = loadLandingFixture();
+
+async function feedGeometry(art: Locator) {
+  return art.evaluate((svg) => {
+    const feed = svg.querySelector(".hf-feed") as SVGGElement;
+    const clip = feed.querySelector("clipPath rect") as SVGRectElement;
+    const matrix = feed.getScreenCTM()!;
+    const start = new DOMPoint(clip.x.baseVal.value, clip.y.baseVal.value).matrixTransform(matrix);
+    const end = new DOMPoint(clip.x.baseVal.value + clip.width.baseVal.value, clip.y.baseVal.value + clip.height.baseVal.value).matrixTransform(matrix);
+    const sheets = [...feed.querySelectorAll<SVGGElement>(".hf-feed-sheet")].map((sheet) => {
+      const bounds = sheet.getBoundingClientRect(), path = sheet.querySelector("path") as SVGGeometryElement;
+      const inverse = path.getScreenCTM()!.inverse();
+      const left = Math.max(bounds.left, start.x), right = Math.min(bounds.right, end.x);
+      const top = Math.max(bounds.top, start.y), bottom = Math.min(bounds.bottom, end.y);
+      let painted = false;
+      for (let x = 1; x < 8 && !painted; x++) for (let y = 1; y < 8 && !painted; y++) {
+        const point = new DOMPoint(left + (right - left) * x / 8, top + (bottom - top) * y / 8);
+        if (right > left && bottom > top && path.isPointInFill(point.matrixTransform(inverse))) {
+          painted = document.elementFromPoint(point.x, point.y)?.closest(".hf-feed-sheet") === sheet;
+        }
+      }
+      return { left: bounds.left, visibleWidth: Math.max(0, Math.min(bounds.right, end.x) - Math.max(bounds.left, start.x)), painted };
+    });
+    const computer = svg.querySelector(".hf-laptop")!.getBoundingClientRect();
+    const screen = svg.querySelector(".hf-screen")!.getBoundingClientRect();
+    return { input: { left: start.x, right: end.x, top: start.y }, computer: { left: computer.left, right: computer.right, width: computer.width }, screenBottom: screen.bottom, sheets };
+  });
+}
 
 test("on a phone the header is the mark and one menu button, and the menu behaves", async ({ browser }) => {
   const context = await browser.newContext(PHONE);
@@ -388,7 +415,21 @@ for (const { name, width, colorScheme, compact } of fixture.hero.flow.layouts) {
     // Observe the same print cycle at each responsive size, including the seam.
     const current = Number(await flow.getAttribute("data-progress"));
     await page.clock.runFor((1 - current) * fixture.hero.flow.duration);
-    let elapsed = 0;
+    let elapsed = 0, previousLeft = -Infinity, previousVisible = 0;
+    for (const frame of fixture.hero.flow.feed.earlyFrames) {
+      await page.clock.runFor(frame.time - elapsed);
+      elapsed = frame.time;
+      const feed = await feedGeometry(art), sheet = feed.sheets[0];
+      expect(feed.input.left, "paper exits within the computer's right edge").toBeGreaterThan(feed.computer.left + feed.computer.width / 2);
+      expect(feed.input.left).toBeLessThan(feed.computer.right);
+      expect(feed.input.top, "paper does not cover provider logos").toBeGreaterThan(feed.screenBottom);
+      expect(sheet.left, `${frame.name} is still emerging from inside the computer`).toBeLessThan(feed.input.left);
+      expect(sheet.left, `${frame.name} travels towards the press`).toBeGreaterThan(previousLeft);
+      expect(sheet.visibleWidth, `${frame.name} reveals more paper rather than fading beside the laptop`).toBeGreaterThan(previousVisible);
+      expect(sheet.visibleWidth).toBeGreaterThanOrEqual(fixture.hero.flow.feed.minVisibleWidth);
+      expect(sheet.painted, `${frame.name} is actually painted at the output`).toBe(true);
+      previousLeft = sheet.left; previousVisible = sheet.visibleWidth;
+    }
     for (const frame of fixture.hero.flow.journeyFrames) {
       await page.clock.runFor(frame.time - elapsed + (elapsed === 0 ? 32 : 0));
       elapsed = frame.time;
@@ -399,14 +440,30 @@ for (const { name, width, colorScheme, compact } of fixture.hero.flow.layouts) {
       expect(escaped, `the full artwork stays inside its viewBox at ${name}, ${frame.name}`).toBe(false);
       expect(await members.evaluateAll((nodes) => nodes.map((node) => { const svg = node as SVGGraphicsElement, matrix = svg.getCTM()!, bounds = svg.getBBox(); return { bounds: [bounds.x, bounds.y, bounds.width, bounds.height], matrix: [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f] }; })), `people stay planted during ${frame.name}`).toEqual(anchored);
       expect(await flow.evaluate((node) => ({ width: node.clientWidth, height: node.clientHeight })), `the picture does not resize during ${frame.name}`).toEqual(before);
-      if (frame.name === "press") await expect(art.locator('[data-part="press-platen"]')).not.toHaveAttribute("transform", "translate(0 0)");
+      const feed = await feedGeometry(art);
+      expect(feed.sheets.filter((sheet) => sheet.painted).length, `paper remains visible during ${frame.name}`).toBeGreaterThan(0);
+      expect(feed.sheets.length).toBeLessThanOrEqual(fixture.hero.flow.feed.maxVisibleSheets);
+      if (frame.name === "press") {
+        await expect(art.locator('[data-part="press-platen"]')).not.toHaveAttribute("transform", "translate(0 0)");
+        let previous = -Infinity;
+        for (const late of fixture.hero.flow.feed.lateFrames) {
+          await page.clock.runFor(late.time - elapsed); elapsed = late.time;
+          const current = await feedGeometry(art);
+          expect(current.sheets[0].left, `feed continues ${late.name}`).toBeGreaterThan(previous);
+          expect(current.sheets.some((sheet) => sheet.painted)).toBe(true);
+          previous = current.sheets[0].left;
+        }
+      }
       if (frame.name === "stamp") {
         await expect(art.locator('[data-part="approval-stamp"]')).toHaveAttribute("transform", "translate(0 3)");
         await expect(art.locator('[data-part="approval-seal"]')).toHaveAttribute("opacity", "1");
       }
     }
+    // Advance past the boundary's final animation frame before checking the new cycle.
+    await page.clock.runFor(32);
     await expect(flow).toHaveAttribute("data-playing", "true");
     expect(Number(await flow.getAttribute("data-progress"))).toBeLessThan(.02);
+    expect((await feedGeometry(art)).sheets.some((sheet) => sheet.painted), "output remains visible across the loop seam").toBe(true);
     await page.clock.runFor(fixture.hero.flow.duration + fixture.hero.flow.journeyFrames[0].time);
     expect(Number(await flow.getAttribute("data-progress"))).toBeCloseTo(fixture.hero.flow.journeyFrames[0].time / fixture.hero.flow.duration, 1);
     await expect(flow).toHaveAttribute("data-playing", "true");
@@ -440,29 +497,23 @@ test("the village loops automatically, suspends out of view and offers a static 
   await expect(panel.locator(".hf-play")).toHaveCount(0);
   await page.clock.pauseAt(new Date(await page.evaluate(() => Date.now() + 100)));
   const first = Number(await flow.getAttribute("data-progress"));
-  const manuscript = await art.locator(".hf-manuscript").getAttribute("transform");
+  await expect(flow).not.toHaveAttribute("role", "button");
+  await expect(flow).not.toHaveAttribute("tabindex", "0");
+  await expect(panel.getByRole("button")).toHaveCount(0);
+  await expect(panel.locator("[tabindex]")).toHaveCount(0);
+  expect(await flow.evaluate((node) => getComputedStyle(node).cursor)).not.toBe("pointer");
+  const manuscript = await art.locator(".hf-feed-sheet").first().getAttribute("transform");
   await page.clock.runFor(fixture.hero.flow.duration + 1600);
   const next = Number(await flow.getAttribute("data-progress"));
   expect(next).toBeCloseTo((first + .2) % 1, 1);
-  await expect(art.locator(".hf-manuscript")).not.toHaveAttribute("transform", manuscript!);
+  await expect(art.locator(".hf-feed-sheet").first()).not.toHaveAttribute("transform", manuscript!);
   await expect(flow).toHaveAttribute("data-playing", "true");
 
-  // The artwork is the pause target, without a separate visible playback button.
-  await expect(flow).toHaveAccessibleName(fixture.hero.flow.motionLabels[0]);
-  await flow.focus();
-  await page.keyboard.press("Enter");
-  await expect(flow).toHaveAccessibleName(fixture.hero.flow.motionLabels[1]);
-  const paused = await flow.getAttribute("data-progress");
-  await page.clock.runFor(1000);
-  await expect(flow).toHaveAttribute("data-progress", paused!);
-  await page.keyboard.press(" ");
-  await expect(flow).toHaveAttribute("data-playing", "true");
-  await page.clock.runFor(1000);
-  expect(Number(await flow.getAttribute("data-progress"))).toBeCloseTo((Number(paused) + .125) % 1, 1);
+  const beforeClick = Number(await flow.getAttribute("data-progress"));
   await flow.click();
-  await expect(flow).toHaveAttribute("data-playing", "false");
-  await flow.click();
+  await page.clock.runFor(1000);
   await expect(flow).toHaveAttribute("data-playing", "true");
+  expect(Number(await flow.getAttribute("data-progress"))).toBeCloseTo((beforeClick + .125) % 1, 1);
 
   await page.locator("#install").scrollIntoViewIfNeeded();
   await expect(flow).toHaveAttribute("data-playing", "false");
@@ -489,17 +540,14 @@ test("the village loops automatically, suspends out of view and offers a static 
   await expect(flow).not.toHaveAttribute("role", "button");
   await expect(flow).not.toHaveAttribute("tabindex", "0");
   await expect(flow).toHaveAttribute("data-progress", fixture.hero.flow.rest.toFixed(3));
-  const staticFrame = await art.locator(".hf-manuscript").getAttribute("transform");
+  const staticFrame = await art.locator(".hf-feed-sheet").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("transform")));
   await page.clock.runFor(fixture.hero.flow.duration);
   await expect(flow).toHaveAttribute("data-progress", fixture.hero.flow.rest.toFixed(3));
-  await expect(art.locator(".hf-manuscript")).toHaveAttribute("transform", staticFrame!);
+  expect(await art.locator(".hf-feed-sheet").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("transform")))).toEqual(staticFrame);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(flow).toHaveAttribute("data-playing", "true");
   await page.clock.runFor(1000);
   expect(Number(await flow.getAttribute("data-progress"))).not.toBe(fixture.hero.flow.rest);
-  await flow.focus();
-  await page.keyboard.press("Escape");
-  await expect(flow).toHaveAttribute("data-playing", "false");
 });
 
 for (const theme of fixture.session.windows.themes) {
