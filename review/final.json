@@ -4,13 +4,13 @@
     {
       "deployment": 7502632787,
       "environment": "peasant-labs / production",
-      "state": "in_progress",
+      "state": "success",
       "url": "https://railway.com/project/47e906cb-aef9-4c1f-a42e-e6e7edb82381?environmentId=d320722b-16ef-437d-a680-de88396dc65d"
     },
     {
       "deployment": 7502632716,
       "environment": "adaptable-motivation / production",
-      "state": "in_progress",
+      "state": "success",
       "url": "https://railway.com/project/13899d33-ccb2-419b-b240-d7577317ec5f?environmentId=139ec968-add3-4489-9250-ca5913de3e24"
     }
   ],
@@ -84,17 +84,6 @@
       55
     ]
   },
-  "deploymentLimitations": [
-    {
-      "environment": "peasant-labs / production",
-      "state": "in_progress",
-      "note": "Deployment is still in progress."
-    },
-    {
-      "environment": "adaptable-motivation / production",
-      "state": "in_progress",
-      "note": "Deployment is still in progress."
-    }
-  ],
+  "deploymentLimitations": [],
   "cleanup": "Owned feature worktree, branch and proof server removed; synced and rebuilt main serves3314. Existing app/fixture services retained."
 }
