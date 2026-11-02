@@ -1,0 +1,84 @@
+{
+  "mergeCommit": "a18d07e470fdd893cb61df32edd10acf22812d5c",
+  "productionDeployments": [
+    {
+      "deployment": 7500555491,
+      "environment": "peasant-labs / production",
+      "state": "failure",
+      "url": "https://railway.com/project/47e906cb-aef9-4c1f-a42e-e6e7edb82381?environmentId=d320722b-16ef-437d-a680-de88396dc65d"
+    },
+    {
+      "deployment": 7500555476,
+      "environment": "adaptable-motivation / production",
+      "state": "success",
+      "url": "https://railway.com/project/13899d33-ccb2-419b-b240-d7577317ec5f?environmentId=139ec968-add3-4489-9250-ca5913de3e24"
+    }
+  ],
+  "localBuildId": "BSGPOFAUftwZSLxYCln-a",
+  "loadedAssetMatches": 33,
+  "themeChecks": [
+    {
+      "theme": "light",
+      "screenOrigin": true,
+      "singlePersistentSheet": true,
+      "providers": [
+        "claude",
+        "openai",
+        "cursor",
+        "claude"
+      ],
+      "noninteractive": true,
+      "reducedStatic": true,
+      "offscreenSuspension": true,
+      "nativeFilters": true,
+      "demoSwitches": true,
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "setupLink": {
+        "label": "more ways to install and run",
+        "href": "/docs#install"
+      },
+      "docsNavigation": true,
+      "overflow": 0
+    },
+    {
+      "theme": "dark",
+      "screenOrigin": true,
+      "singlePersistentSheet": true,
+      "providers": [
+        "claude",
+        "openai",
+        "cursor",
+        "claude"
+      ],
+      "noninteractive": true,
+      "reducedStatic": true,
+      "offscreenSuspension": true,
+      "nativeFilters": true,
+      "demoSwitches": true,
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "setupLink": {
+        "label": "more ways to install and run",
+        "href": "/docs#install"
+      },
+      "docsNavigation": true,
+      "overflow": 0
+    }
+  ],
+  "independentReviews": {
+    "head": "94b7b963d057d267465f4cddda7d1023be763ea1",
+    "axes": [
+      "A",
+      "B",
+      "C"
+    ],
+    "blockers": 0,
+    "important": 0,
+    "minor": 0,
+    "resolvedIssues": [
+      52,
+      53
+    ]
+  },
+  "deploymentLimitation": "The peasant-labs production deployment reports failure, with no GitHub description; Railway CLI access to that project is denied. No authentication or project settings changed. Other production target status is recorded separately.",
+  "cleanup": "Owned feature/worker worktrees, branches and proof servers removed; synced and rebuilt main serves3314. Existing app/fixture services retained."
+}
