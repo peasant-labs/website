@@ -177,15 +177,31 @@ const Ground = memo(function Ground({ compact, draw }: { compact: boolean; draw:
 const Manuscript = memo(function Manuscript({ draw }: { draw: Drawing }) {
   return <>{draw.face([[0, 0], [27, 0], [35, -5], [8, -5]], null)}{draw.line([[9, -3], [27, -3]])}{draw.line([[5, -1], [23, -1]])}{draw.face([[11, -2], [22, -2], [25, -3], [14, -3]], "amber", false)}</>;
 });
+function PaperFeed({ compact, draw, progress, id }: { compact: boolean; draw: Drawing; progress: number; id: string }) {
+  const shop = workshopPlan(compact), exit = compact ? 52 : 114, intake = shop.x + shop.px + 9;
+  const scale = compact ? .6 : .8, width = 35 * scale;
+  // The mask hides each sheet inside the computer and again inside the press.
+  // Two spaced sheets keep the connection visible throughout the print cycle.
+  return <g className="hf-feed">
+    <defs><clipPath id={`${id}-feed`}><rect x={exit} y="94" width={intake - exit} height="8" /></clipPath></defs>
+    <g clipPath={`url(#${id}-feed)`}>
+      {Array.from({ length: 2 }, (_, index) => {
+        const travel = (progress * 2 + index / 2) % 1;
+        const x = lerp(exit - width, intake, travel);
+        return <g key={index} className="hf-feed-sheet" transform={`translate(${x} 100) scale(${scale})`}><Manuscript draw={draw} /></g>;
+      })}
+    </g>
+  </g>;
+}
 function VillageScene({ compact, progress }: { compact: boolean; progress: number }) {
   const id = useId().replace(/:/g, ""), draw = useMemo(() => drawing(id), [id]), shop = workshopPlan(compact);
-  const travel = ease(phase(progress, .06, .52)), delivery = ease(phase(progress, .75, .84));
-  const x = Math.round(lerp(lerp(compact ? 52 : 111, shop.x + shop.px + 9, travel), shop.x + shop.w - 15, delivery));
+  const delivery = ease(phase(progress, .75, .84));
+  const x = Math.round(lerp(shop.x + shop.px + 9, shop.x + shop.w - 15, delivery));
   return <svg className={`hf-art ${compact ? "hf-narrow" : "hf-wide"}`} viewBox={compact ? "0 0 480 360" : "0 0 960 360"} aria-hidden="true" focusable="false">
     <Materials prefix={id} />
     <g className="hf-scene" transform={compact ? "scale(3)" : "translate(24 0) scale(3)"} shapeRendering="crispEdges">
-      <Ground compact={compact} draw={draw} /><Laptop compact={compact} draw={draw} /><Workshop compact={compact} draw={draw} progress={progress} />
-      <g className="hf-manuscript" transform={`translate(${x} 100)`} opacity={ease(phase(progress, .02, .06)) * (1 - ease(phase(progress, .97, 1)))}>
+      <Ground compact={compact} draw={draw} /><Laptop compact={compact} draw={draw} /><PaperFeed compact={compact} draw={draw} progress={progress} id={id} /><Workshop compact={compact} draw={draw} progress={progress} />
+      <g className="hf-manuscript" transform={`translate(${x} 100)`} opacity={ease(phase(progress, .45, .52)) * (1 - ease(phase(progress, .97, 1)))}>
         <Manuscript draw={draw} /><path data-part="approval-seal" d="M18 -2h3v2h-3z" fill={AMBER} opacity={progress >= .89 ? 1 : 0} />
       </g>
     </g>
@@ -195,9 +211,9 @@ function VillageScene({ compact, progress }: { compact: boolean; progress: numbe
 /** The printshop repeats while visible; the computer and villagers stay planted. */
 export function HeroFlow() {
   const ref = useRef<HTMLDivElement>(null), frame = useRef(0);
-  const [progress, setProgress] = useState(0), [paused, setPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
   const reduced = useReducedMotion(), onScreen = useOnScreen(ref, 0);
-  const playing = onScreen && !reduced && !paused;
+  const playing = onScreen && !reduced;
   useEffect(() => {
     if (!playing) return;
     let previous: number | undefined, raf = 0;
@@ -218,18 +234,6 @@ export function HeroFlow() {
       className="hf"
       data-playing={playing ? "true" : "false"}
       data-progress={shown.toFixed(3)}
-      role={reduced ? undefined : "button"}
-      tabIndex={reduced ? undefined : 0}
-      aria-label={reduced ? undefined : paused ? "resume village animation" : "pause village animation"}
-      aria-description={reduced ? undefined : HERO.flow.label}
-      aria-pressed={reduced ? undefined : paused}
-      onClick={reduced ? undefined : () => setPaused((value) => !value)}
-      onKeyDown={reduced ? undefined : (event) => {
-        if (event.key === "Escape") setPaused(true);
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        setPaused((value) => !value);
-      }}
     >
       <div className="hf-picture" role="img" aria-label={HERO.flow.label}><VillageScene compact={false} progress={shown} /><VillageScene compact progress={shown} /></div>
     </div>
