@@ -1,0 +1,57 @@
+{
+  "mergeCommit": "f608518bf355a1d27eda3a134bb53935d38a6429",
+  "productionDeployments": [
+    {
+      "deployment": 7497337549,
+      "state": "success"
+    },
+    {
+      "deployment": 7497337486,
+      "state": "success"
+    }
+  ],
+  "localBuildId": "8sN0AT1yu39J-QQHWoy0P",
+  "loadedAssetMatches": 31,
+  "themeChecks": [
+    {
+      "theme": "light",
+      "repeatedCycle": true,
+      "actualManuscriptMovement": true,
+      "staticReducedMotion": true,
+      "windowSwitches": [
+        "term",
+        "x",
+        "front"
+      ],
+      "nativeFilters": true,
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "overflow": 0
+    },
+    {
+      "theme": "dark",
+      "repeatedCycle": true,
+      "actualManuscriptMovement": true,
+      "staticReducedMotion": true,
+      "windowSwitches": [
+        "term",
+        "x",
+        "front"
+      ],
+      "nativeFilters": true,
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "overflow": 0
+    }
+  ],
+  "independentReviews": {
+    "head": "12045ce433bd5be1e7fcac1869b61e10a5edc5a4",
+    "axes": [
+      "A",
+      "B",
+      "C"
+    ],
+    "blockers": 0,
+    "important": 0,
+    "minor": 0
+  },
+  "cleanup": "Owned feature/worker worktrees, branches and proof servers removed; synced and rebuilt main serves3314. Existing app/fixture services retained."
+}
