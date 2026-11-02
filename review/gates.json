@@ -1,0 +1,20 @@
+{
+  "head": "94b7b963d057d267465f4cddda7d1023be763ea1",
+  "checks": {
+    "build": "pass",
+    "typescript": "pass",
+    "installer": "pass",
+    "lint": "pass; six baseline projects test warnings",
+    "browser": "182 passed (6.6m), frozen production artifact, standard single-worker Chromium/dark/clipboard settings",
+    "visual": "30 raw images individually inspected; both themes, desktop/phone sequence + setup1440/768/390 + actual docs destinations;32 served JS/CSS asset matches",
+    "opacityFollowup52": "effective ancestor opacity and named transparent-sheet/transparent-ancestor/hidden-sheet negative probes pass"
+  },
+  "existingDiagnostic": "Missing-blog404 case retains the pre-existing Next NoFallbackError server diagnostic; expected404 assertion passes.",
+  "logs": {
+    "build.log": "44cbb2006adc088faf51eb48f0adea425648df7aa4c987de3ecacd3fca8d2f8d",
+    "tsc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lint.log": "9a80b38ff2adec043b0b1632e4c32b1a97506756098996cf239da432ac4d8d32",
+    "installer.log": "355515c00a183683bd9015245a2fbbf86256a8e0d09668ab57f11ce0664c104d",
+    "browser.log": "738852159e819e6d49dc5492f9987ef2860d51719bc0654a2412f3f2c915acd0"
+  }
+}

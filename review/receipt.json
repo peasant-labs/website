@@ -1,0 +1,433 @@
+{
+  "head": "94b7b963d057d267465f4cddda7d1023be763ea1",
+  "buildId": "KzlQqVtC7vMyYGyHs-7YZ",
+  "assets": {
+    "/_next/static/css/e1ca4a7f35ff7017.css": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+    "/_next/static/css/508d11f51c7fa509.css": "cb71b7bbdecce851ec4544732615e532ec2232e7d6805d7fb3a98e9657a335fa",
+    "/_next/static/css/d065d856523d0d9b.css": "2d57cf93e4bee096284f9b891088a2aee47acb708a090ba8d0bf32f4b41fd67a",
+    "/_next/static/css/279f976604053b12.css": "206a93648dcb8c33ffd2356363d597ae0ea36070e9fa6834f46000aeb3afd648",
+    "/_next/static/css/f505c5205671eb79.css": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+    "/_next/static/css/6d9d8256903444dc.css": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+    "/_next/static/css/acd68af486ce2177.css": "0a2e6f40933b7ee5a455fdf1577a3d1280f725c0674d84e738fa0659964450b2",
+    "/_next/static/chunks/webpack-4c39f26cab468a5a.js": "983dd9f2abb152dbfbc15c118cd2b16f610ca9d58dda4368a5100834bec9a29f",
+    "/_next/static/chunks/18bad13d-801de1ca2fb94551.js": "b91198d73599cb60bf5795912a75f284e125aa0c50415123468f1e5c04702b28",
+    "/_next/static/chunks/368-ce6821a876415a95.js": "f96dc70fc8fdb29f59a0c78f98fef9825a9049610760a81a3c275c77a3569c79",
+    "/_next/static/chunks/main-app-38c68c0210a05d6d.js": "9aa5313bfd07105b7e328722d2a0f7bc51d3c4b02f399ae0ee6ddc28df1f3082",
+    "/_next/static/chunks/app/layout-dc00f9e944300073.js": "c0ac965fd753dc073b30ca0f7e9983c4ad78a2f3d1b1ec772095b60a342eae27",
+    "/_next/static/chunks/335b9414-c3298510c80fa84c.js": "b804937546a4a95b6878e5799ecbeaaa73892e1c541d7314e01ad938524910a3",
+    "/_next/static/chunks/f777d375-e7c98ff759489d2c.js": "4fb0f61479b6cd0e91ba0a509e0ebfc346662fcf120da6fef33554cf391ef4ea",
+    "/_next/static/chunks/77d3b4b7-0a729972948fb933.js": "ad82774d90e788369445f49065c50ef5b7e4d2ae8244eb5e9934b21f65754c51",
+    "/_next/static/chunks/349-b2c0f7af17e850aa.js": "2fff72ebafc4a3fa5c489f51f4142beb9795e2dd4b4b29611334df8bcdd33eff",
+    "/_next/static/chunks/2167-e2a28884c56d2c6d.js": "b40a510225f66908c7102d2472807b3ee434f411d284c1307b02a026f7889fe4",
+    "/_next/static/chunks/7686-0706444e566035c8.js": "d526ccfdc9b0608cf42b067491ac567a0fce135dc00e098cd373b446eb6bc8a7",
+    "/_next/static/chunks/app/error-513930332d4e9bba.js": "0511d52782732787b5153c8e1c61beab02ff7fbd84757e74f8174da8b99c0bf4",
+    "/_next/static/chunks/9216-f8398bede6a99f77.js": "4a1996899eca169a8fb3e302f5a1a11ec728ccf0e56ff0f2c3fb9b57fb663467",
+    "/_next/static/chunks/6716-53ebfd668b8bd83e.js": "490c6af45a414ad6a644701c53d85157c2151e60e4aa07a7d65111b0e8fd85c9",
+    "/_next/static/chunks/9793-35f165b99628adcd.js": "34e15e8748db3451c364e2d426fe8ee5dcdb8e5ba543e252897285d993f4b726",
+    "/_next/static/chunks/app/page-5cd3fec73df3af77.js": "04e1df9510067bab901908b097b68bf1d7ee9b85637a5937f8b0794455c9c6cb",
+    "/_next/static/chunks/app/global-error-acc203d310831bc3.js": "6ef46a11572d0fc63d5df8cc21c3ff8e3c551482869ba92a49b4f225b3a7d404",
+    "/_next/static/css/640d3b3894fc812f.css": "16b63888a36cd181093065e3e060058a96fd6bd256910545366ba0af14ecf72a",
+    "/_next/static/chunks/app/blog/layout-a33a2d83f646904a.js": "813f2155a9982194707032ccac97ed640d50dc4bb757d59e30345bb7d24e0f7d",
+    "/_next/static/chunks/app/blog/page-2e5bb1d8e03bd812.js": "4c6e0f96532d46694fbffea7a5db6afd4ece518fc05967853f139d8168eef007",
+    "/_next/static/chunks/6892-fbfa6f27c492ea23.js": "aa702374a12123e7b755da5fb0d4d4049d6631d96f67d0de0c1ffa3d62e2d384",
+    "/_next/static/chunks/app/docs/layout-327b741095c0d560.js": "ce2d91a91c4e46fec965ad5fa90dd2274d2ce869779ee01d666413f0ad9e435d",
+    "/_next/static/chunks/app/docs/page-31a8bcccc0e60deb.js": "de966130cad088eda783ebd799ac7a52f777500aa06eff7992415b97985b15f8",
+    "/_next/static/chunks/app/docs/guides/find-sessions/page-8392de678b424ebd.js": "3028f910f4104803347d65a01b1e4f54ba5251c93e161f71ae2b6161fb7a9440",
+    "/_next/static/chunks/app/docs/guides/onboarding/page-8392de678b424ebd.js": "3028f910f4104803347d65a01b1e4f54ba5251c93e161f71ae2b6161fb7a9440"
+  },
+  "images": [
+    {
+      "file": "screen-phone-light.png",
+      "sha256": "7676a11ef54d7c5b627aa5f265e709dc512cdab3f29c0d040f55e3bd0e24d96f"
+    },
+    {
+      "file": "hero-phone-light.png",
+      "sha256": "acf767bffb9f841bd54480350ec171b9c2f25c30e9ca3943fb90df01859878f2"
+    },
+    {
+      "file": "press-phone-light.png",
+      "sha256": "37e7b557c7428726adec6c5878702114cb1fb307749a4fa0ae27c5afe1d0ee91"
+    },
+    {
+      "file": "stamped-phone-light.png",
+      "sha256": "989f4f69878e4d3185f529c680b4f86b116f18723009956f6edec8dc8279d544"
+    },
+    {
+      "file": "next-logo-phone-light.png",
+      "sha256": "aa9d24a78e49b5d2cc300675c46be64e790a7d73ac965476eb25bed6213bcb46"
+    },
+    {
+      "file": "screen-phone-dark.png",
+      "sha256": "b5b0c058f44e1fdfcc05799f40697077f3e968c2e4c0bb11b993f21aeff6b19c"
+    },
+    {
+      "file": "hero-phone-dark.png",
+      "sha256": "9287481c4294d6821bbc1f36fb5de1f09559f6359a076d96d56d2f0e13cc4c2d"
+    },
+    {
+      "file": "press-phone-dark.png",
+      "sha256": "6b08b613c3090302c80881d2de71a46c6c31f9dd1522b0148be730192708b2b2"
+    },
+    {
+      "file": "stamped-phone-dark.png",
+      "sha256": "686a3c6c5d4d373df564b2168388244ac482c66594a332fedf53d767470c43ed"
+    },
+    {
+      "file": "next-logo-phone-dark.png",
+      "sha256": "c7cbe3adfa7e2c1bef191c0b4aca358380e935688d70db39ef380d09e669b5cf"
+    },
+    {
+      "file": "screen-desktop-light.png",
+      "sha256": "49f1555cd0feae0cd21997e658e0c12361d25c4beb52695e6e4ba9eb4853f0fe"
+    },
+    {
+      "file": "hero-desktop-light.png",
+      "sha256": "bef75896a2a1c15658442ad2e5d5fc2921b4358b1d7081da0e7d9749c53d7e46"
+    },
+    {
+      "file": "press-desktop-light.png",
+      "sha256": "babf67758a3a8a4260a28ba371fc4d708c8390a76c3aa0a5b8def0b6a97b6f55"
+    },
+    {
+      "file": "stamped-desktop-light.png",
+      "sha256": "a9676c43ffc67744e636cab521b15fbe24369a181fe698a74c4796db9a7cfcd8"
+    },
+    {
+      "file": "next-logo-desktop-light.png",
+      "sha256": "884ad4c8a36d249c7ae7f9bc03d74d39a2ff1592d0791b0c51ffe9a15694c51b"
+    },
+    {
+      "file": "screen-desktop-dark.png",
+      "sha256": "f645199763c4731a61d2563a0f6abb669641cb64e7766d566b7b49f3edc67158"
+    },
+    {
+      "file": "hero-desktop-dark.png",
+      "sha256": "f9b3bf7c5fba6ff0e6a28cfff8da007d6b1445a8670122e145fb1cb07532b274"
+    },
+    {
+      "file": "press-desktop-dark.png",
+      "sha256": "e077e142ed9aeddea7d5489bc7087bf3d83ff25341862b4b4eb9cad559e3ff08"
+    },
+    {
+      "file": "stamped-desktop-dark.png",
+      "sha256": "960bd58b1a3c7a400c72228bc9de5cc8b2dcf5c427bcc1b9ef7ade01433d11b0"
+    },
+    {
+      "file": "next-logo-desktop-dark.png",
+      "sha256": "1f578a45705de4ca8739309ae32a410870dd0c8e8280b2010087737e65908dfb"
+    },
+    {
+      "file": "setup-phone-light.png",
+      "sha256": "d192badf11f895de6bd49474f78c3a0bb321c9f0aceadbb096e8d4a424e50782"
+    },
+    {
+      "file": "docs-phone-light.png",
+      "sha256": "fb439fd140119b6c7f15c7134dabade909a5afb2201693435ca3a1038549ffb6"
+    },
+    {
+      "file": "setup-phone-dark.png",
+      "sha256": "4073821a194832e8303a3ff929b36b4a294fc9662923d0c87e0cce70b9c572c6"
+    },
+    {
+      "file": "docs-phone-dark.png",
+      "sha256": "713aa9b2cd3ad35177c9bd57ddb8aa14128f86a0be787a18ed10a5c7c86b0b98"
+    },
+    {
+      "file": "setup-tablet-light.png",
+      "sha256": "24d460a802b2ad2290a7d32d6cc5b59490d585ab9298d9a4f29425e347f12491"
+    },
+    {
+      "file": "setup-tablet-dark.png",
+      "sha256": "503ba894668311e50a0f58cd958388c6c8f3a425e4c55b947b6b135e6e5b6563"
+    },
+    {
+      "file": "setup-desktop-light.png",
+      "sha256": "104fb41162651a63f0d2fef1b08ffbaef5c0a1cfac1271692011b4470dcc12d2"
+    },
+    {
+      "file": "docs-desktop-light.png",
+      "sha256": "63c83d5731e36c35d39a2d6baa2ec91098e0874b0472dd2fcda6d221095a525f"
+    },
+    {
+      "file": "setup-desktop-dark.png",
+      "sha256": "5a5ec85b5fca2d146c215cec17bec0c4483635fce1d3eda2c9e42bb41b9f9934"
+    },
+    {
+      "file": "docs-desktop-dark.png",
+      "sha256": "25c5cb1036cf0cdf9ef66f97bd888b5cf0b1957089590553d56e82f5e2fb168c"
+    }
+  ],
+  "results": [
+    {
+      "case": "phone-light",
+      "poses": [
+        {
+          "name": "screen",
+          "provider": "claude",
+          "sheet": {
+            "left": 85.36250305175781,
+            "top": 749.625,
+            "width": 46.98750305175781,
+            "height": 46.98748779296875,
+            "opacity": "1",
+            "transform": "translate(31 57)"
+          }
+        },
+        {
+          "name": "flight",
+          "provider": "claude",
+          "sheet": {
+            "left": 190.52499389648438,
+            "top": 823.4625244140625,
+            "width": 64.88751220703125,
+            "height": 11.1875,
+            "opacity": "1",
+            "transform": "translate(78 90)"
+          }
+        },
+        {
+          "name": "press",
+          "provider": "claude",
+          "sheet": {
+            "left": 221.85000610351562,
+            "top": 839.125,
+            "width": 80.54998779296875,
+            "height": 13.42498779296875,
+            "opacity": "1",
+            "transform": "translate(92 100)"
+          }
+        },
+        {
+          "name": "stamped",
+          "provider": "claude",
+          "sheet": {
+            "left": 275.54998779296875,
+            "top": 839.125,
+            "width": 80.55001831054688,
+            "height": 13.42498779296875,
+            "opacity": "1",
+            "transform": "translate(116 100)"
+          }
+        }
+      ],
+      "nextProvider": "openai",
+      "sameSheetNode": true,
+      "noninteractive": true,
+      "overflow": 0
+    },
+    {
+      "case": "phone-dark",
+      "poses": [
+        {
+          "name": "screen",
+          "provider": "claude",
+          "sheet": {
+            "left": 85.36250305175781,
+            "top": 749.625,
+            "width": 46.98750305175781,
+            "height": 46.98748779296875,
+            "opacity": "1",
+            "transform": "translate(31 57)"
+          }
+        },
+        {
+          "name": "flight",
+          "provider": "claude",
+          "sheet": {
+            "left": 190.52499389648438,
+            "top": 823.4625244140625,
+            "width": 64.88751220703125,
+            "height": 11.1875,
+            "opacity": "1",
+            "transform": "translate(78 90)"
+          }
+        },
+        {
+          "name": "press",
+          "provider": "claude",
+          "sheet": {
+            "left": 221.85000610351562,
+            "top": 839.125,
+            "width": 80.54998779296875,
+            "height": 13.42498779296875,
+            "opacity": "1",
+            "transform": "translate(92 100)"
+          }
+        },
+        {
+          "name": "stamped",
+          "provider": "claude",
+          "sheet": {
+            "left": 275.54998779296875,
+            "top": 839.125,
+            "width": 80.55001831054688,
+            "height": 13.42498779296875,
+            "opacity": "1",
+            "transform": "translate(116 100)"
+          }
+        }
+      ],
+      "nextProvider": "openai",
+      "sameSheetNode": true,
+      "noninteractive": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-light",
+      "poses": [
+        {
+          "name": "screen",
+          "provider": "claude",
+          "sheet": {
+            "left": 465,
+            "top": 677.59375,
+            "width": 69,
+            "height": 93,
+            "opacity": "1",
+            "transform": "translate(67 46)"
+          }
+        },
+        {
+          "name": "flight",
+          "provider": "claude",
+          "sheet": {
+            "left": 774,
+            "top": 800.59375,
+            "width": 96,
+            "height": 24,
+            "opacity": "1",
+            "transform": "translate(170 87)"
+          }
+        },
+        {
+          "name": "press",
+          "provider": "claude",
+          "sheet": {
+            "left": 867,
+            "top": 830.59375,
+            "width": 108,
+            "height": 18,
+            "opacity": "1",
+            "transform": "translate(201 100)"
+          }
+        },
+        {
+          "name": "stamped",
+          "provider": "claude",
+          "sheet": {
+            "left": 957,
+            "top": 830.59375,
+            "width": 108,
+            "height": 18,
+            "opacity": "1",
+            "transform": "translate(231 100)"
+          }
+        }
+      ],
+      "nextProvider": "openai",
+      "sameSheetNode": true,
+      "noninteractive": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-dark",
+      "poses": [
+        {
+          "name": "screen",
+          "provider": "claude",
+          "sheet": {
+            "left": 465,
+            "top": 677.59375,
+            "width": 69,
+            "height": 93,
+            "opacity": "1",
+            "transform": "translate(67 46)"
+          }
+        },
+        {
+          "name": "flight",
+          "provider": "claude",
+          "sheet": {
+            "left": 774,
+            "top": 800.59375,
+            "width": 96,
+            "height": 24,
+            "opacity": "1",
+            "transform": "translate(170 87)"
+          }
+        },
+        {
+          "name": "press",
+          "provider": "claude",
+          "sheet": {
+            "left": 867,
+            "top": 830.59375,
+            "width": 108,
+            "height": 18,
+            "opacity": "1",
+            "transform": "translate(201 100)"
+          }
+        },
+        {
+          "name": "stamped",
+          "provider": "claude",
+          "sheet": {
+            "left": 957,
+            "top": 830.59375,
+            "width": 108,
+            "height": 18,
+            "opacity": "1",
+            "transform": "translate(231 100)"
+          }
+        }
+      ],
+      "nextProvider": "openai",
+      "sameSheetNode": true,
+      "noninteractive": true,
+      "overflow": 0
+    },
+    {
+      "case": "setup-phone-light",
+      "label": "more ways to install and run",
+      "href": "/docs#install",
+      "navigated": true,
+      "overflow": 0
+    },
+    {
+      "case": "setup-phone-dark",
+      "label": "more ways to install and run",
+      "href": "/docs#install",
+      "navigated": true,
+      "overflow": 0
+    },
+    {
+      "case": "setup-tablet-light",
+      "label": "more ways to install and run",
+      "href": "/docs#install",
+      "navigated": false,
+      "overflow": 0
+    },
+    {
+      "case": "setup-tablet-dark",
+      "label": "more ways to install and run",
+      "href": "/docs#install",
+      "navigated": false,
+      "overflow": 0
+    },
+    {
+      "case": "setup-desktop-light",
+      "label": "more ways to install and run",
+      "href": "/docs#install",
+      "navigated": true,
+      "overflow": 0
+    },
+    {
+      "case": "setup-desktop-dark",
+      "label": "more ways to install and run",
+      "href": "/docs#install",
+      "navigated": true,
+      "overflow": 0
+    }
+  ],
+  "errors": []
+}
