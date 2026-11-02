@@ -1,0 +1,309 @@
+{
+  "head": "621296043e962a8690082a33495735c8a0e7407b",
+  "buildId": "PgWTXg-WbgpzQWfLaWAwK",
+  "assets": {
+    "/_next/static/css/e1ca4a7f35ff7017.css": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+    "/_next/static/css/508d11f51c7fa509.css": "cb71b7bbdecce851ec4544732615e532ec2232e7d6805d7fb3a98e9657a335fa",
+    "/_next/static/css/f505c5205671eb79.css": "42d9f3fd6d77a1934c04e854de66903c92673605007933fe3718a4aa92288ba5",
+    "/_next/static/css/d065d856523d0d9b.css": "2d57cf93e4bee096284f9b891088a2aee47acb708a090ba8d0bf32f4b41fd67a",
+    "/_next/static/css/b1b2e6876390bbb9.css": "1ceafd4470eabf06c8165b47765d90574a2b28c47a4c8a10310510ae74d6466a",
+    "/_next/static/css/6d9d8256903444dc.css": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+    "/_next/static/css/acd68af486ce2177.css": "0a2e6f40933b7ee5a455fdf1577a3d1280f725c0674d84e738fa0659964450b2",
+    "/_next/static/chunks/webpack-fd248d5099ef9ade.js": "6fd6dbc59a171869117a8c7bd044d3b2eef4a42ff2fc199585d2abaa4f49ed0a",
+    "/_next/static/chunks/18bad13d-801de1ca2fb94551.js": "b91198d73599cb60bf5795912a75f284e125aa0c50415123468f1e5c04702b28",
+    "/_next/static/chunks/368-ce6821a876415a95.js": "f96dc70fc8fdb29f59a0c78f98fef9825a9049610760a81a3c275c77a3569c79",
+    "/_next/static/chunks/main-app-a84acb3ff2cac8ef.js": "01e90671998f629eb87abbfe19bdf5319a7fbeac29bada3d636fecbb0de6b479",
+    "/_next/static/chunks/app/layout-ffb4208779d4b73f.js": "9570ca921f67b3e6fd94f835d056baa0884e502e952131500617d560b13b05f2",
+    "/_next/static/chunks/335b9414-c3298510c80fa84c.js": "b804937546a4a95b6878e5799ecbeaaa73892e1c541d7314e01ad938524910a3",
+    "/_next/static/chunks/f777d375-e7c98ff759489d2c.js": "4fb0f61479b6cd0e91ba0a509e0ebfc346662fcf120da6fef33554cf391ef4ea",
+    "/_next/static/chunks/77d3b4b7-0a729972948fb933.js": "ad82774d90e788369445f49065c50ef5b7e4d2ae8244eb5e9934b21f65754c51",
+    "/_next/static/chunks/349-b2c0f7af17e850aa.js": "2fff72ebafc4a3fa5c489f51f4142beb9795e2dd4b4b29611334df8bcdd33eff",
+    "/_next/static/chunks/2167-e2a28884c56d2c6d.js": "b40a510225f66908c7102d2472807b3ee434f411d284c1307b02a026f7889fe4",
+    "/_next/static/chunks/7686-0706444e566035c8.js": "d526ccfdc9b0608cf42b067491ac567a0fce135dc00e098cd373b446eb6bc8a7",
+    "/_next/static/chunks/app/error-e06a6eb59b9a5f96.js": "8acbe74077bff84914b4298ca44f88a8890c9035ea190d39d6bdfe4a09529ffe",
+    "/_next/static/chunks/9216-f8398bede6a99f77.js": "4a1996899eca169a8fb3e302f5a1a11ec728ccf0e56ff0f2c3fb9b57fb663467",
+    "/_next/static/chunks/6716-53ebfd668b8bd83e.js": "490c6af45a414ad6a644701c53d85157c2151e60e4aa07a7d65111b0e8fd85c9",
+    "/_next/static/chunks/9793-0fd090b4d50d8693.js": "e36f151e79d13bec9168a24b1e33e7cd983a12aee4261d77947385d9028854f2",
+    "/_next/static/chunks/app/page-82a066e98f4b9447.js": "c336d25293c581868bcdbb1fd4e46101d35013d9cddbb943d0fba68883c5b8dd",
+    "/_next/static/chunks/app/global-error-8e6a329848fc2c83.js": "af54ea0716d5353d401b6cf22899288293a85d84e8c50b19ea197737b0c0e555",
+    "/_next/static/css/640d3b3894fc812f.css": "16b63888a36cd181093065e3e060058a96fd6bd256910545366ba0af14ecf72a",
+    "/_next/static/chunks/app/docs/layout-708dfc8e1a397417.js": "4a977de8c21f969f1a3fc33dae3fa5f9d50cfa86a28a8a583f173e59725236b1",
+    "/_next/static/chunks/app/docs/page-694645fff09be10d.js": "42173f7870abe320ca2b41acb637f229d70d79f98923951eff48eca9e117d19c",
+    "/_next/static/chunks/3948-b40c3ef4a1e474d8.js": "fd7892bf3e5a3a9038096514ebaf2a3e51a8b088775a1d12f7c0f0c5fc9a5987",
+    "/_next/static/chunks/app/blog/layout-42995cf822809e14.js": "7a0107f6d6bf1fabc359669eecb6d504abf3e2692328effa14ab592be8211cd4",
+    "/_next/static/chunks/app/blog/page-e97e9a10d6e55305.js": "4e6ce59134a380936345b99180057cf8057d807103996624470e3a47da27359a"
+  },
+  "images": [
+    {
+      "file": "hero-1536-light.png",
+      "sha256": "b5a8796d713e1f0e1e840f0a69fac54502537142fa03cd835103cc14554efdec"
+    },
+    {
+      "file": "hero-focus-light.png",
+      "sha256": "82975bf84475ce8621f63a95ff25decf05edff67543b6f29f632202ef6ea71d9"
+    },
+    {
+      "file": "demos-front-light.png",
+      "sha256": "66660e8780c5a26aaacc7716cbb27c55e2e2fcaee4362271e29e8fba06771b0f"
+    },
+    {
+      "file": "demos-term-light.png",
+      "sha256": "5625dc212969096c68271cfa055a0e7976b3e5f67907528e1646d8f1db8f246d"
+    },
+    {
+      "file": "demos-x-light.png",
+      "sha256": "4849bf3e2c305d581e37de0ef42a532e18094404eff60a96256ee480200bfddc"
+    },
+    {
+      "file": "hero-390-light.png",
+      "sha256": "8692e7396d8b6f0c384b0d3cbe4384189c053e3d0cd39b4c70c3a26828cdef24"
+    },
+    {
+      "file": "hero-1536-dark.png",
+      "sha256": "96b4cbebbed8099fed0d9877d7a68910d92540da85dc7623352feeacb63d4054"
+    },
+    {
+      "file": "hero-focus-dark.png",
+      "sha256": "54c342cf8dab353f99239b7ecd327b39deee853a8d2180d4ddc3e29efadcb2c7"
+    },
+    {
+      "file": "demos-front-dark.png",
+      "sha256": "2243250e836a666eab45df9ff0f4cf4fbb1db0dfb3bd2bb69afb78e4801bf02f"
+    },
+    {
+      "file": "demos-term-dark.png",
+      "sha256": "dbb767d4f9e1f0e00ab6f0c065cffe2c2fa5ccb3586ad8463faa7f53b50d0edc"
+    },
+    {
+      "file": "demos-x-dark.png",
+      "sha256": "ed11560e96620c35b080a2cb19d86e863e024739f5d812db560136e8d7816dd7"
+    },
+    {
+      "file": "hero-390-dark.png",
+      "sha256": "fa3eb9bff926e7c6ad35cecfe92b86decc1a0cb93c978fa70a999e055b658776"
+    }
+  ],
+  "probes": [
+    {
+      "case": "hero",
+      "theme": "light",
+      "width": 1536,
+      "geometry": {
+        "bounds": [
+          45,
+          33,
+          903.8999633789062,
+          314.5199890136719
+        ],
+        "viewBox": [
+          960,
+          360
+        ],
+        "marks": [
+          {
+            "width": 59.9544677734375,
+            "height": 60
+          },
+          {
+            "width": 59.1846923828125,
+            "height": 60.00018310546875
+          },
+          {
+            "width": 52.64251708984375,
+            "height": 59.999267578125
+          }
+        ],
+        "members": [
+          "back-reader",
+          "front-reader",
+          "printer"
+        ]
+      }
+    },
+    {
+      "case": "hero-focus",
+      "theme": "light",
+      "focus": {
+        "visible": true,
+        "width": "3px",
+        "offset": "2px",
+        "canonicalOffset": "2px"
+      }
+    },
+    {
+      "case": "demos",
+      "theme": "light",
+      "layout": [
+        {
+          "name": "lp-windows-term",
+          "left": 21.80010986328125,
+          "top": 40.175048828125,
+          "width": 441.59375,
+          "height": 480
+        },
+        {
+          "name": "lp-windows-front",
+          "left": 294.390625,
+          "top": 0,
+          "width": 883.203125,
+          "height": 628
+        },
+        {
+          "name": "lp-windows-x",
+          "left": 1008.590576171875,
+          "top": 72.175048828125,
+          "width": 441.59375,
+          "height": 512
+        }
+      ],
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+    },
+    {
+      "case": "hero",
+      "theme": "light",
+      "width": 390,
+      "geometry": {
+        "bounds": [
+          15,
+          33,
+          453,
+          314.1300048828125
+        ],
+        "viewBox": [
+          480,
+          360
+        ],
+        "marks": [
+          {
+            "width": 24.593833923339844,
+            "height": 24.61248779296875
+          },
+          {
+            "width": 24.27806854248047,
+            "height": 24.612548828125
+          },
+          {
+            "width": 21.594390869140625,
+            "height": 24.6121826171875
+          }
+        ],
+        "members": [
+          "back-reader",
+          "front-reader",
+          "printer"
+        ]
+      }
+    },
+    {
+      "case": "hero",
+      "theme": "dark",
+      "width": 1536,
+      "geometry": {
+        "bounds": [
+          45,
+          33,
+          903.8999633789062,
+          314.5199890136719
+        ],
+        "viewBox": [
+          960,
+          360
+        ],
+        "marks": [
+          {
+            "width": 59.9544677734375,
+            "height": 60
+          },
+          {
+            "width": 59.1846923828125,
+            "height": 60.00018310546875
+          },
+          {
+            "width": 52.64251708984375,
+            "height": 59.999267578125
+          }
+        ],
+        "members": [
+          "back-reader",
+          "front-reader",
+          "printer"
+        ]
+      }
+    },
+    {
+      "case": "hero-focus",
+      "theme": "dark",
+      "focus": {
+        "visible": true,
+        "width": "3px",
+        "offset": "2px",
+        "canonicalOffset": "2px"
+      }
+    },
+    {
+      "case": "demos",
+      "theme": "dark",
+      "layout": [
+        {
+          "name": "lp-windows-term",
+          "left": 22.04027557373047,
+          "top": 40.265106201171875,
+          "width": 441.59375,
+          "height": 479.9999694824219
+        },
+        {
+          "name": "lp-windows-front",
+          "left": 294.390625,
+          "top": 0,
+          "width": 883.203125,
+          "height": 628
+        },
+        {
+          "name": "lp-windows-x",
+          "left": 1008.350341796875,
+          "top": 72.26510620117188,
+          "width": 441.59375,
+          "height": 512
+        }
+      ],
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif"
+    },
+    {
+      "case": "hero",
+      "theme": "dark",
+      "width": 390,
+      "geometry": {
+        "bounds": [
+          15,
+          33,
+          453,
+          314.1300048828125
+        ],
+        "viewBox": [
+          480,
+          360
+        ],
+        "marks": [
+          {
+            "width": 24.593833923339844,
+            "height": 24.61248779296875
+          },
+          {
+            "width": 24.27806854248047,
+            "height": 24.612548828125
+          },
+          {
+            "width": 21.594390869140625,
+            "height": 24.6121826171875
+          }
+        ],
+        "members": [
+          "back-reader",
+          "front-reader",
+          "printer"
+        ]
+      }
+    }
+  ],
+  "errors": []
+}

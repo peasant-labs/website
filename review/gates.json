@@ -1,0 +1,20 @@
+{
+  "reviewHead": "12045ce433bd5be1e7fcac1869b61e10a5edc5a4",
+  "builtCommit": "621296043e962a8690082a33495735c8a0e7407b",
+  "identicalTree": "6a9ae3fde80cafae70d8cacdfc26581ce5c4d751",
+  "checks": {
+    "build": "pass",
+    "typescript": "pass",
+    "lint": "pass; six pre-existing unused-symbol warnings in projects tests",
+    "installer": "pass",
+    "browser": "182 passed (6.6m), Chromium, one worker, standard dark/clipboard settings, frozen production build",
+    "visual": "12 mounted captures individually inspected, both themes, desktop and phone;30 JS/CSS asset byte matches; canonical focused artwork ring verified"
+  },
+  "logs": {
+    "build.log": "b24c9a101d89f3034433880ea888a3c0f1c7fc3e1c9a74aae6e5587bc5686ed4",
+    "tsc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lint.log": "c7565cd801e5c2a928d064c3b236a5c4cde0f22d60a7648661bac8d9a3d36cd4",
+    "installer.log": "355515c00a183683bd9015245a2fbbf86256a8e0d09668ab57f11ce0664c104d",
+    "browser.log": "17c43604fb525a37014c57ed19e0428f3c5074f44ffa0a8a155ce1197dac2ad6"
+  }
+}
