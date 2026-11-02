@@ -1,0 +1,62 @@
+{
+  "mergeCommit": "63185a8ea1ea16e2b91e67dce299af42d90be67e",
+  "productionDeployments": [
+    {
+      "deployment": 7498343173,
+      "state": "success"
+    },
+    {
+      "deployment": 7498343075,
+      "state": "success"
+    }
+  ],
+  "localBuildId": "yoSlbXWREF6K_11iBWtGl",
+  "loadedAssetMatches": 31,
+  "themeChecks": [
+    {
+      "theme": "light",
+      "repeatedCycle": true,
+      "actualSheetFeedMovement": true,
+      "noninteractive": true,
+      "staticReducedMotion": true,
+      "windowSwitches": [
+        "term",
+        "x",
+        "front"
+      ],
+      "nativeFilters": true,
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "overflow": 0
+    },
+    {
+      "theme": "dark",
+      "repeatedCycle": true,
+      "actualSheetFeedMovement": true,
+      "noninteractive": true,
+      "staticReducedMotion": true,
+      "windowSwitches": [
+        "term",
+        "x",
+        "front"
+      ],
+      "nativeFilters": true,
+      "proseFont": "\"Atkinson Hyperlegible\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+      "overflow": 0
+    }
+  ],
+  "independentReviews": {
+    "head": "d83fb26f6e6ce630ab9b7fde08d507374685b588",
+    "axes": [
+      "A",
+      "B",
+      "C"
+    ],
+    "blockers": 0,
+    "important": 0,
+    "minor": 1,
+    "followups": [
+      "https://github.com/peasant-labs/website/issues/52"
+    ]
+  },
+  "cleanup": "Owned feature/worker worktrees, branches and proof servers removed; synced and rebuilt main serves3314. Existing app/fixture services retained."
+}
