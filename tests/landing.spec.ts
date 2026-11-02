@@ -283,12 +283,15 @@ test("on a wide screen the install card keeps every command whole on its line, w
   const section = page.locator("#install");
   const guide = section.getByRole("link", { name: fixture.install.guide.label });
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
-  await expect(section.getByRole("link", { name: fixture.install.installGuide.label })).toHaveCount(0);
+  await expect(section.locator(".gs-guide")).toBeHidden();
   // nothing scrolls: each command shows whole, on one line
   const lines = await section
     .locator('[role="tabpanel"]:not([hidden]) .cli-cmd-line')
     .evaluateAll((items) => items.map((line) => line.scrollWidth <= line.clientWidth + 1));
   expect(lines).toEqual([true]);
+  await guide.click();
+  await expect(page).toHaveURL((url) => `${url.pathname}${url.hash}` === fixture.install.guide.href);
+  await expect(page.locator(new URL(fixture.install.guide.href, page.url()).hash)).toBeVisible();
 });
 
 test("on a phone installation keeps two plain actions, matching copy targets and reachable command text", async ({
@@ -328,9 +331,9 @@ test("on a phone installation keeps two plain actions, matching copy targets and
       )
       .toBe(0);
     // the link beside the title gives way to a quiet one under the card, to the install guide
-    await expect(section.getByRole("link", { name: fixture.install.guide.label })).toHaveCount(0);
-    const guide = section.getByRole("link", { name: fixture.install.installGuide.label });
-    await expect(guide).toHaveAttribute("href", fixture.install.installGuide.href);
+    await expect(section.locator(".lp-install-guide")).toBeHidden();
+    const guide = section.getByRole("link", { name: fixture.install.guide.label });
+    await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
     const [card, link] = [(await shell.boundingBox())!, (await guide.boundingBox())!];
     expect(link.y, `the install guide link is not under the card ${at}`).toBeGreaterThan(card.y + card.height);
     expect(link.height).toBeGreaterThanOrEqual(44);
@@ -380,6 +383,9 @@ test("on a phone installation keeps two plain actions, matching copy targets and
     await first.locator(".cli-copy").click();
     await expect(first.locator(".cli-copy")).toContainText("copied");
     expect(await page.evaluate(() => (window as unknown as { copied?: string[] }).copied)).toEqual([command]);
+    await guide.tap();
+    await expect(page).toHaveURL((url) => `${url.pathname}${url.hash}` === fixture.install.guide.href);
+    await expect(page.locator(new URL(fixture.install.guide.href, page.url()).hash)).toBeVisible();
     await context.close();
   }
 });

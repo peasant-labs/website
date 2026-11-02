@@ -44,7 +44,7 @@ export const HERO = {
   /* The accessible description follows the computer-to-printing-workshop scene. */
   flow: {
     label:
-      "A modern computer displays the Claude Code, Codex and Cursor logos. Manuscript sheets flow from the computer into a medieval timber printing press, where a printer stamps a page beside two village readers.",
+      "A modern computer cycles through the Claude Code, Codex and Cursor logos. One transcript forms on its screen, travels into a medieval timber printing press and is stamped by a printer beside two village readers.",
     agents: [
       { mark: "claude", name: "Claude Code" },
       { mark: "codex", name: "Codex" },
@@ -277,11 +277,10 @@ export const HOW = {
   ],
 } as const;
 
-/** Install and start local setup, then ask the agent to publish deliberately. */
+/** Install and start local setup, then ask the agent to open the session locally. */
 export const INSTALL = {
   title: "install, then open a session",
-  guide: { label: "read our docs", href: "/docs" },
-  installGuide: { label: "read the install guide", href: "/docs#install" },
+  guide: { label: "more ways to install and run", href: "/docs#install" },
   platforms: [
     { id: "unix", label: "macos and linux", command: "curl -fsSL https://peasantlabs.org/install | bash -s -- --kickstart", note: "installs Peasant and starts setup" },
     { id: "windows", label: "windows", command: "irm https://peasantlabs.org/install.ps1 | iex", note: "then run the kickstart command printed in your terminal" },

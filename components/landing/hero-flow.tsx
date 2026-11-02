@@ -93,15 +93,18 @@ const Materials = memo(function Materials({ prefix }: { prefix: string }) {
   </defs>;
 });
 
-const Laptop = memo(function Laptop({ compact, draw }: { compact: boolean; draw: Drawing }) {
+function laptopPlan(compact: boolean) {
+  return { w: compact ? 47 : 96, h: compact ? 46 : 58, x: compact ? 13 : 30, y: compact ? 43 : 31, d: compact ? 4 : 6, size: compact ? 11 : 20 };
+}
+const Laptop = memo(function Laptop({ compact, draw, provider }: { compact: boolean; draw: Drawing; provider: number }) {
   const { face, box, shadow } = draw;
-  const w = compact ? 47 : 96, h = compact ? 46 : 58, x = compact ? 13 : 30, y = compact ? 43 : 31, d = compact ? 4 : 6;
-  const size = compact ? 11 : 20, step = compact ? 13 : 25;
+  const { w, h, x, y, d, size } = laptopPlan(compact);
+  const agent = HERO.flow.agents[provider];
   return <g className="hf-laptop">
     {shadow(x - 6, 105, w + 17)}{box(x, y, w, h, 1, "cross")}
     <g className="hf-screen">
       {face([[x + 4, y + 4], [x + w - 4, y + 4], [x + w - 4, y + h - 4], [x + 4, y + h - 4]], null)}
-      <g className="hf-screen-marks">{HERO.flow.agents.map((agent, i) => <g key={agent.mark} transform={`translate(${x + Math.round(w / 2) - step - Math.round(size / 2) + i * step} ${y + Math.round((h - size) / 2)})`}><BrandMark name={agent.mark} size={size} /></g>)}</g>
+      <g className="hf-screen-marks" transform={`translate(${x + Math.round((w - size) / 2)} ${y + Math.round((h - size) / 2)})`}><BrandMark name={agent.mark} size={size} /></g>
     </g>
     {face([[x, y + h + 1], [x + w, y + h + 1], [x + w - 2 * d, y + h + 2 * d + 1], [x - 2 * d, y + h + 2 * d + 1]], "dots")}
     {face([[x - 2 * d, y + h + 2 * d + 1], [x + w - 2 * d, y + h + 2 * d + 1], [x + w - 2 * d, y + h + 2 * d + 4], [x - 2 * d, y + h + 2 * d + 4]], "deep")}
@@ -151,21 +154,30 @@ const WorkshopTimber = memo(function WorkshopTimber({ compact, draw }: { compact
     {box(-3, 101, w + 14, 5, 4, "cross")}{box(1, 107, 4, 6, 2, "deep")}{box(w + 5, 107, 4, 6, 2, "deep")}{box(px - 3, 96, pw + 12, 4, 3, "deep")}
   </>;
 });
-function Workshop({ compact, draw, progress }: { compact: boolean; draw: Drawing; progress: number }) {
-  const { box, line } = draw;
-  const { x, w, px, pw, personX } = workshopPlan(compact), center = px + Math.round(pw * .5);
+function pressMotion(progress: number) {
   const pressure = ease(phase(progress, .55, .64)) * (1 - ease(phase(progress, .68, .75)));
   const stamp = ease(phase(progress, .84, .89)) * (1 - ease(phase(progress, .92, .97)));
-  const turn = Math.sin(phase(progress, .52, .76) * Math.PI * 2) * 4, drop = Math.round(stamp * 3), reach = ease(phase(progress, .73, .82)) * (1 - ease(phase(progress, .95, 1)));
-  const handX = Math.round(lerp(px + pw + 12, w + 4, reach)), handY = Math.round(lerp(75 - Math.round(turn), 93 + drop, reach));
+  return { pressure, drop: Math.round(stamp * 3), turn: Math.sin(phase(progress, .52, .76) * Math.PI * 2) * 4, reach: ease(phase(progress, .73, .82)) * (1 - ease(phase(progress, .95, 1))) };
+}
+type PressMotion = ReturnType<typeof pressMotion>;
+function Workshop({ compact, draw, motion }: { compact: boolean; draw: Drawing; motion: PressMotion }) {
+  const { box, line } = draw;
+  const { x, px, pw, personX } = workshopPlan(compact), center = px + Math.round(pw * .5);
   return <g className="hf-workshop" transform={`translate(${x} 0)`}>
     <WorkshopTimber compact={compact} draw={draw} />
-    <g data-part="press-screw" transform={`translate(0 ${Math.round(pressure * 6)})`}>{box(center - 2, 64, 5, 23, 1, "dots")}{Array.from({ length: 8 }, (_, i) => <g key={i}>{line([[center - 2, 66 + i * 3], [center + 3, 65 + i * 3]])}</g>)}</g>
-    <g data-part="press-platen" transform={`translate(0 ${Math.round(pressure * 8)})`}>{box(px + 7, 85, pw - 9, 5, 3, "cross")}{line([[px + 10, 88], [px + pw - 4, 88]], AMBER)}</g>
-    {line([[px - 1, 75 + Math.round(turn)], [px + pw + 13, 75 - Math.round(turn)]])}
+    <g data-part="press-screw" transform={`translate(0 ${Math.round(motion.pressure * 6)})`}>{box(center - 2, 64, 5, 23, 1, "dots")}{Array.from({ length: 8 }, (_, i) => <g key={i}>{line([[center - 2, 66 + i * 3], [center + 3, 65 + i * 3]])}</g>)}</g>
+    {line([[px - 1, 75 + Math.round(motion.turn)], [px + pw + 13, 75 - Math.round(motion.turn)]])}
     <Readers compact={compact} draw={draw} /><Printer x={personX} draw={draw} />
+  </g>;
+}
+// The sheet passes beneath the platen and the printer's hand, without a second page.
+function WorkshopFront({ compact, draw, motion }: { compact: boolean; draw: Drawing; motion: PressMotion }) {
+  const { box, line } = draw, { x, w, px, pw, personX } = workshopPlan(compact);
+  const handX = Math.round(lerp(px + pw + 12, w + 4, motion.reach)), handY = Math.round(lerp(75 - Math.round(motion.turn), 93 + motion.drop, motion.reach));
+  return <g className="hf-workshop-front" transform={`translate(${x} 0)`}>
+    <g data-part="press-platen" transform={`translate(0 ${Math.round(motion.pressure * 8)})`}>{box(px + 7, 85, pw - 9, 5, 3, "cross")}</g>
     {line([[personX - 5, 88], [personX - 10, 85], [handX, handY]])}{line([[personX - 5, 89], [personX - 10, 86], [handX, handY + 1]])}
-    <g data-part="approval-stamp" transform={`translate(0 ${drop})`}>{box(w, 96, 7, 2, 1, "deep")}<path d={`M${w + 2} 91h3v5h-3zM${w} 90h7v2h-7z`} fill={INK} /></g>
+    <g data-part="approval-stamp" transform={`translate(0 ${motion.drop})`}>{box(w, 96, 7, 2, 1, "deep")}<path d={`M${w + 2} 91h3v5h-3zM${w} 90h7v2h-7z`} fill={INK} /></g>
   </g>;
 }
 const Ground = memo(function Ground({ compact, draw }: { compact: boolean; draw: Drawing }) {
@@ -174,36 +186,29 @@ const Ground = memo(function Ground({ compact, draw }: { compact: boolean; draw:
   for (let x = 7; x < (compact ? 155 : 310); x += 7) dots.push(<path key={x} d={`M${x} ${113 + x % 3}h.3v.3h-.3z`} fill={INK} />);
   return <>{dots}<g className="hf-feed-bench">{draw.box(start, 102, end - start, 3, 3, "dots")}{!compact && <>{draw.box(142, 106, 3, 7, 1, "deep")}{draw.box(184, 106, 3, 7, 1, "deep")}</>}</g></>;
 });
-const Manuscript = memo(function Manuscript({ draw }: { draw: Drawing }) {
-  return <>{draw.face([[0, 0], [27, 0], [35, -5], [8, -5]], null)}{draw.line([[9, -3], [27, -3]])}{draw.line([[5, -1], [23, -1]])}{draw.face([[11, -2], [22, -2], [25, -3], [14, -3]], "amber", false)}</>;
-});
-function PaperFeed({ compact, draw, progress, id }: { compact: boolean; draw: Drawing; progress: number; id: string }) {
-  const shop = workshopPlan(compact), exit = compact ? 52 : 114, intake = shop.x + shop.px + 9;
-  const scale = compact ? .6 : .8, width = 35 * scale;
-  // The mask hides each sheet inside the computer and again inside the press.
-  // Two spaced sheets keep the connection visible throughout the print cycle.
-  return <g className="hf-feed">
-    <defs><clipPath id={`${id}-feed`}><rect x={exit} y="94" width={intake - exit} height="8" /></clipPath></defs>
-    <g clipPath={`url(#${id}-feed)`}>
-      {Array.from({ length: 2 }, (_, index) => {
-        const travel = (progress * 2 + index / 2) % 1;
-        const x = lerp(exit - width, intake, travel);
-        return <g key={index} className="hf-feed-sheet" transform={`translate(${x} 100) scale(${scale})`}><Manuscript draw={draw} /></g>;
-      })}
-    </g>
+function Transcript({ compact, draw, progress }: { compact: boolean; draw: Drawing; progress: number }) {
+  const laptop = laptopPlan(compact), shop = workshopPlan(compact);
+  const growth = ease(phase(progress, .04, .18)), travel = ease(phase(progress, .18, .5)), fold = ease(phase(progress, .22, .5)), delivery = ease(phase(progress, .75, .84));
+  const w = (compact ? 12 : 22) * growth, h = (compact ? 18 : 28) * growth;
+  const startX = laptop.x + (laptop.w - w) / 2, startY = laptop.y + (laptop.h - h) / 2;
+  const x = Math.round(lerp(lerp(startX, shop.x + shop.px + 9, travel), shop.x + shop.w - 15, delivery));
+  const y = Math.round(lerp(startY, 100, travel));
+  const points = (screen: readonly Point[], flat: readonly Point[]) => screen.map(([sx, sy], i) => [Math.round(lerp(sx, flat[i][0], fold)), Math.round(lerp(sy, flat[i][1], fold))] as Point);
+  return <g className="hf-transcript" transform={`translate(${x} ${y})`} opacity={ease(phase(progress, .04, .065)) * (1 - ease(phase(progress, .97, 1)))}>
+    {draw.face(points([[0, 0], [w, 0], [w, h], [0, h]], [[0, 0], [27, 0], [35, -5], [8, -5]]), null)}
+    {draw.line(points([[w * .18, h * .25], [w * .82, h * .25]], [[9, -3], [27, -3]]))}
+    {draw.line(points([[w * .18, h * .45], [w * .82, h * .45]], [[5, -1], [23, -1]]))}
+    {draw.face(points([[w * .18, h * .6], [w * .82, h * .6], [w * .82, h * .72], [w * .18, h * .72]], [[11, -2], [22, -2], [25, -3], [14, -3]]), "amber", false)}
+    <path data-part="approval-seal" d="M18 -2h3v2h-3z" fill={AMBER} opacity={progress >= .89 ? 1 : 0} />
   </g>;
 }
-function VillageScene({ compact, progress }: { compact: boolean; progress: number }) {
-  const id = useId().replace(/:/g, ""), draw = useMemo(() => drawing(id), [id]), shop = workshopPlan(compact);
-  const delivery = ease(phase(progress, .75, .84));
-  const x = Math.round(lerp(shop.x + shop.px + 9, shop.x + shop.w - 15, delivery));
+function VillageScene({ compact, progress, provider }: { compact: boolean; progress: number; provider: number }) {
+  const id = useId().replace(/:/g, ""), draw = useMemo(() => drawing(id), [id]), motion = pressMotion(progress);
   return <svg className={`hf-art ${compact ? "hf-narrow" : "hf-wide"}`} viewBox={compact ? "0 0 480 360" : "0 0 960 360"} aria-hidden="true" focusable="false">
     <Materials prefix={id} />
     <g className="hf-scene" transform={compact ? "scale(3)" : "translate(24 0) scale(3)"} shapeRendering="crispEdges">
-      <Ground compact={compact} draw={draw} /><Laptop compact={compact} draw={draw} /><PaperFeed compact={compact} draw={draw} progress={progress} id={id} /><Workshop compact={compact} draw={draw} progress={progress} />
-      <g className="hf-manuscript" transform={`translate(${x} 100)`} opacity={ease(phase(progress, .45, .52)) * (1 - ease(phase(progress, .97, 1)))}>
-        <Manuscript draw={draw} /><path data-part="approval-seal" d="M18 -2h3v2h-3z" fill={AMBER} opacity={progress >= .89 ? 1 : 0} />
-      </g>
+      <Ground compact={compact} draw={draw} /><Laptop compact={compact} draw={draw} provider={provider} /><Workshop compact={compact} draw={draw} motion={motion} />
+      <Transcript compact={compact} draw={draw} progress={progress} /><WorkshopFront compact={compact} draw={draw} motion={motion} />
     </g>
   </svg>;
 }
@@ -211,7 +216,7 @@ function VillageScene({ compact, progress }: { compact: boolean; progress: numbe
 /** The printshop repeats while visible; the computer and villagers stay planted. */
 export function HeroFlow() {
   const ref = useRef<HTMLDivElement>(null), frame = useRef(0);
-  const [progress, setProgress] = useState(0);
+  const [position, setPosition] = useState(0);
   const reduced = useReducedMotion(), onScreen = useOnScreen(ref, 0);
   const playing = onScreen && !reduced;
   useEffect(() => {
@@ -219,8 +224,8 @@ export function HeroFlow() {
     let previous: number | undefined, raf = 0;
     const tick = (now: number) => {
       if (previous !== undefined) {
-        frame.current = (frame.current + (now - previous) / DURATION) % 1;
-        setProgress(frame.current);
+        frame.current = (frame.current + (now - previous) / DURATION) % HERO.flow.agents.length;
+        setPosition(frame.current);
       }
       previous = now;
       raf = requestAnimationFrame(tick);
@@ -228,14 +233,14 @@ export function HeroFlow() {
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [playing]);
-  const shown = reduced ? REST : progress;
+  const shown = reduced ? REST : position % 1, provider = reduced ? 0 : Math.floor(position);
   return <div className="hf-panel" ref={ref}>
     <div
       className="hf"
       data-playing={playing ? "true" : "false"}
       data-progress={shown.toFixed(3)}
     >
-      <div className="hf-picture" role="img" aria-label={HERO.flow.label}><VillageScene compact={false} progress={shown} /><VillageScene compact progress={shown} /></div>
+      <div className="hf-picture" role="img" aria-label={HERO.flow.label}><VillageScene compact={false} progress={shown} provider={provider} /><VillageScene compact progress={shown} provider={provider} /></div>
     </div>
   </div>;
 }
