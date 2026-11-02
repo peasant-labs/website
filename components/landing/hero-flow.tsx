@@ -96,15 +96,13 @@ const Materials = memo(function Materials({ prefix }: { prefix: string }) {
 function laptopPlan(compact: boolean) {
   return { w: compact ? 47 : 96, h: compact ? 46 : 58, x: compact ? 13 : 30, y: compact ? 43 : 31, d: compact ? 4 : 6, size: compact ? 11 : 20 };
 }
-const Laptop = memo(function Laptop({ compact, draw, provider }: { compact: boolean; draw: Drawing; provider: number }) {
+const Laptop = memo(function Laptop({ compact, draw }: { compact: boolean; draw: Drawing }) {
   const { face, box, shadow } = draw;
-  const { w, h, x, y, d, size } = laptopPlan(compact);
-  const agent = HERO.flow.agents[provider];
+  const { w, h, x, y, d } = laptopPlan(compact);
   return <g className="hf-laptop">
     {shadow(x - 6, 105, w + 17)}{box(x, y, w, h, 1, "cross")}
     <g className="hf-screen">
       {face([[x + 4, y + 4], [x + w - 4, y + 4], [x + w - 4, y + h - 4], [x + 4, y + h - 4]], null)}
-      <g className="hf-screen-marks" transform={`translate(${x + Math.round((w - size) / 2)} ${y + Math.round((h - size) / 2)})`}><BrandMark name={agent.mark} size={size} /></g>
     </g>
     {face([[x, y + h + 1], [x + w, y + h + 1], [x + w - 2 * d, y + h + 2 * d + 1], [x - 2 * d, y + h + 2 * d + 1]], "dots")}
     {face([[x - 2 * d, y + h + 2 * d + 1], [x + w - 2 * d, y + h + 2 * d + 1], [x + w - 2 * d, y + h + 2 * d + 4], [x - 2 * d, y + h + 2 * d + 4]], "deep")}
@@ -112,6 +110,12 @@ const Laptop = memo(function Laptop({ compact, draw, provider }: { compact: bool
     {face([[x + Math.round(w * .35), y + h + 8], [x + Math.round(w * .6), y + h + 8], [x + Math.round(w * .6) - 3, y + h + 10], [x + Math.round(w * .35) - 3, y + h + 10]], null)}
   </g>;
 });
+
+function ScreenMark({ compact, provider, progress }: { compact: boolean; provider: number; progress: number }) {
+  const { w, h, x, y, size } = laptopPlan(compact);
+  const opacity = ease(phase(progress, 0, .06)) * (1 - ease(phase(progress, .94, 1)));
+  return <g className="hf-screen-marks" opacity={opacity} transform={`translate(${x + Math.round((w - size) / 2)} ${y + Math.round((h - size) / 2)})`}><BrandMark name={HERO.flow.agents[provider].mark} size={size} /></g>;
+}
 
 function workshopPlan(compact: boolean) {
   return { x: compact ? 74 : 180, w: compact ? 57 : 66, px: compact ? 9 : 12, pw: compact ? 37 : 43, personX: compact ? 65 : 81 };
@@ -186,20 +190,27 @@ const Ground = memo(function Ground({ compact, draw }: { compact: boolean; draw:
   for (let x = 7; x < (compact ? 155 : 310); x += 7) dots.push(<path key={x} d={`M${x} ${113 + x % 3}h.3v.3h-.3z`} fill={INK} />);
   return <>{dots}<g className="hf-feed-bench">{draw.box(start, 102, end - start, 3, 3, "dots")}{!compact && <>{draw.box(142, 106, 3, 7, 1, "deep")}{draw.box(184, 106, 3, 7, 1, "deep")}</>}</g></>;
 });
+const TranscriptPaper = memo(function TranscriptPaper({ compact, draw }: { compact: boolean; draw: Drawing }) {
+  const w = compact ? 12 : 22, h = compact ? 18 : 28;
+  return <>
+    {draw.face([[0, 0], [w, 0], [w, h], [0, h]], null)}
+    {draw.line([[Math.round(w * .18), Math.round(h * .25)], [Math.round(w * .82), Math.round(h * .25)]])}
+    {draw.line([[Math.round(w * .18), Math.round(h * .45)], [Math.round(w * .82), Math.round(h * .45)]])}
+    {draw.face([[Math.round(w * .18), Math.round(h * .6)], [Math.round(w * .82), Math.round(h * .6)], [Math.round(w * .82), Math.round(h * .72)], [Math.round(w * .18), Math.round(h * .72)]], "amber", false)}
+  </>;
+});
 function Transcript({ compact, draw, progress }: { compact: boolean; draw: Drawing; progress: number }) {
   const laptop = laptopPlan(compact), shop = workshopPlan(compact);
-  const growth = ease(phase(progress, .04, .18)), travel = ease(phase(progress, .18, .5)), fold = ease(phase(progress, .22, .5)), delivery = ease(phase(progress, .75, .84));
-  const w = (compact ? 12 : 22) * growth, h = (compact ? 18 : 28) * growth;
+  const travel = ease(phase(progress, .18, .5)), flatten = ease(phase(progress, .34, .5)), delivery = ease(phase(progress, .75, .84));
+  const w = compact ? 12 : 22, h = compact ? 18 : 28;
   const startX = laptop.x + (laptop.w - w) / 2, startY = laptop.y + (laptop.h - h) / 2;
-  const x = Math.round(lerp(lerp(startX, shop.x + shop.px + 9, travel), shop.x + shop.w - 15, delivery));
-  const y = Math.round(lerp(startY, 100, travel));
-  const points = (screen: readonly Point[], flat: readonly Point[]) => screen.map(([sx, sy], i) => [Math.round(lerp(sx, flat[i][0], fold)), Math.round(lerp(sy, flat[i][1], fold))] as Point);
-  return <g className="hf-transcript" transform={`translate(${x} ${y})`} opacity={ease(phase(progress, .04, .065)) * (1 - ease(phase(progress, .97, 1)))}>
-    {draw.face(points([[0, 0], [w, 0], [w, h], [0, h]], [[0, 0], [27, 0], [35, -5], [8, -5]]), null)}
-    {draw.line(points([[w * .18, h * .25], [w * .82, h * .25]], [[9, -3], [27, -3]]))}
-    {draw.line(points([[w * .18, h * .45], [w * .82, h * .45]], [[5, -1], [23, -1]]))}
-    {draw.face(points([[w * .18, h * .6], [w * .82, h * .6], [w * .82, h * .72], [w * .18, h * .72]], [[11, -2], [22, -2], [25, -3], [14, -3]]), "amber", false)}
-    <path data-part="approval-seal" d="M18 -2h3v2h-3z" fill={AMBER} opacity={progress >= .89 ? 1 : 0} />
+  const x = lerp(lerp(startX, shop.x + shop.px + 9, travel), shop.x + shop.w - 15, delivery);
+  const y = lerp(startY, 95, travel);
+  // Keep the page's orientation positive while it settles onto the press bed.
+  // The drawing stays fixed; fractional transforms avoid rebuilding its pixel edges.
+  return <g className="hf-transcript" shapeRendering="geometricPrecision" transform={`matrix(${lerp(1, 27 / w, flatten)} 0 ${8 / h * flatten} ${lerp(1, 5 / h, flatten)} ${x} ${y})`} opacity={ease(phase(progress, .04, .12)) * (1 - ease(phase(progress, .93, .99)))}>
+    <TranscriptPaper compact={compact} draw={draw} />
+    <rect data-part="approval-seal" x={w * .65} y={h * .6} width={w * .16} height={h * .16} fill={AMBER} opacity={ease(phase(progress, .87, .89))} />
   </g>;
 }
 function VillageScene({ compact, progress, provider }: { compact: boolean; progress: number; provider: number }) {
@@ -207,7 +218,7 @@ function VillageScene({ compact, progress, provider }: { compact: boolean; progr
   return <svg className={`hf-art ${compact ? "hf-narrow" : "hf-wide"}`} viewBox={compact ? "0 0 480 360" : "0 0 960 360"} aria-hidden="true" focusable="false">
     <Materials prefix={id} />
     <g className="hf-scene" transform={compact ? "scale(3)" : "translate(24 0) scale(3)"} shapeRendering="crispEdges">
-      <Ground compact={compact} draw={draw} /><Laptop compact={compact} draw={draw} provider={provider} /><Workshop compact={compact} draw={draw} motion={motion} />
+      <Ground compact={compact} draw={draw} /><Laptop compact={compact} draw={draw} /><ScreenMark compact={compact} provider={provider} progress={progress} /><Workshop compact={compact} draw={draw} motion={motion} />
       <Transcript compact={compact} draw={draw} progress={progress} /><WorkshopFront compact={compact} draw={draw} motion={motion} />
     </g>
   </svg>;

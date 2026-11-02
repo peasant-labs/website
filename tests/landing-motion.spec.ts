@@ -416,10 +416,21 @@ for (const { name, width, colorScheme, compact } of fixture.hero.flow.layouts) {
     const activeProvider = fixture.hero.flow.providerOrder[1];
     await expect(art.locator(".hf-screen-marks [data-brand]")).toHaveAttribute("data-brand", activeProvider);
     const sheet = await art.locator(".hf-transcript").elementHandle();
+    const outline = await art.locator(".hf-transcript path").first().getAttribute("d");
     let elapsed = 32, previousLeft = -Infinity;
     for (const frame of fixture.hero.flow.journeyFrames) {
       await page.clock.runFor(frame.time - elapsed); elapsed = frame.time;
       const paper = await transcriptGeometry(art);
+      await expect(art.locator(".hf-transcript path").first(), "paper edges stay fixed instead of being redrawn as it moves").toHaveAttribute("d", outline!);
+      const matrix = await sheet!.evaluate(node => { const m = (node as SVGGraphicsElement).transform.baseVal.consolidate()!.matrix; return { a: m.a, b: m.b, c: m.c, d: m.d, x: m.e, y: m.f }; });
+      expect(matrix.a * matrix.d - matrix.b * matrix.c, "the sheet never collapses or turns inside out").toBeGreaterThan(0);
+      if (frame.name === "travel") {
+        await page.clock.runFor(fixture.hero.flow.motionSampleMs); elapsed += fixture.hero.flow.motionSampleMs;
+        const nextX = await sheet!.evaluate(node => (node as SVGGraphicsElement).transform.baseVal.consolidate()!.matrix.e);
+        expect(nextX, "the paper advances between adjacent frames").toBeGreaterThan(matrix.x);
+        expect(nextX - matrix.x, "the paper glides without whole-cell jumps").toBeLessThan(fixture.hero.flow.motionMaxStep);
+        expect(Math.abs(nextX - Math.round(nextX)), "translation retains subcell precision").toBeGreaterThan(.001);
+      }
       expect(paper.count, "one physical transcript is conserved throughout the cycle").toBe(fixture.hero.flow.sheetCount);
       expect(await sheet!.evaluate(node => node.isConnected && node === (node as SVGElement).ownerSVGElement!.querySelector(".hf-transcript")), `the same sheet reaches ${frame.name}`).toBe(true);
       await expect(art.locator(".hf-feed, .hf-feed-sheet")).toHaveCount(0);
@@ -473,13 +484,18 @@ for (const { name, width, colorScheme, compact } of fixture.hero.flow.layouts) {
         await expect(art.locator('[data-part="approval-seal"]')).toHaveAttribute("opacity", "1");
       }
     }
-    await page.clock.runFor(fixture.hero.flow.duration - elapsed + 32);
+    for (const frame of fixture.hero.flow.logoTransition) {
+      await page.clock.runFor(frame.time - elapsed); elapsed = frame.time;
+      const mark = art.locator(".hf-screen-marks");
+      await expect(mark.locator("[data-brand]")).toHaveAttribute("data-brand", frame.provider);
+      const opacity = await mark.evaluate(node => Number(getComputedStyle(node).opacity));
+      expect(opacity, frame.name).toBeGreaterThanOrEqual(frame.minOpacity);
+      expect(opacity, frame.name).toBeLessThanOrEqual(frame.maxOpacity);
+      if (frame.name === "seam") expect((await transcriptGeometry(art)).painted, "the completed sheet leaves before the next one forms").toBe(false);
+    }
     await expect(flow).toHaveAttribute("data-playing", "true");
-    expect(Number(await flow.getAttribute("data-progress"))).toBeLessThan(.02);
-    await expect(art.locator(".hf-screen-marks [data-brand]")).toHaveAttribute("data-brand", fixture.hero.flow.providerOrder[2]);
-    expect((await transcriptGeometry(art)).painted, "the completed sheet leaves before the next one forms").toBe(false);
     expect(await sheet!.evaluate(node => node.isConnected && node === (node as SVGElement).ownerSVGElement!.querySelector(".hf-transcript"))).toBe(true);
-    await page.clock.runFor(fixture.hero.flow.journeyFrames[0].time);
+    await page.clock.runFor(fixture.hero.flow.duration + fixture.hero.flow.journeyFrames[0].time - elapsed);
     expect((await transcriptGeometry(art)).painted, "the next provider creates the next transcript on screen").toBe(true);
   });
 }

@@ -42,6 +42,16 @@ hero:
     members: [back-reader, front-reader, printer]
     duration: 8000
     rest: 0.9
+    # 134.5-cell wide journey / 2.56s, smoothstep peak speed, plus one RAF interval.
+    motionMaxStep: 1.4
+    motionSampleMs: 16
+    logoTransition:
+      - { name: outgoing, time: 7680, provider: openai, minOpacity: 0.65, maxOpacity: 0.85 }
+      - { name: faded, time: 7920, provider: openai, minOpacity: 0.01, maxOpacity: 0.15 }
+      - { name: seam, time: 8032, provider: cursor, minOpacity: 0, maxOpacity: 0.03 }
+      - { name: entering, time: 8160, provider: cursor, minOpacity: 0.15, maxOpacity: 0.4 }
+      - { name: returning, time: 8320, provider: cursor, minOpacity: 0.6, maxOpacity: 0.85 }
+      - { name: ready, time: 8480, provider: cursor, minOpacity: 0.98, maxOpacity: 1 }
     logoMinScreenRatio: { compact: 0.23, wide: 0.19 }
     # One physical sheet per cycle is the visual contract, from screen to stamp.
     sheetCount: 1
