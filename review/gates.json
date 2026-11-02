@@ -5,5 +5,5 @@
   "lint": "pass; six baseline warnings",
   "installer": "pass",
   "focusedBrowser": "8 passed",
-  "fullBrowser": "running"
+  "fullBrowser": "182 passed (6.5m)"
 }
