@@ -4,5 +4,5 @@
   "typescript": "pass",
   "lint": "pass; six baseline warnings",
   "installer": "pass",
-  "fullBrowser": "running"
+  "fullBrowser": "182 passed (6.6m)"
 }

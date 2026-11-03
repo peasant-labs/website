@@ -1,0 +1,145 @@
+{
+  "mergeCommit": "8b4c49d07d8a1081ea698ad54bc43468f5c03451",
+  "productionDeployments": [
+    {
+      "deployment": 7516208029,
+      "environment": "adaptable-motivation / production",
+      "state": "success",
+      "url": "https://railway.com/project/13899d33-ccb2-419b-b240-d7577317ec5f?environmentId=139ec968-add3-4489-9250-ca5913de3e24"
+    },
+    {
+      "deployment": 7516207984,
+      "environment": "peasant-labs / production",
+      "state": "success",
+      "url": "https://railway.com/project/47e906cb-aef9-4c1f-a42e-e6e7edb82381?environmentId=d320722b-16ef-437d-a680-de88396dc65d"
+    }
+  ],
+  "localBuildId": "UmzNdjhXdFb6Snrr-Hlk_",
+  "loadedAssetMatches": 30,
+  "themeChecks": [
+    {
+      "case": "phone-light",
+      "unix": {
+        "cardBottom": 792.4375,
+        "linkTop": 804.4375,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 841.03125,
+        "linkTop": 853.03125,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "phone-dark",
+      "unix": {
+        "cardBottom": 792.4375,
+        "linkTop": 804.4375,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 841.03125,
+        "linkTop": 853.03125,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "tablet-light",
+      "unix": {
+        "cardBottom": 971.890625,
+        "linkTop": 983.890625,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 983.40625,
+        "linkTop": 995.40625,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "tablet-dark",
+      "unix": {
+        "cardBottom": 971.890625,
+        "linkTop": 983.890625,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 983.40625,
+        "linkTop": 995.40625,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-light",
+      "unix": {
+        "cardBottom": 790.171875,
+        "linkTop": 802.171875,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 818.46875,
+        "linkTop": 830.46875,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-dark",
+      "unix": {
+        "cardBottom": 790.171875,
+        "linkTop": 802.171875,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 818.46875,
+        "linkTop": 830.46875,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    }
+  ],
+  "independentReviews": {
+    "head": "4a4d4a931e06546dc8977e0579e26fd19d6f50c7",
+    "axes": [
+      "A",
+      "B",
+      "C"
+    ],
+    "blockers": 0,
+    "important": 0,
+    "minor": 0,
+    "resolvedIssues": [
+      57
+    ]
+  },
+  "deploymentLimitations": [],
+  "cleanup": "Owned feature worktree, branch and proof server removed; synced and rebuilt main serves3314. Existing app/fixture services retained."
+}

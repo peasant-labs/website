@@ -1,0 +1,148 @@
+{
+  "head": "8b4c49d07d8a1081ea698ad54bc43468f5c03451",
+  "buildId": "UmzNdjhXdFb6Snrr-Hlk_",
+  "assets": {
+    "/_next/static/css/e1ca4a7f35ff7017.css": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+    "/_next/static/css/508d11f51c7fa509.css": "cb71b7bbdecce851ec4544732615e532ec2232e7d6805d7fb3a98e9657a335fa",
+    "/_next/static/css/04d8f823600284cc.css": "f12d859a010ede4c9e19c438dc557c4bcb61c94afab5b16befb5afe2e97a0552",
+    "/_next/static/css/8b54ad58cabff861.css": "20fecfe19d550cde05fd63066fba9baef0f8e8d4ac0a759fb00e510a5b0b607c",
+    "/_next/static/css/6d9d8256903444dc.css": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+    "/_next/static/css/8f74d6608d9c0e2f.css": "179c16e9af1cd47c2d0af5b773ec17c9e9a75fbc666041939c0ef0ba7eb7d049",
+    "/_next/static/css/acd68af486ce2177.css": "0a2e6f40933b7ee5a455fdf1577a3d1280f725c0674d84e738fa0659964450b2",
+    "/_next/static/chunks/webpack-4c39f26cab468a5a.js": "983dd9f2abb152dbfbc15c118cd2b16f610ca9d58dda4368a5100834bec9a29f",
+    "/_next/static/chunks/18bad13d-801de1ca2fb94551.js": "b91198d73599cb60bf5795912a75f284e125aa0c50415123468f1e5c04702b28",
+    "/_next/static/chunks/368-ce6821a876415a95.js": "f96dc70fc8fdb29f59a0c78f98fef9825a9049610760a81a3c275c77a3569c79",
+    "/_next/static/chunks/main-app-47d71ef97e7b1074.js": "8d41d8ebd8a45fa336c6f8d376dde88e082005b88389f64c341bf9a8ff317aa0",
+    "/_next/static/chunks/app/layout-470ea8b20ad3c12f.js": "ba997c2d620561b133b30b06c62169c0d3069e3a62d2d6eca7b82cffb5f906d9",
+    "/_next/static/chunks/335b9414-c3298510c80fa84c.js": "b804937546a4a95b6878e5799ecbeaaa73892e1c541d7314e01ad938524910a3",
+    "/_next/static/chunks/f777d375-e7c98ff759489d2c.js": "4fb0f61479b6cd0e91ba0a509e0ebfc346662fcf120da6fef33554cf391ef4ea",
+    "/_next/static/chunks/77d3b4b7-0a729972948fb933.js": "ad82774d90e788369445f49065c50ef5b7e4d2ae8244eb5e9934b21f65754c51",
+    "/_next/static/chunks/349-b2c0f7af17e850aa.js": "2fff72ebafc4a3fa5c489f51f4142beb9795e2dd4b4b29611334df8bcdd33eff",
+    "/_next/static/chunks/2167-e2a28884c56d2c6d.js": "b40a510225f66908c7102d2472807b3ee434f411d284c1307b02a026f7889fe4",
+    "/_next/static/chunks/7686-0706444e566035c8.js": "d526ccfdc9b0608cf42b067491ac567a0fce135dc00e098cd373b446eb6bc8a7",
+    "/_next/static/chunks/app/error-df1ad7dffb4b26b4.js": "c828e27d8b9dfdb8dec4c8bf50e599449c4ff8606afd3de596d79b1f1d90c4a4",
+    "/_next/static/chunks/9216-f8398bede6a99f77.js": "4a1996899eca169a8fb3e302f5a1a11ec728ccf0e56ff0f2c3fb9b57fb663467",
+    "/_next/static/chunks/6716-53ebfd668b8bd83e.js": "490c6af45a414ad6a644701c53d85157c2151e60e4aa07a7d65111b0e8fd85c9",
+    "/_next/static/chunks/9793-35f165b99628adcd.js": "34e15e8748db3451c364e2d426fe8ee5dcdb8e5ba543e252897285d993f4b726",
+    "/_next/static/chunks/app/page-21eed194f1188409.js": "32d2b112c50f007ba6e5411b42425b6da3ae2e286593102740f0f1bd0913b457",
+    "/_next/static/chunks/app/global-error-33f2580ec93b9e0f.js": "c23f9b77baa249856ec0456edbbb25241649bb6600296f8d52446cd5d09ce623",
+    "/_next/static/css/640d3b3894fc812f.css": "16b63888a36cd181093065e3e060058a96fd6bd256910545366ba0af14ecf72a",
+    "/_next/static/chunks/app/blog/layout-77ee231b4e606008.js": "c201fe4da568c68c6e959a3409f9882ff6f3b9e27c9460be48491e3c28536bb0",
+    "/_next/static/chunks/app/blog/page-55e9a5fec4e13bdb.js": "5c73d177ea4874c18b6989bf0b291862ef57923e07ddd183ab5759d73e992fae",
+    "/_next/static/chunks/1980-61b7a04cf128320c.js": "8ded762227767f312e8a0f83cf6afda3855d451933b2d4763ff17dd45a865e99",
+    "/_next/static/chunks/app/docs/layout-4ecdadbd1b4600ae.js": "dcbab60c4984f1300c2942899aec6412f0e17886e104756103d4208ef63de95f",
+    "/_next/static/chunks/app/docs/page-92bcfab87df60a31.js": "de5e87ee519c2a39fadb2f366e7dd47a89361a4e31cffe57bac4b414cfb6e9ec"
+  },
+  "images": [],
+  "results": [
+    {
+      "case": "phone-light",
+      "unix": {
+        "cardBottom": 792.4375,
+        "linkTop": 804.4375,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 841.03125,
+        "linkTop": 853.03125,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "phone-dark",
+      "unix": {
+        "cardBottom": 792.4375,
+        "linkTop": 804.4375,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 841.03125,
+        "linkTop": 853.03125,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "tablet-light",
+      "unix": {
+        "cardBottom": 971.890625,
+        "linkTop": 983.890625,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 983.40625,
+        "linkTop": 995.40625,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "tablet-dark",
+      "unix": {
+        "cardBottom": 971.890625,
+        "linkTop": 983.890625,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 983.40625,
+        "linkTop": 995.40625,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-light",
+      "unix": {
+        "cardBottom": 790.171875,
+        "linkTop": 802.171875,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 818.46875,
+        "linkTop": 830.46875,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-dark",
+      "unix": {
+        "cardBottom": 790.171875,
+        "linkTop": 802.171875,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 818.46875,
+        "linkTop": 830.46875,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    }
+  ],
+  "errors": []
+}
