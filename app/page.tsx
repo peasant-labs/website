@@ -80,9 +80,6 @@ export default function Home() {
               <h2 id="install-title" className="lp-title" data-fade>
                 {INSTALL.title}
               </h2>
-              <Link className="site-link lp-install-guide" href={INSTALL.guide.href}>
-                {INSTALL.guide.label}
-              </Link>
             </div>
             <GetStarted />
           </div>
