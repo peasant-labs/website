@@ -1,0 +1,8 @@
+{
+  "head": "4a4d4a931e06546dc8977e0579e26fd19d6f50c7",
+  "build": "pass",
+  "typescript": "pass",
+  "lint": "pass; six baseline warnings",
+  "installer": "pass",
+  "fullBrowser": "running"
+}

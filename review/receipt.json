@@ -1,0 +1,173 @@
+{
+  "head": "4a4d4a931e06546dc8977e0579e26fd19d6f50c7",
+  "buildId": "uyQ02mq8WUZCoLLqRfTzc",
+  "assets": {
+    "/_next/static/css/e1ca4a7f35ff7017.css": "20b27aa89705062268c11d0768451e95a6adffda927297b9316637f23db26b6b",
+    "/_next/static/css/508d11f51c7fa509.css": "cb71b7bbdecce851ec4544732615e532ec2232e7d6805d7fb3a98e9657a335fa",
+    "/_next/static/css/8f74d6608d9c0e2f.css": "179c16e9af1cd47c2d0af5b773ec17c9e9a75fbc666041939c0ef0ba7eb7d049",
+    "/_next/static/css/04d8f823600284cc.css": "f12d859a010ede4c9e19c438dc557c4bcb61c94afab5b16befb5afe2e97a0552",
+    "/_next/static/css/8b54ad58cabff861.css": "20fecfe19d550cde05fd63066fba9baef0f8e8d4ac0a759fb00e510a5b0b607c",
+    "/_next/static/css/6d9d8256903444dc.css": "ad30a3a1e18ed6ffafeae36e135652bf4a34cd541a5ee476cebc565b54975edf",
+    "/_next/static/css/acd68af486ce2177.css": "0a2e6f40933b7ee5a455fdf1577a3d1280f725c0674d84e738fa0659964450b2",
+    "/_next/static/chunks/webpack-fd248d5099ef9ade.js": "6fd6dbc59a171869117a8c7bd044d3b2eef4a42ff2fc199585d2abaa4f49ed0a",
+    "/_next/static/chunks/18bad13d-801de1ca2fb94551.js": "b91198d73599cb60bf5795912a75f284e125aa0c50415123468f1e5c04702b28",
+    "/_next/static/chunks/368-ce6821a876415a95.js": "f96dc70fc8fdb29f59a0c78f98fef9825a9049610760a81a3c275c77a3569c79",
+    "/_next/static/chunks/main-app-16ac4269d0ffe2b4.js": "13938a4f85104163207ba071236bcea6196e9a289fd8f5a44d0ac3a09e39be1d",
+    "/_next/static/chunks/app/layout-58b0e522d073aba8.js": "3cecb025f077d6e5b4bc35506bf00e77281ea4034f16565badfc62d473c72875",
+    "/_next/static/chunks/335b9414-c3298510c80fa84c.js": "b804937546a4a95b6878e5799ecbeaaa73892e1c541d7314e01ad938524910a3",
+    "/_next/static/chunks/f777d375-e7c98ff759489d2c.js": "4fb0f61479b6cd0e91ba0a509e0ebfc346662fcf120da6fef33554cf391ef4ea",
+    "/_next/static/chunks/77d3b4b7-0a729972948fb933.js": "ad82774d90e788369445f49065c50ef5b7e4d2ae8244eb5e9934b21f65754c51",
+    "/_next/static/chunks/349-b2c0f7af17e850aa.js": "2fff72ebafc4a3fa5c489f51f4142beb9795e2dd4b4b29611334df8bcdd33eff",
+    "/_next/static/chunks/2167-e2a28884c56d2c6d.js": "b40a510225f66908c7102d2472807b3ee434f411d284c1307b02a026f7889fe4",
+    "/_next/static/chunks/7686-0706444e566035c8.js": "d526ccfdc9b0608cf42b067491ac567a0fce135dc00e098cd373b446eb6bc8a7",
+    "/_next/static/chunks/app/error-400ebd29e047d230.js": "6f3d08aba952193f6a159bd6c91d0af0c8f8a938d81609d441dea7e036f62d72",
+    "/_next/static/chunks/9216-f8398bede6a99f77.js": "4a1996899eca169a8fb3e302f5a1a11ec728ccf0e56ff0f2c3fb9b57fb663467",
+    "/_next/static/chunks/6716-53ebfd668b8bd83e.js": "490c6af45a414ad6a644701c53d85157c2151e60e4aa07a7d65111b0e8fd85c9",
+    "/_next/static/chunks/9793-35f165b99628adcd.js": "34e15e8748db3451c364e2d426fe8ee5dcdb8e5ba543e252897285d993f4b726",
+    "/_next/static/chunks/app/page-ac7413ad58991007.js": "cfef67314da850871e483d58978b157c4104b4a8081a3eacf81d301ac23decdd",
+    "/_next/static/chunks/app/global-error-f6ddb0104c8e5030.js": "d471fb3bd1bbc6f01dcfc25e2f0d1180d6a39be7d35eeb4fee1b20bd98946cf6",
+    "/_next/static/css/640d3b3894fc812f.css": "16b63888a36cd181093065e3e060058a96fd6bd256910545366ba0af14ecf72a",
+    "/_next/static/chunks/app/docs/layout-dba4b715fc1d8aa2.js": "764b89af9549bcc4f9a7b88f66ea1995da52fc8ccefa716154eef9b4b128e3a6",
+    "/_next/static/chunks/app/blog/layout-31770273c5e083de.js": "6c72a7b2d10248994ce19fc6641837828a86aec729d2a9fd2b9c75b3db6b603b",
+    "/_next/static/chunks/app/docs/page-248ddbfb7422a97c.js": "3fe2015d6386086f00dcd1dbc1ef31ecd8127dab7b68f100bea2060351930ef3",
+    "/_next/static/chunks/app/blog/page-3fb54d5668f0ee6d.js": "f3329542b4b26d7a7d4b0c6628d0953102f9a13bdb01e8840eee33c38d84e020",
+    "/_next/static/chunks/8280-ba66e3bf3deddc93.js": "d622559faed8938864d178d1df8d7c39134520da53826ef010278eb42326f2bb"
+  },
+  "images": [
+    {
+      "file": "setup-phone-light.png",
+      "sha256": "b87a163eeef9c9ee8db9071242b6782d46b351a537ba10e4519673a42fa679ad"
+    },
+    {
+      "file": "setup-phone-dark.png",
+      "sha256": "306049d8a57cb6d2af9bacf6d065285a8a0969970d6d5161b4d064367055da9c"
+    },
+    {
+      "file": "setup-tablet-light.png",
+      "sha256": "938a401d28a5e2919fce76f35a623883da459a4d1f16d30bb63d2ac42a107ada"
+    },
+    {
+      "file": "setup-tablet-dark.png",
+      "sha256": "f32ffcbd685cd0e13e7bf907a1484c4deabcd0ce11ec3bd2084bca3a0c129a4b"
+    },
+    {
+      "file": "setup-desktop-light.png",
+      "sha256": "6576355989e64a3eee261ffed6b85299d439c64f99f46624645591968bc7a1ee"
+    },
+    {
+      "file": "setup-desktop-dark.png",
+      "sha256": "20f36eadef275ab480ba0b460a0c19b81d45a21fd368ead93877f5c0fa6f14c9"
+    }
+  ],
+  "results": [
+    {
+      "case": "phone-light",
+      "unix": {
+        "cardBottom": 792.4375,
+        "linkTop": 804.4375,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 841.03125,
+        "linkTop": 853.03125,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "phone-dark",
+      "unix": {
+        "cardBottom": 792.4375,
+        "linkTop": 804.4375,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 841.03125,
+        "linkTop": 853.03125,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "tablet-light",
+      "unix": {
+        "cardBottom": 971.890625,
+        "linkTop": 983.890625,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 983.40625,
+        "linkTop": 995.40625,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "tablet-dark",
+      "unix": {
+        "cardBottom": 971.890625,
+        "linkTop": 983.890625,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 983.40625,
+        "linkTop": 995.40625,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-light",
+      "unix": {
+        "cardBottom": 790.171875,
+        "linkTop": 802.171875,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 818.46875,
+        "linkTop": 830.46875,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    },
+    {
+      "case": "desktop-dark",
+      "unix": {
+        "cardBottom": 790.171875,
+        "linkTop": 802.171875,
+        "linkHeight": 44
+      },
+      "windows": {
+        "cardBottom": 818.46875,
+        "linkTop": 830.46875,
+        "linkHeight": 44
+      },
+      "oneTrailingLink": true,
+      "noHeadingLink": true,
+      "docsNavigation": true,
+      "docsOptOut": true,
+      "overflow": 0
+    }
+  ],
+  "errors": []
+}
