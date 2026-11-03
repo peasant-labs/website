@@ -179,9 +179,26 @@
   }
 }
 
-/* the link to the install guide shows on a phone only, under the card, in place of the one beside the title */
+/* Installation alternatives follow the complete instructions at every width. */
 .gs-guide {
-  display: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: var(--target-comfortable);
+  margin-block-start: var(--sp-3);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 4px;
+}
+
+.gs-guide svg {
+  flex: none;
+  width: var(--ic-sm);
+  height: var(--ic-sm);
 }
 
 /* how much of a phone's command fades at its right edge while more of it is out of sight; none at its end */
@@ -211,8 +228,7 @@
  * content's width, all on the page's one edge. The command never wraps: it scrolls sideways
  * inside its block, fading at the right edge while more of it is out of
  * sight, and its copy button stays an icon at full tap size. Under the steps,
- * a quiet link to the install guide takes the place of the one beside the
- * title.
+ * the same quiet link to installation alternatives follows the instructions.
  */
 @media (max-width: 30rem) {
   .gs {
@@ -285,26 +301,5 @@
   /* a keyboard focus ring shows whole */
   .gs .cli-cmd-wrap .cli-cmd-line:focus-visible {
     mask-image: none;
-  }
-
-  .gs-guide {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--sp-2);
-    min-height: var(--target-comfortable);
-    margin-block-start: var(--sp-3);
-    color: var(--ink-3);
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: 0;
-    text-decoration: underline;
-    text-decoration-color: var(--rule-strong);
-    text-underline-offset: 4px;
-  }
-
-  .gs-guide svg {
-    flex: none;
-    width: var(--ic-sm);
-    height: var(--ic-sm);
   }
 }

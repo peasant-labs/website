@@ -2015,28 +2015,8 @@
 
 /* get started */
 
-/*
- * One card at the content's width, in the docs cards' tokens: fairtrade's
- * tabs for the systems along its top, then three numbered rows split by
- * hairlines, which carry the card's room. Each row is a small muted number,
- * the command in fairtrade's CommandBlock as the docs draw it, and under it
- * what it does in the docs' label style.
- */
-.lp-install-guide {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--target-comfortable);
-  font-family: var(--font-mono);
-  font-size: var(--fs-body);
-  letter-spacing: 0;
-}
-
 #install .lp-title {
   line-height: var(--lh-mono);
-}
-
-@media (max-width: 30rem) {
-  .lp-install-guide { display: none; }
 }
 
 /* a published session */

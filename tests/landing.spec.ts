@@ -275,7 +275,7 @@ test("the install card is fairtrade's tabs and CommandBlocks, one terminal comma
   }
 });
 
-test("on a wide screen the install card keeps every command whole on its line, with the docs link beside the title", async ({
+test("on a wide screen the install card keeps every command whole on its line, with the docs link after the instructions", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -283,7 +283,10 @@ test("on a wide screen the install card keeps every command whole on its line, w
   const section = page.locator("#install");
   const guide = section.getByRole("link", { name: fixture.install.guide.label });
   await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
-  await expect(section.locator(".gs-guide")).toBeHidden();
+  await expect(guide).toHaveCount(1);
+  const card = (await section.locator("[data-install-shell]").boundingBox())!;
+  const link = (await guide.boundingBox())!;
+  expect(link.y).toBeGreaterThan(card.y + card.height);
   // nothing scrolls: each command shows whole, on one line
   const lines = await section
     .locator('[role="tabpanel"]:not([hidden]) .cli-cmd-line')
@@ -330,9 +333,9 @@ test("on a phone installation keeps two plain actions, matching copy targets and
         ),
       )
       .toBe(0);
-    // the link beside the title gives way to a quiet one under the card, to the install guide
-    await expect(section.locator(".lp-install-guide")).toBeHidden();
+    // Installation alternatives follow both instructions at every width.
     const guide = section.getByRole("link", { name: fixture.install.guide.label });
+    await expect(guide).toHaveCount(1);
     await expect(guide).toHaveAttribute("href", fixture.install.guide.href);
     const [card, link] = [(await shell.boundingBox())!, (await guide.boundingBox())!];
     expect(link.y, `the install guide link is not under the card ${at}`).toBeGreaterThan(card.y + card.height);
