@@ -4,8 +4,9 @@ import type { TocItem } from "@/lib/docs-content";
 /*
  * The essay first published as the front page of peasantlabs.org on
  * 2026-05-20, moved here when the front page became the product landing page.
- * Its sentences are unchanged; its opening summary was taken out, and short
- * headings in its own words mark its parts for "on this page". Its words are
+ * Its sentences are unchanged: it opens with its own summary and the three
+ * goals that finish that summary's last sentence, and short headings in its
+ * own words mark its parts for "on this page". Its words are
  * data, so the docs search indexes exactly what the page shows; [label](href)
  * marks a link, which opens in a new tab.
  */
@@ -51,6 +52,16 @@ const PROBLEMS = [
   },
 ] as const;
 
+/* the essay's opening: its summary, whose last sentence the three goals finish */
+const OPENING =
+  "We are developing the suite of tools required to safely share and manage access to transcripts produced by coding agent sessions. While others are developing similar tools, our tools are designed to be local-first, prioritizing the user’s autonomy with explicit opt-ins at network boundaries; and to provide fine-grained access controls at low friction, with sane defaults and settings profiles for varying levels of complexity. This will be a fundamental component of software engineering infrastructure, enabling us to";
+
+const GOALS = [
+  "incorporate coding agents into software engineering processes in a sustainable way",
+  "create a data commons with the public interest in mind",
+  "allow the public to have autonomy over their data, outside the walled gardens run by corporate actors such as Anthropic or OpenAI",
+] as const;
+
 const BODY = [
   "Using coding agents like Claude Code or OpenAI Codex leaves traces on your local machine in the form of transcripts, and these transcripts contain all the messages and tool calls from your coding sessions. This means that much of the software engineering lifecycle can be captured within a series of coding agent transcripts. The amount captured depends on your usage patterns and how reliant you are on these agentic tools. If you’re involving agents every step of the way, your entire process of research, product ideation, requirements gathering, iterating, fixing, and maintaining code may all be in your transcript. These traces contain all of your preference data about what you built, valued, and accepted.",
   "The speedup you get from AI coding agents also fizzles once you introduce …. one other human. Collaborating with others means reviewing your teammate’s code, or a random contributor’s pull request that modified 10K lines in the codebase. As stated by Simon Willison (and one month earlier by [Kailash Nadh](https://nadh.in/blog/code-is-cheap/)), [“Writing code is cheap now”](https://simonwillison.net/guides/agentic-engineering-patterns/code-is-cheap/) , but there is still substantial effort when it comes to engineering good, verified, and maintainable solutions for multiple operating systems and form factors — and these engineering decisions would be sitting in the coding agent transcripts. When I’m handed a large slop PR, whether good or bad, I’d prefer to also see the person’s engineering process. How were they actually thinking about the problem? Did they do their due diligence? Ask the right questions? Was this a one-prompt job? Many developers haven’t tried looking at their past sessions: for those that have, it is often an unpleasant challenge, and figuring out how to share them with others is worse. Within a mountain of JSONL files and coding sessions only named by their UUID, finding the exact set of transcripts that corresponded to a given commit or pull request may be impossible.",
@@ -69,6 +80,8 @@ const CLOSING =
 
 /** every line the essay shows, in reading order, for the docs search */
 export const ESSAY_TEXT: readonly string[] = [
+  OPENING,
+  ...GOALS,
   PARTS.traces.title,
   BODY[0],
   PARTS.review.title,
@@ -100,6 +113,13 @@ function Paragraph({ text }: { text: string }) {
 export default function ReclaimingDataAutonomy() {
   return (
     <>
+      <p>{OPENING}</p>
+      <ol className="bx-list">
+        {GOALS.map((goal) => (
+          <li key={goal}>{goal}</li>
+        ))}
+      </ol>
+
       <Part part={PARTS.traces} />
       <Paragraph text={BODY[0]} />
 

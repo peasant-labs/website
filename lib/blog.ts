@@ -22,6 +22,7 @@ export type Post = Readonly<{
    * canonical address points there, so search engines credit the original
    */
   origin?: Readonly<{ name: string; href: string }>;
+  /* the picture on the post's card in the blog index; the post itself opens with its words */
   art: Art;
 }>;
 

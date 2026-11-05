@@ -157,11 +157,6 @@
   image-rendering: auto;
 }
 
-.bx-figure.dx-pic {
-  /* half the blog file's 1128px width */
-  --dx-pic-w: 35.25rem;
-}
-
 /* ---------- header ---------- */
 
 .dx-head {
@@ -1080,10 +1075,12 @@ ol.bx-list {
 }
 
 /* a figure fills the reading column; its caption sits under it in the secondary ink */
+/* only the browser's side margins go: the space above comes from the prose rhythm, like every other block */
 .bx-essay-figure {
   display: grid;
   gap: var(--sp-3);
-  margin: 0;
+  margin-inline: 0;
+  margin-block-end: 0;
 }
 
 .bx-essay-figure img {

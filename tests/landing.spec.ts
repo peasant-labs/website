@@ -486,7 +486,8 @@ test("every picture on the site is addressed by its content hash, so a redrawn p
   for (const name of readdirSync(folder)) {
     hashes.set(name, createHash("sha256").update(readFileSync(resolve(folder, name))).digest("hex").slice(0, 8));
   }
-  for (const path of ["/", "/docs", "/blog", `/blog/${fixture.posts[0]!.slug}`]) {
+  // a post opens with its words; its picture is on its card in the blog index
+  for (const path of ["/", "/docs", "/blog"]) {
     await page.goto(path);
     const sources = await page
       .locator('img[src^="/art/"]')

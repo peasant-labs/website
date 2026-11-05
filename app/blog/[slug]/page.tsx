@@ -1,4 +1,3 @@
-import { Art } from "@/components/art";
 import { DocHead, DocJump } from "@/components/docs/doc-parts";
 import { OnThisPage } from "@/components/docs/on-this-page";
 import { POST_BODIES, readingMinutes } from "@/content/blog";
@@ -65,7 +64,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       <div className="dx-columns">
         <div className="dx-article">
           <article className="dx-prose" aria-labelledby="page-heading">
-            <Art art={post.art} className="dx-pic bx-figure" />
             {post.origin ? (
               <p className="bx-origin">
                 first published on{" "}
