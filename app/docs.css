@@ -157,7 +157,6 @@
   image-rendering: auto;
 }
 
-.bx-post-art.dx-pic,
 .bx-figure.dx-pic {
   /* half the blog file's 1128px width */
   --dx-pic-w: 35.25rem;
@@ -960,26 +959,46 @@
   text-transform: none;
 }
 
-/* the blog lists its posts one to a row, each a docs card, so a picture shows at its full size */
+/* the blog lists its posts one to a row, each a docs card with a small picture beside its words, so several fit on a screen */
 .bx-posts.dx-guides {
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* a post's card keeps its picture above its words on a phone too: a post's summary is too long to sit beside it */
 .bx-post.dx-guide {
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto 1fr;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  grid-template-rows: auto;
 }
 
 .bx-post.dx-guide .dx-pic {
+  --dx-pic-w: 100%;
+
   min-height: 0;
-  padding: var(--sp-4);
-  border-inline-end: 0;
-  border-block-end: var(--bd);
+  padding: var(--sp-2);
+  border-block-end: 0;
+  border-inline-end: var(--bd);
 }
 
 .bx-post .dx-guide-text {
-  padding: var(--card-pad);
+  padding: var(--sp-3) var(--card-pad);
+}
+
+/* a card's summary keeps to three lines; the post itself has the rest */
+.bx-post .dx-guide-desc {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+@container dx-page (min-width: 34rem) {
+  .bx-post.dx-guide {
+    grid-template-columns: 12rem minmax(0, 1fr);
+  }
+
+  .bx-post.dx-guide .dx-pic {
+    padding: var(--sp-3);
+  }
 }
 
 /* a quote: a hairline on its left, the words in the secondary ink */
