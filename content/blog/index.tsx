@@ -1,6 +1,22 @@
 import type { TocItem } from "@/lib/docs-content";
 import type { ComponentType } from "react";
+import { EssayBody } from "@/components/blog/essay";
+import { type Essay, essayText, essayToc } from "@/lib/essay";
+import { STRIKES } from "./a-short-guide-to-data-strikes";
+import { BIG_DEAL } from "./coding-agents-are-a-big-deal";
 import ReclaimingDataAutonomy, { ESSAY_TEXT, ESSAY_TOC } from "./reclaiming-data-autonomy-as-a-peasant";
+import { DATA_DEAL } from "./the-coding-agent-data-deal";
+
+/** a post written as data (lib/essay.ts): its body, words and "on this page" all come from the one value */
+function essay(value: Essay) {
+  return {
+    Body: function Essay() {
+      return <EssayBody essay={value} />;
+    },
+    text: essayText(value),
+    toc: essayToc(value),
+  };
+}
 
 /**
  * Every listed post's body, the words it shows for the docs search, and its
@@ -12,6 +28,9 @@ export const POST_BODIES: Readonly<
   Record<string, { Body: ComponentType; text: readonly string[]; toc: readonly TocItem[] }>
 > = {
   "reclaiming-data-autonomy-as-a-peasant": { Body: ReclaimingDataAutonomy, text: ESSAY_TEXT, toc: ESSAY_TOC },
+  "a-short-guide-to-data-strikes": essay(STRIKES),
+  "the-coding-agent-data-deal": essay(DATA_DEAL),
+  "coding-agents-are-a-big-deal": essay(BIG_DEAL),
 };
 
 /* a reader's pace for the reading-time estimate, in words a minute */

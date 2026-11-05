@@ -157,12 +157,6 @@
   image-rendering: auto;
 }
 
-.bx-post-art.dx-pic,
-.bx-figure.dx-pic {
-  /* half the blog file's 1128px width */
-  --dx-pic-w: 35.25rem;
-}
-
 /* ---------- header ---------- */
 
 .dx-head {
@@ -955,26 +949,51 @@
   text-transform: none;
 }
 
-/* the blog lists its posts one to a row, each a docs card, so a picture shows at its full size */
+/* a byline's name is the author's, so it keeps its capitals inside the lowercase label */
+.bx-author {
+  text-transform: none;
+}
+
+/* the blog lists its posts one to a row, each a docs card with a small picture beside its words, so several fit on a screen */
 .bx-posts.dx-guides {
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* a post's card keeps its picture above its words on a phone too: a post's summary is too long to sit beside it */
 .bx-post.dx-guide {
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto 1fr;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  grid-template-rows: auto;
 }
 
 .bx-post.dx-guide .dx-pic {
+  --dx-pic-w: 100%;
+
   min-height: 0;
-  padding: var(--sp-4);
-  border-inline-end: 0;
-  border-block-end: var(--bd);
+  padding: var(--sp-2);
+  border-block-end: 0;
+  border-inline-end: var(--bd);
 }
 
 .bx-post .dx-guide-text {
-  padding: var(--card-pad);
+  padding: var(--sp-3) var(--card-pad);
+}
+
+/* a card's summary keeps to three lines; the post itself has the rest */
+.bx-post .dx-guide-desc {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+@container dx-page (min-width: 34rem) {
+  .bx-post.dx-guide {
+    grid-template-columns: 12rem minmax(0, 1fr);
+  }
+
+  .bx-post.dx-guide .dx-pic {
+    padding: var(--sp-3);
+  }
 }
 
 /* a quote: a hairline on its left, the words in the secondary ink */
@@ -1004,6 +1023,118 @@
 
 .essay-problems ul li::marker {
   color: var(--ink-3);
+}
+
+/* ---------- a guest essay: its credit, lists, figures and notes ---------- */
+
+/* where a guest post first appeared, above its first words, in the label style */
+.dx-prose > .bx-origin {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0;
+  word-spacing: normal;
+}
+
+.bx-origin .dx-link {
+  text-transform: none;
+}
+
+/* an essay's lists nest as deep as the author wrote them, each level a docs bullet */
+.bx-list {
+  display: grid;
+  gap: var(--sp-3);
+  padding-inline-start: 1.5em;
+  list-style: disc;
+}
+
+ol.bx-list {
+  list-style: decimal;
+}
+
+.bx-list .bx-list {
+  margin-block-start: var(--sp-3);
+  list-style: circle;
+}
+
+.bx-list .bx-list .bx-list {
+  list-style: square;
+}
+
+.bx-list li {
+  max-inline-size: var(--dx-col);
+  padding-inline-start: var(--sp-1);
+  color: var(--ink);
+  letter-spacing: var(--tracking-prose);
+  word-spacing: var(--word-spacing-prose);
+  text-wrap: pretty;
+}
+
+.bx-list li::marker {
+  color: var(--ink-3);
+}
+
+/* a figure fills the reading column; its caption sits under it in the secondary ink */
+/* only the browser's side margins go: the space above comes from the prose rhythm, like every other block */
+.bx-essay-figure {
+  display: grid;
+  gap: var(--sp-3);
+  margin-inline: 0;
+  margin-block-end: 0;
+}
+
+.bx-essay-figure img {
+  width: 100%;
+  height: auto;
+  border: var(--bd);
+}
+
+.bx-essay-figure figcaption {
+  color: var(--ink-2);
+  letter-spacing: var(--tracking-prose);
+  word-spacing: var(--word-spacing-prose);
+  text-wrap: pretty;
+}
+
+/* a reference to a note: a raised number, never smaller than the label size */
+.bx-note-ref {
+  font-size: max(var(--fs-label), 0.75em);
+  line-height: 0;
+}
+
+.bx-note-ref a {
+  padding-inline: 0.15em;
+  color: var(--ink-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.bx-notes {
+  display: grid;
+  gap: var(--sp-4);
+  padding-inline-start: 1.5em;
+  list-style: decimal;
+}
+
+.bx-notes li {
+  max-inline-size: var(--dx-col);
+  scroll-margin-top: var(--sp-5);
+}
+
+.bx-notes li::marker {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.bx-notes p + p {
+  margin-block-start: var(--sp-3);
+}
+
+.bx-note-back {
+  display: inline-block;
+  margin-block-start: var(--sp-2);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
 }
 
 /* ---------- docs search: fairtrade's command palette, with a snippet under each hit ---------- */

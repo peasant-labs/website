@@ -85,6 +85,44 @@ test("a blog post's \"on this page\" lists exactly its headings", async ({ page 
   }
 });
 
+test("a post's \"on this page\" marks its last part at the end of the page, and marks a part chosen from the list", async ({
+  page,
+}) => {
+  for (const post of landing.posts) {
+    await page.goto(`/blog/${post.slug}`);
+    const links = page.locator("main .dx-aside .dx-toc a");
+    const current = links.and(page.locator('[aria-current="location"]'));
+    await expect(current, `${post.slug}: a part is marked on arrival`).toHaveCount(1);
+    // a short last part never gets its heading to the top third: the end of the page marks it
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await expect(current, `${post.slug}: the end of the page marks the last part`).toHaveAttribute(
+      "href",
+      (await links.last().getAttribute("href"))!,
+    );
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(current).toHaveAttribute("href", (await links.first().getAttribute("href"))!);
+    await links.last().click();
+    await expect(current, `${post.slug}: a part chosen from the list is marked`).toHaveAttribute(
+      "href",
+      (await links.last().getAttribute("href"))!,
+    );
+  }
+});
+
+test("every block of a post keeps the prose rhythm: none sits flush against the one above it", async ({ page }) => {
+  for (const post of landing.posts) {
+    await page.goto(`/blog/${post.slug}`);
+    const flush = await page.locator("main article.dx-prose").evaluate((article) => {
+      const blocks = [...article.children];
+      return blocks.slice(1).flatMap((block, index) => {
+        const gap = block.getBoundingClientRect().top - blocks[index]!.getBoundingClientRect().bottom;
+        return gap < 8 ? [`${blocks[index]!.tagName.toLowerCase()} then ${block.tagName.toLowerCase()}: ${Math.round(gap)}px`] : [];
+      });
+    });
+    expect(flush, `${post.slug}: blocks with no space between them`).toEqual([]);
+  }
+});
+
 async function assertPhoneCommandWrap(page: Page, address: string) {
   // Tabs retain hidden panels. Measure the rendered commands after selecting
   // each platform below, including all of the detailed reference commands.

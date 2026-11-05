@@ -106,7 +106,7 @@ export type LandingFixture = {
   };
   vision: { line: string; story: string[]; cta: Link; artMax: number };
   docsNav: Link[];
-  posts: Array<{ slug: string; title: string }>;
+  posts: Array<{ slug: string; title: string; author: string; origin?: string }>;
 };
 
 /** testdata/landing/landing.yaml, the landing's independent oracle */
