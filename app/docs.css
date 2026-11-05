@@ -955,6 +955,11 @@
   text-transform: none;
 }
 
+/* a byline's name is the author's, so it keeps its capitals inside the lowercase label */
+.bx-author {
+  text-transform: none;
+}
+
 /* the blog lists its posts one to a row, each a docs card, so a picture shows at its full size */
 .bx-posts.dx-guides {
   grid-template-columns: minmax(0, 1fr);
@@ -1004,6 +1009,116 @@
 
 .essay-problems ul li::marker {
   color: var(--ink-3);
+}
+
+/* ---------- a guest essay: its credit, lists, figures and notes ---------- */
+
+/* where a guest post first appeared, above its first words, in the label style */
+.dx-prose > .bx-origin {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0;
+  word-spacing: normal;
+}
+
+.bx-origin .dx-link {
+  text-transform: none;
+}
+
+/* an essay's lists nest as deep as the author wrote them, each level a docs bullet */
+.bx-list {
+  display: grid;
+  gap: var(--sp-3);
+  padding-inline-start: 1.5em;
+  list-style: disc;
+}
+
+ol.bx-list {
+  list-style: decimal;
+}
+
+.bx-list .bx-list {
+  margin-block-start: var(--sp-3);
+  list-style: circle;
+}
+
+.bx-list .bx-list .bx-list {
+  list-style: square;
+}
+
+.bx-list li {
+  max-inline-size: var(--dx-col);
+  padding-inline-start: var(--sp-1);
+  color: var(--ink);
+  letter-spacing: var(--tracking-prose);
+  word-spacing: var(--word-spacing-prose);
+  text-wrap: pretty;
+}
+
+.bx-list li::marker {
+  color: var(--ink-3);
+}
+
+/* a figure fills the reading column; its caption sits under it in the secondary ink */
+.bx-essay-figure {
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+}
+
+.bx-essay-figure img {
+  width: 100%;
+  height: auto;
+  border: var(--bd);
+}
+
+.bx-essay-figure figcaption {
+  color: var(--ink-2);
+  letter-spacing: var(--tracking-prose);
+  word-spacing: var(--word-spacing-prose);
+  text-wrap: pretty;
+}
+
+/* a reference to a note: a raised number, never smaller than the label size */
+.bx-note-ref {
+  font-size: max(var(--fs-label), 0.75em);
+  line-height: 0;
+}
+
+.bx-note-ref a {
+  padding-inline: 0.15em;
+  color: var(--ink-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.bx-notes {
+  display: grid;
+  gap: var(--sp-4);
+  padding-inline-start: 1.5em;
+  list-style: decimal;
+}
+
+.bx-notes li {
+  max-inline-size: var(--dx-col);
+  scroll-margin-top: var(--sp-5);
+}
+
+.bx-notes li::marker {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.bx-notes p + p {
+  margin-block-start: var(--sp-3);
+}
+
+.bx-note-back {
+  display: inline-block;
+  margin-block-start: var(--sp-2);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
 }
 
 /* ---------- docs search: fairtrade's command palette, with a snippet under each hit ---------- */

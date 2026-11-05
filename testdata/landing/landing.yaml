@@ -295,5 +295,18 @@ docsNav:
 # Pages lead; search sits near the account footer. The docs app has no other app in its switcher.
 docsNavigation: [docs pages, guides, more, shortcuts]
 docsShortcuts: [search]
+# newest first; each names its author as the byline does, and a guest post where it first appeared
 posts:
-  - { slug: reclaiming-data-autonomy-as-a-peasant, title: Reclaiming Data Autonomy as a Peasant }
+  - { slug: reclaiming-data-autonomy-as-a-peasant, title: Reclaiming Data Autonomy as a Peasant, author: David Huu Pham }
+  - slug: a-short-guide-to-data-strikes
+    title: A Short Guide to Data Strikes and Conscious Data Contribution in the Context of 2026 Frontier AI
+    author: Nick Vincent
+    origin: https://dataleverage.substack.com/p/a-short-guide-to-data-strikes-and
+  - slug: the-coding-agent-data-deal
+    title: The Coding Agent Data Deal
+    author: Nick Vincent
+    origin: https://dataleverage.substack.com/p/the-coding-agent-data-deal
+  - slug: coding-agents-are-a-big-deal
+    title: "Coding agents are (1) a big deal, (2) very relevant to data leverage, and (3) able to help build tools that support data leverage!"
+    author: Nick Vincent
+    origin: https://dataleverage.substack.com/p/coding-agents-are-1-a-big-deal-2

@@ -2199,3 +2199,34 @@ test("the blog lists every post and each post renders under its own title", asyn
   const missing = await page.goto("/blog/not-a-post");
   expect(missing?.status()).toBe(404);
 });
+
+test("every post names its author, and a guest post credits and points search engines to where it first appeared", async ({
+  page,
+}) => {
+  await page.goto("/blog");
+  const cards = page.locator(".bx-post");
+  for (const [index, post] of fixture.posts.entries()) {
+    await expect(cards.nth(index).locator(".bx-author")).toHaveText(post.author);
+  }
+  for (const post of fixture.posts) {
+    await page.goto(`/blog/${post.slug}`);
+    const author = page.locator(".dx-head .dx-meta .bx-author");
+    await expect(author).toHaveText(post.author);
+    // a name is the author's own: it keeps its capitals inside the lowercase label
+    expect(await author.evaluate((name) => getComputedStyle(name).textTransform)).toBe("none");
+    const canonical = page.locator('link[rel="canonical"]');
+    const origin = page.locator("main article .bx-origin a");
+    if (post.origin) {
+      await expect(origin).toHaveAttribute("href", post.origin);
+      await expect(canonical).toHaveAttribute("href", post.origin);
+    } else {
+      await expect(origin).toHaveCount(0);
+      await expect(canonical).toHaveAttribute("href", new RegExp(`/blog/${post.slug}$`));
+    }
+  }
+  // the sitemap lists only addresses that are canonical here
+  const sitemap = await (await page.request.get("/sitemap.xml")).text();
+  for (const post of fixture.posts) {
+    expect(sitemap.includes(`/blog/${post.slug}<`), `${post.slug} in the sitemap`).toBe(!post.origin);
+  }
+});

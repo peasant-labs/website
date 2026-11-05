@@ -40,7 +40,8 @@ export default function BlogIndex() {
                   <Art art={post.art} className="dx-pic bx-post-art" />
                   <span className="dx-guide-text">
                     <span className="dx-meta">
-                      {post.kind} · <time dateTime={post.published}>{formatPostDate(post.published)}</time>
+                      {post.kind} by <span className="bx-author">{post.author}</span>,{" "}
+                      <time dateTime={post.published}>{formatPostDate(post.published)}</time>
                     </span>
                     <h2 className="dx-guide-title dx-authored">{post.title}</h2>
                     <span className="dx-guide-desc">{post.summary}</span>

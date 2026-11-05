@@ -28,7 +28,14 @@ export async function generateMetadata({
     description: post.description,
     canonical: `/blog/${post.slug}`,
   });
-  return { ...metadata, openGraph: { ...metadata.openGraph, type: "article" } };
+  // a guest post's canonical address is where it first appeared, so search engines credit the original
+  const alternates = post.origin ? { ...metadata.alternates, canonical: post.origin.href } : metadata.alternates;
+  return {
+    ...metadata,
+    alternates,
+    authors: [{ name: post.author }],
+    openGraph: { ...metadata.openGraph, type: "article", authors: [post.author], publishedTime: post.published },
+  };
 }
 
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
@@ -47,8 +54,9 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         authored
         meta={
           <>
-            peasant · <time dateTime={post.published}>{formatPostDate(post.published)}</time> ·{" "}
-            {readingMinutes(post.slug)} min read
+            by <span className="bx-author">{post.author}</span>,{" "}
+            <time dateTime={post.published}>{formatPostDate(post.published)}</time>, {readingMinutes(post.slug)} min
+            read
           </>
         }
         columns
@@ -58,6 +66,15 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         <div className="dx-article">
           <article className="dx-prose" aria-labelledby="page-heading">
             <Art art={post.art} className="dx-pic bx-figure" />
+            {post.origin ? (
+              <p className="bx-origin">
+                first published on{" "}
+                <a className="dx-link" href={post.origin.href} target="_blank" rel="noopener noreferrer">
+                  {post.origin.name}
+                </a>
+                , republished here as a guest post
+              </p>
+            ) : null}
             <Body />
           </article>
           <nav className="dx-pager" aria-label="after this post">
