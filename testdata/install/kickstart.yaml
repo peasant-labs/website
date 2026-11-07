@@ -1,5 +1,5 @@
 version: 1
-requiredNames: [bare-install, kickstart-approved, kickstart-declined, checksum-failure, missing-binary, missing-terminal, setup-failure, unknown-option]
+requiredNames: [bare-install, kickstart-approved, kickstart-declined, checksum-failure, missing-binary, missing-terminal, setup-failure, unknown-option, windows-git-bash, windows-msys2, windows-cygwin, windows-arm-runs-amd64, windows-kickstart-approved, windows-checksum-failure, windows-missing-binary, windows-tar-fallback, windows-no-extractor, windows-no-profile]
 cases:
   - { name: bare-install, tty: false, yes: true, args: [], installed: true, setup: false, exit: 0 }
   - { name: kickstart-approved, tty: true, reply: y, args: [--kickstart], installed: true, setup: true, exit: 0 }
@@ -9,3 +9,14 @@ cases:
   - { name: missing-terminal, tty: false, yes: true, args: [--kickstart], installed: false, setup: false, exit: 1 }
   - { name: setup-failure, tty: true, reply: y, args: [--kickstart], setupExit: 7, installed: true, setup: true, exit: 7 }
   - { name: unknown-option, tty: false, args: [--unknown], installed: false, setup: false, exit: 2 }
+  # Git Bash, MSYS2 and Cygwin: the native Windows build, installed where install.ps1 puts it.
+  - { name: windows-git-bash, uname: MINGW64_NT-10.0-19045, tty: false, yes: true, args: [], installed: true, setup: false, exit: 0, output: [windows/amd64, peasant_0.0.0_windows_amd64.zip, peasant.exe, "[Environment]::SetEnvironmentVariable('Path'"] }
+  - { name: windows-msys2, uname: MSYS_NT-10.0-19045, tty: false, yes: true, args: [], installed: true, setup: false, exit: 0 }
+  - { name: windows-cygwin, uname: CYGWIN_NT-10.0-19045, tty: false, yes: true, args: [], installed: true, setup: false, exit: 0 }
+  - { name: windows-arm-runs-amd64, uname: MINGW64_NT-10.0-22631, machine: aarch64, tty: false, yes: true, args: [], installed: true, setup: false, exit: 0, output: [windows/amd64] }
+  - { name: windows-kickstart-approved, uname: MINGW64_NT-10.0-19045, tty: true, reply: y, args: [--kickstart], installed: true, setup: true, exit: 0 }
+  - { name: windows-checksum-failure, uname: MINGW64_NT-10.0-19045, tty: false, yes: true, args: [], badChecksum: true, installed: false, setup: false, exit: 1 }
+  - { name: windows-missing-binary, uname: MINGW64_NT-10.0-19045, tty: false, yes: true, args: [], missingBinary: true, installed: false, setup: false, exit: 1 }
+  - { name: windows-tar-fallback, uname: MINGW64_NT-10.0-19045, extractor: windows-tar, tty: false, yes: true, args: [], installed: true, setup: false, exit: 0 }
+  - { name: windows-no-extractor, uname: MINGW64_NT-10.0-19045, extractor: none, tty: false, yes: true, args: [], installed: false, setup: false, exit: 1, output: [unzip] }
+  - { name: windows-no-profile, uname: MINGW64_NT-10.0-19045, profile: false, tty: false, yes: true, args: [], installed: false, setup: false, exit: 1, output: [USERPROFILE] }
