@@ -1,5 +1,5 @@
 version: 1
-requiredNames: [bare-install, kickstart-approved, kickstart-declined, checksum-failure, missing-binary, missing-terminal, setup-failure, unknown-option, windows-git-bash, windows-msys2, windows-cygwin, windows-arm-runs-amd64, windows-kickstart-approved, windows-checksum-failure, windows-missing-binary, windows-tar-fallback, windows-no-extractor, windows-no-profile]
+requiredNames: [bare-install, kickstart-approved, kickstart-declined, checksum-failure, missing-binary, missing-terminal, setup-failure, unknown-option, windows-git-bash, windows-msys2, windows-cygwin, windows-arm-runs-amd64, windows-kickstart-approved, windows-checksum-failure, windows-missing-binary, windows-tar-fallback, windows-no-extractor, windows-no-profile, windows-unreachable-profile]
 cases:
   - { name: bare-install, tty: false, yes: true, args: [], installed: true, setup: false, exit: 0 }
   - { name: kickstart-approved, tty: true, reply: y, args: [--kickstart], installed: true, setup: true, exit: 0 }
@@ -20,3 +20,4 @@ cases:
   - { name: windows-tar-fallback, uname: MINGW64_NT-10.0-19045, extractor: windows-tar, tty: false, yes: true, args: [], installed: true, setup: false, exit: 0 }
   - { name: windows-no-extractor, uname: MINGW64_NT-10.0-19045, extractor: none, tty: false, yes: true, args: [], installed: false, setup: false, exit: 1, output: [unzip] }
   - { name: windows-no-profile, uname: MINGW64_NT-10.0-19045, profile: false, tty: false, yes: true, args: [], installed: false, setup: false, exit: 1, output: [USERPROFILE] }
+  - { name: windows-unreachable-profile, uname: MINGW64_NT-10.0-19045, profile: unreachable, tty: false, yes: true, args: [], installed: false, setup: false, exit: 1, output: ["could not open USERPROFILE"] }

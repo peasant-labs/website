@@ -71,16 +71,17 @@ for (const row of fixture.cases) {
     if (row.yes) env.PEASANT_YES = '1';
     if (windows) {
       script(join(tools, 'uname'), `#!/bin/sh\ncase "$1" in -s) echo '${row.uname}';; -m) echo '${row.machine ?? 'x86_64'}';; *) echo '${row.uname}';; esac\n`);
-      // The paths in these cases are already POSIX, so converting is the identity.
-      script(join(tools, 'cygpath'), '#!/bin/sh\nshift\nprintf "%s\\n" "$1"\n');
-      if (row.profile !== false) env.USERPROFILE = profile;
+      // The paths in these cases are already POSIX, so the script's own
+      // path handling is the identity here; no converter is on the PATH.
+      if (row.profile !== false) env.USERPROFILE = row.profile === 'unreachable' ? join(work, 'no-such-profile') : profile;
       const extractor = row.extractor ?? 'unzip';
       if (extractor !== 'unzip') env.PATH = `${tools}${delimiter}${pathWithout(join(work, 'path'), ['unzip'])}`;
       if (extractor === 'windows-tar') {
         // Windows' own tar.exe is bsdtar, which reads zip archives.
         const system32 = join(work, 'windows', 'System32');
         mkdirSync(system32, { recursive: true });
-        script(join(system32, 'tar.exe'), '#!/bin/sh\n[ "$1" = -xf ] && [ "$3" = -C ] || exit 64\nexec python3 -m zipfile -e "$2" "$4"\n');
+        // The script runs it inside the work directory with the archive's bare name.
+        script(join(system32, 'tar.exe'), '#!/bin/sh\n[ "$1" = -xf ] && [ "$#" = 2 ] && [ "${2#/}" = "$2" ] || exit 64\nexec python3 -m zipfile -e "$2" .\n');
       }
       env.SYSTEMROOT = join(work, 'windows');
     }

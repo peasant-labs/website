@@ -82,8 +82,11 @@ detect_arch() {
 # bsdtar, which reads zip — under System32. Prints the tool it settled on, or
 # nothing when there is none, so the check runs before the plan is shown.
 windows_tar() {
-  local root
-  root="$(cygpath -u "${SYSTEMROOT:-C:\\Windows}" 2>/dev/null || true)"
+  local sysroot="${SYSTEMROOT:-C:\\Windows}" root
+  # SYSTEMROOT is a Windows path. Bash accepts it with forward slashes, and
+  # asking the shell where that folder is hands back its own spelling of it
+  # (/c/Windows in Git Bash and MSYS2, /cygdrive/c/Windows in Cygwin).
+  root="$(cd "${sysroot//\\//}" 2>/dev/null && pwd || true)"
   [ -n "$root" ] && [ -x "${root}/System32/tar.exe" ] && printf '%s' "${root}/System32/tar.exe"
 }
 
@@ -103,8 +106,9 @@ unpack() {
       if [ "$tool" = "unzip" ]; then
         unzip -q -o "$archive" -d "$dir"
       else
-        # tar.exe is a Windows program, so it is handed Windows paths.
-        "$tool" -xf "$(cygpath -w "$archive")" -C "$(cygpath -w "$dir")"
+        # tar.exe is a Windows program and does not know this shell's /tmp, so
+        # it runs inside the work directory and is given the file's bare name.
+        (cd "$dir" && "$tool" -xf "${archive##*/}")
       fi
       ;;
     *) tar -xzf "$archive" -C "$dir" ;;
@@ -246,8 +250,9 @@ verify() {
 # both — the shell line for this terminal, and the PowerShell line install.ps1
 # prints for every other window. Neither is run for you.
 show_windows_path() {
-  local win_dir
-  win_dir="$(cygpath -w "$BIN_DIR")"
+  # BIN_DIR is always USERPROFILE\.local\bin, so the Windows spelling is built
+  # from USERPROFILE itself rather than converted back from the shell's path.
+  local win_dir="${USERPROFILE//\//\\}\\.local\\bin"
 
   say "  ${BIN_DIR} is not on your PATH yet."
   say "  for PowerShell, cmd and new windows, run this in PowerShell:"
@@ -338,7 +343,6 @@ main() {
   arch="$(detect_arch)"
 
   if [ "$os" = "windows" ]; then
-    need cygpath
     # Windows amd64 is the only native build; Arm Windows runs it under
     # emulation, as install.ps1 does.
     arch="amd64"
@@ -350,8 +354,13 @@ main() {
     }
     # USERPROFILE, not HOME: MSYS2 and Cygwin keep a home of their own
     # (C:\msys64\home\you), and a binary there is one install.ps1, PowerShell
-    # and `peasant upgrade` would never see.
-    home="$(cygpath -u "$USERPROFILE")"
+    # and `peasant upgrade` would never see. USERPROFILE is a Windows path; the
+    # shell enters it with forward slashes and reports the folder in its own
+    # spelling, which is the one PATH and every command below need.
+    home="$(cd "${USERPROFILE//\\//}" 2>/dev/null && pwd)" || {
+      err "peasant: could not open USERPROFILE (${USERPROFILE}) from this shell, so there is no Windows home to install into"
+      exit 1
+    }
     tool="$(zip_tool)"
     [ -n "$tool" ] || {
       err "peasant: unpacking the Windows build needs unzip or Windows' own tar.exe, and neither was found"
