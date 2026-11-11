@@ -11,6 +11,10 @@
 # escalates and never edits a shell profile; where PATH needs a line added, it
 # prints the line for you to add.
 #
+# On Windows it runs from Git Bash, MSYS2 or Cygwin and installs the native
+# build: peasant.exe, into %USERPROFILE%\.local\bin — the folder install.ps1
+# uses — so both installers manage the one binary.
+#
 #   PEASANT_YES=1        install without the prompt (for CI and scripts)
 #   PEASANT_VERSION=vX   install a specific release instead of the newest
 #
@@ -23,7 +27,10 @@ set -euo pipefail
 
 REPO="peasant-labs/peasant"
 BIN="peasant"
-BIN_DIR="${HOME}/.local/bin"
+# Both set in `main` once the system is known: Windows names the binary
+# peasant.exe and roots the folder at USERPROFILE rather than the shell's HOME.
+BIN_DIR=""
+EXE="$BIN"
 
 # Global rather than a local of `main`: the cleanup trap runs after `main` has
 # returned and its locals are gone, so a local here would leave the trap reading
@@ -46,18 +53,10 @@ detect_os() {
   case "$(uname -s)" in
     Linux) printf 'linux' ;;
     Darwin) printf 'darwin' ;;
-    # Git Bash, MSYS2 and Cygwin all report a Windows kernel here. Such a shell
-    # can run this script perfectly well, but the build it would fetch is the
-    # wrong one: the native Windows binary is a peasant.exe installed by the
-    # PowerShell script, not a binary unpacked from a linux tarball.
-    MINGW* | MSYS* | CYGWIN*)
-      err "peasant: this looks like Windows, and the native Windows build installs from PowerShell:"
-      err ""
-      err "    irm https://peasantlabs.org/install.ps1 | iex"
-      err ""
-      err "to install the linux build instead, run this inside WSL"
-      exit 1
-      ;;
+    # Git Bash, MSYS2 and Cygwin all report a Windows kernel here. They get the
+    # native Windows build, not a linux tarball: WSL is the place for that, and
+    # WSL reports Linux.
+    MINGW* | MSYS* | CYGWIN*) printf 'windows' ;;
     *)
       err "peasant: unsupported operating system: $(uname -s)"
       err "peasant publishes linux, macOS and Windows builds - see https://peasantlabs.org"
@@ -75,6 +74,44 @@ detect_arch() {
       err "peasant publishes amd64 and arm64 builds"
       exit 1
       ;;
+  esac
+}
+
+# Windows ships a zip, which Git Bash's GNU tar cannot open. `unzip` comes with
+# Git for Windows; failing that, Windows 10 and later carry their own tar.exe —
+# bsdtar, which reads zip — under System32. Prints the tool it settled on, or
+# nothing when there is none, so the check runs before the plan is shown.
+windows_tar() {
+  local sysroot="${SYSTEMROOT:-C:\\Windows}" root
+  # SYSTEMROOT is a Windows path. Bash accepts it with forward slashes, and
+  # asking the shell where that folder is hands back its own spelling of it
+  # (/c/Windows in Git Bash and MSYS2, /cygdrive/c/Windows in Cygwin).
+  root="$(cd "${sysroot//\\//}" 2>/dev/null && pwd || true)"
+  [ -n "$root" ] && [ -x "${root}/System32/tar.exe" ] && printf '%s' "${root}/System32/tar.exe"
+}
+
+zip_tool() {
+  if command -v unzip >/dev/null 2>&1; then
+    printf 'unzip'
+  else
+    windows_tar || true
+  fi
+}
+
+# Unpack the downloaded archive into the work directory.
+unpack() {
+  local archive="$1" dir="$2" tool="$3"
+  case "$archive" in
+    *.zip)
+      if [ "$tool" = "unzip" ]; then
+        unzip -q -o "$archive" -d "$dir"
+      else
+        # tar.exe is a Windows program and does not know this shell's /tmp, so
+        # it runs inside the work directory and is given the file's bare name.
+        (cd "$dir" && "$tool" -xf "${archive##*/}")
+      fi
+      ;;
+    *) tar -xzf "$archive" -C "$dir" ;;
   esac
 }
 
@@ -106,23 +143,23 @@ latest_tag() {
 # the only way to consent to one, and an installer that has already started is
 # not asking.
 show_plan() {
-  local tag="$1" os="$2" arch="$3" asset="$4" verb="$5" url="$6" sums_url="$7"
+  local tag="$1" os="$2" arch="$3" asset="$4" verb="$5" url="$6" sums_url="$7" home="$8"
 
   say ""
   say "  peasant ${tag}"
   say ""
-  say "  home found     ${HOME}"
+  say "  home found     ${home}"
   say "  machine        ${os}/${arch}"
   say "  checksum       ${sums_url}"
   say "  source         ${url}"
   say "  download to    ${TMPDIR:-/tmp}  (temporary, removed when finished)"
-  say "  install to     ${BIN_DIR}/${BIN}"
+  say "  install to     ${BIN_DIR}/${EXE}"
   say ""
   say "  here are the steps we will take to install on your machine:"
   # The origin is stated in full as `source` above, so the step just names the file.
   say "    1. download  ${asset}"
   say "    2. verify    against checksums.txt published with the release"
-  say "    3. ${verb}   ${BIN_DIR}/${BIN}"
+  say "    3. ${verb}   ${BIN_DIR}/${EXE}"
   if [ "$RUN_KICKSTART" = "1" ]; then
     say "    4. open      interactive local setup (nothing published)"
   fi
@@ -208,15 +245,36 @@ verify() {
   printf '%s' "$got"
 }
 
+# A bash shell on Windows and the Windows PATH are two different lists: the
+# shell builds its own from the Windows one when it starts. So the hint covers
+# both — the shell line for this terminal, and the PowerShell line install.ps1
+# prints for every other window. Neither is run for you.
+show_windows_path() {
+  # BIN_DIR is always USERPROFILE\.local\bin, so the Windows spelling is built
+  # from USERPROFILE itself rather than converted back from the shell's path.
+  local win_dir="${USERPROFILE//\//\\}\\.local\\bin"
+
+  say "  ${BIN_DIR} is not on your PATH yet."
+  say "  for PowerShell, cmd and new windows, run this in PowerShell:"
+  say ""
+  say "      [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'User') + ';${win_dir}', 'User')"
+  say ""
+  say "  and for this shell, now:"
+  say ""
+  say "      export PATH=\"${BIN_DIR}:\$PATH\""
+  say ""
+  say "  next:  ${BIN} kickstart"
+}
+
 # What happened, in the same shape as what was promised.
 show_result() {
-  local sum="$1" size="$2"
+  local sum="$1" size="$2" os="$3"
   local profile
 
   say ""
   say "  done."
   say ""
-  say "  installed  ${BIN_DIR}/${BIN}${size:+  (${size})}"
+  say "  installed  ${BIN_DIR}/${EXE}${size:+  (${size})}"
   say "  verified   sha256 ${sum:0:16}…"
   say ""
 
@@ -231,6 +289,11 @@ show_result() {
       say "  next:  ${BIN} kickstart"
       ;;
     *)
+      if [ "$os" = "windows" ]; then
+        show_windows_path
+        say ""
+        return 0
+      fi
       case "${SHELL:-}" in
         */zsh) profile="${HOME}/.zshrc" ;;
         */bash) profile="${HOME}/.bashrc" ;;
@@ -273,12 +336,45 @@ main() {
   fi
 
   need curl
-  need tar
   need uname
 
-  local os arch tag version asset url sums_url verb sum size
+  local os arch tag version asset url sums_url verb sum size home ext tool=""
   os="$(detect_os)"
   arch="$(detect_arch)"
+
+  if [ "$os" = "windows" ]; then
+    # Windows amd64 is the only native build; Arm Windows runs it under
+    # emulation, as install.ps1 does.
+    arch="amd64"
+    EXE="${BIN}.exe"
+    ext="zip"
+    [ -n "${USERPROFILE:-}" ] || {
+      err "peasant: USERPROFILE is not set, so there is no Windows home to install into"
+      exit 1
+    }
+    # USERPROFILE, not HOME: MSYS2 and Cygwin keep a home of their own
+    # (C:\msys64\home\you), and a binary there is one install.ps1, PowerShell
+    # and `peasant upgrade` would never see. USERPROFILE is a Windows path; the
+    # shell enters it with forward slashes and reports the folder in its own
+    # spelling, which is the one PATH and every command below need.
+    home="$(cd "${USERPROFILE//\\//}" 2>/dev/null && pwd)" || {
+      err "peasant: could not open USERPROFILE (${USERPROFILE}) from this shell, so there is no Windows home to install into"
+      exit 1
+    }
+    tool="$(zip_tool)"
+    [ -n "$tool" ] || {
+      err "peasant: unpacking the Windows build needs unzip or Windows' own tar.exe, and neither was found"
+      err "install unzip (Git for Windows includes it), or use PowerShell:"
+      err ""
+      err "    irm https://peasantlabs.org/install.ps1 | iex"
+      exit 1
+    }
+  else
+    need tar
+    ext="tar.gz"
+    home="$HOME"
+  fi
+  BIN_DIR="${home}/.local/bin"
 
   # `|| true` is load-bearing. Under `set -e`, a command substitution that fails
   # inside an assignment exits the shell then and there — so when GitHub 404s a
@@ -298,15 +394,15 @@ main() {
 
   # Release tags carry a leading v; the asset filenames do not.
   version="${tag#v}"
-  asset="${BIN}_${version}_${os}_${arch}.tar.gz"
+  asset="${BIN}_${version}_${os}_${arch}.${ext}"
   url="https://github.com/${REPO}/releases/download/${tag}/${asset}"
   sums_url="https://github.com/${REPO}/releases/download/${tag}/checksums.txt"
 
   # Say "replace" when there is something there to replace, so an upgrade never
   # looks like a first install.
-  if [ -e "${BIN_DIR}/${BIN}" ]; then verb="replace"; else verb="install"; fi
+  if [ -e "${BIN_DIR}/${EXE}" ]; then verb="replace"; else verb="install"; fi
 
-  show_plan "$tag" "$os" "$arch" "$asset" "$verb" "$url" "$sums_url"
+  show_plan "$tag" "$os" "$arch" "$asset" "$verb" "$url" "$sums_url" "$home"
   confirm
 
   WORK_DIR="$(mktemp -d)"
@@ -323,20 +419,26 @@ main() {
   say "  verifying…"
   sum="$(verify "$WORK_DIR" "$asset" "$tag" "$sums_url")"
 
-  tar -xzf "${WORK_DIR}/${asset}" -C "$WORK_DIR"
-  [ -f "${WORK_DIR}/${BIN}" ] || {
-    err "peasant: the archive did not contain a ${BIN} binary"
+  unpack "${WORK_DIR}/${asset}" "$WORK_DIR" "$tool"
+  [ -f "${WORK_DIR}/${EXE}" ] || {
+    err "peasant: the archive did not contain a ${EXE} binary"
     exit 1
   }
 
   mkdir -p "$BIN_DIR"
-  install -m 755 "${WORK_DIR}/${BIN}" "${BIN_DIR}/${BIN}" 2>/dev/null ||
-    { cp "${WORK_DIR}/${BIN}" "${BIN_DIR}/${BIN}" && chmod 755 "${BIN_DIR}/${BIN}"; }
+  # Windows will not overwrite an executable that is running, and says only
+  # "permission denied" — so name the likely cause.
+  install -m 755 "${WORK_DIR}/${EXE}" "${BIN_DIR}/${EXE}" 2>/dev/null ||
+    { cp "${WORK_DIR}/${EXE}" "${BIN_DIR}/${EXE}" && chmod 755 "${BIN_DIR}/${EXE}"; } || {
+    err "peasant: could not write ${BIN_DIR}/${EXE}"
+    [ "$os" = "windows" ] && err "if peasant is running, stop it and run the installer again"
+    exit 1
+  }
 
-  size="$(du -h "${BIN_DIR}/${BIN}" 2>/dev/null | awk '{ print $1 }' || true)"
-  show_result "$sum" "$size"
+  size="$(du -h "${BIN_DIR}/${EXE}" 2>/dev/null | awk '{ print $1 }' || true)"
+  show_result "$sum" "$size" "$os"
   if [ "$RUN_KICKSTART" = "1" ]; then
-    "${BIN_DIR}/${BIN}" kickstart </dev/tty >/dev/tty 2>&1
+    "${BIN_DIR}/${EXE}" kickstart </dev/tty >/dev/tty 2>&1
   fi
 }
 
