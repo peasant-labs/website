@@ -1110,11 +1110,15 @@ test("the selected landing sections share an open ground and coherent responsive
   await expect(page.locator("footer .site-foot-close-panel")).toHaveCount(0);
 });
 
-test("/about carries the owner's statement in full, word for word", async ({ page }) => {
+test("/about leads with the owner's statement, then names the people behind peasant", async ({ page }) => {
   await page.goto("/about");
-  const vision = page.locator(".pj-vision");
-  // the lead line is the page's heading, the story its paragraphs
-  await expect(vision.locator("h1, p")).toHaveText([fixture.vision.line, ...fixture.vision.story]);
+  // the lead line is the page's heading; the landing's story is not repeated under it
+  await expect(page.locator(".pj-vision h1")).toHaveText(fixture.vision.line);
+  for (const paragraph of fixture.vision.story) await expect(page.locator("main")).not.toContainText(paragraph);
+  // the team, the advising and the ways to take part each have their own section
+  for (const heading of ["core members", "advising", "get involved", "contributors"]) {
+    await expect(page.getByRole("heading", { level: 2, name: heading, exact: true })).toBeVisible();
+  }
 });
 
 test("whitespace, not rules, separates the sections, with generous room between them", async ({ page }) => {
