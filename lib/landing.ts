@@ -100,7 +100,7 @@ export type UseCase = Readonly<{
   id: string;
   label: string;
   icon: LandingIconName;
-  capabilities: readonly [Capability, Capability, Capability];
+  capabilities: readonly Capability[];
 }>;
 
 /* every use-case picture is drawn on the same 704 by 528 grid */
@@ -122,12 +122,12 @@ export const USE_CASES = {
    * and half a pixel a frame at 60 frames a second, so it moves on an even beat on any screen
    */
   speed: 30,
-  /* after the twelve, one card that leads on to the docs, in the same shape */
+  /* after the capabilities, one card that leads on to the docs, in the same shape */
   more: {
     tag: "docs",
     icon: "book",
     text: "explore more in the docs",
-    detail: "Set up, publishing, redaction and collectives, with guides for evals and pull request reviews.",
+    detail: "Set up Peasant and explore guides for evals and pull request reviews.",
     cta: { label: "read our docs", href: "/docs" },
     art: capabilityArt("uc-docs", "an open book with written pages, one line in amber"),
   },
@@ -140,14 +140,14 @@ export const USE_CASES = {
         {
           text: "build evals from real work",
           detail:
-            "Collect real coding transcripts in a private collective, then download them to test agents.",
+            "Collect real coding transcripts and turn them into evaluation suites.",
           icon: "check",
           art: capabilityArt("uc-balance", "a balance scale with an amber weight in its right pan"),
         },
         {
           text: "study how agents are used",
           detail:
-            "Read how people actually talk to their agents and correct them, in transcripts shared with your collective.",
+            "Review how people actually talk to their agents.",
           icon: "chart",
           art: capabilityArt("uc-book", "an open book on a stand with an amber ribbon bookmark"),
         },
@@ -166,23 +166,23 @@ export const USE_CASES = {
       icon: "team",
       capabilities: [
         {
-          text: "review the work behind a diff",
+          text: "explain the work behind a PR",
           detail:
-            "Attach the transcripts behind your pull request, so your collective can read how the change was made.",
+            "Attach the prompts behind your pull request, so your team can read how the change was made.",
           icon: "pull-request",
           art: capabilityArt("uc-lens", "an amber magnifying glass held up to a page"),
         },
         {
           text: "onboard from real history",
           detail:
-            "New teammates read the transcripts behind past pull requests to learn why the code looks the way it does.",
+            "Agents of new teammates read transcripts behind past pull requests to learn why the code looks the way it does.",
           icon: "history",
           art: capabilityArt("uc-signpost", "a signpost with three arrows, the top one amber"),
         },
         {
           text: "learn from each other's prompts",
           detail:
-            "Read what your teammates typed to their agents in the transcripts they share, and reuse what works.",
+            "Read how your teammates used their agents in the transcripts they share, and reuse what works.",
           icon: "conversation",
           art: capabilityArt("uc-candles", "one candle leaning over to light another, both flames amber"),
         },
@@ -201,46 +201,44 @@ export const USE_CASES = {
           art: capabilityArt("uc-lantern", "a lantern with amber glass"),
         },
         {
-          text: "explain a PR in one comment",
-          detail:
-            "Comment `/peasant attach` on your pull request, then confirm, to link your transcripts behind its commits.",
-          icon: "link",
-          art: capabilityArt("uc-door", "an arched door with an amber note pinned to it"),
+          text: "license your work",
+          detail: "Attach licenses to your transcripts under CC0, CC BY, CC BY-SA, or other.",
+          icon: "stamp",
+          art: capabilityArt("uc-scroll", "a written scroll with an amber wax seal"),
         },
+      ],
+    },
+    {
+      id: "auditors",
+      label: "auditors",
+      icon: "search",
+      capabilities: [
         {
-          text: "publish on every push",
+          text: "see where the human is",
           detail:
-            "Automatically push sessions to your chosen collectives.",
-          icon: "send",
+            "Inspect prompts, corrections, and steering for safety and evaluation purposes.",
+          icon: "review",
           art: capabilityArt("uc-bell", "an amber town crier's handbell"),
         },
       ],
     },
     {
-      id: "companies",
-      label: "companies",
+      id: "enterprise",
+      label: "enterprise",
       icon: "company",
       capabilities: [
         {
-          text: "keep agent data in-house",
+          text: "start a private collective",
           detail:
-            "Only members of your collective can read its transcripts, and joining can be limited to your GitHub org.",
+            "Create a private collective for your development team, class or lab.",
           icon: "lock",
           art: capabilityArt("uc-chest", "a closed chest with an amber padlock"),
         },
         {
-          text: "see which commits agents wrote",
-          detail:
-            "A session is linked to the commits its author made while it ran, so a change traces back to its transcript.",
-          icon: "code",
-          art: capabilityArt("uc-scroll", "a written scroll with an amber wax seal"),
-        },
-        {
-          text: "usage across teams",
-          detail:
-            "Your collective's page lists who shared what, with which agent, plus token and pull request totals.",
-          icon: "chart",
-          art: capabilityArt("uc-sacks", "three tied sacks rising in height like a bar chart, the tallest amber"),
+          text: "host it yourself",
+          detail: "Self-host village on your own servers, so your transcripts never leave infrastructure you control.",
+          icon: "company",
+          art: capabilityArt("uc-door", "an arched door with an amber note pinned to it"),
         },
       ],
     },
@@ -254,7 +252,7 @@ export const HOW = {
       id: "record",
       title: "record",
       icon: "record",
-      body: "Peasant saves every coding agent session on your computer. Type `/peasant` in Claude Code to open it in your browser.",
+      body: "Peasant reads coding agent sessions on your computer.",
       scene:
         "in Claude Code in Terminal, /peasant is typed and peasant answers that it opened the session, not published; Safari then comes forward on the session's page, with publish as its one action",
     },
@@ -366,8 +364,8 @@ export const THREAD = {
 export const VISION = {
   line: "We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.",
   story: [
-    "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's capital.",
-    "We think the work also belongs to the people who did it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use.",
+    "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent is becoming part of someone else's capital.",
+    "We think the work also belongs to the people who did it: everyone. Using Peasant, what you choose to give goes into a commons others can use. Help us build a traceable, open research ecosystem!",
   ],
   cta: { label: "about us", href: "/about" },
   art: art(
@@ -380,5 +378,5 @@ export const VISION = {
 
 /** The landing's closing invitation, followed only by installation and docs. */
 export const CLOSE = {
-  line: "start with the work you’ve already done.",
+  line: "you’ve already done the work. now decide where it goes.",
 } as const;

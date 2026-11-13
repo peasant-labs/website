@@ -393,7 +393,7 @@ test("on a phone installation keeps two plain actions, matching copy targets and
   }
 });
 
-test("the use cases are one row of all twelve capabilities, each tagged with its audience, then the docs card, all in the served page", async ({
+test("the use cases are one row of every capability, each tagged with its audience, then the docs card, all in the served page", async ({
   page,
 }) => {
   await page.goto("/");
@@ -1164,10 +1164,11 @@ test("how it works: three steps, each with its scene; choosing one makes it curr
   // (the buttons drawn inside a scene are part of its picture, which nobody can tab into)
   await expect(page.locator("#how .hw-window button:not(.scn-screen *)")).toHaveCount(0);
   await expect(page.locator(".hw-step-body")).toHaveText(fixture.how.steps.map((step) => step.body));
-  // a command named in the copy is code that never breaks across lines
-  const command = page.locator(".hw-step-body .lp-nowrap").first();
-  await expect(command.locator("code")).toHaveText("/peasant");
-  expect(await command.evaluate((element) => getComputedStyle(element).whiteSpace)).toBe("nowrap");
+  // a command named in the copy, when there is one, is code that never breaks across lines
+  for (const command of await page.locator(".hw-step-body .lp-nowrap").all()) {
+    await expect(command.locator("code")).toHaveCount(1);
+    expect(await command.evaluate((element) => getComputedStyle(element).whiteSpace)).toBe("nowrap");
+  }
   const list = page.locator(".hw-steps");
   let listHeight: number | null = null;
   await settle(page);
