@@ -16,7 +16,7 @@ footer:
   # install section, in place on the landing and across from any other page
   cta:
     line: try peasant on your own agent sessions
-    landingLine: start with the work you’ve already done.
+    landingLine: "you’ve already done the work. now decide where it goes."
     primary: { label: install now, href: "/#install", landingHref: "#install" }
     secondary: { label: read our docs, href: /docs }
   nav:
@@ -103,7 +103,7 @@ removed:
   - discord
   - data commons built by commoners
 # one row of every capability, each tagged with its audience and saying in one or two sentences
-# what it is (all twelve in the server's HTML); grouped here by audience; then one card on to the docs
+# what it is (all of them in the server's HTML); grouped here by audience; then one card on to the docs
 useCases:
   # one shape for every card at each screen width: its width in px, and the lines its headline takes
   # (one on a wide screen, two reserved on a phone); its words take at most three lines, with room for three
@@ -116,50 +116,55 @@ useCases:
   more:
     tag: docs
     text: explore more in the docs
-    detail: Set up, publishing, redaction and collectives, with guides for evals and pull request reviews.
+    detail: "Set up Peasant and explore guides for evals and pull request reviews."
     picture: uc-docs
     cta: { label: read our docs, href: /docs }
   slides:
     - id: researchers
       label: researchers
-      capabilities: [build evals from real work, study how agents are used, run a class with open agent use]
+      capabilities: ["build evals from real work", "study how agents are used", "run a class with open agent use"]
       details:
-        - "Collect real coding transcripts in a private collective, then download them to test agents."
-        - "Read how people actually talk to their agents and correct them, in transcripts shared with your collective."
+        - "Collect real coding transcripts and turn them into evaluation suites."
+        - "Review how people actually talk to their agents."
         - "Students publish their sessions to your class's collective, so you can see how each worked with an agent."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-balance, uc-book, uc-slate]
     - id: teams
       label: teams
-      capabilities: [review the work behind a diff, onboard from real history, "learn from each other's prompts"]
+      capabilities: ["explain the work behind a PR", "onboard from real history", "learn from each other's prompts"]
       details:
-        - "Attach the transcripts behind your pull request, so your collective can read how the change was made."
-        - "New teammates read the transcripts behind past pull requests to learn why the code looks the way it does."
-        - "Read what your teammates typed to their agents in the transcripts they share, and reuse what works."
+        - "Attach the prompts behind your pull request, so your team can read how the change was made."
+        - "Agents of new teammates read transcripts behind past pull requests to learn why the code looks the way it does."
+        - "Read how your teammates used their agents in the transcripts they share, and reuse what works."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
       pictures: [uc-lens, uc-signpost, uc-candles]
     - id: developers
       label: developers
-      capabilities: [find any past session, explain a PR in one comment, publish on every push]
+      capabilities: ["find any past session", "license your work"]
       details:
         - "Search and open your past sessions from supported agents, all kept on your computer."
-        - "Comment /peasant attach on your pull request, then confirm, to link your transcripts behind its commits."
-        - "Automatically push sessions to your chosen collectives."
+        - "Attach licenses to your transcripts under CC0, CC BY, CC BY-SA, or other."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
-      pictures: [uc-lantern, uc-door, uc-bell]
-    - id: companies
-      label: companies
-      capabilities: [keep agent data in-house, see which commits agents wrote, usage across teams]
+      pictures: [uc-lantern, uc-scroll]
+    - id: auditors
+      label: auditors
+      capabilities: ["see where the human is"]
       details:
-        - "Only members of your collective can read its transcripts, and joining can be limited to your GitHub org."
-        - "A session is linked to the commits its author made while it ran, so a change traces back to its transcript."
-        - "Your collective's page lists who shared what, with which agent, plus token and pull request totals."
+        - "Inspect prompts, corrections, and steering for safety and evaluation purposes."
       # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
-      pictures: [uc-chest, uc-scroll, uc-sacks]
+      pictures: [uc-bell]
+    - id: enterprise
+      label: enterprise
+      capabilities: ["start a private collective", "host it yourself"]
+      details:
+        - "Create a private collective for your development team, class or lab."
+        - "Self-host village on your own servers, so your transcripts never leave infrastructure you control."
+      # each capability's own picture, in caption order: public/art/<name>-light.png and -dark.png
+      pictures: [uc-chest, uc-door]
 how:
   steps:
     - title: record
-      body: Peasant saves every coding agent session on your computer. Type /peasant in Claude Code to open it in your browser.
+      body: "Peasant reads coding agent sessions on your computer."
     - title: review
       body: Before anything leaves your computer, peasant hides keys, personal details, file paths and project names, and shows you what it hid.
     - title: publish
@@ -281,8 +286,8 @@ vision:
   artMax: 448
   line: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.
   story:
-    - "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent becomes part of someone else's capital."
-    - "We think the work also belongs to the people who did it. You decide what is hidden and who may read it. What you choose to give goes into a commons that everyone can use."
+    - "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent is becoming part of someone else's capital."
+    - "We think the work also belongs to the people who did it: everyone. Using Peasant, what you choose to give goes into a commons others can use. Help us build a traceable, open research ecosystem!"
   cta: { label: about us, href: /about }
 docsNav:
   - { label: overview, href: /docs }

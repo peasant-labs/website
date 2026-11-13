@@ -67,7 +67,7 @@ function endOf(row: HTMLElement) {
 
 /**
  * The use cases: the section's heading on its own row, then one row of all
- * twelve capabilities, each a card of one shape (its picture on a tinted
+ * every capability, each a card of one shape (its picture on a tinted
  * panel, a small tag naming its audience, its headline, a sentence or two on
  * what it is), and a last card in the same shape that leads on to the docs,
  * the only one with an action. Every card's words are in the page as served.

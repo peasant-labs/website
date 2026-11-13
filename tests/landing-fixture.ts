@@ -155,8 +155,8 @@ export function loadLandingFixture(): LandingFixture {
   }
   const pictures = new Set<string>();
   for (const slide of root.useCases.slides) {
-    if (slide.capabilities.length !== 3) {
-      throw new Error(`useCases.slides.${slide.id}: a slide carries exactly three capabilities.`);
+    if (slide.capabilities.length < 1) {
+      throw new Error(`useCases.slides.${slide.id}: an audience carries at least one capability.`);
     }
     if (slide.details?.length !== slide.capabilities.length) {
       throw new Error(`useCases.slides.${slide.id}: each capability carries its own words.`);
