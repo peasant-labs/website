@@ -6,11 +6,13 @@ header:
   nav:
     - { label: docs, href: /docs }
     - { label: blog, href: /blog }
+    - { label: about, href: /about }
   login: { label: log in, href: "/?login" }
   # the phone menu mirrors the header's destinations, then its actions; the rest of the site is in the footer
   menu:
     - { label: docs, href: /docs }
     - { label: blog, href: /blog }
+    - { label: about, href: /about }
 footer:
   # the call to action every page ends with; install points at the landing's
   # install section, in place on the landing and across from any other page
