@@ -1,0 +1,174 @@
+/*
+ * /about's people and ways to take part. Each person is a bordered tile on the
+ * site's square grid: the name in the body face, an optional line they give
+ * about themselves, then their links in a row.
+ */
+.ab-people,
+.ab-ways {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .ab-people,
+  .ab-ways {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.ab-person,
+.ab-way {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-3);
+  min-width: 0;
+  padding: var(--sp-5);
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.ab-person-name {
+  color: var(--ink-strong);
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.ab-person-role,
+.ab-way > p {
+  color: var(--ink-2);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+/* a placeholder until we have photos: a square on the raised surface holding the person's initials */
+.ab-portrait {
+  display: block;
+  inline-size: 96px;
+  block-size: 96px;
+  margin-block-end: var(--sp-2);
+  object-fit: cover;
+}
+
+.ab-portrait-empty {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule);
+  background: var(--surface-2);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-md);
+  letter-spacing: 0.08em;
+}
+
+/* the person's own sites as words, then the profile icons, in one row of full tap targets */
+.ab-person-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--sp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ab-link-text {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  margin-inline-end: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+}
+
+.ab-link {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  color: var(--amber);
+}
+
+/* the first icon in a row with no words before it lines its mark up with the name above */
+.ab-person-links > li:first-child > .ab-link {
+  margin-inline-start: calc(var(--sp-3) * -1);
+}
+
+.ab-link:hover {
+  color: var(--ink-strong);
+}
+
+.ab-link:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.ab-link-ic,
+.ab-link .brand {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+.ab-way > a {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+}
+
+/*
+ * The contributors' field: one drawing across the content width, on the hero
+ * scene's cell grid and in its ink (the strongest ink in light, the page ink
+ * in dark). The names are its only text, in the interface's mono face.
+ */
+.wh-art {
+  --hf-ink: var(--ink-strong);
+  --wh-field: var(--ink-4);
+  --wh-stalk: var(--ink-3);
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  touch-action: pan-y;
+}
+
+:root:not([data-theme="light"]) .wh-art {
+  --hf-ink: var(--ink);
+}
+
+/* a name is the clearest part of its stalk, but quieter than the page's text */
+.wh-name text {
+  fill: var(--ink-2);
+  font-family: var(--font-mono);
+}
+
+.wh-name:is(:hover, :focus-visible) text {
+  fill: var(--amber);
+}
+
+.wh-name:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wh-twinkle {
+    animation: wh-twinkle 4s steps(1) infinite;
+  }
+}
+
+@keyframes wh-twinkle {
+  0%,
+  70% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 0.25;
+  }
+
+  90% {
+    opacity: 0;
+  }
+}

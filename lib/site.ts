@@ -46,6 +46,7 @@ export const GITHUB_URL = "https://github.com/peasant-labs";
 export const SITE_NAV = [
   { id: "docs", label: "docs", href: "/docs" },
   { id: "blog", label: "blog", href: "/blog" },
+  { id: "about", label: "about", href: "/about" },
 ] as const;
 
 /** the phone menu: the header's destinations and nothing more; the rest of the site is in the footer. */

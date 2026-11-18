@@ -172,17 +172,17 @@ site:
       h1: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.
       metadata:
         title: about | peasant
-        description: who we are and what peasant is for.
+        description: who builds peasant, who advises it, and how to take part.
         canonical: https://peasantlabs.org/about
         openGraph:
           title: about | peasant
-          description: who we are and what peasant is for.
+          description: who builds peasant, who advises it, and how to take part.
           url: https://peasantlabs.org/about
           type: website
         twitter:
           card: summary_large_image
           title: about | peasant
-          description: who we are and what peasant is for.
+          description: who builds peasant, who advises it, and how to take part.
     - id: contact
       path: /contact
       h1: contact
