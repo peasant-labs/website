@@ -1121,6 +1121,41 @@ test("/about leads with the owner's statement, then names the people behind peas
   }
 });
 
+test("the vision's drifting words are decoration that never widens the page or covers the statement", async ({ page }) => {
+  const { words, widths } = fixture.vision.drift;
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const field = page.locator(".lp-vision-drift");
+    // the words are all there, hidden from assistive technology and out of the pointer's way
+    await expect(field).toHaveAttribute("aria-hidden", "true");
+    await expect(field.locator(".lp-drift-word")).toHaveText(words);
+    expect(await field.evaluate((element) => getComputedStyle(element).pointerEvents)).toBe("none");
+    // drifting off either side, they never make the page scroll sideways
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), `width ${width}`).toBeLessThanOrEqual(width);
+    // the statement and the illustration each stand on a halo in the page's colour, painted between the words and them
+    for (const block of [".lp-vision-words", ".lp-vision-scene"]) {
+      const halo = await page.locator(block).evaluate((element) => {
+        const before = getComputedStyle(element, "::before");
+        return { content: before.content, background: before.backgroundColor, canvas: getComputedStyle(document.body).backgroundColor };
+      });
+      expect(halo.content, `${block} at ${width}`).not.toBe("none");
+      expect(halo.background, `${block} at ${width}`).toBe(halo.canvas);
+    }
+  }
+});
+
+test("under reduced motion the vision's words stand still", async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: "reduce" });
+  const page = await context.newPage();
+  await page.goto("/");
+  const names = await page.locator(".lp-drift-word").evaluateAll((elements) =>
+    elements.map((element) => getComputedStyle(element).animationName),
+  );
+  expect(new Set(names)).toEqual(new Set(["none"]));
+  await context.close();
+});
+
 test("whitespace, not rules, separates the sections, with generous room between them", async ({ page }) => {
   for (const [width, least] of [
     [1440, 160],

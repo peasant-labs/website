@@ -2640,6 +2640,87 @@
   margin-block-start: var(--sp-6);
 }
 
+/*
+ * The drifting words: a faint field behind the vision section. Each word crosses the section's width in its
+ * own lane at its own slow pace; the field fades out toward the edges and stays far below the text's contrast.
+ */
+.lp-vision {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.lp-vision-drift {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+  /* the field fades out at the section's sides */
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+}
+
+/*
+ * A soft halo in the page's colour behind the statement and behind the
+ * illustration, so the words pass mostly around them, not behind them. The
+ * halo is part of each block, so it follows them wherever the layout puts
+ * them, at any width.
+ */
+.lp-vision-words,
+.lp-vision-scene {
+  position: relative;
+}
+
+.lp-vision-words::before,
+.lp-vision-scene::before {
+  content: "";
+  position: absolute;
+  /* the whole block in the page's colour, with a soft shadow of the same colour carrying it past the edges */
+  inset: 0;
+  z-index: -1;
+  background: var(--canvas);
+  box-shadow: 0 0 var(--sp-6) var(--sp-5) var(--canvas);
+  pointer-events: none;
+}
+
+.lp-drift-word {
+  position: absolute;
+  inset-block-start: calc(4% + var(--lane) * 88%);
+  inset-inline-start: 0;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: calc(var(--fs-md) * var(--size));
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0.13;
+  /* still, the words rest across the field at their starting points */
+  transform: translateX(calc(-100% + (100cqw + 100%) * (0 - var(--start))));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lp-drift-word {
+    animation: lp-drift var(--pace) linear calc(var(--pace) * var(--start)) infinite var(--way);
+  }
+}
+
+/* on a phone the words are smaller, so the largest still fits beside the text rather than across it */
+@media (max-width: 47.99rem) {
+  .lp-drift-word {
+    font-size: calc(var(--fs-md) * var(--size) * 0.7);
+  }
+}
+
+@keyframes lp-drift {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100cqw);
+  }
+}
+
 /* A quiet full-width closing band pairs the invitation with its two exits. */
 .site-foot-close {
   margin-block-end: var(--sp-7);

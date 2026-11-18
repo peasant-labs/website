@@ -19,6 +19,38 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
+/*
+ * One drifting word's lane, pace and starting point, fixed by its place in the list so the server and the
+ * browser draw the same field: lanes spread top to bottom, alternate lanes run the other way, and each word
+ * starts part-way through its crossing so the field is already full when the section comes into view.
+ */
+/* the smallest step of 2 or more that visits every lane once before repeating (it shares no factor with the count) */
+function laneStep(lanes: number) {
+  const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
+  let step = 2;
+  while (step < lanes && gcd(step, lanes) !== 1) step += 1;
+  return step < lanes ? step : 1;
+}
+
+function drift(index: number) {
+  // two words share each lane, half a crossing apart, so every lane always carries one in view
+  const lanes = Math.ceil(VISION.drift.length / 2);
+  const lane = index % lanes;
+  const reverse = lane % 2 === 1;
+  // where across the section the word starts: lanes spread by the golden ratio, the lane's second word half a lap on
+  const across = ((lane * 0.618) % 1 + (index >= lanes ? 0.5 : 0)) % 1;
+  // a reversed animation runs its progress backwards, so its starting progress is the mirror of its place
+  const progress = reverse ? 1 - across : across;
+  return {
+    // lanes in an interleaved order top to bottom, so neighbouring lanes do not hold neighbouring words
+    "--lane": `${((lane * laneStep(lanes)) % lanes) / (lanes - 1)}`,
+    "--pace": `${80 + ((lane * 37) % 50)}s`,
+    "--start": `${-progress.toFixed(3)}`,
+    "--size": `${[1.1, 1.6, 1.3, 2, 1.2, 1.45, 1.75, 1.15][lane % 8]}`,
+    "--way": reverse ? "reverse" : "normal",
+  } as CSSProperties;
+}
+
 /* the place of a revealed element among its siblings: each starts a beat after the last */
 function fade(order: number) {
   return { "--fade-i": order } as CSSProperties;
@@ -127,6 +159,14 @@ export default function Home() {
         </section>
 
         <section className="lp-sec lp-vision" aria-labelledby="vision-line">
+          {/* the ideas behind the statement drift faintly across the section, behind everything else */}
+          <div className="lp-vision-drift" aria-hidden="true">
+            {VISION.drift.map((word, index) => (
+              <span key={word} className="lp-drift-word" style={drift(index)}>
+                {word}
+              </span>
+            ))}
+          </div>
           {/* the statement and its explanation read together beside the illustration */}
           <div className="site-wrap">
             <div className="lp-vision-inner">
