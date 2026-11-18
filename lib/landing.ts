@@ -367,6 +367,29 @@ export const VISION = {
     "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent is becoming part of someone else's capital.",
     "We think the work also belongs to the people who did it: everyone. Using Peasant, what you choose to give goes into a commons others can use. Help us build a traceable, open research ecosystem!",
   ],
+  /*
+   * The ideas the statement stands on, drifting faintly behind it. Decoration only: hidden from
+   * assistive technology, and still under reduced motion.
+   */
+  drift: [
+    "data leverage",
+    "data attribution",
+    "data provenance",
+    "data rights",
+    "data labor",
+    "data dignity",
+    "data commons",
+    "data consent",
+    "data sovereignty",
+    "data stewardship",
+    "data ownership",
+    "data cooperatives",
+    "data trusts",
+    "data unions",
+    "data licensing",
+    "data transparency",
+    "data anarchism",
+  ],
   cta: { label: "about us", href: "/about" },
   art: art(
     "vision3",

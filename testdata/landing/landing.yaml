@@ -286,6 +286,11 @@ thread:
 # the owner's statement, word for word: the lead line, then two paragraphs (the landing and /about)
 vision:
   artMax: 448
+  # the ideas drifting faintly behind the statement, and the screen widths at which they must stay decoration:
+  # hidden from assistive technology, never widening the page, and never painted over the statement's text
+  drift:
+    words: [data leverage, data attribution, data provenance, data rights, data labor, data dignity, data commons, data consent, data sovereignty, data stewardship, data ownership, data cooperatives, data trusts, data unions, data licensing, data transparency, data anarchism]
+    widths: [320, 390, 768, 1440]
   line: We are building a sustainable, respectful ecosystem where people have a stake in the data they produce.
   story:
     - "Peasants once worked shared land, until it was fenced off and sold. The work we do with AI is being fenced off the same way: every question, fix and judgment you make with an agent is becoming part of someone else's capital."
