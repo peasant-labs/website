@@ -110,6 +110,7 @@ export const DOCS_HOME = {
     windows: [
       "On Windows, `peasant.exe` goes to `%USERPROFILE%\\.local\\bin`. Arm devices run the x64 build.",
       "In WSL, use the first command. It installs the Linux build.",
+      "In Git Bash, MSYS2 or Cygwin, the first command installs the same `peasant.exe` to the same folder.",
     ],
   },
 
